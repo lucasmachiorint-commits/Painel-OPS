@@ -1,0 +1,855 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Capacity & FTE - Eficiência Operacional</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- FontAwesome for Premium Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Supabase SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="dark-theme">
+    <div class="app-container">
+        <!-- LEFT SIDEBAR -->
+        <nav class="sidebar">
+            <div class="sidebar-brand">
+                <div class="brand-logo">
+                    <svg width="36" height="36" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <rect width="100" height="100" fill="#043e26" rx="18" />
+                        <!-- Pink Wave -->
+                        <path d="M-10 35 C 20 15, 60 40, 110 10 L 110 -10 L -10 -10 Z" fill="#e55f91" />
+                        <!-- Orange Wave -->
+                        <path d="M-10 65 C 20 85, 70 55, 110 75 L 110 110 L -10 110 Z" fill="#eb5c27" />
+                        <!-- Stylized Monogram ea -->
+                        <path d="M38.5 24 C31 24 26 30 26 39.5 C26 49.5 32 55 39.5 55 C46.5 55 50 50.5 50.5 47 L 45 47 C44 49 42 50.5 39.5 50.5 C36.5 50.5 34.5 48.5 34.5 44 L 51 44 C51 34 47 24 38.5 24 Z M38.5 29 C42.5 29 44.5 33.5 44.5 39.5 L 34.5 39.5 C34.5 35 36 29 38.5 29 Z" fill="white" />
+                        <path d="M62.5 24 C55 24 50 29.5 50 39.5 C50 49.5 55 55 62.5 55 C66.5 55 70 52.5 71.5 48.5 L 71.5 53.5 L 77.5 53.5 L 77.5 34 C77.5 27.5 73.5 24 65.5 24 L 62.5 24 Z M63.5 29 C67.5 29 71.5 32.5 71.5 38.5 L 71.5 40.5 C71.5 46.5 67.5 50 63.5 50 C59.5 50 56.5 46 56.5 39.5 C56.5 33 59.5 29 63.5 29 Z" fill="white" />
+                        <!-- Thin text pay -->
+                        <text x="50" y="86" font-family="'Outfit', sans-serif" font-weight="400" font-size="16" fill="white" text-anchor="middle" letter-spacing="1">pay</text>
+                    </svg>
+                </div>
+                <div class="brand-text">
+                    <h1>EmanaPay</h1>
+                    <span>FTE & Capacity</span>
+                </div>
+            </div>
+            
+            <ul class="sidebar-menu">
+                <li class="menu-item active" data-view="cadastros" title="Cadastros">
+                    <i class="fa-solid fa-address-book"></i>
+                    <span>Cadastros</span>
+                </li>
+                <li class="menu-item" data-view="dashboard" title="Dashboard">
+                    <i class="fa-solid fa-chart-pie"></i>
+                    <span>Dashboard</span>
+                </li>
+                <li class="menu-item" data-view="balancing" title="Balanceamento">
+                    <i class="fa-solid fa-scale-balanced"></i>
+                    <span>Balanceamento</span>
+                </li>
+                <li class="menu-item" data-view="review" title="Revisão de Atividades" style="display: none;">
+                    <i class="fa-solid fa-clipboard-check"></i>
+                    <span>Revisão</span>
+                </li>
+                <li class="menu-item" data-view="history" title="Histórico de Volumes">
+                    <i class="fa-solid fa-chart-line"></i>
+                    <span>Histórico</span>
+                </li>
+                <li class="menu-item" data-view="access-control" data-permissao="ADMIN" title="Controle de Acesso">
+                    <i class="fa-solid fa-shield-halved"></i>
+                    <span>Acesso</span>
+                </li>
+            </ul>
+        </nav>
+
+        <!-- MAIN CONTENT AREA -->
+        <div class="main-content">
+            <!-- HEADER -->
+            <header class="app-header">
+                <div class="header-info">
+                    <h2 class="app-title" id="app-view-title">Cadastro</h2>
+                </div>
+                <div class="header-actions">
+                    <button id="btn-export-csv" class="btn btn-primary-outline" title="Exportar CSV (Excel)">
+                        <i class="fa-solid fa-file-csv"></i> Exportar Excel
+                    </button>
+                    <button id="btn-print" class="btn btn-primary" title="Imprimir / PDF">
+                        <i class="fa-solid fa-print"></i> Imprimir / PDF
+                    </button>
+                </div>
+            </header>
+
+            <main class="content-area">
+                <!-- VIEW 0: CADASTROS -->
+                <div id="view-cadastros" class="tab-view" style="display: block;">
+                    <div class="grid-2-col" style="grid-template-columns: 300px 1fr; gap: 1.5rem;">
+                        <!-- SIDEBAR: EQUIPES & RESPONSÁVEIS -->
+                        <aside style="display: flex; flex-direction: column; gap: 1.5rem;">
+                            <!-- PANELS FOR TEAMS (EQUIPES) -->
+                            <section class="panel glass-panel">
+                                <div style="display: flex; justify-content: space-between; align-items: center; width: 100%; border-bottom: 1px solid var(--border-color); padding-bottom: 0.75rem; margin-bottom: 1.25rem;">
+                                    <h2 class="panel-title" style="margin-bottom: 0; border-bottom: none; padding-bottom: 0; font-size: 1.1rem;">
+                                        <i class="fa-solid fa-users"></i> Equipes (Áreas)
+                                    </h2>
+                                    <div style="display: flex; gap: 0.5rem; align-items: center;">
+                                        <button id="btn-view-organogram" class="btn btn-secondary" style="padding: 0.3rem 0.6rem; font-size: 0.75rem; opacity: 0.5; cursor: not-allowed; background: rgba(235, 92, 39, 0.05); border: 1px solid #eb5c27; color: #eb5c27;" title="Em breve" disabled>
+                                            <i class="fa-solid fa-sitemap"></i> Ver Fluxograma
+                                        </button>
+                                        <button id="btn-open-new-team-modal" data-permissao="OPERADOR,ADMIN" onclick="openNewTeamModal()" class="btn btn-primary" style="padding: 0.3rem 0.75rem; font-size: 0.8rem;">
+                                            <i class="fa-solid fa-plus"></i> Nova Equipe
+                                        </button>
+                                    </div>
+                                </div>
+                                <div id="cadastros-teams-list" style="max-height: 280px; overflow-y: auto; display: flex; flex-direction: column; gap: 0.5rem;">
+                                    <!-- Populated dynamically -->
+                                </div>
+                            </section>
+
+                            <!-- PANELS FOR RESPONSÍVEIS -->
+                            <section class="panel glass-panel">
+                                <div style="display: flex; justify-content: space-between; align-items: center; width: 100%; border-bottom: 1px solid var(--border-color); padding-bottom: 0.75rem; margin-bottom: 1.25rem;">
+                                    <h2 class="panel-title" style="margin-bottom: 0; border-bottom: none; padding-bottom: 0; font-size: 1.1rem;">
+                                        <i class="fa-solid fa-user-tie"></i> Responsáveis
+                                    </h2>
+                                    <button id="btn-global-params" data-permissao="OPERADOR,ADMIN" class="btn btn-secondary" style="padding: 0.3rem 0.6rem; font-size: 0.75rem; background: rgba(235, 92, 39, 0.08); border: 1px solid #eb5c27; color: #eb5c27;" title="Configurar Parâmetros Padrão de Capacidade">
+                                        <i class="fa-solid fa-sliders"></i> Padrão Global
+                                    </button>
+                                </div>
+                                <div style="display: flex; flex-direction: column; gap: 0.5rem; margin-bottom: 1rem;">
+                                    <input type="text" id="input-new-responsible" data-permissao="OPERADOR,ADMIN" placeholder="Novo Responsável" style="width: 100%; padding: 0.4rem 0.8rem; border-radius: 6px; border: 1px solid var(--border-color); background: rgba(255,255,255,0.05); color: var(--text-primary);">
+                                    <div style="display: flex; gap: 0.5rem;">
+                                        <select id="select-new-responsible-team" data-permissao="OPERADOR,ADMIN" style="flex: 1; padding: 0.4rem 0.8rem; border-radius: 6px; border: 1px solid var(--border-color); background: rgba(255,255,255,0.05); color: var(--text-primary); cursor: pointer;">
+                                            <!-- Populated dynamically -->
+                                        </select>
+                                         <button id="btn-add-responsible" data-permissao="OPERADOR,ADMIN" class="btn btn-primary" style="padding: 0.4rem 1rem; white-space: nowrap;" title="Adicionar Responsável">
+                                             Adicionar
+                                         </button>
+                                    </div>
+                                </div>
+                                <div id="cadastros-responsibles-list" style="max-height: 350px; overflow-y: auto; display: flex; flex-direction: column; gap: 0.5rem;">
+                                    <!-- Populated dynamically -->
+                                </div>
+                            </section>
+                        </aside>
+
+                        <!-- MAIN: ACTIVITIES (ATIVIDADES) TABLE -->
+                        <section class="panel glass-panel table-panel">
+                            <div class="panel-header-actions" style="margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
+                                <h2 class="panel-title" style="margin-bottom: 0;">
+                                    <i class="fa-solid fa-list-check"></i> Cadastro de Atividades <span class="badge" id="cadastros-activity-count">0</span>
+                                </h2>
+                                <div class="header-table-controls" style="gap: 0.75rem; flex-wrap: wrap;">
+                                    <button id="btn-cadastros-delete-selected" data-permissao="ADMIN" class="btn btn-secondary" style="background: rgba(244, 63, 94, 0.08); border: 1px solid #f43f5e; color: #f43f5e; display: none;">
+                                        <i class="fa-solid fa-trash-can"></i> Excluir Selecionados (<span id="cadastros-selected-count">0</span>)
+                                    </button>
+                                    <input type="file" id="cadastros-import-excel-file" accept=".xlsx, .xls, .csv" style="display: none;">
+                                    <button id="btn-cadastros-import-excel" data-permissao="ADMIN" class="btn btn-secondary" style="background: rgba(16, 185, 129, 0.08); border: 1px solid #10b981; color: #10b981;">
+                                        <i class="fa-solid fa-file-import"></i> Importar Atividades
+                                    </button>
+                                    <button id="btn-cadastros-add-row" data-permissao="OPERADOR,ADMIN" class="btn btn-primary">
+                                        <i class="fa-solid fa-plus"></i> Adicionar Atividade
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="table-responsive">
+                                <table class="fte-table" id="cadastros-table">
+                                    <thead>
+                                        <tr>
+                                            <th class="col-excluir-admin" style="width: 4%; text-align: center;"><input type="checkbox" id="cadastros-select-all" data-permissao="ADMIN"></th>
+                                            <th style="width: 41%;">Nome da Atividade / Demanda</th>
+                                            <th style="width: 25%;">Equipe / Área Responsável</th>
+                                            <th style="width: 25%;">Responsável</th>
+                                            <th class="col-excluir-admin" style="width: 5%; text-align: center;">Excluir</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="cadastros-table-body">
+                                        <!-- Populated dynamically -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </section>
+                    </div>
+                </div>
+
+                <!-- VIEW 1: DASHBOARD -->
+                <div id="view-dashboard" class="tab-view" style="display: none;">
+                    <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+                        <!-- DASHBOARD MAIN PANEL -->
+                        <div class="dashboard-main" style="width: 100%;">
+                            <!-- WIDGETS -->
+                            <section class="dashboard-widgets">
+                                <div class="widget-card glass-panel count-card">
+                                    <div class="widget-icon primary-glow">
+                                        <i class="fa-solid fa-user-gear"></i>
+                                    </div>
+                                    <div class="widget-info">
+                                        <h3>FTEs Requeridos</h3>
+                                        <p class="widget-value" id="widget-fte-required">0.00</p>
+                                        <span class="widget-sub">Recursos necessários</span>
+                                    </div>
+                                </div>
+
+                                <div class="widget-card glass-panel count-card">
+                                    <div class="widget-icon secondary-glow">
+                                        <i class="fa-solid fa-list-check"></i>
+                                    </div>
+                                    <div class="widget-info">
+                                        <h3>Total de Atividades</h3>
+                                        <p class="widget-value" id="widget-activity-count">0</p>
+                                        <span class="widget-sub">Atividades cadastradas</span>
+                                    </div>
+                                </div>
+                            </section>
+
+                            <!-- PROCESSES TABLE PANEL -->
+                            <section class="panel glass-panel table-panel">
+                                <div class="panel-header-actions">
+                                    <h2 class="panel-title">
+                                        <i class="fa-solid fa-list-check"></i> Processos e Atividades <span class="badge" id="activity-count">0</span>
+                                    </h2>
+                                    <div class="header-table-controls">
+                                        <div class="filter-group">
+                                            <i class="fa-solid fa-filter"></i>
+                                            <select id="filter-area">
+                                                <option value="all">Todas as Áreas</option>
+                                                <option value="Backoffice">Backoffice</option>
+                                                <option value="Governança">Governança</option>
+                                                <option value="Seguros/N2">Seguros/N2</option>
+                                                <option value="Eficiência Operacional">Eficiência Operacional</option>
+                                            </select>
+                                        </div>
+                                        <div class="filter-group">
+                                            <i class="fa-solid fa-user-tag"></i>
+                                            <select id="filter-responsavel">
+                                                <option value="all">Todos os Responsáveis</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="table-responsive">
+                                    <table class="fte-table" id="fte-table">
+                                        <thead>
+                                            <tr>
+                                                <th style="width: 25%;">Processo / Atividade</th>
+                                                <th style="width: 15%;">Área Responsável</th>
+                                                <th style="width: 15%;">Responsável</th>
+                                                <th style="width: 12%;">Volume / Qtd. Mês</th>
+                                                <th style="width: 10%;">Tempo (Minutos)</th>
+                                                <th style="width: 13%;">Freq. Execução Mês</th>
+                                                <th style="width: 10%;">Horas / Mês</th>
+                                                <th style="width: 8%;">FTE (%)</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="table-body">
+                                            <!-- Dynamic rows go here -->
+                                        </tbody>
+                                        <tfoot>
+                                            <tr class="total-row" id="row-total-filtered" style="display: none;">
+                                                <td>Total Filtrado</td>
+                                                <td></td>
+                                                <td></td>
+                                                <td></td>
+                                                <td></td>
+                                                <td></td>
+                                                <td id="total-hours-filtered">0.0h</td>
+                                                <td class="neon-text-secondary" id="total-fte-pct-filtered">0.00%</td>
+                                            </tr>
+                                            <tr class="total-row">
+                                                <td>Total Geral</td>
+                                                <td></td>
+                                                <td></td>
+                                                <td></td>
+                                                <td></td>
+                                                <td></td>
+                                                <td id="total-hours">0.0h</td>
+                                                <td class="neon-text-secondary" id="total-fte-pct">0.00%</td>
+                                            </tr>
+                                        </tfoot>
+                                    </table>
+                                </div>
+                                
+                                <div class="empty-state-container" id="empty-state" style="display: none;">
+                                    <i class="fa-solid fa-folder-open empty-icon"></i>
+                                    <h3>Nenhum processo cadastrado</h3>
+                                    <p>Adicione um processo manualmente ou carregue o modelo de exemplo para começar.</p>
+                                    <button id="btn-empty-load-example" data-permissao="OPERADOR,ADMIN" class="btn btn-secondary">
+                                        <i class="fa-solid fa-wand-magic-sparkles"></i> Carregar Exemplo
+                                    </button>
+                                </div>
+                            </section>
+
+                            <!-- VISUALIZATION DASHBOARD -->
+                            <section class="charts-grid">
+                                <div class="panel glass-panel chart-container">
+                                    <h3 class="panel-title" id="chart-pie-title"><i class="fa-solid fa-chart-pie"></i> Distribuição de FTE por Processo</h3>
+                                    <div class="canvas-wrapper">
+                                        <canvas id="chart-pie"></canvas>
+                                    </div>
+                                </div>
+                                <div class="panel glass-panel chart-container">
+                                    <h3 class="panel-title"><i class="fa-solid fa-chart-bar"></i> Balanço de Capacidade (FTE)</h3>
+                                    <div class="canvas-wrapper">
+                                        <canvas id="chart-bar"></canvas>
+                                    </div>
+                                </div>
+                            </section>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- VIEW 2: BALANCEAMENTO -->
+                <div id="view-balancing" class="tab-view" style="display: none;">
+                    <!-- BALANCING SUMMARY WIDGETS -->
+                    <section class="dashboard-widgets">
+                        <div class="widget-card glass-panel count-card">
+                            <div class="widget-icon primary-glow" style="background: rgba(99, 102, 241, 0.15); color: #6366f1; box-shadow: 0 0 20px rgba(99, 102, 241, 0.15);">
+                                <i class="fa-solid fa-clock"></i>
+                            </div>
+                            <div class="widget-info">
+                                <h3>Total Horas Backlog</h3>
+                                <p class="widget-value" id="widget-backlog-hours">0.0h</p>
+                                <span class="widget-sub">Horas requeridas</span>
+                            </div>
+                        </div>
+
+                        <div class="widget-card glass-panel count-card">
+                            <div class="widget-icon secondary-glow">
+                                <i class="fa-solid fa-user-plus"></i>
+                            </div>
+                            <div class="widget-info">
+                                <h3>FTEs Requeridos Backlog</h3>
+                                <p class="widget-value" id="widget-backlog-fte">0.00</p>
+                                <span class="widget-sub">Recursos necessários</span>
+                            </div>
+                        </div>
+
+
+                    </section>
+                    <section class="panel glass-panel" style="margin-bottom: 1.5rem; padding: 1.25rem;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.5rem;">
+                            <h3 class="panel-title" style="margin-bottom: 0;"><i class="fa-solid fa-users-gear"></i> Recursos por Área</h3>
+                            <p style="font-size: 0.8rem; color: var(--text-secondary); margin: 0; line-height: 1.3;">
+                                Insira a quantidade de colaboradores alocados para cada equipe. Clique em um processo na tabela para focar e editar a respectiva equipe.
+                            </p>
+                        </div>
+                        <div id="area-allocations-list" class="area-allocations-row">
+                            <!-- Populated dynamically -->
+                        </div>
+                    </section>
+
+                    <!-- BALANCING PROCESSES PANEL -->
+                    <section class="panel glass-panel table-panel">
+                        <div class="panel-header-actions">
+                            <h2 class="panel-title">
+                                <i class="fa-solid fa-scale-balanced"></i> Planejamento de Backlog
+                            </h2>
+                            <div class="header-table-controls">
+                                <button id="btn-import-active-volumes" data-permissao="OPERADOR,ADMIN" class="btn btn-secondary">
+                                    <i class="fa-solid fa-arrow-down-long"></i> Importar Volumes do Dashboard
+                                </button>
+                                <button id="btn-clear-backlog-volumes" data-permissao="ADMIN" class="btn btn-secondary" style="background: rgba(244, 63, 94, 0.08); border: 1px solid #f43f5e; color: #f43f5e;">
+                                    <i class="fa-solid fa-eraser"></i> Limpar Backlog
+                                </button>
+                                <div class="filter-group">
+                                    <i class="fa-solid fa-filter"></i>
+                                    <select id="filter-area-balancing">
+                                        <option value="all">Todas as Áreas</option>
+                                        <option value="Backoffice">Backoffice</option>
+                                        <option value="Governança">Governança</option>
+                                        <option value="Seguros/N2">Seguros/N2</option>
+                                        <option value="Eficiência Operacional">Eficiência Operacional</option>
+                                    </select>
+                                </div>
+                                <div class="filter-group">
+                                    <i class="fa-solid fa-user-tag"></i>
+                                    <select id="filter-responsavel-balancing">
+                                        <option value="all">Todos os Responsáveis</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="table-responsive">
+                            <table class="fte-table" id="balancing-table">
+                                <thead>
+                                    <tr>
+                                        <th style="width: 30%;">Processo / Atividade</th>
+                                        <th style="width: 15%;">Área Responsável</th>
+                                        <th style="width: 15%;">Responsável</th>
+                                        <th style="width: 10%;">Tempo (Minutos)</th>
+                                        <th style="width: 12%;">Volume do Backlog</th>
+                                        <th style="width: 10%;">Horas Requeridas</th>
+                                        <th style="width: 8%;">FTE Requerido (%)</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="balancing-table-body">
+                                    <!-- Dynamic balancing rows go here -->
+                                </tbody>
+                                <tfoot>
+                                    <tr class="total-row" id="balancing-row-total-filtered" style="display: none;">
+                                        <td>Total Filtrado</td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td id="balancing-total-hours-filtered">0.0h</td>
+                                        <td class="neon-text-secondary" id="balancing-total-fte-pct-filtered">0.00%</td>
+                                    </tr>
+                                    <tr class="total-row">
+                                        <td>Total Geral</td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td id="balancing-total-hours">0.0h</td>
+                                        <td class="neon-text-secondary" id="balancing-total-fte-pct">0.00%</td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                        
+                        <div class="empty-state-container" id="balancing-empty-state" style="display: none;">
+                            <i class="fa-solid fa-folder-open empty-icon"></i>
+                            <h3>Nenhuma atividade cadastrada</h3>
+                            <p>Cadastre atividades no menu Dashboard para poder visualizá-las e simular backlogs aqui.</p>
+                        </div>
+                    </section>
+                </div>
+
+                <!-- VIEW 3: REVISÃO DE ATIVIDADES -->
+                <div id="view-review" class="tab-view" style="display: none;">
+                    <!-- REVIEW SUMMARY WIDGETS -->
+                    <section class="dashboard-widgets">
+                        <div class="widget-card glass-panel count-card">
+                            <div class="widget-icon success-glow" style="background: rgba(16, 185, 129, 0.15); color: #10b981; box-shadow: 0 0 20px rgba(16, 185, 129, 0.15);">
+                                <i class="fa-solid fa-circle-check"></i>
+                            </div>
+                            <div class="widget-info">
+                                <h3>Atividades a Manter</h3>
+                                <p class="widget-value" id="widget-review-manter">0</p>
+                                <span class="widget-sub">Manter a execução</span>
+                            </div>
+                        </div>
+                        <div class="widget-card glass-panel count-card">
+                            <div class="widget-icon danger-glow" style="background: rgba(244, 63, 94, 0.15); color: #f43f5e; box-shadow: 0 0 20px rgba(244, 63, 94, 0.15);">
+                                <i class="fa-solid fa-circle-xmark"></i>
+                            </div>
+                            <div class="widget-info">
+                                <h3>Atividades a Parar</h3>
+                                <p class="widget-value" id="widget-review-parar">0</p>
+                                <span class="widget-sub">Encerrar execução</span>
+                            </div>
+                        </div>
+                        <div class="widget-card glass-panel count-card">
+                            <div class="widget-icon primary-glow" style="background: rgba(99, 102, 241, 0.15); color: #6366f1; box-shadow: 0 0 20px rgba(99, 102, 241, 0.15);">
+                                <i class="fa-solid fa-circle-plus"></i>
+                            </div>
+                            <div class="widget-info">
+                                <h3>Atividades a Começar</h3>
+                                <p class="widget-value" id="widget-review-comecar">0</p>
+                                <span class="widget-sub">Novas iniciativas</span>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- REVIEW PROCESSES PANEL -->
+                    <section class="panel glass-panel table-panel">
+                        <div class="panel-header-actions">
+                            <h2 class="panel-title">
+                                <i class="fa-solid fa-clipboard-check"></i> Revisão de Atividades
+                            </h2>
+                            <div class="header-table-controls">
+                                <div class="filter-group">
+                                    <i class="fa-solid fa-filter"></i>
+                                    <select id="filter-area-review">
+                                        <option value="all">Todas as Áreas</option>
+                                        <!-- Dynamically populated options -->
+                                    </select>
+                                </div>
+                                <div class="filter-group">
+                                    <i class="fa-solid fa-user-tag"></i>
+                                    <select id="filter-responsavel-review">
+                                        <option value="all">Todos os Responsáveis</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="table-responsive">
+                            <table class="fte-table" id="review-table">
+                                <thead>
+                                    <tr>
+                                        <th style="width: 30%;">Processo / Atividade</th>
+                                        <th style="width: 20%;">Área Responsável (Equipe)</th>
+                                        <th style="width: 15%;">Responsável</th>
+                                        <th style="width: 12%;">Métrica Atual</th>
+                                        <th style="width: 8%;">FTE (%)</th>
+                                        <th style="width: 15%;">Ação de Revisão (Decisão)</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="review-table-body">
+                                    <!-- Dynamic review rows go here -->
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                        <div class="empty-state-container" id="review-empty-state" style="display: none;">
+                            <i class="fa-solid fa-folder-open empty-icon"></i>
+                            <h3>Nenhuma atividade cadastrada</h3>
+                            <p>Cadastre atividades no menu Dashboard para poder revisá-las aqui.</p>
+                        </div>
+                    </section>
+                </div>
+
+                <!-- HISTORY VIEW -->
+                <div id="view-history" class="tab-view" style="display: none;">
+                    <!-- TOP CONTROL CARD -->
+                    <section class="panel glass-panel">
+                        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+                            <div>
+                                <h3 class="panel-title" style="margin-bottom: 0.5rem;"><i class="fa-solid fa-cloud-arrow-up"></i> Salvar Registro de Demandas</h3>
+                                <p style="font-size: 0.85rem; color: var(--text-secondary); margin: 0;">
+                                    Salve o volume atual de todas as atividades para gerar o histórico de demanda ao longo dos meses.
+                                </p>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
+                                <div class="filter-group" style="margin: 0; background: rgba(255, 255, 255, 0.05); border: 1px solid var(--border-color); padding: 0.4rem 0.8rem; border-radius: 6px;">
+                                    <i class="fa-solid fa-calendar-days" style="color: var(--color-primary); margin-right: 0.5rem;"></i>
+                                    <input type="month" id="history-month-input" style="background: transparent; border: none; color: var(--text-primary); outline: none; font-size: 0.9rem; font-family: inherit;">
+                                </div>
+                                <button id="btn-save-history" data-permissao="OPERADOR,ADMIN" class="btn btn-primary">
+                                    <i class="fa-solid fa-floppy-disk"></i> Salvar Registro do Mês
+                                </button>
+                            </div>
+                        </div>
+                    </section>
+
+                    <div class="grid-2-col" style="grid-template-columns: 2fr 1fr; margin-top: 1.5rem; gap: 1.5rem;">
+                        <!-- CHART PANEL -->
+                        <section class="panel glass-panel">
+                            <div class="panel-header-actions" style="margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
+                                <h2 class="panel-title" style="margin-bottom: 0;">
+                                    <i class="fa-solid fa-chart-area"></i> Evolução de Volume de Demandas
+                                </h2>
+                                <div class="header-table-controls" style="gap: 0.75rem; flex-wrap: wrap;">
+                                    <!-- Chart Filters -->
+                                    <div class="filter-group">
+                                        <i class="fa-solid fa-users-viewfinder"></i>
+                                        <select id="filter-history-type">
+                                            <option value="atividade">Por Atividade</option>
+                                            <option value="area">Por Área</option>
+                                            <option value="responsavel">Por Responsável</option>
+                                        </select>
+                                    </div>
+                                    <div class="filter-group">
+                                        <i class="fa-solid fa-list-check"></i>
+                                        <select id="filter-history-item">
+                                            <!-- Dynamically populated -->
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="chart-container" style="height: 350px; position: relative;">
+                                <canvas id="chart-history"></canvas>
+                            </div>
+                        </section>
+
+                        <!-- SNAPSHOTS LIST PANEL -->
+                        <section class="panel glass-panel">
+                            <h2 class="panel-title" style="margin-bottom: 1rem;">
+                                <i class="fa-solid fa-clock-rotate-left"></i> Registros Salvos
+                            </h2>
+                            <div style="max-height: 350px; overflow-y: auto;" id="history-snapshots-list">
+                                <!-- Dynamically populated list of snapshots with delete buttons -->
+                            </div>
+                        </section>
+                    </div>
+                </div>
+
+                <!-- VIEW: CONTROLE DE ACESSO -->
+                <div id="view-access-control" class="tab-view" style="display: none;">
+                    <!-- WIDGETS DE RESUMO -->
+                    <section class="dashboard-widgets" style="margin-bottom: 1.5rem;">
+                        <div class="widget-card glass-panel count-card">
+                            <div class="widget-icon primary-glow">
+                                <i class="fa-solid fa-users"></i>
+                            </div>
+                            <div class="widget-info">
+                                <h3>Total de Usuários</h3>
+                                <p class="widget-value" id="widget-access-total">–</p>
+                                <span class="widget-sub">Contas cadastradas</span>
+                            </div>
+                        </div>
+                        <div class="widget-card glass-panel count-card">
+                            <div class="widget-icon" style="background: rgba(235,92,39,0.15); color: #eb5c27; box-shadow: 0 0 20px rgba(235,92,39,0.15);">
+                                <i class="fa-solid fa-user-shield"></i>
+                            </div>
+                            <div class="widget-info">
+                                <h3>Admins</h3>
+                                <p class="widget-value" id="widget-access-admin">–</p>
+                                <span class="widget-sub">Acesso total</span>
+                            </div>
+                        </div>
+                        <div class="widget-card glass-panel count-card">
+                            <div class="widget-icon" style="background: rgba(99,102,241,0.15); color: #6366f1; box-shadow: 0 0 20px rgba(99,102,241,0.15);">
+                                <i class="fa-solid fa-user-pen"></i>
+                            </div>
+                            <div class="widget-info">
+                                <h3>Operadores</h3>
+                                <p class="widget-value" id="widget-access-operador">–</p>
+                                <span class="widget-sub">Criação e edição</span>
+                            </div>
+                        </div>
+                        <div class="widget-card glass-panel count-card">
+                            <div class="widget-icon" style="background: rgba(16,185,129,0.15); color: #10b981; box-shadow: 0 0 20px rgba(16,185,129,0.15);">
+                                <i class="fa-solid fa-user-magnifying-glass"></i>
+                            </div>
+                            <div class="widget-info">
+                                <h3>Consulta</h3>
+                                <p class="widget-value" id="widget-access-consulta">–</p>
+                                <span class="widget-sub">Somente leitura</span>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- PAINEL DA TABELA DE USUÁRIOS -->
+                    <section class="panel glass-panel table-panel">
+                        <div class="panel-header-actions" style="margin-bottom: 1.5rem;">
+                            <h2 class="panel-title" style="margin-bottom: 0;">
+                                <i class="fa-solid fa-shield-halved"></i> Gestão de Perfis de Acesso
+                            </h2>
+                            <div class="header-table-controls">
+                                <button id="btn-refresh-access" class="btn btn-secondary" onclick="renderAccessControlView()" title="Atualizar lista">
+                                    <i class="fa-solid fa-rotate-right"></i> Atualizar
+                                </button>
+                            </div>
+                        </div>
+
+                        <div id="access-control-empty" style="display: none; text-align: center; padding: 3rem; color: var(--text-muted);">
+                            <i class="fa-solid fa-circle-info" style="font-size: 2rem; margin-bottom: 1rem; display: block; opacity: 0.4;"></i>
+                            <p style="font-size: 0.9rem;">Nenhum usuário encontrado. Verifique se a tabela <code>profiles</code> foi criada no Supabase.</p>
+                        </div>
+
+                        <div id="access-control-loading" style="text-align: center; padding: 3rem; color: var(--text-muted);">
+                            <i class="fa-solid fa-spinner fa-spin" style="font-size: 2rem; margin-bottom: 1rem; display: block;"></i>
+                            <p style="font-size: 0.9rem;">Carregando usuários...</p>
+                        </div>
+
+                        <div class="table-responsive" id="access-control-table-wrapper" style="display: none;">
+                            <table class="fte-table" id="access-control-table">
+                                <thead>
+                                    <tr>
+                                        <th style="width: 25%;">Nome</th>
+                                        <th style="width: 35%;">E-mail</th>
+                                        <th style="width: 20%;">Perfil</th>
+                                        <th style="width: 20%;">Cadastro</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="access-control-table-body">
+                                    <!-- Populated dynamically -->
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Info block with SQL setup instructions -->
+                        <div id="access-control-setup-info" style="display: none; margin-top: 1.5rem; background: rgba(99,102,241,0.08); border: 1px solid rgba(99,102,241,0.25); border-radius: 8px; padding: 1.25rem;">
+                            <h4 style="color: #6366f1; margin-bottom: 0.75rem; font-size: 0.95rem;"><i class="fa-solid fa-circle-info"></i> Configuração Necessária</h4>
+                            <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.75rem;">Para listar e gerenciar usuários, execute o SQL abaixo no <strong>SQL Editor</strong> do seu projeto Supabase:</p>
+                            <pre id="access-control-sql-block" style="background: rgba(0,0,0,0.3); border-radius: 6px; padding: 1rem; font-size: 0.75rem; color: #a5f3fc; overflow-x: auto; white-space: pre-wrap; line-height: 1.5;"></pre>
+                            <button class="btn btn-secondary" style="margin-top: 0.75rem; font-size: 0.8rem;" onclick="navigator.clipboard.writeText(document.getElementById('access-control-sql-block').textContent).then(() => alert('SQL copiado!'))">
+                                <i class="fa-solid fa-copy"></i> Copiar SQL
+                            </button>
+                        </div>
+                    </section>
+                </div>
+
+            </main>
+        </div>
+    </div>
+
+    <!-- MODAL FOR CAPACITY PARAMETERS -->
+    <div id="modal-parameters" class="modal-overlay" style="display: none;">
+        <div class="modal-content glass-panel" style="max-width: 450px;">
+            <div class="modal-header">
+                <h3 id="modal-param-title"><i class="fa-solid fa-sliders"></i> Parâmetros de Capacidade</h3>
+                <button class="modal-close" id="btn-close-modal-param">&times;</button>
+            </div>
+            <div class="modal-body" style="display: flex; flex-direction: column; gap: 1.25rem; padding: 1rem 0 1.5rem 0;">
+                <input type="hidden" id="modal-param-target-resp" value="">
+                
+                <!-- Input: Horas Trabalho / Dia -->
+                <div class="control-group">
+                    <div class="control-label">
+                        <span>Horas Trabalho / Dia</span>
+                        <span class="value-display" id="modal-val-horas-dia">8.0h</span>
+                    </div>
+                    <input type="range" id="modal-input-horas-dia" min="4" max="12" step="0.5" value="8">
+                    <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.2rem; display: none;" id="modal-lbl-horas-dia-pattern"></div>
+                </div>
+
+                <!-- Input: Absenteísmo / Shrinkage -->
+                <div class="control-group">
+                    <div class="control-label">
+                        <span>Absenteísmo / Shrinkage</span>
+                        <span class="value-display" id="modal-val-absenteismo">20%</span>
+                    </div>
+                    <input type="range" id="modal-input-absenteismo" min="0" max="50" step="1" value="20">
+                    <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.2rem; display: none;" id="modal-lbl-abs-pattern"></div>
+                </div>
+
+                <!-- Input: Dias Úteis no Mês -->
+                <div class="control-group">
+                    <div class="control-label">
+                        <span>Dias Úteis no Mês</span>
+                        <span class="value-display" id="modal-val-dias-uteis">21d</span>
+                    </div>
+                    <input type="range" id="modal-input-dias-uteis" min="15" max="27" step="1" value="21">
+                    <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.2rem; display: none;" id="modal-lbl-dias-pattern"></div>
+                </div>
+                
+                <!-- Calculated details -->
+                <div style="display: flex; gap: 1rem; border-top: 1px dashed var(--border-color); padding-top: 1rem; margin-top: 0.5rem;">
+                    <div style="flex: 1; display: flex; flex-direction: column; gap: 0.2rem;">
+                        <span style="font-size: 0.75rem; color: var(--text-secondary);">Real / Dia:</span>
+                        <span id="modal-calc-real-dia" style="font-size: 1.1rem; font-weight: 700; color: var(--text-primary);">6.4h</span>
+                    </div>
+                    <div style="flex: 1; display: flex; flex-direction: column; gap: 0.2rem;">
+                        <span style="font-size: 0.75rem; color: var(--text-secondary);">Capacidade Mês (1 FTE):</span>
+                        <span id="modal-calc-mes" style="font-size: 1.1rem; font-weight: 700; color: var(--color-primary);">134.4h</span>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer" style="display: flex; justify-content: flex-end; gap: 0.75rem; border-top: 1px solid var(--border-color); padding-top: 1rem;">
+                <button id="btn-modal-param-clear" data-permissao="OPERADOR,ADMIN" class="btn btn-secondary" style="display: none; background: rgba(244, 63, 94, 0.08); border: 1px solid #f43f5e; color: #f43f5e;">
+                    Usar Padrão
+                </button>
+                <button id="btn-modal-param-save" data-permissao="OPERADOR,ADMIN" class="btn btn-primary">
+                    Confirmar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Nova Equipe -->
+    <div id="modal-new-team" class="modal-overlay" style="display: none;">
+        <div class="modal-content" style="max-width: 460px; width: 95%;">
+            <div class="modal-header">
+                <h3 class="modal-title">
+                    <i class="fa-solid fa-users"></i> Nova Equipe
+                </h3>
+                <button class="modal-close" id="btn-close-new-team-modal" onclick="closeNewTeamModal()" title="Fechar">&times;</button>
+            </div>
+            <div class="modal-body" style="display: flex; flex-direction: column; gap: 1.25rem; padding: 1.5rem;">
+                <div style="display: flex; flex-direction: column; gap: 0.35rem;">
+                    <label style="font-size: 0.8rem; font-weight: 600; color: var(--text-secondary);">Nome da Equipe <span style="color: var(--color-danger);">*</span></label>
+                    <input type="text" id="modal-input-new-team" placeholder="Ex: Backoffice" style="width: 100%; padding: 0.55rem 0.85rem; border-radius: 8px; border: 1px solid var(--border-color); background: rgba(255,255,255,0.05); color: var(--text-primary); font-size: 0.95rem;">
+                </div>
+                <div style="display: flex; flex-direction: column; gap: 0.35rem;">
+                    <label style="font-size: 0.8rem; font-weight: 600; color: var(--text-secondary);">Gerência <span style="color: var(--color-danger);">*</span></label>
+                    <select id="modal-select-team-gerencia" style="width: 100%; padding: 0.55rem 0.85rem; border-radius: 8px; border: 1px solid var(--border-color); background: rgba(255,255,255,0.05); color: var(--text-primary); font-size: 0.95rem; cursor: pointer;">
+                        <option value="Suporte Operacional">Suporte Operacional</option>
+                        <option value="Conciliação e Parâmetros">Conciliação e Parâmetros</option>
+                        <option value="Atendimento">Atendimento</option>
+                    </select>
+                </div>
+                <div style="display: flex; flex-direction: column; gap: 0.35rem;">
+                    <label style="font-size: 0.8rem; font-weight: 600; color: var(--text-secondary);">Diretoria <span style="color: var(--color-danger);">*</span></label>
+                    <select id="modal-select-team-diretoria" style="width: 100%; padding: 0.55rem 0.85rem; border-radius: 8px; border: 1px solid var(--border-color); background: rgba(255,255,255,0.05); color: var(--text-primary); font-size: 0.95rem; cursor: pointer;">
+                        <option value="Operações">Operações</option>
+                    </select>
+                </div>
+                <div id="modal-new-team-error" style="display: none; color: var(--color-danger); font-size: 0.8rem; padding: 0.5rem 0.75rem; background: rgba(244,63,94,0.08); border-radius: 6px; border: 1px solid rgba(244,63,94,0.3);"></div>
+            </div>
+            <div class="modal-footer" style="display: flex; justify-content: flex-end; gap: 0.75rem; border-top: 1px solid var(--border-color); padding-top: 1rem;">
+                <button id="btn-cancel-new-team-modal" onclick="closeNewTeamModal()" class="btn btn-secondary">Cancelar</button>
+                <button id="btn-save-new-team-modal" data-permissao="OPERADOR,ADMIN" onclick="saveNewTeamFromModal()" class="btn btn-primary">
+                    <i class="fa-solid fa-check"></i> Cadastrar Equipe
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Organograma (Fluxograma de Equipes) -->
+    <div id="modal-organogram" class="modal-overlay" style="display: none;">
+        <div class="modal-content" style="max-width: 950px; width: 95%;">
+            <div class="modal-header">
+                <h3 class="modal-title">
+                    <i class="fa-solid fa-sitemap"></i> Fluxograma de Equipes (Organograma)
+                </h3>
+                <button class="modal-close" id="btn-close-organogram" title="Fechar">&times;</button>
+            </div>
+            <div class="modal-body" style="padding: 1.5rem 1rem; overflow-x: auto;">
+                <div class="tree-flowchart-container" id="organogram-flowchart-content">
+                    <!-- Populated dynamically via JS -->
+                </div>
+            </div>
+            <div class="modal-footer" style="display: flex; justify-content: flex-end; gap: 0.75rem; border-top: 1px solid var(--border-color); padding-top: 1rem;">
+                <button id="btn-close-organogram-footer" class="btn btn-secondary">
+                    Fechar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- TOP RIGHT FIXED CONTROLS -->
+    <div style="position: fixed; top: 1.5rem; right: 1.5rem; z-index: 9999; display: flex; align-items: center; gap: 0.75rem;">
+        <!-- USER CHIP -->
+        <div id="header-user-chip" style="display: flex; align-items: center; gap: 0.6rem; padding: 0.3rem 0.75rem 0.3rem 0.5rem; border-radius: 999px; background: var(--bg-glass); border: 1px solid var(--border-color); box-shadow: var(--shadow-premium); cursor: default; user-select: none; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);">
+            <i class="fa-solid fa-circle-user" style="font-size: 1.4rem; color: var(--color-primary);"></i>
+            <div style="display: flex; flex-direction: column; line-height: 1.2;">
+                <span id="userName" style="font-size: 0.82rem; font-weight: 600; color: var(--text-primary); max-width: 130px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">Usuário</span>
+                <span id="userRole" class="user-role-badge role-consulta" style="font-size: 0.68rem; padding: 0.05rem 0.4rem; margin-top: 0.1rem; width: fit-content;">CONSULTA</span>
+            </div>
+            <button id="btn-logout" onclick="handleLogout()" title="Sair do sistema" style="background: transparent; border: 1px solid var(--border-color); color: var(--text-secondary); border-radius: 6px; padding: 0.3rem 0.55rem; cursor: pointer; font-size: 0.78rem; display: flex; align-items: center; gap: 0.3rem; transition: all 0.2s; white-space: nowrap;" onmouseover="this.style.background='rgba(244,63,94,0.12)';this.style.color='#f43f5e';this.style.borderColor='rgba(244,63,94,0.3)'" onmouseout="this.style.background='transparent';this.style.color='var(--text-secondary)';this.style.borderColor='var(--border-color)'">
+                <i class="fa-solid fa-arrow-right-from-bracket"></i> Sair
+            </button>
+        </div>
+
+        <!-- Floating Theme Toggle -->
+        <button id="theme-toggle" title="Alternar Tema" style="position: static; margin: 0; box-shadow: var(--shadow-premium);">
+            <i class="fa-solid fa-sun icon-light"></i>
+            <i class="fa-solid fa-moon icon-dark"></i>
+        </button>
+    </div>
+
+    <!-- Hidden Printable Area for Clean PDF -->
+    <div id="print-area" class="print-only"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    
+    <!-- AUTH OVERLAY -->
+    <div id="auth-overlay" class="modal-overlay" style="display: flex; z-index: 9999;">
+        <div class="modal-container" style="max-width: 400px; padding: 2rem;">
+            <div style="text-align: center; margin-bottom: 2rem;">
+                <h2 style="font-size: 1.5rem; margin-bottom: 0.5rem; color: var(--text-primary);">EmanaPay</h2>
+                <p style="color: var(--text-secondary); font-size: 0.9rem;">Controle de Eficiência Operacional</p>
+            </div>
+            
+            <div id="auth-error-msg" style="display: none; background: rgba(244, 63, 94, 0.1); border: 1px solid rgba(244, 63, 94, 0.3); color: #f43f5e; padding: 0.75rem; border-radius: 6px; font-size: 0.85rem; margin-bottom: 1rem; text-align: center;"></div>
+            <div id="auth-info-msg" style="display: none; background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3); color: #10b981; padding: 0.75rem; border-radius: 6px; font-size: 0.85rem; margin-bottom: 1rem; text-align: center;"></div>
+            
+            <div style="display: flex; flex-direction: column; gap: 1rem;">
+                <input type="email" id="auth-email" placeholder="Seu e-mail" style="width: 100%; padding: 0.6rem 0.8rem; border-radius: 6px; border: 1px solid var(--border-color); background: rgba(255,255,255,0.05); color: var(--text-primary); outline: none;">
+                <input type="password" id="auth-password" placeholder="Sua senha" style="width: 100%; padding: 0.6rem 0.8rem; border-radius: 6px; border: 1px solid var(--border-color); background: rgba(255,255,255,0.05); color: var(--text-primary); outline: none;">
+                
+                <button id="btn-auth-login" onclick="handleLogin()" class="btn btn-primary" style="width: 100%; justify-content: center; padding: 0.6rem; font-size: 0.9rem; margin-top: 0.5rem;">Entrar</button>
+                <div style="text-align: center; margin: 0.5rem 0;">
+                    <span style="color: var(--text-muted); font-size: 0.8rem;">ou</span>
+                </div>
+                <button id="btn-auth-signup" onclick="handleSignup()" class="btn btn-secondary" style="width: 100%; justify-content: center; padding: 0.6rem; font-size: 0.9rem;">Criar nova conta</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
