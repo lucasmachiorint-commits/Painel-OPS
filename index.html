@@ -54,13 +54,13 @@
                     <i class="fa-solid fa-scale-balanced"></i>
                     <span>Balanceamento</span>
                 </li>
-                <li class="menu-item" data-view="review" title="Revisão de Atividades" style="display: none;">
+                <li class="menu-item" data-view="review" title="RevisÃ£o de Atividades" style="display: none;">
                     <i class="fa-solid fa-clipboard-check"></i>
-                    <span>Revisão</span>
+                    <span>RevisÃ£o</span>
                 </li>
-                <li class="menu-item" data-view="history" title="Histórico de Volumes">
+                <li class="menu-item" data-view="history" title="HistÃ³rico de Volumes">
                     <i class="fa-solid fa-chart-line"></i>
-                    <span>Histórico</span>
+                    <span>HistÃ³rico</span>
                 </li>
                 <li class="menu-item" data-view="access-control" data-permissao="ADMIN" title="Controle de Acesso">
                     <i class="fa-solid fa-shield-halved"></i>
@@ -125,8 +125,8 @@
                                     <h2 class="panel-title" style="margin-bottom: 0; border-bottom: none; padding-bottom: 0; font-size: 1.1rem;">
                                         <i class="fa-solid fa-user-tie"></i> Responsáveis
                                     </h2>
-                                    <button id="btn-global-params" data-permissao="OPERADOR,ADMIN" class="btn btn-secondary" style="padding: 0.3rem 0.6rem; font-size: 0.75rem; background: rgba(235, 92, 39, 0.08); border: 1px solid #eb5c27; color: #eb5c27;" title="Configurar Parâmetros Padrão de Capacidade">
-                                        <i class="fa-solid fa-sliders"></i> Padrão Global
+                                    <button id="btn-global-params" data-permissao="OPERADOR,ADMIN" class="btn btn-secondary" style="padding: 0.3rem 0.6rem; font-size: 0.75rem; background: rgba(235, 92, 39, 0.08); border: 1px solid #eb5c27; color: #eb5c27;" title="Configurar Parâmetros PadrÃ£o de Capacidade">
+                                        <i class="fa-solid fa-sliders"></i> PadrÃ£o Global
                                     </button>
                                 </div>
                                 <div style="display: flex; flex-direction: column; gap: 0.5rem; margin-bottom: 1rem;">
@@ -200,7 +200,7 @@
                                     <div class="widget-info">
                                         <h3>FTEs Requeridos</h3>
                                         <p class="widget-value" id="widget-fte-required">0.00</p>
-                                        <span class="widget-sub">Recursos necessários</span>
+                                        <span class="widget-sub">Recursos necessÃ¡rios</span>
                                     </div>
                                 </div>
 
@@ -335,7 +335,7 @@
                             <div class="widget-info">
                                 <h3>FTEs Requeridos Backlog</h3>
                                 <p class="widget-value" id="widget-backlog-fte">0.00</p>
-                                <span class="widget-sub">Recursos necessários</span>
+                                <span class="widget-sub">Recursos necessÃ¡rios</span>
                             </div>
                         </div>
 
@@ -472,7 +472,7 @@
                     <section class="panel glass-panel table-panel">
                         <div class="panel-header-actions">
                             <h2 class="panel-title">
-                                <i class="fa-solid fa-clipboard-check"></i> Revisão de Atividades
+                                <i class="fa-solid fa-clipboard-check"></i> RevisÃ£o de Atividades
                             </h2>
                             <div class="header-table-controls">
                                 <div class="filter-group">
@@ -500,7 +500,7 @@
                                         <th style="width: 15%;">Responsável</th>
                                         <th style="width: 12%;">Métrica Atual</th>
                                         <th style="width: 8%;">FTE (%)</th>
-                                        <th style="width: 15%;">Ação de Revisão (Decisão)</th>
+                                        <th style="width: 15%;">Ação de RevisÃ£o (Decisão)</th>
                                     </tr>
                                 </thead>
                                 <tbody id="review-table-body">
@@ -737,7 +737,7 @@
             </div>
             <div class="modal-footer" style="display: flex; justify-content: flex-end; gap: 0.75rem; border-top: 1px solid var(--border-color); padding-top: 1rem;">
                 <button id="btn-modal-param-clear" data-permissao="OPERADOR,ADMIN" class="btn btn-secondary" style="display: none; background: rgba(244, 63, 94, 0.08); border: 1px solid #f43f5e; color: #f43f5e;">
-                    Usar Padrão
+                    Usar PadrÃ£o
                 </button>
                 <button id="btn-modal-param-save" data-permissao="OPERADOR,ADMIN" class="btn btn-primary">
                     Confirmar
