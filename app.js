@@ -6,10 +6,10 @@ const SUPABASE_URL = 'https://maguyzjhldcgpcvkvkqe.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1hZ3V5empobGRjZ3Bjdmt2a3FlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQ2NTU0MDMsImV4cCI6MjEwMDIzMTQwM30.Ow9xruE1qAFTX3mqELERxrY3CRBOdV_n4MoXXhtt3Y8';
 
 let supabaseClient = null;
-let realtimeChannel = null;
+let Ã¡Ã¡realtimeChannel = null;
 if (window.supabase) {
     try {
-        supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        supabaseClient = window.supabase.cÃ¡Ã¡reateClient(SUPABASE_URL, SUPABASE_ANON_KEY);
     } catch (err) {
         console.warn('Erro ao inicializar Supabase Client:', err);
     }
@@ -67,7 +67,7 @@ function aplicarPerfilDeAcesso() {
 
     // Controla inputs editÃ¡veis para perfil CONSULTA
     const isConsulta = perfil === 'CONSULTA';
-    document.querySelectorAll('.input-volume, .input-minutes, .input-qtd, .input-backlog-volume, .input-area-allocation').forEach(el => {
+    document.querySelectorAll('.input-volume, .input-minutes, .input-qtd, .input-backlog-volume, .input-aÃ¡Ã¡rea-allocation').forEach(el => {
         el.disabled = isConsulta;
         el.style.opacity = isConsulta ? '0.5' : '1';
     });
@@ -91,8 +91,8 @@ let state = {
         teamSize: 5.0
     },
     processes: [],
-    customAreas: [],
-    areaAllocations: {}
+    customAÃ¡Ã¡Ã¡Ã¡reas: [],
+    aÃ¡Ã¡reaAllocations: {}
 };
 
 // CHART INSTANCES
@@ -101,28 +101,28 @@ let barChartInstance = null;
 
 // DEFAULT EXAMPLE DATA WITH AREAS
 const EXAMPLE_PROCESSES = [
-    { id: 'ex-1', name: 'Cancelamento DY - SolicitaÃ§Ã£o CB (Fila Projeto)', area: 'Backoffice', volume: '', minutos: 0, qtdExecucao: '', backlogVolume: '', allocatedResource: '' },
-    { id: 'ex-2', name: 'ProrrogaÃ§Ã£o', area: 'Backoffice', volume: '', minutos: 0, qtdExecucao: '', backlogVolume: '', allocatedResource: '' },
-    { id: 'ex-3', name: 'Baixa de Parcela (RobÃ´ Baixas) - Demandas BKO + Baixa em lote + Baixa manual', area: 'Backoffice', volume: '', minutos: 0, qtdExecucao: '', backlogVolume: '', allocatedResource: '' },
-    { id: 'ex-4', name: 'Improcedente DY', area: 'Backoffice', volume: '', minutos: 0, qtdExecucao: '', backlogVolume: '', allocatedResource: '' },
-    { id: 'ex-5', name: 'DevoluÃ§Ã£o de pagamento em duplicidade', area: 'Backoffice', volume: '', minutos: 0, qtdExecucao: '', backlogVolume: '', allocatedResource: '' },
-    { id: 'ex-6', name: 'Reembolso (RobÃ´ Reembolsos) Montagem Arquivo + Upload Zord + Monitoria/Retorno', area: 'Backoffice', volume: '', minutos: 0, qtdExecucao: '', backlogVolume: '', allocatedResource: '' },
-    { id: 'ex-7', name: 'Cancelamento CAPTA + Cancelamento Jira', area: 'Backoffice', volume: '', minutos: 0, qtdExecucao: '', backlogVolume: '', allocatedResource: '' },
-    { id: 'ex-8', name: 'Cancelamento SAP + Cancelamento Jira', area: 'Backoffice', volume: '', minutos: 0, qtdExecucao: '', backlogVolume: '', allocatedResource: '' },
-    { id: 'ex-9', name: 'DÃ©bitos Pag Emana Pay', area: 'Backoffice', volume: '', minutos: 0, qtdExecucao: '', backlogVolume: '', allocatedResource: '' },
-    { id: 'ex-10', name: 'Cancelamento DY - SolicitaÃ§Ã£o CB (Fila N3) + Cancelamento Jira', area: 'Backoffice', volume: '', minutos: 0, qtdExecucao: '', backlogVolume: '', allocatedResource: '' },
-    { id: 'ex-11', name: 'Pagamento nÃ£o processado', area: 'Backoffice', volume: '', minutos: 0, qtdExecucao: '', backlogVolume: '', allocatedResource: '' },
-    { id: 'ex-12', name: 'Parcela invertida', area: 'Backoffice', volume: '', minutos: 0, qtdExecucao: '', backlogVolume: '', allocatedResource: '' },
-    { id: 'ex-13', name: 'Cancelamento Parcial/AmortizaÃ§Ã£o', area: 'Backoffice', volume: '', minutos: 0, qtdExecucao: '', backlogVolume: '', allocatedResource: '' },
-    { id: 'ex-14', name: 'AmortizaÃ§Ã£o Nota de credito', area: 'Backoffice', volume: '', minutos: 0, qtdExecucao: '', backlogVolume: '', allocatedResource: '' },
-    { id: 'ex-15', name: 'Recompra (AmortizaÃ§Ã£o e Recompra Proativa)', area: 'Backoffice', volume: '', minutos: 0, qtdExecucao: '', backlogVolume: '', allocatedResource: '' },
-    { id: 'ex-16', name: 'DÃºvidas - Pagamento, CobranÃ§a e Espelhamento', area: 'Backoffice', volume: '', minutos: 0, qtdExecucao: '', backlogVolume: '', allocatedResource: '' }
+    { id: 'ex-1', name: 'Cancelamento DY - SolicitaÃ§Ã£o CB (Fila Projeto)', aÃ¡Ã¡rea: 'Backoffice', volume: '', minutos: 0, qtdExecucao: '', backlogVolume: '', allocatedResource: '' },
+    { id: 'ex-2', name: 'ProrrogaÃ§Ã£o', aÃ¡Ã¡rea: 'Backoffice', volume: '', minutos: 0, qtdExecucao: '', backlogVolume: '', allocatedResource: '' },
+    { id: 'ex-3', name: 'Baixa de Parcela (RobÃ´ Baixas) - Demandas BKO + Baixa em lote + Baixa manual', aÃ¡Ã¡rea: 'Backoffice', volume: '', minutos: 0, qtdExecucao: '', backlogVolume: '', allocatedResource: '' },
+    { id: 'ex-4', name: 'Improcedente DY', aÃ¡Ã¡rea: 'Backoffice', volume: '', minutos: 0, qtdExecucao: '', backlogVolume: '', allocatedResource: '' },
+    { id: 'ex-5', name: 'DevoluÃ§Ã£o de pagamento em duplicidade', aÃ¡Ã¡rea: 'Backoffice', volume: '', minutos: 0, qtdExecucao: '', backlogVolume: '', allocatedResource: '' },
+    { id: 'ex-6', name: 'Reembolso (RobÃ´ Reembolsos) Montagem Arquivo + Upload Zord + Monitoria/Retorno', aÃ¡Ã¡rea: 'Backoffice', volume: '', minutos: 0, qtdExecucao: '', backlogVolume: '', allocatedResource: '' },
+    { id: 'ex-7', name: 'Cancelamento CAPTA + Cancelamento Jira', aÃ¡Ã¡rea: 'Backoffice', volume: '', minutos: 0, qtdExecucao: '', backlogVolume: '', allocatedResource: '' },
+    { id: 'ex-8', name: 'Cancelamento SAP + Cancelamento Jira', aÃ¡Ã¡rea: 'Backoffice', volume: '', minutos: 0, qtdExecucao: '', backlogVolume: '', allocatedResource: '' },
+    { id: 'ex-9', name: 'DÃ©bitos Pag Emana Pay', aÃ¡Ã¡rea: 'Backoffice', volume: '', minutos: 0, qtdExecucao: '', backlogVolume: '', allocatedResource: '' },
+    { id: 'ex-10', name: 'Cancelamento DY - SolicitaÃ§Ã£o CB (Fila N3) + Cancelamento Jira', aÃ¡Ã¡rea: 'Backoffice', volume: '', minutos: 0, qtdExecucao: '', backlogVolume: '', allocatedResource: '' },
+    { id: 'ex-11', name: 'Pagamento nÃ£o processado', aÃ¡Ã¡rea: 'Backoffice', volume: '', minutos: 0, qtdExecucao: '', backlogVolume: '', allocatedResource: '' },
+    { id: 'ex-12', name: 'Parcela invertida', aÃ¡Ã¡rea: 'Backoffice', volume: '', minutos: 0, qtdExecucao: '', backlogVolume: '', allocatedResource: '' },
+    { id: 'ex-13', name: 'Cancelamento Parcial/AmortizaÃ§Ã£o', aÃ¡Ã¡rea: 'Backoffice', volume: '', minutos: 0, qtdExecucao: '', backlogVolume: '', allocatedResource: '' },
+    { id: 'ex-14', name: 'AmortizaÃ§Ã£o Nota de credito', aÃ¡Ã¡rea: 'Backoffice', volume: '', minutos: 0, qtdExecucao: '', backlogVolume: '', allocatedResource: '' },
+    { id: 'ex-15', name: 'Recompra (AmortizaÃ§Ã£o e Recompra Proativa)', aÃ¡Ã¡rea: 'Backoffice', volume: '', minutos: 0, qtdExecucao: '', backlogVolume: '', allocatedResource: '' },
+    { id: 'ex-16', name: 'DÃºvidas - Pagamento, CobranÃ§a e Espelhamento', aÃ¡Ã¡rea: 'Backoffice', volume: '', minutos: 0, qtdExecucao: '', backlogVolume: '', allocatedResource: '' }
 ];
 
 function getSupabase() {
-    if (!supabaseClient && window.supabase && typeof window.supabase.createClient === 'function') {
+    if (!supabaseClient && window.supabase && typeof window.supabase.cÃ¡Ã¡reateClient === 'function') {
         try {
-            supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+            supabaseClient = window.supabase.cÃ¡Ã¡reateClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         } catch (err) {
             console.error('Erro ao inicializar Supabase Client:', err);
         }
@@ -234,7 +234,7 @@ async function handleSignup() {
             } else if (data.user) {
                 showAuthInfo("Conta criada com sucesso! Se a confirmaÃ§Ã£o de e-mail estiver ativa no seu projeto Supabase, verifique sua caixa de entrada para ativar a conta.");
             } else {
-                showAuthInfo("Cadastro realizado com sucesso.");
+                showAuthInfo("Cadastro Ã¡Ã¡realizado com sucesso.");
             }
         }
     } catch (err) {
@@ -403,7 +403,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         showAuthError("Aviso: Configure o SUPABASE_URL e SUPABASE_ANON_KEY no app.js para utilizar a autenticação.");
     }
     
-    renderAreaFilterOptions();
+    renderAÃ¡Ã¡reaFilterOptions();
     renderResponsavelFilterOptions();
     renderCadastrosView();
     renderTable();
@@ -416,7 +416,7 @@ function showToast(message, type = 'info', duration = 5000) {
     const container = document.getElementById('toast-container');
     if (!container) return;
 
-    const toast = document.createElement('div');
+    const toast = document.cÃ¡Ã¡reateElement('div');
     toast.style.cssText = `
         pointer-events: auto;
         padding: 0.75rem 1rem;
@@ -446,7 +446,7 @@ function showToast(message, type = 'info', duration = 5000) {
 
 // REALTIME STATUS UI INDICATOR
 function updateRealtimeStatusUI(status, customMessage) {
-    const badge = document.getElementById('realtime-status-badge');
+    const badge = document.getElementById('Ã¡Ã¡realtime-status-badge');
     if (!badge) return;
 
     const dot = badge.querySelector('.status-dot');
@@ -459,11 +459,11 @@ function updateRealtimeStatusUI(status, customMessage) {
     } else if (status === 'CONNECTING') {
         if (dot) dot.style.background = '#eab308'; // Yellow
         if (text) text.textContent = 'Conectando...';
-        badge.title = 'Conectando ao canal de tempo real...';
+        badge.title = 'Conectando ao canal de tempo Ã¡Ã¡real...';
     } else if (status === 'ERROR' || status === 'CLOSED' || status === 'CHANNEL_ERROR') {
         if (dot) dot.style.background = '#ef4444'; // Red
         if (text) text.textContent = customMessage || 'Offline (Local)';
-        badge.title = 'Sem sincronização remota em tempo real. Verifique se a tabela board_state existe no Supabase.';
+        badge.title = 'Sem sincronização remota em tempo Ã¡Ã¡real. Verifique se a tabela board_state existe no Supabase.';
     }
 }
 
@@ -473,7 +473,7 @@ function refreshAllViews() {
     renderTable();
     renderBalancingTable();
     renderReviewTable();
-    renderAreaFilterOptions();
+    renderAÃ¡Ã¡reaFilterOptions();
     renderResponsavelFilterOptions();
     aplicarPerfilDeAcesso();
 }
@@ -483,14 +483,14 @@ function subscribeRealtime() {
     const client = getSupabase();
     if (!client) return;
 
-    if (realtimeChannel) {
-        client.removeChannel(realtimeChannel);
-        realtimeChannel = null;
+    if (Ã¡Ã¡realtimeChannel) {
+        client.removeChannel(Ã¡Ã¡realtimeChannel);
+        Ã¡Ã¡realtimeChannel = null;
     }
 
     updateRealtimeStatusUI('CONNECTING');
 
-    realtimeChannel = client
+    Ã¡Ã¡realtimeChannel = client
         .channel('board-changes')
         .on('postgres_changes', {
             event: '*',
@@ -510,7 +510,7 @@ function subscribeRealtime() {
                 applyStateMigrations();
                 localStorage.setItem('capacity_fte_hub_state', JSON.stringify(state));
                 refreshAllViews();
-                showToast('⚡ O painel foi atualizado em tempo real por outro usuário!', 'info', 4000);
+                showToast('⚡ O painel foi atualizado em tempo Ã¡Ã¡real por outro usuário!', 'info', 4000);
             }
         })
         .subscribe((status, err) => {
@@ -519,7 +519,7 @@ function subscribeRealtime() {
                 updateRealtimeStatusUI('SUBSCRIBED');
             } else if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
                 updateRealtimeStatusUI('ERROR', 'Erro Realtime');
-                console.warn('[Realtime Error] Certifique-se de que a publicação Realtime está ativa no Supabase (ALTER PUBLICATION supabase_realtime ADD TABLE board_state).');
+                console.warn('[Realtime Error] Certifique-se de que a publicação Realtime está ativa no Supabase (ALTER PUBLICATION supabase_Ã¡Ã¡realtime ADD TABLE board_state).');
             } else if (status === 'CLOSED') {
                 updateRealtimeStatusUI('ERROR', 'Desconectado');
             }
@@ -528,9 +528,9 @@ function subscribeRealtime() {
 
 function unsubscribeRealtime() {
     const client = getSupabase();
-    if (realtimeChannel && client) {
-        client.removeChannel(realtimeChannel);
-        realtimeChannel = null;
+    if (Ã¡Ã¡realtimeChannel && client) {
+        client.removeChannel(Ã¡Ã¡realtimeChannel);
+        Ã¡Ã¡realtimeChannel = null;
         updateRealtimeStatusUI('CLOSED');
         console.log('[Realtime] Canal desconectado.');
     }
@@ -578,7 +578,7 @@ async function forceResetGlobalState() {
         return;
     }
 
-    if (!confirm('Deseja realmente definir e publicar a sua visão atual como a base oficial para TODOS os usuários? Isso sincronizará a tela de todos imediatamente.')) {
+    if (!confirm('Deseja Ã¡Ã¡realmente definir e publicar a sua visão atual como a base oficial para TODOS os usuários? Isso sincronizará a tela de todos imediatamente.')) {
         return;
     }
 
@@ -648,13 +648,13 @@ async function loadStateFromSupabase() {
 // STATE MIGRATIONS HELPER
 function applyStateMigrations() {
     if (!state) return;
-    if (!state.customAreas) state.customAreas = [];
-    if (!state.areaAllocations) state.areaAllocations = {};
+    if (!state.customAÃ¡Ã¡Ã¡Ã¡reas) state.customAÃ¡Ã¡Ã¡Ã¡reas = [];
+    if (!state.aÃ¡Ã¡reaAllocations) state.aÃ¡Ã¡reaAllocations = {};
     if (!state.processes) state.processes = [];
 
     state.processes.forEach(p => {
         const match = EXAMPLE_PROCESSES.find(ep => ep.name === p.name);
-        if (match) p.area = 'Backoffice';
+        if (match) p.aÃ¡Ã¡rea = 'Backoffice';
         if (p.backlogVolume === undefined) p.backlogVolume = '';
         if (p.allocatedResource === undefined) p.allocatedResource = '';
         if (p.reviewStatus === undefined) p.reviewStatus = 'Manter';
@@ -662,8 +662,8 @@ function applyStateMigrations() {
     });
     if (state.history === undefined) state.history = [];
     if (state.teams === undefined) {
-        if (state.customAreas && state.customAreas.length > 0) {
-            state.teams = ['Backoffice', 'Governança', 'Seguros/N2', 'Eficiência Operacional', ...state.customAreas];
+        if (state.customAÃ¡Ã¡Ã¡Ã¡reas && state.customAÃ¡Ã¡Ã¡Ã¡reas.length > 0) {
+            state.teams = ['Backoffice', 'Governança', 'Seguros/N2', 'Eficiência Operacional', ...state.customAÃ¡Ã¡Ã¡Ã¡reas];
         } else {
             state.teams = ['Backoffice', 'Governança', 'Seguros/N2', 'Eficiência Operacional'];
         }
@@ -687,20 +687,20 @@ function applyStateMigrations() {
         const uniqueResps = [...new Set(state.processes.map(p => p.responsavel || '').filter(r => r.trim() !== ''))].sort();
         state.responsaveis = uniqueResps.map(r => {
             const procWithResp = state.processes.find(p => p.responsavel === r);
-            const inheritedArea = procWithResp ? procWithResp.area : '';
-            return { name: r, area: inheritedArea, horasDia: null, absenteismo: null, diasUteis: null };
+            const inheritedAÃ¡Ã¡rea = procWithResp ? procWithResp.aÃ¡Ã¡rea : '';
+            return { name: r, aÃ¡Ã¡rea: inheritedAÃ¡Ã¡rea, horasDia: null, absenteismo: null, diasUteis: null };
         });
     } else if (Array.isArray(state.responsaveis) && state.responsaveis.length > 0 && typeof state.responsaveis[0] === 'string') {
         state.responsaveis = state.responsaveis.map(r => {
             const procWithResp = state.processes.find(p => p.responsavel === r);
-            const inheritedArea = procWithResp ? procWithResp.area : '';
-            return { name: r, area: inheritedArea, horasDia: null, absenteismo: null, diasUteis: null };
+            const inheritedAÃ¡Ã¡rea = procWithResp ? procWithResp.aÃ¡Ã¡rea : '';
+            return { name: r, aÃ¡Ã¡rea: inheritedAÃ¡Ã¡rea, horasDia: null, absenteismo: null, diasUteis: null };
         });
     } else if (Array.isArray(state.responsaveis)) {
         state.responsaveis.forEach(r => {
-            if (r && typeof r === 'object' && r.area === undefined) {
+            if (r && typeof r === 'object' && r.aÃ¡Ã¡rea === undefined) {
                 const procWithResp = state.processes.find(p => p.responsavel === r.name);
-                r.area = procWithResp ? procWithResp.area : '';
+                r.aÃ¡Ã¡rea = procWithResp ? procWithResp.aÃ¡Ã¡rea : '';
             }
         });
     } else {
@@ -733,14 +733,14 @@ function loadState() {
 
     if (useDefaults) {
         state.processes = JSON.parse(JSON.stringify(EXAMPLE_PROCESSES));
-        state.customAreas = [];
-        state.areaAllocations = {};
+        state.customAÃ¡Ã¡Ã¡Ã¡reas = [];
+        state.aÃ¡Ã¡reaAllocations = {};
         state.teams = ['Backoffice', 'Governança', 'Seguros/N2', 'Eficiência Operacional'];
         const uniqueResps = [...new Set(state.processes.map(p => p.responsavel || '').filter(r => r.trim() !== ''))].sort();
         state.responsaveis = uniqueResps.map(r => {
             const procWithResp = state.processes.find(p => p.responsavel === r);
-            const inheritedArea = procWithResp ? procWithResp.area : '';
-            return { name: r, area: inheritedArea, horasDia: null, absenteismo: null, diasUteis: null };
+            const inheritedAÃ¡Ã¡rea = procWithResp ? procWithResp.aÃ¡Ã¡rea : '';
+            return { name: r, aÃ¡Ã¡rea: inheritedAÃ¡Ã¡rea, horasDia: null, absenteismo: null, diasUteis: null };
         });
         state.history = [];
         state.params = {
@@ -851,7 +851,7 @@ function saveNewTeamFromModal() {
     saveState();
     if (modal) modal.style.display = 'none';
     renderCadastrosView();
-    renderAreaFilterOptions();
+    renderAÃ¡Ã¡reaFilterOptions();
     renderTable();
     renderBalancingTable();
     renderReviewTable();
@@ -930,7 +930,7 @@ function setupEventListeners() {
             const idsToDelete = [...checkedBoxes].map(cb => cb.dataset.id);
             if (idsToDelete.length === 0) return;
             
-            if (confirm(`Deseja realmente excluir as ${idsToDelete.length} atividades selecionadas?`)) {
+            if (confirm(`Deseja Ã¡Ã¡realmente excluir as ${idsToDelete.length} atividades selecionadas?`)) {
                 state.processes = state.processes.filter(p => !idsToDelete.includes(p.id));
                 saveState();
                 
@@ -965,10 +965,10 @@ function setupEventListeners() {
         });
     }
 
-    // Area & Owner filter triggers
-    const filterAreaEl = document.getElementById('filter-area');
-    if (filterAreaEl) {
-        filterAreaEl.addEventListener('change', () => {
+    // AÃ¡Ã¡rea & Owner filter triggers
+    const filterAÃ¡Ã¡reaEl = document.getElementById('filter-aÃ¡Ã¡rea');
+    if (filterAÃ¡Ã¡reaEl) {
+        filterAÃ¡Ã¡reaEl.addEventListener('change', () => {
             renderTable();
         });
     }
@@ -980,9 +980,9 @@ function setupEventListeners() {
         });
     }
 
-    const filterAreaBalEl = document.getElementById('filter-area-balancing');
-    if (filterAreaBalEl) {
-        filterAreaBalEl.addEventListener('change', () => {
+    const filterAÃ¡Ã¡reaBalEl = document.getElementById('filter-aÃ¡Ã¡rea-balancing');
+    if (filterAÃ¡Ã¡reaBalEl) {
+        filterAÃ¡Ã¡reaBalEl.addEventListener('change', () => {
             renderBalancingTable();
         });
     }
@@ -994,9 +994,9 @@ function setupEventListeners() {
         });
     }
 
-    const filterAreaRevEl = document.getElementById('filter-area-review');
-    if (filterAreaRevEl) {
-        filterAreaRevEl.addEventListener('change', () => {
+    const filterAÃ¡Ã¡reaRevEl = document.getElementById('filter-aÃ¡Ã¡rea-review');
+    if (filterAÃ¡Ã¡reaRevEl) {
+        filterAÃ¡Ã¡reaRevEl.addEventListener('change', () => {
             renderReviewTable();
         });
     }
@@ -1052,7 +1052,7 @@ function setupEventListeners() {
         
         state.responsaveis.push({
             name: respName,
-            area: selectedTeam || '',
+            aÃ¡Ã¡rea: selectedTeam || '',
             horasDia: null,
             absenteismo: null,
             diasUteis: null
@@ -1167,16 +1167,16 @@ function setupEventListeners() {
 function renderTable() {
     const tableBody = document.getElementById('table-body');
     const emptyState = document.getElementById('empty-state');
-    const filterValue = document.getElementById('filter-area').value;
+    const filterValue = document.getElementById('filter-aÃ¡Ã¡rea').value;
     const respFilter = document.getElementById('filter-responsavel').value;
     
     if (!tableBody) return;
     tableBody.innerHTML = '';
     
     const filteredProcesses = state.processes.filter(p => {
-        const areaMatch = filterValue === 'all' || p.area === filterValue;
+        const aÃ¡Ã¡reaMatch = filterValue === 'all' || p.aÃ¡Ã¡rea === filterValue;
         const respMatch = respFilter === 'all' || p.responsavel === respFilter;
-        return areaMatch && respMatch;
+        return aÃ¡Ã¡reaMatch && respMatch;
     });
 
     if (filteredProcesses.length === 0) {
@@ -1187,7 +1187,7 @@ function renderTable() {
             emptyState.style.display = 'none';
             document.getElementById('fte-table').style.display = 'table';
             
-            const tr = document.createElement('tr');
+            const tr = document.cÃ¡Ã¡reateElement('tr');
             tr.innerHTML = `<td colspan="8" style="text-align: center; color: var(--text-muted); padding: 2rem;">Nenhuma atividade cadastrada nesta busca/filtro.</td>`;
             tableBody.appendChild(tr);
         }
@@ -1199,7 +1199,7 @@ function renderTable() {
     }
 
     filteredProcesses.forEach((proc) => {
-        const tr = document.createElement('tr');
+        const tr = document.cÃ¡Ã¡reateElement('tr');
         tr.dataset.id = proc.id;
         if (proc.reviewStatus === 'Parar') {
             tr.className = 'row-review-stopped';
@@ -1213,7 +1213,7 @@ function renderTable() {
                 </div>
             </td>
             <td>
-                <span class="badge-area" style="font-size: 0.85rem; padding: 0.25rem 0.5rem; border-radius: 4px; background: rgba(235, 92, 39, 0.08); color: var(--color-primary); border: 1px solid rgba(235, 92, 39, 0.15);">${escapeHtml(proc.area || 'Sem Equipe')}</span>
+                <span class="badge-aÃ¡Ã¡rea" style="font-size: 0.85rem; padding: 0.25rem 0.5rem; border-radius: 4px; background: rgba(235, 92, 39, 0.08); color: var(--color-primary); border: 1px solid rgba(235, 92, 39, 0.15);">${escapeHtml(proc.aÃ¡Ã¡rea || 'Sem Equipe')}</span>
             </td>
             <td>
                 <span style="font-size: 0.9rem; color: var(--text-secondary);">${escapeHtml(proc.responsavel || 'Sem ResponsÃ¡vel')}</span>
@@ -1271,15 +1271,15 @@ function renderTable() {
 function renderBalancingTable() {
     const balancingBody = document.getElementById('balancing-table-body');
     const emptyState = document.getElementById('balancing-empty-state');
-    const filterValue = document.getElementById('filter-area-balancing').value;
+    const filterValue = document.getElementById('filter-aÃ¡Ã¡rea-balancing').value;
     
     balancingBody.innerHTML = '';
     
     const respFilter = document.getElementById('filter-responsavel-balancing').value;
     const filteredProcesses = state.processes.filter(p => {
-        const areaMatch = filterValue === 'all' || p.area === filterValue;
+        const aÃ¡Ã¡reaMatch = filterValue === 'all' || p.aÃ¡Ã¡rea === filterValue;
         const respMatch = respFilter === 'all' || p.responsavel === respFilter;
-        return areaMatch && respMatch;
+        return aÃ¡Ã¡reaMatch && respMatch;
     });
 
     if (filteredProcesses.length === 0) {
@@ -1290,7 +1290,7 @@ function renderBalancingTable() {
             emptyState.style.display = 'none';
             document.getElementById('balancing-table').style.display = 'table';
             
-            const tr = document.createElement('tr');
+            const tr = document.cÃ¡Ã¡reateElement('tr');
             tr.innerHTML = `<td colspan="7" style="text-align: center; color: var(--text-muted); padding: 2rem;">Nenhuma atividade cadastrada nesta busca/filtro.</td>`;
             balancingBody.appendChild(tr);
         }
@@ -1302,7 +1302,7 @@ function renderBalancingTable() {
     }
 
     filteredProcesses.forEach(proc => {
-        const tr = document.createElement('tr');
+        const tr = document.cÃ¡Ã¡reateElement('tr');
         tr.dataset.id = proc.id;
         tr.style.cursor = 'pointer';
         if (proc.reviewStatus === 'Parar') {
@@ -1334,7 +1334,7 @@ function renderBalancingTable() {
             </td>
             <td>
                 <span class="badge" style="margin-left: 0; background: rgba(235, 92, 39, 0.15); border: 1px solid var(--color-primary); color: var(--color-primary); box-shadow: none;">
-                    ${escapeHtml(proc.area)}
+                    ${escapeHtml(proc.aÃ¡Ã¡rea)}
                 </span>
             </td>
             <td>
@@ -1360,7 +1360,7 @@ function renderBalancingTable() {
             }
         }
         
-        // Click event to highlight corresponding area card on the right (ignore for ResponsÃ¡vel and Backlog inputs)
+        // Click event to highlight corresponding aÃ¡Ã¡rea card on the right (ignore for ResponsÃ¡vel and Backlog inputs)
         tr.addEventListener('click', (e) => {
             const td = e.target.closest('td');
             if (!td) return;
@@ -1370,8 +1370,8 @@ function renderBalancingTable() {
                 return;
             }
             
-            const areaName = proc.area;
-            highlightAndFocusArea(areaName);
+            const aÃ¡Ã¡reaName = proc.aÃ¡Ã¡rea;
+            highlightAndFocusAÃ¡Ã¡rea(aÃ¡Ã¡reaName);
         });
         
         balancingBody.appendChild(tr);
@@ -1380,16 +1380,16 @@ function renderBalancingTable() {
     updateBalancingCalculations();
 }
 
-function highlightAndFocusArea(areaName) {
-    document.querySelectorAll('.area-alloc-card').forEach(card => {
+function highlightAndFocusAÃ¡Ã¡rea(aÃ¡Ã¡reaName) {
+    document.querySelectorAll('.aÃ¡Ã¡rea-alloc-card').forEach(card => {
         card.classList.remove('active-highlight');
     });
     
-    const card = document.querySelector(`.area-alloc-card[data-area="${areaName}"]`);
+    const card = document.querySelector(`.aÃ¡Ã¡rea-alloc-card[data-aÃ¡Ã¡rea="${aÃ¡Ã¡reaName}"]`);
     if (card) {
         card.classList.add('active-highlight');
         card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-        const input = card.querySelector('.input-area-allocation');
+        const input = card.querySelector('.input-aÃ¡Ã¡rea-allocation');
         if (input) {
             input.focus();
             input.select();
@@ -1418,13 +1418,13 @@ function updateCalculations() {
     const horasDia = state.params.horasDia;
     const absenteismo = state.params.absenteismo / 100;
     const diasUteis = state.params.diasUteis;
-    const filterValue = document.getElementById('filter-area').value;
+    const filterValue = document.getElementById('filter-aÃ¡Ã¡rea').value;
 
     const horasRealDia = horasDia * (1 - absenteismo);
     const horasTrabalhoMes = horasRealDia * diasUteis;
 
-    // Render global read-only parameter fields
-    const elHorasReal = document.getElementById('val-horas-real');
+    // Render global Ã¡Ã¡read-only parameter fields
+    const elHorasReal = document.getElementById('val-horas-Ã¡Ã¡real');
     if (elHorasReal) elHorasReal.textContent = horasRealDia.toFixed(1) + 'h';
     
     const elHorasMes = document.getElementById('val-horas-mes');
@@ -1551,7 +1551,7 @@ function updateCalculations() {
 // UPDATE BALANCE LOGIC & CALCULATIONS (BALANCEAMENTO TAB)
 function updateBalancingCalculations() {
     const teamSize = state.params.teamSize;
-    const filterValue = document.getElementById('filter-area-balancing').value;
+    const filterValue = document.getElementById('filter-aÃ¡Ã¡rea-balancing').value;
 
     let totalHoursAccum = 0;
     let totalFtePctAccum = 0;
@@ -1648,15 +1648,15 @@ function updateBalancingCalculations() {
 
 
 
-    // Update Area Allocations Side Panel
-    renderAreaAllocations();
+    // Update AÃ¡Ã¡rea Allocations Side Panel
+    renderAÃ¡Ã¡reaAllocations();
 }
 
-function renderAreaAllocations() {
-    const listContainer = document.getElementById('area-allocations-list');
+function renderAÃ¡Ã¡reaAllocations() {
+    const listContainer = document.getElementById('aÃ¡Ã¡rea-allocations-list');
     if (!listContainer) return;
     
-    const areas = ['Backoffice', 'GovernanÃ§a', 'Seguros/N2', 'EficiÃªncia Operacional', ...state.customAreas];
+    const aÃ¡Ã¡Ã¡Ã¡reas = ['Backoffice', 'GovernanÃ§a', 'Seguros/N2', 'EficiÃªncia Operacional', ...state.customAÃ¡Ã¡Ã¡Ã¡reas];
     
     const horasDia = state.params.horasDia;
     const absenteismo = state.params.absenteismo / 100;
@@ -1664,18 +1664,18 @@ function renderAreaAllocations() {
     const diasUteis = state.params.diasUteis;
     
     // Check if we need to do a full rebuild or if we can just update in place
-    const existingCards = listContainer.querySelectorAll('.area-alloc-card');
-    const needsFullRebuild = existingCards.length !== areas.length;
+    const existingCards = listContainer.querySelectorAll('.aÃ¡Ã¡rea-alloc-card');
+    const needsFullRebuild = existingCards.length !== aÃ¡Ã¡Ã¡Ã¡reas.length;
     
     if (needsFullRebuild) {
         listContainer.innerHTML = '';
     }
     
-    areas.forEach(areaName => {
-        let areaDailyHours = 0;
+    aÃ¡Ã¡Ã¡Ã¡reas.forEach(aÃ¡Ã¡reaName => {
+        let aÃ¡Ã¡reaDailyHours = 0;
         
         state.processes.forEach(proc => {
-            if (proc.area !== areaName) return;
+            if (proc.aÃ¡Ã¡rea !== aÃ¡Ã¡reaName) return;
             if (proc.reviewStatus === 'Parar') return;
             
             const isTempoFrequencia = proc.qtdExecucao !== null && proc.qtdExecucao !== '' && parseFloat(proc.qtdExecucao) > 0;
@@ -1683,17 +1683,17 @@ function renderAreaAllocations() {
             
             if (isTempoFrequencia) {
                 const qtdExec = parseFloat(proc.qtdExecucao) || 0;
-                areaDailyHours += (qtdExec * minutes) / 60 / diasUteis;
+                aÃ¡Ã¡reaDailyHours += (qtdExec * minutes) / 60 / diasUteis;
             } else {
                 const hasBacklog = proc.backlogVolume !== undefined && proc.backlogVolume !== '';
                 const backlogVol = hasBacklog ? parseFloat(proc.backlogVolume) : 0;
-                areaDailyHours += (backlogVol * minutes) / 60;
+                aÃ¡Ã¡reaDailyHours += (backlogVol * minutes) / 60;
             }
         });
         
-        const requiredFte = horasRealDia > 0 ? (areaDailyHours / horasRealDia) : 0;
+        const requiredFte = horasRealDia > 0 ? (aÃ¡Ã¡reaDailyHours / horasRealDia) : 0;
         
-        const allocatedNum = (state.responsaveis || []).filter(r => r.area === areaName).length;
+        const allocatedNum = (state.responsaveis || []).filter(r => r.aÃ¡Ã¡rea === aÃ¡Ã¡reaName).length;
         
         let statusHtml = '';
         if (allocatedNum === 0) {
@@ -1715,39 +1715,39 @@ function renderAreaAllocations() {
         
         if (!needsFullRebuild) {
             // Update in place to preserve input focus
-            const card = listContainer.querySelector(`.area-alloc-card[data-area="${areaName}"]`);
+            const card = listContainer.querySelector(`.aÃ¡Ã¡rea-alloc-card[data-aÃ¡Ã¡rea="${aÃ¡Ã¡reaName}"]`);
             if (card) {
-                const header = card.querySelector('.area-alloc-header');
+                const header = card.querySelector('.aÃ¡Ã¡rea-alloc-header');
                 if (header) {
-                    header.innerHTML = `<span class="area-alloc-name">${escapeHtml(areaName)}</span> ${statusHtml}`;
+                    header.innerHTML = `<span class="aÃ¡Ã¡rea-alloc-name">${escapeHtml(aÃ¡Ã¡reaName)}</span> ${statusHtml}`;
                 }
-                const statVal = card.querySelector('.area-alloc-stat span');
+                const statVal = card.querySelector('.aÃ¡Ã¡rea-alloc-stat span');
                 if (statVal) {
                     statVal.textContent = requiredFte.toFixed(2);
                 }
-                const allocValDiv = card.querySelector('.area-allocation-value');
+                const allocValDiv = card.querySelector('.aÃ¡Ã¡rea-allocation-value');
                 if (allocValDiv) {
                     allocValDiv.textContent = allocatedNum;
                 }
             }
         } else {
-            // Create new card
-            const card = document.createElement('div');
-            card.className = 'area-alloc-card';
-            card.dataset.area = areaName;
+            // CÃ¡Ã¡reate new card
+            const card = document.cÃ¡Ã¡reateElement('div');
+            card.className = 'aÃ¡Ã¡rea-alloc-card';
+            card.dataset.aÃ¡Ã¡rea = aÃ¡Ã¡reaName;
             
             card.innerHTML = `
-                <div class="area-alloc-header">
-                    <span class="area-alloc-name">${escapeHtml(areaName)}</span>
+                <div class="aÃ¡Ã¡rea-alloc-header">
+                    <span class="aÃ¡Ã¡rea-alloc-name">${escapeHtml(aÃ¡Ã¡reaName)}</span>
                     ${statusHtml}
                 </div>
-                <div class="area-alloc-body">
-                    <div class="area-alloc-stat">
+                <div class="aÃ¡Ã¡rea-alloc-body">
+                    <div class="aÃ¡Ã¡rea-alloc-stat">
                         FTE Requerido: <span>${requiredFte.toFixed(2)}</span>
                     </div>
                     <div style="display: flex; align-items: center; gap: 0.5rem;">
                         <span style="font-size: 0.75rem; color: var(--text-secondary);">Alocado:</span>
-                        <div class="area-allocation-value" style="padding: 0.2rem 0.6rem; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 4px; font-weight: 500; font-size: 0.9rem; min-width: 40px; text-align: center;">
+                        <div class="aÃ¡Ã¡rea-allocation-value" style="padding: 0.2rem 0.6rem; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 4px; font-weight: 500; font-size: 0.9rem; min-width: 40px; text-align: center;">
                             ${allocatedNum}
                         </div>
                     </div>
@@ -1763,12 +1763,12 @@ function renderAreaAllocations() {
 function addNewProcess() {
     if (!verificarPermissao('OPERADOR')) { alert('Acesso negado: Perfil OPERADOR necessÃ¡rio.'); return; }
     const newId = 'proc-' + Date.now();
-    const defaultArea = state.teams.length > 0 ? state.teams[0] : '';
+    const defaultAÃ¡Ã¡rea = state.teams.length > 0 ? state.teams[0] : '';
     
     state.processes.push({
         id: newId,
         name: `Nova Atividade ${state.processes.length + 1}`,
-        area: defaultArea,
+        aÃ¡Ã¡rea: defaultAÃ¡Ã¡rea,
         responsavel: '',
         volume: '',
         minutos: 0,
@@ -1798,7 +1798,7 @@ function duplicateProcess(proc) {
     state.processes.push({
         id: newId,
         name: `${proc.name} (CÃ³pia)`,
-        area: proc.area,
+        aÃ¡Ã¡rea: proc.aÃ¡Ã¡rea,
         volume: proc.volume,
         minutos: proc.minutos,
         qtdExecucao: proc.qtdExecucao,
@@ -1819,7 +1819,7 @@ function loadExampleData() {
         diasUteis: 21,
         teamSize: 5.0
     };
-    state.customAreas = [];
+    state.customAÃ¡Ã¡Ã¡Ã¡reas = [];
     state.teams = ['Backoffice', 'GovernanÃ§a', 'Seguros/N2', 'EficiÃªncia Operacional'];
     state.teamHierarchy = {
         'Backoffice': { gerencia: 'ConciliaÃ§Ã£o', diretoria: 'OperaÃ§Ãµes' },
@@ -1831,8 +1831,8 @@ function loadExampleData() {
     const uniqueResps = [...new Set(state.processes.map(p => p.responsavel || '').filter(r => r.trim() !== ''))].sort();
     state.responsaveis = uniqueResps.map(r => {
         const procWithResp = state.processes.find(p => p.responsavel === r);
-        const inheritedArea = procWithResp ? procWithResp.area : '';
-        return { name: r, area: inheritedArea, horasDia: null, absenteismo: null, diasUteis: null };
+        const inheritedAÃ¡Ã¡rea = procWithResp ? procWithResp.aÃ¡Ã¡rea : '';
+        return { name: r, aÃ¡Ã¡rea: inheritedAÃ¡Ã¡rea, horasDia: null, absenteismo: null, diasUteis: null };
     });
     
     const elInputHoras = document.getElementById('input-horas-dia');
@@ -1843,14 +1843,14 @@ function loadExampleData() {
     if (elInputDias) elInputDias.value = 21;
     const elInputTeam = document.getElementById('input-team-size');
     if (elInputTeam) elInputTeam.value = 5.0;
-    document.getElementById('filter-area').value = 'all';
-    document.getElementById('filter-area-balancing').value = 'all';
-    document.getElementById('filter-area-review').value = 'all';
+    document.getElementById('filter-aÃ¡Ã¡rea').value = 'all';
+    document.getElementById('filter-aÃ¡Ã¡rea-balancing').value = 'all';
+    document.getElementById('filter-aÃ¡Ã¡rea-review').value = 'all';
     document.getElementById('filter-responsavel').value = 'all';
     document.getElementById('filter-responsavel-balancing').value = 'all';
     document.getElementById('filter-responsavel-review').value = 'all';
 
-    renderAreaFilterOptions();
+    renderAÃ¡Ã¡reaFilterOptions();
     renderResponsavelFilterOptions();
     renderTable();
     renderBalancingTable();
@@ -1859,20 +1859,20 @@ function loadExampleData() {
 function resetSimulator() {
     if (!verificarPermissao('ADMIN')) { alert('Acesso negado: Perfil ADMIN necessÃ¡rio.'); return; }
     state.processes = [];
-    document.getElementById('filter-area').value = 'all';
-    document.getElementById('filter-area-balancing').value = 'all';
-    document.getElementById('filter-area-review').value = 'all';
+    document.getElementById('filter-aÃ¡Ã¡rea').value = 'all';
+    document.getElementById('filter-aÃ¡Ã¡rea-balancing').value = 'all';
+    document.getElementById('filter-aÃ¡Ã¡rea-review').value = 'all';
     document.getElementById('filter-responsavel').value = 'all';
     document.getElementById('filter-responsavel-balancing').value = 'all';
     document.getElementById('filter-responsavel-review').value = 'all';
     
-    renderAreaFilterOptions();
+    renderAÃ¡Ã¡reaFilterOptions();
     renderResponsavelFilterOptions();
     renderTable();
     renderBalancingTable();
 }
 
-// CHART RENDER ENGINE (Grouped by Area or Process based on filter selection)
+// CHART RENDER ENGINE (Grouped by AÃ¡Ã¡rea or Process based on filter selection)
 function renderCharts(totalFteRequired) {
     const isDark = document.body.classList.contains('dark-theme');
     
@@ -1882,22 +1882,22 @@ function renderCharts(totalFteRequired) {
     const primaryColor = style.getPropertyValue('--color-primary').trim();
     const successColor = style.getPropertyValue('--color-success').trim();
 
-    // 1. Doughnut Chart (Aggregated by Area or by Process)
+    // 1. Doughnut Chart (Aggregated by AÃ¡Ã¡rea or by Process)
     const pieCanvas = document.getElementById('chart-pie');
     if (!pieCanvas) return;
 
-    const filterValue = document.getElementById('filter-area').value;
+    const filterValue = document.getElementById('filter-aÃ¡Ã¡rea').value;
     const chartTitleElement = document.getElementById('chart-pie-title');
 
-    const areaMap = {};
+    const aÃ¡Ã¡reaMap = {};
     const processMap = {};
     const horasRealDia = state.params.horasDia * (1 - state.params.absenteismo / 100);
     const horasTrabalhoMes = horasRealDia * state.params.diasUteis;
 
-    // Filter processes list based on active area selection
+    // Filter processes list based on active aÃ¡Ã¡rea selection
     const filteredList = filterValue === 'all' 
         ? state.processes 
-        : state.processes.filter(p => p.area === filterValue);
+        : state.processes.filter(p => p.aÃ¡Ã¡rea === filterValue);
 
     filteredList.forEach(p => {
         const hasVolume = p.volume !== null && p.volume !== '';
@@ -1908,11 +1908,11 @@ function renderCharts(totalFteRequired) {
         const fte = horasTrabalhoMes > 0 ? (totalHours / horasTrabalhoMes) : 0;
 
         if (filterValue === 'all') {
-            const areaName = p.area || 'Outras';
-            if (!areaMap[areaName]) {
-                areaMap[areaName] = 0;
+            const aÃ¡Ã¡reaName = p.aÃ¡Ã¡rea || 'Outras';
+            if (!aÃ¡Ã¡reaMap[aÃ¡Ã¡reaName]) {
+                aÃ¡Ã¡reaMap[aÃ¡Ã¡reaName] = 0;
             }
-            areaMap[areaName] += fte;
+            aÃ¡Ã¡reaMap[aÃ¡Ã¡reaName] += fte;
         } else {
             const procName = p.name || 'Sem nome';
             if (!processMap[procName]) {
@@ -1926,10 +1926,10 @@ function renderCharts(totalFteRequired) {
     let pieData = [];
 
     if (filterValue === 'all') {
-        pieLabels = Object.keys(areaMap).filter(k => areaMap[k] > 0);
-        pieData = pieLabels.map(k => parseFloat(areaMap[k].toFixed(2)));
+        pieLabels = Object.keys(aÃ¡Ã¡reaMap).filter(k => aÃ¡Ã¡reaMap[k] > 0);
+        pieData = pieLabels.map(k => parseFloat(aÃ¡Ã¡reaMap[k].toFixed(2)));
         if (chartTitleElement) {
-            chartTitleElement.innerHTML = '<i class="fa-solid fa-chart-pie"></i> DistribuiÃ§Ã£o de FTE por Ãrea';
+            chartTitleElement.innerHTML = '<i class="fa-solid fa-chart-pie"></i> DistribuiÃ§Ã£o de FTE por ÃÃ¡Ã¡rea';
         }
     } else {
         pieLabels = Object.keys(processMap).filter(k => processMap[k] > 0);
@@ -1952,7 +1952,7 @@ function renderCharts(totalFteRequired) {
         pieChartInstance = new Chart(pieCanvas, {
             type: 'doughnut',
             data: {
-                labels: ['Nenhuma Ã¡rea com dados'],
+                labels: ['Nenhuma Ã¡Ã¡Ã¡rea com dados'],
                 datasets: [{
                     data: [1],
                     backgroundColor: [isDark ? '#081e13' : '#cbd5e1'],
@@ -2128,12 +2128,12 @@ function exportToCSV() {
             totalFtePct += ftePct;
 
             const name = `"${(proc.name || '').replace(/"/g, '""')}"`;
-            const area = `"${(proc.area || '').replace(/"/g, '""')}"`;
+            const aÃ¡Ã¡rea = `"${(proc.aÃ¡Ã¡rea || '').replace(/"/g, '""')}"`;
             const vol = proc.volume !== '' ? proc.volume : '""';
             const mins = proc.minutos !== '' ? proc.minutos : 0;
             const qtd = proc.qtdExecucao !== '' ? proc.qtdExecucao : '""';
 
-            csvContent += `${name};${area};${vol};${mins};${qtd};${totalHoursRow.toFixed(2).replace('.', ',')};${ftePct.toFixed(2).replace('.', ',')}%\n`;
+            csvContent += `${name};${aÃ¡Ã¡rea};${vol};${mins};${qtd};${totalHoursRow.toFixed(2).replace('.', ',')};${ftePct.toFixed(2).replace('.', ',')}%\n`;
         });
 
         csvContent += `TOTAL GERAL;;;;;;${totalHours.toFixed(2).replace('.', ',')};${totalFtePct.toFixed(2).replace('.', ',')}%\n`;
@@ -2171,10 +2171,10 @@ function exportToCSV() {
             totalFtePct += ftePct;
 
             const name = `"${(proc.name || '').replace(/"/g, '""')}"`;
-            const area = `"${(proc.area || '').replace(/"/g, '""')}"`;
+            const aÃ¡Ã¡rea = `"${(proc.aÃ¡Ã¡rea || '').replace(/"/g, '""')}"`;
             const mins = proc.minutos !== '' ? proc.minutos : 0;
 
-            csvContent += `${name};${area};${mins};${typeStr};${volStr};${totalHoursRow.toFixed(2).replace('.', ',')};${ftePct.toFixed(2).replace('.', ',')}%\n`;
+            csvContent += `${name};${aÃ¡Ã¡rea};${mins};${typeStr};${volStr};${totalHoursRow.toFixed(2).replace('.', ',')};${ftePct.toFixed(2).replace('.', ',')}%\n`;
         });
 
         csvContent += `TOTAL GERAL;;;;;${totalHours.toFixed(2).replace('.', ',')};${totalFtePct.toFixed(2).replace('.', ',')}%\n\n`;
@@ -2183,29 +2183,29 @@ function exportToCSV() {
         csvContent += "BALANCEAMENTO DE CAPACIDADE POR EQUIPE / AREA\n";
         csvContent += "AREA / EQUIPE;FTE REQUERIDO DIARIO;RECURSO ALOCADO (FTE);STATUS CAPACIDADE\n";
 
-        const areasList = ['Backoffice', 'GovernanÃ§a', 'Seguros/N2', 'EficiÃªncia Operacional', ...state.customAreas];
+        const aÃ¡Ã¡Ã¡Ã¡reasList = ['Backoffice', 'GovernanÃ§a', 'Seguros/N2', 'EficiÃªncia Operacional', ...state.customAÃ¡Ã¡Ã¡Ã¡reas];
         let sumRequiredFte = 0;
         let sumAllocatedFte = 0;
 
-        areasList.forEach(areaName => {
-            let areaDailyHours = 0;
+        aÃ¡Ã¡Ã¡Ã¡reasList.forEach(aÃ¡Ã¡reaName => {
+            let aÃ¡Ã¡reaDailyHours = 0;
             state.processes.forEach(proc => {
-                if (proc.area !== areaName) return;
+                if (proc.aÃ¡Ã¡rea !== aÃ¡Ã¡reaName) return;
                 const isTempoFrequencia = proc.qtdExecucao !== null && proc.qtdExecucao !== '' && parseFloat(proc.qtdExecucao) > 0;
                 const minutes = proc.minutos || 0;
                 
                 if (isTempoFrequencia) {
                     const qtdExec = parseFloat(proc.qtdExecucao) || 0;
-                    areaDailyHours += (qtdExec * minutes) / 60 / diasUteis;
+                    aÃ¡Ã¡reaDailyHours += (qtdExec * minutes) / 60 / diasUteis;
                 } else {
                     const hasBacklog = proc.backlogVolume !== undefined && proc.backlogVolume !== '';
                     const backlogVol = hasBacklog ? parseFloat(proc.backlogVolume) : 0;
-                    areaDailyHours += (backlogVol * minutes) / 60;
+                    aÃ¡Ã¡reaDailyHours += (backlogVol * minutes) / 60;
                 }
             });
 
-            const requiredFte = horasRealDia > 0 ? (areaDailyHours / horasRealDia) : 0;
-            const allocatedVal = state.areaAllocations[areaName] !== undefined && state.areaAllocations[areaName] !== '' ? parseFloat(state.areaAllocations[areaName]) : 0;
+            const requiredFte = horasRealDia > 0 ? (aÃ¡Ã¡reaDailyHours / horasRealDia) : 0;
+            const allocatedVal = state.aÃ¡Ã¡reaAllocations[aÃ¡Ã¡reaName] !== undefined && state.aÃ¡Ã¡reaAllocations[aÃ¡Ã¡reaName] !== '' ? parseFloat(state.aÃ¡Ã¡reaAllocations[aÃ¡Ã¡reaName]) : 0;
 
             let statusStr = "";
             if (allocatedVal === 0) {
@@ -2224,7 +2224,7 @@ function exportToCSV() {
             sumRequiredFte += requiredFte;
             sumAllocatedFte += allocatedVal;
 
-            csvContent += `"${areaName.replace(/"/g, '""')}";${requiredFte.toFixed(2).replace('.', ',')};${allocatedVal.toFixed(2).replace('.', ',')};${statusStr}\n`;
+            csvContent += `"${aÃ¡Ã¡reaName.replace(/"/g, '""')}";${requiredFte.toFixed(2).replace('.', ',')};${allocatedVal.toFixed(2).replace('.', ',')};${statusStr}\n`;
         });
 
         csvContent += `TOTAL GERAL;${sumRequiredFte.toFixed(2).replace('.', ',')};${sumAllocatedFte.toFixed(2).replace('.', ',')};\n`;
@@ -2232,7 +2232,7 @@ function exportToCSV() {
 
     // Trigger download
     const encodedUri = encodeURI(csvContent);
-    const link = document.createElement("a");
+    const link = document.cÃ¡Ã¡reateElement("a");
     link.setAttribute("href", encodedUri);
     link.setAttribute("download", `Capacity_FTE_${activeTab === 'dashboard' ? 'Report' : 'Backlog'}_${new Date().toISOString().slice(0,10)}.csv`);
     document.body.appendChild(link);
@@ -2252,40 +2252,40 @@ function escapeHtml(str) {
 }
 
 // DYNAMICALLY RENDER THE FILTER OPTIONS FOR AREAS (ALL TABLES)
-function renderAreaFilterOptions() {
-    const filterSelect = document.getElementById('filter-area');
-    const filterSelectBalancing = document.getElementById('filter-area-balancing');
-    const filterSelectReview = document.getElementById('filter-area-review');
+function renderAÃ¡Ã¡reaFilterOptions() {
+    const filterSelect = document.getElementById('filter-aÃ¡Ã¡rea');
+    const filterSelectBalancing = document.getElementById('filter-aÃ¡Ã¡rea-balancing');
+    const filterSelectReview = document.getElementById('filter-aÃ¡Ã¡rea-review');
     if (!filterSelect || !filterSelectBalancing || !filterSelectReview) return;
     
     const currentValue = filterSelect.value;
     const currentValueBalancing = filterSelectBalancing.value;
     const currentValueReview = filterSelectReview.value;
     
-    const optionsHtml = '<option value="all">Todas as Ãreas</option>' +
-        (state.teams || []).map(area =>
-            `<option value="${escapeHtml(area)}">${escapeHtml(area)}</option>`
+    const optionsHtml = '<option value="all">Todas as ÃÃ¡Ã¡Ã¡Ã¡reas</option>' +
+        (state.teams || []).map(aÃ¡Ã¡rea =>
+            `<option value="${escapeHtml(aÃ¡Ã¡rea)}">${escapeHtml(aÃ¡Ã¡rea)}</option>`
         ).join('');
         
     filterSelect.innerHTML = optionsHtml;
     filterSelectBalancing.innerHTML = optionsHtml;
     filterSelectReview.innerHTML = optionsHtml;
     
-    const allAreas = state.teams || [];
+    const allAÃ¡Ã¡Ã¡Ã¡reas = state.teams || [];
     
-    if (allAreas.includes(currentValue)) {
+    if (allAÃ¡Ã¡Ã¡Ã¡reas.includes(currentValue)) {
         filterSelect.value = currentValue;
     } else {
         filterSelect.value = 'all';
     }
     
-    if (allAreas.includes(currentValueBalancing)) {
+    if (allAÃ¡Ã¡Ã¡Ã¡reas.includes(currentValueBalancing)) {
         filterSelectBalancing.value = currentValueBalancing;
     } else {
         filterSelectBalancing.value = 'all';
     }
 
-    if (allAreas.includes(currentValueReview)) {
+    if (allAÃ¡Ã¡Ã¡Ã¡reas.includes(currentValueReview)) {
         filterSelectReview.value = currentValueReview;
     } else {
         filterSelectReview.value = 'all';
@@ -2296,16 +2296,16 @@ function renderAreaFilterOptions() {
 function renderReviewTable() {
     const tableBody = document.getElementById('review-table-body');
     const emptyState = document.getElementById('review-empty-state');
-    const filterValue = document.getElementById('filter-area-review').value;
+    const filterValue = document.getElementById('filter-aÃ¡Ã¡rea-review').value;
     const respFilter = document.getElementById('filter-responsavel-review').value;
 
     if (!tableBody) return;
     tableBody.innerHTML = '';
 
     const filteredProcesses = state.processes.filter(p => {
-        const areaMatch = filterValue === 'all' || p.area === filterValue;
+        const aÃ¡Ã¡reaMatch = filterValue === 'all' || p.aÃ¡Ã¡rea === filterValue;
         const respMatch = respFilter === 'all' || p.responsavel === respFilter;
-        return areaMatch && respMatch;
+        return aÃ¡Ã¡reaMatch && respMatch;
     });
 
     if (filteredProcesses.length === 0) {
@@ -2350,7 +2350,7 @@ function renderReviewTable() {
         const pHorasTrabalhoMes = pHorasRealDia * respParams.diasUteis;
         const ftePct = pHorasTrabalhoMes > 0 ? (totalHours / pHorasTrabalhoMes) * 100 : 0;
 
-        // Metric Description (read-only)
+        // Metric Description (Ã¡Ã¡read-only)
         let metricDesc = '';
         if (proc.qtdExecucao !== null && proc.qtdExecucao !== '' && parseFloat(proc.qtdExecucao) > 0) {
             metricDesc = `Tempo x Freq: ${proc.minutos}m / ${proc.qtdExecucao}x`;
@@ -2365,7 +2365,7 @@ function renderReviewTable() {
         ).join('');
         const statusSelectHtml = `<select class="select-review-status" data-id="${proc.id}" data-status="${proc.reviewStatus || 'Manter'}">${statusOptionsHtml}</select>`;
 
-        const tr = document.createElement('tr');
+        const tr = document.cÃ¡Ã¡reateElement('tr');
         if (proc.reviewStatus === 'Parar') {
             tr.className = 'row-review-stopped';
         }
@@ -2376,7 +2376,7 @@ function renderReviewTable() {
                 ${proc.reviewStatus && proc.reviewStatus !== 'Manter' ? `<span class="badge-review badge-review-${proc.reviewStatus.toLowerCase()}">${proc.reviewStatus}</span>` : ''}
             </td>
             <td>
-                <span class="badge-area" style="font-size: 0.85rem; padding: 0.25rem 0.5rem; border-radius: 4px; background: rgba(235, 92, 39, 0.08); color: var(--color-primary); border: 1px solid rgba(235, 92, 39, 0.15);">${escapeHtml(proc.area || 'Sem Equipe')}</span>
+                <span class="badge-aÃ¡Ã¡rea" style="font-size: 0.85rem; padding: 0.25rem 0.5rem; border-radius: 4px; background: rgba(235, 92, 39, 0.08); color: var(--color-primary); border: 1px solid rgba(235, 92, 39, 0.15);">${escapeHtml(proc.aÃ¡Ã¡rea || 'Sem Equipe')}</span>
             </td>
             <td>
                 <span style="font-size: 0.9rem; color: var(--text-secondary);">${escapeHtml(proc.responsavel || 'Sem ResponsÃ¡vel')}</span>
@@ -2445,11 +2445,11 @@ function renderResponsavelFilterOptions() {
 // IMPORT PROCESSES FROM EXCEL/CSV SPREADSHEET (SHEETJS)
 function importExcelFile(file) {
     if (!verificarPermissao('ADMIN')) { alert('Acesso negado: Perfil ADMIN necessÃ¡rio.'); return; }
-    const reader = new FileReader();
-    reader.onload = function(e) {
+    const Ã¡Ã¡reader = new FileReader();
+    Ã¡Ã¡reader.onload = function(e) {
         try {
             const data = new Uint8Array(e.target.result);
-            const workbook = XLSX.read(data, { type: 'array' });
+            const workbook = XLSX.Ã¡Ã¡read(data, { type: 'array' });
             
             let importCount = 0;
             const importedProcesses = [];
@@ -2465,7 +2465,7 @@ function importExcelFile(file) {
                 const headers = rows[0].map(h => String(h || '').trim().toLowerCase());
                 
                 let activityIdx = headers.findIndex(h => h.includes('atividade') || h.includes('nome') || h.includes('processo'));
-                let teamIdx = headers.findIndex(h => h.includes('equipe') || h.includes('Ã¡rea') || h.includes('area') || h.includes('grupo'));
+                let teamIdx = headers.findIndex(h => h.includes('equipe') || h.includes('Ã¡Ã¡Ã¡rea') || h.includes('aÃ¡Ã¡rea') || h.includes('grupo'));
                 let respIdx = headers.findIndex(h => h.includes('responsÃ¡vel') || h.includes('responsavel') || h.includes('dono') || h.includes('colaborador'));
                 let volIdx = headers.findIndex(h => h.includes('volume') || h.includes('qtd. mÃªs') || h.includes('qtd. mes') || h.includes('quantidade') || h.includes('qtd. mes'));
                 let minIdx = headers.findIndex(h => h.includes('tempo') || h.includes('minutos') || h.includes('duraÃ§Ã£o') || h.includes('duracao'));
@@ -2516,7 +2516,7 @@ function importExcelFile(file) {
                     importedProcesses.push({
                         id: 'proc-' + Date.now() + '-' + Math.floor(Math.random() * 1000) + '-' + importCount,
                         name: activityName,
-                        area: teamName || (state.teams.length > 0 ? state.teams[0] : ''),
+                        aÃ¡Ã¡rea: teamName || (state.teams.length > 0 ? state.teams[0] : ''),
                         responsavel: respName,
                         volume: volumeVal,
                         minutos: minutesVal,
@@ -2537,15 +2537,15 @@ function importExcelFile(file) {
                 state.responsaveis = [...newResps].sort().map(name => {
                     const existing = existingResps.find(r => r.name === name);
                     const importedAct = importedProcesses.find(ip => ip.responsavel === name);
-                    const importedArea = importedAct ? importedAct.area : '';
+                    const importedAÃ¡Ã¡rea = importedAct ? importedAct.aÃ¡Ã¡rea : '';
                     
                     if (existing) {
-                        if (!existing.area) {
-                            existing.area = importedArea;
+                        if (!existing.aÃ¡Ã¡rea) {
+                            existing.aÃ¡Ã¡rea = importedAÃ¡Ã¡rea;
                         }
                         return existing;
                     }
-                    return { name, area: importedArea, horasDia: null, absenteismo: null, diasUteis: null };
+                    return { name, aÃ¡Ã¡rea: importedAÃ¡Ã¡rea, horasDia: null, absenteismo: null, diasUteis: null };
                 });
                 
                 if (mode) {
@@ -2556,7 +2556,7 @@ function importExcelFile(file) {
                 
                 saveState();
                 renderResponsavelFilterOptions();
-                renderAreaFilterOptions();
+                renderAÃ¡Ã¡reaFilterOptions();
                 
                 renderCadastrosView();
                 renderTable();
@@ -2572,7 +2572,7 @@ function importExcelFile(file) {
             alert("Erro ao ler o arquivo Excel. Certifique-se de que Ã© um arquivo .xlsx, .xls ou .csv vÃ¡lido.");
         }
     };
-    reader.readAsArrayBuffer(file);
+    Ã¡Ã¡reader.Ã¡Ã¡readAsArrayBuffer(file);
 }
 
 // ----------------------------------------------------
@@ -2624,7 +2624,7 @@ function saveHistorySnapshot() {
     
     const snapshotData = state.processes.map(p => ({
         name: p.name,
-        area: p.area,
+        aÃ¡Ã¡rea: p.aÃ¡Ã¡rea,
         responsavel: p.responsavel || 'Sem ResponsÃ¡vel',
         volume: p.volume !== null && p.volume !== '' ? parseFloat(p.volume) : 0
     }));
@@ -2707,7 +2707,7 @@ function populateHistoryItemOptions() {
         state.history.forEach(h => {
             h.data.forEach(d => {
                 if (type === 'atividade') itemsSet.add(d.name);
-                else if (type === 'area') itemsSet.add(d.area);
+                else if (type === 'aÃ¡Ã¡rea') itemsSet.add(d.aÃ¡Ã¡rea);
                 else if (type === 'responsavel') itemsSet.add(d.responsavel);
             });
         });
@@ -2716,7 +2716,7 @@ function populateHistoryItemOptions() {
     // Collect from current processes as fallback/addition
     state.processes.forEach(p => {
         if (type === 'atividade') itemsSet.add(p.name);
-        else if (type === 'area') itemsSet.add(p.area);
+        else if (type === 'aÃ¡Ã¡rea') itemsSet.add(p.aÃ¡Ã¡rea);
         else if (type === 'responsavel') itemsSet.add(p.responsavel || 'Sem ResponsÃ¡vel');
     });
     
@@ -2763,7 +2763,7 @@ function renderHistoryChart() {
         h.data.forEach(d => {
             if (type === 'atividade' && d.name === selectedItem) {
                 sum += d.volume;
-            } else if (type === 'area' && d.area === selectedItem) {
+            } else if (type === 'aÃ¡Ã¡rea' && d.aÃ¡Ã¡rea === selectedItem) {
                 sum += d.volume;
             } else if (type === 'responsavel' && d.responsavel === selectedItem) {
                 sum += d.volume;
@@ -2780,8 +2780,8 @@ function renderHistoryChart() {
     
     const ctx = chartCanvas.getContext('2d');
     
-    // Create gradient fill under line
-    const gradient = ctx.createLinearGradient(0, 0, 0, 300);
+    // CÃ¡Ã¡reate gradient fill under line
+    const gradient = ctx.cÃ¡Ã¡reateLinearGradient(0, 0, 0, 300);
     gradient.addColorStop(0, 'rgba(235, 92, 39, 0.35)');
     gradient.addColorStop(1, 'rgba(235, 92, 39, 0.0)');
     
@@ -2876,14 +2876,14 @@ function renderCadastrosView() {
                     e.stopPropagation();
                     if (!verificarPermissao('ADMIN')) { alert('Acesso negado: Perfil ADMIN necessário.'); return; }
                     const team = btn.getAttribute('data-team');
-                    if (confirm(`Deseja realmente excluir a equipe "${team}"? Todos os responsáveis e atividades desta equipe ficarão "Sem Equipe".`)) {
+                    if (confirm(`Deseja Ã¡Ã¡realmente excluir a equipe "${team}"? Todos os responsáveis e atividades desta equipe ficarão "Sem Equipe".`)) {
                         state.teams = state.teams.filter(t => t !== team);
                         state.processes.forEach(p => {
-                            if (p.area === team) p.area = '';
+                            if (p.aÃ¡Ã¡rea === team) p.aÃ¡Ã¡rea = '';
                         });
                         if (state.responsaveis) {
                             state.responsaveis.forEach(r => {
-                                if (r.area === team) r.area = '';
+                                if (r.aÃ¡Ã¡rea === team) r.aÃ¡Ã¡rea = '';
                             });
                         }
                         if (state.teamHierarchy) {
@@ -2891,7 +2891,7 @@ function renderCadastrosView() {
                         }
                         saveState();
                         renderCadastrosView();
-                        renderAreaFilterOptions();
+                        renderAÃ¡Ã¡reaFilterOptions();
                         renderTable();
                         renderBalancingTable();
                         renderReviewTable();
@@ -2936,32 +2936,32 @@ function renderCadastrosView() {
         teamsToRender.forEach(team => {
             let teamResps = [];
             if (team === 'Outros / Sem Equipe') {
-                teamResps = state.responsaveis.filter(r => !r.area || !state.teams.includes(r.area));
+                teamResps = state.responsaveis.filter(r => !r.aÃ¡Ã¡rea || !state.teams.includes(r.aÃ¡Ã¡rea));
             } else {
-                teamResps = state.responsaveis.filter(r => r.area === team);
+                teamResps = state.responsaveis.filter(r => r.aÃ¡Ã¡rea === team);
             }
             
             if (teamResps.length === 0) return;
             
             // Accordion Header
-            const header = document.createElement('div');
+            const header = document.cÃ¡Ã¡reateElement('div');
             header.style.cssText = 'display: flex; align-items: center; gap: 0.5rem; cursor: pointer; padding: 0.5rem; background: rgba(255,255,255,0.05); border-radius: 4px; font-weight: 500; font-size: 0.85rem; user-select: none; border: 1px solid rgba(255,255,255,0.02); margin-top: 0.5rem;';
             header.innerHTML = `<i class="fa-solid fa-chevron-right" style="width: 15px; text-align: center;"></i> ${escapeHtml(team)} <span style="background: rgba(255,255,255,0.1); padding: 0.1rem 0.4rem; border-radius: 10px; font-size: 0.7rem; margin-left: auto;">${teamResps.length}</span>`;
             
-            const contentContainer = document.createElement('div');
+            const contentContainer = document.cÃ¡Ã¡reateElement('div');
             contentContainer.style.cssText = 'display: none; flex-direction: column; gap: 0.5rem; padding-left: 0.5rem; margin-top: 0.5rem; margin-bottom: 0.5rem;';
             
             header.addEventListener('click', () => toggleAccordion(header, contentContainer));
             
             teamResps.forEach(resp => {
-                const container = document.createElement('div');
+                const container = document.cÃ¡Ã¡reateElement('div');
                 container.className = 'resp-item-container';
                 container.style.cssText = 'display: flex; flex-direction: column; gap: 0.5rem; padding: 0.5rem 0.6rem; border-radius: 6px; border: 1px solid rgba(255,255,255,0.03); background: rgba(255,255,255,0.01);';
                 
-                const headerRow = document.createElement('div');
+                const headerRow = document.cÃ¡Ã¡reateElement('div');
                 headerRow.style.cssText = 'display: flex; justify-content: space-between; align-items: center;';
                 
-                const nameSpan = document.createElement('span');
+                const nameSpan = document.cÃ¡Ã¡reateElement('span');
                 nameSpan.style.cssText = 'font-size: 0.85rem; font-weight: 500; color: var(--text-primary);';
                 
                 const hasOverrides = resp.horasDia !== null || resp.absenteismo !== null || resp.diasUteis !== null;
@@ -2972,16 +2972,16 @@ function renderCadastrosView() {
                     ${hasOverrides ? '<i class="fa-solid fa-user-gear" style="color: var(--color-primary); font-size: 0.75rem; margin-left: 0.25rem;" title="Parâmetros customizados ativos"></i>' : ''}
                 `;
                 
-                const btnGroup = document.createElement('div');
+                const btnGroup = document.cÃ¡Ã¡reateElement('div');
                 btnGroup.style.cssText = 'display: flex; align-items: center; gap: 0.5rem;';
                 
-                const btnConfig = document.createElement('button');
+                const btnConfig = document.cÃ¡Ã¡reateElement('button');
                 btnConfig.className = 'btn-config-resp-item';
                 btnConfig.style.cssText = 'background: transparent; border: none; color: var(--color-primary); cursor: pointer; font-size: 0.85rem; padding: 0.2rem; display: flex; align-items: center; justify-content: center;';
                 btnConfig.title = 'Configurar Parâmetros de Capacidade';
                 btnConfig.innerHTML = '<i class="fa-solid fa-cog"></i>';
                 
-                const btnDelete = document.createElement('button');
+                const btnDelete = document.cÃ¡Ã¡reateElement('button');
                 btnDelete.className = 'btn-delete-resp-item';
                 btnDelete.setAttribute('data-permissao', 'ADMIN');
                 btnDelete.style.cssText = 'background: transparent; border: none; color: var(--color-danger); cursor: pointer; font-size: 0.85rem; padding: 0.2rem; display: flex; align-items: center; justify-content: center;';
@@ -3048,9 +3048,9 @@ function renderCadastrosView() {
     activityTeamsToRender.forEach((team, teamIndex) => {
         let teamProcs = [];
         if (team === 'Outros / Sem Equipe') {
-            teamProcs = state.processes.filter(p => !p.area || !state.teams.includes(p.area));
+            teamProcs = state.processes.filter(p => !p.aÃ¡Ã¡rea || !state.teams.includes(p.aÃ¡Ã¡rea));
         } else {
-            teamProcs = state.processes.filter(p => p.area === team);
+            teamProcs = state.processes.filter(p => p.aÃ¡Ã¡rea === team);
         }
         
         if (teamProcs.length === 0) return;
@@ -3058,7 +3058,7 @@ function renderCadastrosView() {
         const rowClass = 'team-activity-row-' + teamIndex;
         
         // Header Row
-        const headerTr = document.createElement('tr');
+        const headerTr = document.cÃ¡Ã¡reateElement('tr');
         headerTr.style.cssText = 'background: rgba(255,255,255,0.03); cursor: pointer; user-select: none;';
         headerTr.innerHTML = `
             <td colspan="5" style="padding: 0.8rem; font-weight: 600; color: var(--text-primary); border-top: 1px solid rgba(255,255,255,0.05); border-bottom: 1px solid rgba(255,255,255,0.05);">
@@ -3070,20 +3070,20 @@ function renderCadastrosView() {
         
         // Activity Rows
         teamProcs.forEach(proc => {
-            const tr = document.createElement('tr');
+            const tr = document.cÃ¡Ã¡reateElement('tr');
             tr.className = rowClass;
             tr.style.display = 'none'; // Initially collapsed
             tr.dataset.id = proc.id;
             
             const teamOptions = '<option value="">-- Sem Equipe --</option>' +
                 state.teams.map(t => `
-                    <option value="${escapeHtml(t)}" ${proc.area === t ? 'selected' : ''}>${escapeHtml(t)}</option>
+                    <option value="${escapeHtml(t)}" ${proc.aÃ¡Ã¡rea === t ? 'selected' : ''}>${escapeHtml(t)}</option>
                 `).join('');
                 
             const teamResps = (state.responsaveis || []).filter(resp => {
                 const rName = typeof resp === 'object' ? resp.name : resp;
-                const rArea = typeof resp === 'object' ? resp.area : '';
-                return !proc.area || !rArea || rArea === proc.area || proc.responsavel === rName;
+                const rAÃ¡Ã¡rea = typeof resp === 'object' ? resp.aÃ¡Ã¡rea : '';
+                return !proc.aÃ¡Ã¡rea || !rAÃ¡Ã¡rea || rAÃ¡Ã¡rea === proc.aÃ¡Ã¡rea || proc.responsavel === rName;
             });
             const respsToDisplay = teamResps.length > 0 ? teamResps : (state.responsaveis || []);
             const respOptions = '<option value="">-- Sem Responsável --</option>' +
@@ -3143,12 +3143,12 @@ function renderCadastrosView() {
             const teamSelect = tr.querySelector('.select-activity-team-cell');
             teamSelect.addEventListener('change', (e) => {
                 const newTeam = e.target.value;
-                proc.area = newTeam;
+                proc.aÃ¡Ã¡rea = newTeam;
                 proc.responsavel = '';
                 saveState();
                 
                 renderCadastrosView();
-                renderAreaFilterOptions();
+                renderAÃ¡Ã¡reaFilterOptions();
                 renderResponsavelFilterOptions();
                 renderTable();
                 renderBalancingTable();
@@ -3184,7 +3184,7 @@ function renderCadastrosView() {
             const deleteBtn = tr.querySelector('.btn-delete-activity-cell');
             deleteBtn.addEventListener('click', () => {
                 if (!verificarPermissao('ADMIN')) { alert('Acesso negado: Perfil ADMIN necessário.'); return; }
-                if (confirm(`Deseja realmente excluir a atividade "${proc.name}"?`)) {
+                if (confirm(`Deseja Ã¡Ã¡realmente excluir a atividade "${proc.name}"?`)) {
                     state.processes = state.processes.filter(p => p.id !== proc.id);
                     saveState();
                     renderCadastrosView();
@@ -3200,7 +3200,7 @@ function renderCadastrosView() {
     
     updateBulkDeleteState();
     
-    // Re-apply permission logic after recreating DOM elements
+    // Re-apply permission logic after recÃ¡Ã¡reating DOM elements
     aplicarPerfilDeAcesso();
 }
 
@@ -3246,7 +3246,7 @@ function setupModalParametersListeners() {
     const valAbs = document.getElementById('modal-val-absenteismo');
     const valDias = document.getElementById('modal-val-dias-uteis');
     
-    const calcReal = document.getElementById('modal-calc-real-dia');
+    const calcReal = document.getElementById('modal-calc-Ã¡Ã¡real-dia');
     const calcMes = document.getElementById('modal-calc-mes');
     
     function updateModalCalculations() {
@@ -3429,7 +3429,7 @@ CREATE TABLE public.profiles (
 
 ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
 
-CREATE POLICY "Perfis visÃ­veis para autenticados"
+CREATE POLICY "Perfis visíveis para autenticados"
   ON public.profiles FOR SELECT
   USING (auth.role() = 'authenticated');
 
@@ -3523,7 +3523,7 @@ async function renderAccessControlView() {
             const isCurrentUser = profile.id === (window._authUserId || '');
             const date = profile.created_at
                 ? new Date(profile.created_at).toLocaleDateString('pt-BR')
-                : 'â€“';
+                : '-';
 
             const badgeClass = {
                 'ADMIN':    'role-admin',
