@@ -395,6 +395,62 @@ document.addEventListener('DOMContentLoaded', async () => {
     renderReviewTable();
 });
 
+// TOAST NOTIFICATION SYSTEM
+function showToast(message, type = 'info', duration = 5000) {
+    const container = document.getElementById('toast-container');
+    if (!container) return;
+
+    const toast = document.createElement('div');
+    toast.style.cssText = `
+        pointer-events: auto;
+        padding: 0.75rem 1rem;
+        border-radius: 8px;
+        font-size: 0.85rem;
+        color: #fff;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+        transition: opacity 0.3s ease-out, transform 0.3s ease-out;
+        background: ${type === 'error' ? 'rgba(239, 68, 68, 0.95)' : type === 'warning' ? 'rgba(245, 158, 11, 0.95)' : type === 'success' ? 'rgba(16, 185, 129, 0.95)' : 'rgba(59, 130, 246, 0.95)'};
+        backdrop-filter: blur(8px);
+    `;
+
+    const icon = type === 'error' ? 'fa-circle-xmark' : type === 'warning' ? 'fa-triangle-exclamation' : type === 'success' ? 'fa-circle-check' : 'fa-circle-info';
+    toast.innerHTML = `<i class="fa-solid ${icon}" style="font-size: 1rem;"></i> <span>${escapeHtml(message)}</span>`;
+
+    container.appendChild(toast);
+
+    setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateY(10px)';
+        setTimeout(() => toast.remove(), 300);
+    }, duration);
+}
+
+// REALTIME STATUS UI INDICATOR
+function updateRealtimeStatusUI(status, customMessage) {
+    const badge = document.getElementById('realtime-status-badge');
+    if (!badge) return;
+
+    const dot = badge.querySelector('.status-dot');
+    const text = badge.querySelector('.status-text');
+
+    if (status === 'SUBSCRIBED') {
+        if (dot) dot.style.background = '#10b981'; // Green
+        if (text) text.textContent = 'Sincronizado';
+        badge.title = 'Realtime ativo: Qualquer alteração será sincronizada com todos os usuários.';
+    } else if (status === 'CONNECTING') {
+        if (dot) dot.style.background = '#eab308'; // Yellow
+        if (text) text.textContent = 'Conectando...';
+        badge.title = 'Conectando ao canal de tempo real...';
+    } else if (status === 'ERROR' || status === 'CLOSED' || status === 'CHANNEL_ERROR') {
+        if (dot) dot.style.background = '#ef4444'; // Red
+        if (text) text.textContent = customMessage || 'Offline (Local)';
+        badge.title = 'Sem sincronização remota em tempo real. Verifique se a tabela board_state existe no Supabase.';
+    }
+}
+
 // REFRESH ALL UI VIEWS
 function refreshAllViews() {
     renderCadastrosView();
@@ -409,7 +465,14 @@ function refreshAllViews() {
 // REALTIME SUBSCRIPTION HELPERS
 function subscribeRealtime() {
     const client = getSupabase();
-    if (!client || realtimeChannel) return;
+    if (!client) return;
+
+    if (realtimeChannel) {
+        client.removeChannel(realtimeChannel);
+        realtimeChannel = null;
+    }
+
+    updateRealtimeStatusUI('CONNECTING');
 
     realtimeChannel = client
         .channel('board-changes')
@@ -418,20 +481,32 @@ function subscribeRealtime() {
             schema: 'public',
             table: 'board_state'
         }, (payload) => {
-            console.log('[Realtime] Evento recebido:', payload.eventType);
-            if (payload.new && payload.new.data) {
+            console.log('[Realtime] Evento recebido via WebSocket:', payload.eventType, payload);
+            
+            const payloadData = payload.new || payload.record;
+            if (payloadData && payloadData.data) {
                 const myUserId = window._authUserId;
-                if (payload.new.updated_by && payload.new.updated_by === myUserId) {
+                if (payloadData.updated_by && payloadData.updated_by === myUserId) {
                     return; // Ignore local updates sent by current user
                 }
-                state = payload.new.data;
+                
+                state = payloadData.data;
                 applyStateMigrations();
                 localStorage.setItem('capacity_fte_hub_state', JSON.stringify(state));
                 refreshAllViews();
+                showToast('⚡ O painel foi atualizado em tempo real por outro usuário!', 'info', 4000);
             }
         })
-        .subscribe((status) => {
-            console.log('[Realtime] Status da inscrição:', status);
+        .subscribe((status, err) => {
+            console.log('[Realtime] Status da inscrição:', status, err || '');
+            if (status === 'SUBSCRIBED') {
+                updateRealtimeStatusUI('SUBSCRIBED');
+            } else if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
+                updateRealtimeStatusUI('ERROR', 'Erro Realtime');
+                console.warn('[Realtime Error] Certifique-se de que a publicação Realtime está ativa no Supabase (ALTER PUBLICATION supabase_realtime ADD TABLE board_state).');
+            } else if (status === 'CLOSED') {
+                updateRealtimeStatusUI('ERROR', 'Desconectado');
+            }
         });
 }
 
@@ -440,6 +515,7 @@ function unsubscribeRealtime() {
     if (realtimeChannel && client) {
         client.removeChannel(realtimeChannel);
         realtimeChannel = null;
+        updateRealtimeStatusUI('CLOSED');
         console.log('[Realtime] Canal desconectado.');
     }
 }
@@ -450,9 +526,8 @@ async function saveStateToSupabase() {
     if (!client) return;
 
     try {
-        const { data } = await client.auth.getUser();
-        const user = data ? data.user : null;
-        await client
+        const { data: { user } } = await client.auth.getUser();
+        const { error } = await client
             .from('board_state')
             .upsert({
                 id: 'default',
@@ -460,8 +535,24 @@ async function saveStateToSupabase() {
                 updated_by: user ? user.id : null,
                 updated_at: new Date().toISOString()
             });
+
+        if (error) {
+            console.error('[Supabase Save Error]', error);
+            if (error.code === '42P01' || error.message?.includes('board_state')) {
+                showToast('Erro Supabase: Tabela "board_state" não encontrada. Execute o SQL de configuração no Supabase.', 'error', 10000);
+            } else if (error.code === '42501' || error.message?.includes('row-level security')) {
+                showToast('Erro de permissão RLS no Supabase. Habilite políticas de SELECT/INSERT/UPDATE na tabela board_state.', 'error', 10000);
+            } else {
+                showToast(`Erro ao salvar no Supabase: ${error.message}`, 'error', 5000);
+            }
+            updateRealtimeStatusUI('ERROR', 'Erro ao Salvar');
+        } else {
+            updateRealtimeStatusUI('SUBSCRIBED');
+        }
     } catch (err) {
-        console.warn('Erro ao salvar estado no Supabase:', err);
+        console.error('[Supabase Save Exception]', err);
+        showToast('Falha na conexão ao salvar no Supabase.', 'warning');
+        updateRealtimeStatusUI('ERROR', 'Erro Conexão');
     }
 }
 
@@ -472,18 +563,32 @@ async function loadStateFromSupabase() {
     try {
         const { data, error } = await client
             .from('board_state')
-            .select('data')
+            .select('data, updated_at')
             .eq('id', 'default')
             .maybeSingle();
 
-        if (error || !data || !data.data) return false;
+        if (error) {
+            console.error('[Supabase Load Error]', error);
+            if (error.code === '42P01' || error.message?.includes('board_state')) {
+                showToast('Aviso: Tabela "board_state" não foi criada no Supabase ainda.', 'warning', 8000);
+            } else {
+                showToast(`Aviso ao carregar do Supabase: ${error.message}`, 'warning', 5000);
+            }
+            return false;
+        }
+
+        if (!data || !data.data) {
+            console.log('[Supabase Load] Nenhum registro existente na tabela board_state.');
+            return false;
+        }
 
         state = data.data;
         applyStateMigrations();
         localStorage.setItem('capacity_fte_hub_state', JSON.stringify(state));
+        console.log('[Supabase Load] Estado compartilhado carregado com sucesso!');
         return true;
     } catch (err) {
-        console.warn('Erro ao carregar estado do Supabase:', err);
+        console.error('[Supabase Load Exception]', err);
         return false;
     }
 }
@@ -608,10 +713,17 @@ function loadState() {
     document.body.className = theme;
 }
 
-// SAVE STATE TO LOCALSTORAGE & SUPABASE
+// SAVE STATE TO LOCALSTORAGE & SUPABASE WITH DEBOUNCE
+let _saveDebounceTimer = null;
+
 function saveState() {
     localStorage.setItem('capacity_fte_hub_state', JSON.stringify(state));
-    saveStateToSupabase();
+    
+    // Debounce to prevent flooding Supabase with calls on every keystroke
+    if (_saveDebounceTimer) clearTimeout(_saveDebounceTimer);
+    _saveDebounceTimer = setTimeout(() => {
+        saveStateToSupabase();
+    }, 1000);
 }
 
 // GET RESPONSIBLE SPECIFIC CAPACITY PARAMETERS WITH GLOBAL FALLBACK

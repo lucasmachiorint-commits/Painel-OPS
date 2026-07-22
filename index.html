@@ -77,6 +77,10 @@
                     <h2 class="app-title" id="app-view-title">Cadastro</h2>
                 </div>
                 <div class="header-actions">
+                    <div id="realtime-status-badge" style="display: flex; align-items: center; gap: 0.4rem; padding: 0.4rem 0.8rem; border-radius: 20px; font-size: 0.8rem; background: rgba(255,255,255,0.05); border: 1px solid var(--border-color); color: var(--text-muted);" title="Status da sincronização em tempo real (Supabase)">
+                        <span class="status-dot" style="width: 8px; height: 8px; border-radius: 50%; background: #eab308; display: inline-block;"></span>
+                        <span class="status-text">Conectando...</span>
+                    </div>
                     <button id="btn-export-csv" class="btn btn-primary-outline" title="Exportar CSV (Excel)">
                         <i class="fa-solid fa-file-csv"></i> Exportar Excel
                     </button>
@@ -849,6 +853,9 @@
             </div>
         </div>
     </div>
+
+    <!-- TOAST NOTIFICATIONS CONTAINER -->
+    <div id="toast-container" style="position: fixed; bottom: 20px; right: 20px; z-index: 99999; display: flex; flex-direction: column; gap: 0.5rem; max-width: 380px; pointer-events: none;"></div>
 
     <script src="app.js"></script>
 </body>
