@@ -6,10 +6,10 @@ const SUPABASE_URL = 'https://maguyzjhldcgpcvkvkqe.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1hZ3V5empobGRjZ3Bjdmt2a3FlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQ2NTU0MDMsImV4cCI6MjEwMDIzMTQwM30.Ow9xruE1qAFTX3mqELERxrY3CRBOdV_n4MoXXhtt3Y8';
 
 let supabaseClient = null;
-let Ã¡Ã¡realtimeChannel = null;
+let ÃÃrealtimeChannel = null;
 if (window.supabase) {
     try {
-        supabaseClient = window.supabase.cÃ¡Ã¡reateClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        supabaseClient = window.supabase.cÃÃreateClient(SUPABASE_URL, SUPABASE_ANON_KEY);
     } catch (err) {
         console.warn('Erro ao inicializar Supabase Client:', err);
     }
@@ -30,7 +30,7 @@ function verificarPermissao(perfilMinimo) {
     return (hierarquia[currentUser.perfil] || 0) >= (hierarquia[perfilMinimo] || 0);
 }
 
-// Varre o DOM e oculta/exibe elementos conforme o perfil do usuÃ¡rio
+// Varre o DOM e oculta/exibe elementos conforme o perfil do usuÃrio
 function aplicarPerfilDeAcesso() {
     const perfil = currentUser.perfil;
 
@@ -65,9 +65,9 @@ function aplicarPerfilDeAcesso() {
         el.style.display = isAdmin ? '' : 'none';
     });
 
-    // Controla inputs editÃ¡veis para perfil CONSULTA
+    // Controla inputs editÃveis para perfil CONSULTA
     const isConsulta = perfil === 'CONSULTA';
-    document.querySelectorAll('.input-volume, .input-minutes, .input-qtd, .input-backlog-volume, .input-aÃ¡Ã¡rea-allocation').forEach(el => {
+    document.querySelectorAll('.input-volume, .input-minutes, .input-qtd, .input-backlog-volume, .input-aÃÃrea-allocation').forEach(el => {
         el.disabled = isConsulta;
         el.style.opacity = isConsulta ? '0.5' : '1';
     });
@@ -75,7 +75,7 @@ function aplicarPerfilDeAcesso() {
         el.disabled = isConsulta;
         el.style.opacity = isConsulta ? '0.5' : '1';
     });
-    // Controla inputs editÃ¡veis na tabela de Cadastros
+    // Controla inputs editÃveis na tabela de Cadastros
     document.querySelectorAll('.input-activity-name-cell, .select-activity-team-cell, .select-activity-resp-cell').forEach(el => {
         el.disabled = isConsulta;
         el.style.opacity = isConsulta ? '0.5' : '1';
@@ -91,8 +91,8 @@ let state = {
         teamSize: 5.0
     },
     processes: [],
-    customAÃ¡Ã¡Ã¡Ã¡reas: [],
-    aÃ¡Ã¡reaAllocations: {}
+    customAÃÃÃÃreas: [],
+    aÃÃreaAllocations: {}
 };
 
 // CHART INSTANCES
@@ -101,28 +101,28 @@ let barChartInstance = null;
 
 // DEFAULT EXAMPLE DATA WITH AREAS
 const EXAMPLE_PROCESSES = [
-    { id: 'ex-1', name: 'Cancelamento DY - SolicitaÃ§Ã£o CB (Fila Projeto)', aÃ¡Ã¡rea: 'Backoffice', volume: '', minutos: 0, qtdExecucao: '', backlogVolume: '', allocatedResource: '' },
-    { id: 'ex-2', name: 'ProrrogaÃ§Ã£o', aÃ¡Ã¡rea: 'Backoffice', volume: '', minutos: 0, qtdExecucao: '', backlogVolume: '', allocatedResource: '' },
-    { id: 'ex-3', name: 'Baixa de Parcela (RobÃ´ Baixas) - Demandas BKO + Baixa em lote + Baixa manual', aÃ¡Ã¡rea: 'Backoffice', volume: '', minutos: 0, qtdExecucao: '', backlogVolume: '', allocatedResource: '' },
-    { id: 'ex-4', name: 'Improcedente DY', aÃ¡Ã¡rea: 'Backoffice', volume: '', minutos: 0, qtdExecucao: '', backlogVolume: '', allocatedResource: '' },
-    { id: 'ex-5', name: 'DevoluÃ§Ã£o de pagamento em duplicidade', aÃ¡Ã¡rea: 'Backoffice', volume: '', minutos: 0, qtdExecucao: '', backlogVolume: '', allocatedResource: '' },
-    { id: 'ex-6', name: 'Reembolso (RobÃ´ Reembolsos) Montagem Arquivo + Upload Zord + Monitoria/Retorno', aÃ¡Ã¡rea: 'Backoffice', volume: '', minutos: 0, qtdExecucao: '', backlogVolume: '', allocatedResource: '' },
-    { id: 'ex-7', name: 'Cancelamento CAPTA + Cancelamento Jira', aÃ¡Ã¡rea: 'Backoffice', volume: '', minutos: 0, qtdExecucao: '', backlogVolume: '', allocatedResource: '' },
-    { id: 'ex-8', name: 'Cancelamento SAP + Cancelamento Jira', aÃ¡Ã¡rea: 'Backoffice', volume: '', minutos: 0, qtdExecucao: '', backlogVolume: '', allocatedResource: '' },
-    { id: 'ex-9', name: 'DÃ©bitos Pag Emana Pay', aÃ¡Ã¡rea: 'Backoffice', volume: '', minutos: 0, qtdExecucao: '', backlogVolume: '', allocatedResource: '' },
-    { id: 'ex-10', name: 'Cancelamento DY - SolicitaÃ§Ã£o CB (Fila N3) + Cancelamento Jira', aÃ¡Ã¡rea: 'Backoffice', volume: '', minutos: 0, qtdExecucao: '', backlogVolume: '', allocatedResource: '' },
-    { id: 'ex-11', name: 'Pagamento nÃ£o processado', aÃ¡Ã¡rea: 'Backoffice', volume: '', minutos: 0, qtdExecucao: '', backlogVolume: '', allocatedResource: '' },
-    { id: 'ex-12', name: 'Parcela invertida', aÃ¡Ã¡rea: 'Backoffice', volume: '', minutos: 0, qtdExecucao: '', backlogVolume: '', allocatedResource: '' },
-    { id: 'ex-13', name: 'Cancelamento Parcial/AmortizaÃ§Ã£o', aÃ¡Ã¡rea: 'Backoffice', volume: '', minutos: 0, qtdExecucao: '', backlogVolume: '', allocatedResource: '' },
-    { id: 'ex-14', name: 'AmortizaÃ§Ã£o Nota de credito', aÃ¡Ã¡rea: 'Backoffice', volume: '', minutos: 0, qtdExecucao: '', backlogVolume: '', allocatedResource: '' },
-    { id: 'ex-15', name: 'Recompra (AmortizaÃ§Ã£o e Recompra Proativa)', aÃ¡Ã¡rea: 'Backoffice', volume: '', minutos: 0, qtdExecucao: '', backlogVolume: '', allocatedResource: '' },
-    { id: 'ex-16', name: 'DÃºvidas - Pagamento, CobranÃ§a e Espelhamento', aÃ¡Ã¡rea: 'Backoffice', volume: '', minutos: 0, qtdExecucao: '', backlogVolume: '', allocatedResource: '' }
+    { id: 'ex-1', name: 'Cancelamento DY - SolicitaÃ§Ã£o CB (Fila Projeto)', aÃÃrea: 'Backoffice', volume: '', minutos: 0, qtdExecucao: '', backlogVolume: '', allocatedResource: '' },
+    { id: 'ex-2', name: 'ProrrogaÃ§Ã£o', aÃÃrea: 'Backoffice', volume: '', minutos: 0, qtdExecucao: '', backlogVolume: '', allocatedResource: '' },
+    { id: 'ex-3', name: 'Baixa de Parcela (RobÃ´ Baixas) - Demandas BKO + Baixa em lote + Baixa manual', aÃÃrea: 'Backoffice', volume: '', minutos: 0, qtdExecucao: '', backlogVolume: '', allocatedResource: '' },
+    { id: 'ex-4', name: 'Improcedente DY', aÃÃrea: 'Backoffice', volume: '', minutos: 0, qtdExecucao: '', backlogVolume: '', allocatedResource: '' },
+    { id: 'ex-5', name: 'DevoluÃ§Ã£o de pagamento em duplicidade', aÃÃrea: 'Backoffice', volume: '', minutos: 0, qtdExecucao: '', backlogVolume: '', allocatedResource: '' },
+    { id: 'ex-6', name: 'Reembolso (RobÃ´ Reembolsos) Montagem Arquivo + Upload Zord + Monitoria/Retorno', aÃÃrea: 'Backoffice', volume: '', minutos: 0, qtdExecucao: '', backlogVolume: '', allocatedResource: '' },
+    { id: 'ex-7', name: 'Cancelamento CAPTA + Cancelamento Jira', aÃÃrea: 'Backoffice', volume: '', minutos: 0, qtdExecucao: '', backlogVolume: '', allocatedResource: '' },
+    { id: 'ex-8', name: 'Cancelamento SAP + Cancelamento Jira', aÃÃrea: 'Backoffice', volume: '', minutos: 0, qtdExecucao: '', backlogVolume: '', allocatedResource: '' },
+    { id: 'ex-9', name: 'DÃ©bitos Pag Emana Pay', aÃÃrea: 'Backoffice', volume: '', minutos: 0, qtdExecucao: '', backlogVolume: '', allocatedResource: '' },
+    { id: 'ex-10', name: 'Cancelamento DY - SolicitaÃ§Ã£o CB (Fila N3) + Cancelamento Jira', aÃÃrea: 'Backoffice', volume: '', minutos: 0, qtdExecucao: '', backlogVolume: '', allocatedResource: '' },
+    { id: 'ex-11', name: 'Pagamento nÃ£o processado', aÃÃrea: 'Backoffice', volume: '', minutos: 0, qtdExecucao: '', backlogVolume: '', allocatedResource: '' },
+    { id: 'ex-12', name: 'Parcela invertida', aÃÃrea: 'Backoffice', volume: '', minutos: 0, qtdExecucao: '', backlogVolume: '', allocatedResource: '' },
+    { id: 'ex-13', name: 'Cancelamento Parcial/AmortizaÃ§Ã£o', aÃÃrea: 'Backoffice', volume: '', minutos: 0, qtdExecucao: '', backlogVolume: '', allocatedResource: '' },
+    { id: 'ex-14', name: 'AmortizaÃ§Ã£o Nota de credito', aÃÃrea: 'Backoffice', volume: '', minutos: 0, qtdExecucao: '', backlogVolume: '', allocatedResource: '' },
+    { id: 'ex-15', name: 'Recompra (AmortizaÃ§Ã£o e Recompra Proativa)', aÃÃrea: 'Backoffice', volume: '', minutos: 0, qtdExecucao: '', backlogVolume: '', allocatedResource: '' },
+    { id: 'ex-16', name: 'DÃºvidas - Pagamento, CobranÃ§a e Espelhamento', aÃÃrea: 'Backoffice', volume: '', minutos: 0, qtdExecucao: '', backlogVolume: '', allocatedResource: '' }
 ];
 
 function getSupabase() {
-    if (!supabaseClient && window.supabase && typeof window.supabase.cÃ¡Ã¡reateClient === 'function') {
+    if (!supabaseClient && window.supabase && typeof window.supabase.cÃÃreateClient === 'function') {
         try {
-            supabaseClient = window.supabase.cÃ¡Ã¡reateClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+            supabaseClient = window.supabase.cÃÃreateClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         } catch (err) {
             console.error('Erro ao inicializar Supabase Client:', err);
         }
@@ -149,7 +149,7 @@ async function handleLogin() {
     
     const client = getSupabase();
     if (!client) {
-        showAuthError("NÃ£o foi possÃ­vel conectar ao Supabase SDK. Verifique sua conexÃ£o ou se o SDK foi carregado.");
+        showAuthError("NÃ£o foi possÃvel conectar ao Supabase SDK. Verifique sua conexÃ£o ou se o SDK foi carregado.");
         return;
     }
 
@@ -167,7 +167,7 @@ async function handleLogin() {
         } else if (data && data.session && data.session.user) {
             setupUserSession(data.session.user);
         } else {
-            showAuthError("UsuÃ¡rio ou senha incorretos.");
+            showAuthError("UsuÃrio ou senha incorretos.");
         }
     } catch (err) {
         showAuthError(err.message || "Ocorreu um erro inesperado ao tentar fazer login.");
@@ -202,7 +202,7 @@ async function handleSignup() {
     
     const client = getSupabase();
     if (!client) {
-        showAuthError("NÃ£o foi possÃ­vel conectar ao Supabase. Verifique sua conexÃ£o com a internet.");
+        showAuthError("NÃ£o foi possÃvel conectar ao Supabase. Verifique sua conexÃ£o com a internet.");
         return;
     }
 
@@ -213,7 +213,7 @@ async function handleSignup() {
     }
 
     try {
-        // Todo usuÃ¡rio recÃ©m cadastrado recebe perfil 'CONSULTA' por padrÃ£o nos metadados
+        // Todo usuÃrio recÃ©m cadastrado recebe perfil 'CONSULTA' por padrÃ£o nos metadados
         const { data, error } = await client.auth.signUp({
             email,
             password,
@@ -226,7 +226,7 @@ async function handleSignup() {
         });
 
         if (error) {
-            showAuthError(error.message || "Erro ao cadastrar usuÃ¡rio.");
+            showAuthError(error.message || "Erro ao cadastrar usuÃrio.");
         } else if (data) {
             if (data.session && data.session.user) {
                 showAuthInfo("Conta criada e autenticada com sucesso!");
@@ -234,7 +234,7 @@ async function handleSignup() {
             } else if (data.user) {
                 showAuthInfo("Conta criada com sucesso! Se a confirmaÃ§Ã£o de e-mail estiver ativa no seu projeto Supabase, verifique sua caixa de entrada para ativar a conta.");
             } else {
-                showAuthInfo("Cadastro Ã¡Ã¡realizado com sucesso.");
+                showAuthInfo("Cadastro ÃÃrealizado com sucesso.");
             }
         }
     } catch (err) {
@@ -403,7 +403,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         showAuthError("Aviso: Configure o SUPABASE_URL e SUPABASE_ANON_KEY no app.js para utilizar a autenticação.");
     }
     
-    renderAÃ¡Ã¡reaFilterOptions();
+    renderAÃÃreaFilterOptions();
     renderResponsavelFilterOptions();
     renderCadastrosView();
     renderTable();
@@ -416,7 +416,7 @@ function showToast(message, type = 'info', duration = 5000) {
     const container = document.getElementById('toast-container');
     if (!container) return;
 
-    const toast = document.cÃ¡Ã¡reateElement('div');
+    const toast = document.cÃÃreateElement('div');
     toast.style.cssText = `
         pointer-events: auto;
         padding: 0.75rem 1rem;
@@ -446,7 +446,7 @@ function showToast(message, type = 'info', duration = 5000) {
 
 // REALTIME STATUS UI INDICATOR
 function updateRealtimeStatusUI(status, customMessage) {
-    const badge = document.getElementById('Ã¡Ã¡realtime-status-badge');
+    const badge = document.getElementById('ÃÃrealtime-status-badge');
     if (!badge) return;
 
     const dot = badge.querySelector('.status-dot');
@@ -459,11 +459,11 @@ function updateRealtimeStatusUI(status, customMessage) {
     } else if (status === 'CONNECTING') {
         if (dot) dot.style.background = '#eab308'; // Yellow
         if (text) text.textContent = 'Conectando...';
-        badge.title = 'Conectando ao canal de tempo Ã¡Ã¡real...';
+        badge.title = 'Conectando ao canal de tempo ÃÃreal...';
     } else if (status === 'ERROR' || status === 'CLOSED' || status === 'CHANNEL_ERROR') {
         if (dot) dot.style.background = '#ef4444'; // Red
         if (text) text.textContent = customMessage || 'Offline (Local)';
-        badge.title = 'Sem sincronização remota em tempo Ã¡Ã¡real. Verifique se a tabela board_state existe no Supabase.';
+        badge.title = 'Sem sincronização remota em tempo ÃÃreal. Verifique se a tabela board_state existe no Supabase.';
     }
 }
 
@@ -473,7 +473,7 @@ function refreshAllViews() {
     renderTable();
     renderBalancingTable();
     renderReviewTable();
-    renderAÃ¡Ã¡reaFilterOptions();
+    renderAÃÃreaFilterOptions();
     renderResponsavelFilterOptions();
     aplicarPerfilDeAcesso();
 }
@@ -483,14 +483,14 @@ function subscribeRealtime() {
     const client = getSupabase();
     if (!client) return;
 
-    if (Ã¡Ã¡realtimeChannel) {
-        client.removeChannel(Ã¡Ã¡realtimeChannel);
-        Ã¡Ã¡realtimeChannel = null;
+    if (ÃÃrealtimeChannel) {
+        client.removeChannel(ÃÃrealtimeChannel);
+        ÃÃrealtimeChannel = null;
     }
 
     updateRealtimeStatusUI('CONNECTING');
 
-    Ã¡Ã¡realtimeChannel = client
+    ÃÃrealtimeChannel = client
         .channel('board-changes')
         .on('postgres_changes', {
             event: '*',
@@ -510,7 +510,7 @@ function subscribeRealtime() {
                 applyStateMigrations();
                 localStorage.setItem('capacity_fte_hub_state', JSON.stringify(state));
                 refreshAllViews();
-                showToast('⚡ O painel foi atualizado em tempo Ã¡Ã¡real por outro usuário!', 'info', 4000);
+                showToast('⚡ O painel foi atualizado em tempo ÃÃreal por outro usuário!', 'info', 4000);
             }
         })
         .subscribe((status, err) => {
@@ -519,7 +519,7 @@ function subscribeRealtime() {
                 updateRealtimeStatusUI('SUBSCRIBED');
             } else if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
                 updateRealtimeStatusUI('ERROR', 'Erro Realtime');
-                console.warn('[Realtime Error] Certifique-se de que a publicação Realtime está ativa no Supabase (ALTER PUBLICATION supabase_Ã¡Ã¡realtime ADD TABLE board_state).');
+                console.warn('[Realtime Error] Certifique-se de que a publicação Realtime está ativa no Supabase (ALTER PUBLICATION supabase_ÃÃrealtime ADD TABLE board_state).');
             } else if (status === 'CLOSED') {
                 updateRealtimeStatusUI('ERROR', 'Desconectado');
             }
@@ -528,9 +528,9 @@ function subscribeRealtime() {
 
 function unsubscribeRealtime() {
     const client = getSupabase();
-    if (Ã¡Ã¡realtimeChannel && client) {
-        client.removeChannel(Ã¡Ã¡realtimeChannel);
-        Ã¡Ã¡realtimeChannel = null;
+    if (ÃÃrealtimeChannel && client) {
+        client.removeChannel(ÃÃrealtimeChannel);
+        ÃÃrealtimeChannel = null;
         updateRealtimeStatusUI('CLOSED');
         console.log('[Realtime] Canal desconectado.');
     }
@@ -578,7 +578,7 @@ async function forceResetGlobalState() {
         return;
     }
 
-    if (!confirm('Deseja Ã¡Ã¡realmente definir e publicar a sua visão atual como a base oficial para TODOS os usuários? Isso sincronizará a tela de todos imediatamente.')) {
+    if (!confirm('Deseja ÃÃrealmente definir e publicar a sua visão atual como a base oficial para TODOS os usuários? Isso sincronizará a tela de todos imediatamente.')) {
         return;
     }
 
@@ -648,13 +648,13 @@ async function loadStateFromSupabase() {
 // STATE MIGRATIONS HELPER
 function applyStateMigrations() {
     if (!state) return;
-    if (!state.customAÃ¡Ã¡Ã¡Ã¡reas) state.customAÃ¡Ã¡Ã¡Ã¡reas = [];
-    if (!state.aÃ¡Ã¡reaAllocations) state.aÃ¡Ã¡reaAllocations = {};
+    if (!state.customAÃÃÃÃreas) state.customAÃÃÃÃreas = [];
+    if (!state.aÃÃreaAllocations) state.aÃÃreaAllocations = {};
     if (!state.processes) state.processes = [];
 
     state.processes.forEach(p => {
         const match = EXAMPLE_PROCESSES.find(ep => ep.name === p.name);
-        if (match) p.aÃ¡Ã¡rea = 'Backoffice';
+        if (match) p.aÃÃrea = 'Backoffice';
         if (p.backlogVolume === undefined) p.backlogVolume = '';
         if (p.allocatedResource === undefined) p.allocatedResource = '';
         if (p.reviewStatus === undefined) p.reviewStatus = 'Manter';
@@ -662,8 +662,8 @@ function applyStateMigrations() {
     });
     if (state.history === undefined) state.history = [];
     if (state.teams === undefined) {
-        if (state.customAÃ¡Ã¡Ã¡Ã¡reas && state.customAÃ¡Ã¡Ã¡Ã¡reas.length > 0) {
-            state.teams = ['Backoffice', 'Governança', 'Seguros/N2', 'Eficiência Operacional', ...state.customAÃ¡Ã¡Ã¡Ã¡reas];
+        if (state.customAÃÃÃÃreas && state.customAÃÃÃÃreas.length > 0) {
+            state.teams = ['Backoffice', 'Governança', 'Seguros/N2', 'Eficiência Operacional', ...state.customAÃÃÃÃreas];
         } else {
             state.teams = ['Backoffice', 'Governança', 'Seguros/N2', 'Eficiência Operacional'];
         }
@@ -687,20 +687,20 @@ function applyStateMigrations() {
         const uniqueResps = [...new Set(state.processes.map(p => p.responsavel || '').filter(r => r.trim() !== ''))].sort();
         state.responsaveis = uniqueResps.map(r => {
             const procWithResp = state.processes.find(p => p.responsavel === r);
-            const inheritedAÃ¡Ã¡rea = procWithResp ? procWithResp.aÃ¡Ã¡rea : '';
-            return { name: r, aÃ¡Ã¡rea: inheritedAÃ¡Ã¡rea, horasDia: null, absenteismo: null, diasUteis: null };
+            const inheritedAÃÃrea = procWithResp ? procWithResp.aÃÃrea : '';
+            return { name: r, aÃÃrea: inheritedAÃÃrea, horasDia: null, absenteismo: null, diasUteis: null };
         });
     } else if (Array.isArray(state.responsaveis) && state.responsaveis.length > 0 && typeof state.responsaveis[0] === 'string') {
         state.responsaveis = state.responsaveis.map(r => {
             const procWithResp = state.processes.find(p => p.responsavel === r);
-            const inheritedAÃ¡Ã¡rea = procWithResp ? procWithResp.aÃ¡Ã¡rea : '';
-            return { name: r, aÃ¡Ã¡rea: inheritedAÃ¡Ã¡rea, horasDia: null, absenteismo: null, diasUteis: null };
+            const inheritedAÃÃrea = procWithResp ? procWithResp.aÃÃrea : '';
+            return { name: r, aÃÃrea: inheritedAÃÃrea, horasDia: null, absenteismo: null, diasUteis: null };
         });
     } else if (Array.isArray(state.responsaveis)) {
         state.responsaveis.forEach(r => {
-            if (r && typeof r === 'object' && r.aÃ¡Ã¡rea === undefined) {
+            if (r && typeof r === 'object' && r.aÃÃrea === undefined) {
                 const procWithResp = state.processes.find(p => p.responsavel === r.name);
-                r.aÃ¡Ã¡rea = procWithResp ? procWithResp.aÃ¡Ã¡rea : '';
+                r.aÃÃrea = procWithResp ? procWithResp.aÃÃrea : '';
             }
         });
     } else {
@@ -733,14 +733,14 @@ function loadState() {
 
     if (useDefaults) {
         state.processes = JSON.parse(JSON.stringify(EXAMPLE_PROCESSES));
-        state.customAÃ¡Ã¡Ã¡Ã¡reas = [];
-        state.aÃ¡Ã¡reaAllocations = {};
+        state.customAÃÃÃÃreas = [];
+        state.aÃÃreaAllocations = {};
         state.teams = ['Backoffice', 'Governança', 'Seguros/N2', 'Eficiência Operacional'];
         const uniqueResps = [...new Set(state.processes.map(p => p.responsavel || '').filter(r => r.trim() !== ''))].sort();
         state.responsaveis = uniqueResps.map(r => {
             const procWithResp = state.processes.find(p => p.responsavel === r);
-            const inheritedAÃ¡Ã¡rea = procWithResp ? procWithResp.aÃ¡Ã¡rea : '';
-            return { name: r, aÃ¡Ã¡rea: inheritedAÃ¡Ã¡rea, horasDia: null, absenteismo: null, diasUteis: null };
+            const inheritedAÃÃrea = procWithResp ? procWithResp.aÃÃrea : '';
+            return { name: r, aÃÃrea: inheritedAÃÃrea, horasDia: null, absenteismo: null, diasUteis: null };
         });
         state.history = [];
         state.params = {
@@ -822,7 +822,7 @@ function closeNewTeamModal() {
 }
 
 function saveNewTeamFromModal() {
-    if (!verificarPermissao('OPERADOR')) { alert('Acesso negado: Perfil OPERADOR necessÃ¡rio.'); return; }
+    if (!verificarPermissao('OPERADOR')) { alert('Acesso negado: Perfil OPERADOR necessÃrio.'); return; }
     const nameInput = document.getElementById('modal-input-new-team');
     const gerenciaSelect = document.getElementById('modal-select-team-gerencia');
     const diretoriaSelect = document.getElementById('modal-select-team-diretoria');
@@ -836,7 +836,7 @@ function saveNewTeamFromModal() {
         return;
     }
     if ((state.teams || []).map(t => t.toLowerCase()).includes(teamName.toLowerCase())) {
-        if (errorDiv) { errorDiv.textContent = 'Esta equipe jÃ¡ estÃ¡ cadastrada.'; errorDiv.style.display = 'block'; }
+        if (errorDiv) { errorDiv.textContent = 'Esta equipe jÃ estÃ cadastrada.'; errorDiv.style.display = 'block'; }
         if (nameInput) nameInput.focus();
         return;
     }
@@ -851,7 +851,7 @@ function saveNewTeamFromModal() {
     saveState();
     if (modal) modal.style.display = 'none';
     renderCadastrosView();
-    renderAÃ¡Ã¡reaFilterOptions();
+    renderAÃÃreaFilterOptions();
     renderTable();
     renderBalancingTable();
     renderReviewTable();
@@ -925,12 +925,12 @@ function setupEventListeners() {
     const btnBulkDeleteSelected = document.getElementById('btn-cadastros-delete-selected');
     if (btnBulkDeleteSelected) {
         btnBulkDeleteSelected.addEventListener('click', () => {
-            if (!verificarPermissao('ADMIN')) { alert('Acesso negado: Perfil ADMIN necessÃ¡rio.'); return; }
+            if (!verificarPermissao('ADMIN')) { alert('Acesso negado: Perfil ADMIN necessÃrio.'); return; }
             const checkedBoxes = document.querySelectorAll('.cadastros-row-checkbox:checked');
             const idsToDelete = [...checkedBoxes].map(cb => cb.dataset.id);
             if (idsToDelete.length === 0) return;
             
-            if (confirm(`Deseja Ã¡Ã¡realmente excluir as ${idsToDelete.length} atividades selecionadas?`)) {
+            if (confirm(`Deseja ÃÃrealmente excluir as ${idsToDelete.length} atividades selecionadas?`)) {
                 state.processes = state.processes.filter(p => !idsToDelete.includes(p.id));
                 saveState();
                 
@@ -965,10 +965,10 @@ function setupEventListeners() {
         });
     }
 
-    // AÃ¡Ã¡rea & Owner filter triggers
-    const filterAÃ¡Ã¡reaEl = document.getElementById('filter-aÃ¡Ã¡rea');
-    if (filterAÃ¡Ã¡reaEl) {
-        filterAÃ¡Ã¡reaEl.addEventListener('change', () => {
+    // AÃÃrea & Owner filter triggers
+    const filterAÃÃreaEl = document.getElementById('filter-aÃÃrea');
+    if (filterAÃÃreaEl) {
+        filterAÃÃreaEl.addEventListener('change', () => {
             renderTable();
         });
     }
@@ -980,9 +980,9 @@ function setupEventListeners() {
         });
     }
 
-    const filterAÃ¡Ã¡reaBalEl = document.getElementById('filter-aÃ¡Ã¡rea-balancing');
-    if (filterAÃ¡Ã¡reaBalEl) {
-        filterAÃ¡Ã¡reaBalEl.addEventListener('change', () => {
+    const filterAÃÃreaBalEl = document.getElementById('filter-aÃÃrea-balancing');
+    if (filterAÃÃreaBalEl) {
+        filterAÃÃreaBalEl.addEventListener('change', () => {
             renderBalancingTable();
         });
     }
@@ -994,9 +994,9 @@ function setupEventListeners() {
         });
     }
 
-    const filterAÃ¡Ã¡reaRevEl = document.getElementById('filter-aÃ¡Ã¡rea-review');
-    if (filterAÃ¡Ã¡reaRevEl) {
-        filterAÃ¡Ã¡reaRevEl.addEventListener('change', () => {
+    const filterAÃÃreaRevEl = document.getElementById('filter-aÃÃrea-review');
+    if (filterAÃÃreaRevEl) {
+        filterAÃÃreaRevEl.addEventListener('change', () => {
             renderReviewTable();
         });
     }
@@ -1025,12 +1025,12 @@ function setupEventListeners() {
 
     // Cadastros - Add Responsible button
     const handleAddResponsible = () => {
-        if (!verificarPermissao('OPERADOR')) { alert('Acesso negado: Perfil OPERADOR necessÃ¡rio.'); return; }
+        if (!verificarPermissao('OPERADOR')) { alert('Acesso negado: Perfil OPERADOR necessÃrio.'); return; }
         const respInput = document.getElementById('input-new-responsible');
         if (!respInput) return;
         const respName = respInput.value.trim();
         if (!respName) {
-            alert("Por favor, digite o nome do responsÃ¡vel.");
+            alert("Por favor, digite o nome do responsÃvel.");
             return;
         }
         
@@ -1046,13 +1046,13 @@ function setupEventListeners() {
         
         const currentNames = state.responsaveis.map(r => (r && r.name ? r.name : String(r)).toLowerCase());
         if (currentNames.includes(respName.toLowerCase())) {
-            alert("Este responsÃ¡vel jÃ¡ estÃ¡ cadastrado.");
+            alert("Este responsÃvel jÃ estÃ cadastrado.");
             return;
         }
         
         state.responsaveis.push({
             name: respName,
-            aÃ¡Ã¡rea: selectedTeam || '',
+            aÃÃrea: selectedTeam || '',
             horasDia: null,
             absenteismo: null,
             diasUteis: null
@@ -1112,7 +1112,7 @@ function setupEventListeners() {
     });
 
     document.getElementById('btn-clear-backlog-volumes').addEventListener('click', () => {
-        if (!verificarPermissao('ADMIN')) { alert('Acesso negado: Perfil ADMIN necessÃ¡rio.'); return; }
+        if (!verificarPermissao('ADMIN')) { alert('Acesso negado: Perfil ADMIN necessÃrio.'); return; }
         state.processes.forEach(proc => {
             proc.backlogVolume = '';
         });
@@ -1167,16 +1167,16 @@ function setupEventListeners() {
 function renderTable() {
     const tableBody = document.getElementById('table-body');
     const emptyState = document.getElementById('empty-state');
-    const filterValue = document.getElementById('filter-aÃ¡Ã¡rea').value;
+    const filterValue = document.getElementById('filter-aÃÃrea').value;
     const respFilter = document.getElementById('filter-responsavel').value;
     
     if (!tableBody) return;
     tableBody.innerHTML = '';
     
     const filteredProcesses = state.processes.filter(p => {
-        const aÃ¡Ã¡reaMatch = filterValue === 'all' || p.aÃ¡Ã¡rea === filterValue;
+        const aÃÃreaMatch = filterValue === 'all' || p.aÃÃrea === filterValue;
         const respMatch = respFilter === 'all' || p.responsavel === respFilter;
-        return aÃ¡Ã¡reaMatch && respMatch;
+        return aÃÃreaMatch && respMatch;
     });
 
     if (filteredProcesses.length === 0) {
@@ -1187,7 +1187,7 @@ function renderTable() {
             emptyState.style.display = 'none';
             document.getElementById('fte-table').style.display = 'table';
             
-            const tr = document.cÃ¡Ã¡reateElement('tr');
+            const tr = document.cÃÃreateElement('tr');
             tr.innerHTML = `<td colspan="8" style="text-align: center; color: var(--text-muted); padding: 2rem;">Nenhuma atividade cadastrada nesta busca/filtro.</td>`;
             tableBody.appendChild(tr);
         }
@@ -1199,7 +1199,7 @@ function renderTable() {
     }
 
     filteredProcesses.forEach((proc) => {
-        const tr = document.cÃ¡Ã¡reateElement('tr');
+        const tr = document.cÃÃreateElement('tr');
         tr.dataset.id = proc.id;
         if (proc.reviewStatus === 'Parar') {
             tr.className = 'row-review-stopped';
@@ -1213,10 +1213,10 @@ function renderTable() {
                 </div>
             </td>
             <td>
-                <span class="badge-aÃ¡Ã¡rea" style="font-size: 0.85rem; padding: 0.25rem 0.5rem; border-radius: 4px; background: rgba(235, 92, 39, 0.08); color: var(--color-primary); border: 1px solid rgba(235, 92, 39, 0.15);">${escapeHtml(proc.aÃ¡Ã¡rea || 'Sem Equipe')}</span>
+                <span class="badge-aÃÃrea" style="font-size: 0.85rem; padding: 0.25rem 0.5rem; border-radius: 4px; background: rgba(235, 92, 39, 0.08); color: var(--color-primary); border: 1px solid rgba(235, 92, 39, 0.15);">${escapeHtml(proc.aÃÃrea || 'Sem Equipe')}</span>
             </td>
             <td>
-                <span style="font-size: 0.9rem; color: var(--text-secondary);">${escapeHtml(proc.responsavel || 'Sem ResponsÃ¡vel')}</span>
+                <span style="font-size: 0.9rem; color: var(--text-secondary);">${escapeHtml(proc.responsavel || 'Sem ResponsÃvel')}</span>
             </td>
             <td>
                 <input type="number" class="input-volume" value="${proc.volume}" placeholder="---" min="0">
@@ -1271,15 +1271,15 @@ function renderTable() {
 function renderBalancingTable() {
     const balancingBody = document.getElementById('balancing-table-body');
     const emptyState = document.getElementById('balancing-empty-state');
-    const filterValue = document.getElementById('filter-aÃ¡Ã¡rea-balancing').value;
+    const filterValue = document.getElementById('filter-aÃÃrea-balancing').value;
     
     balancingBody.innerHTML = '';
     
     const respFilter = document.getElementById('filter-responsavel-balancing').value;
     const filteredProcesses = state.processes.filter(p => {
-        const aÃ¡Ã¡reaMatch = filterValue === 'all' || p.aÃ¡Ã¡rea === filterValue;
+        const aÃÃreaMatch = filterValue === 'all' || p.aÃÃrea === filterValue;
         const respMatch = respFilter === 'all' || p.responsavel === respFilter;
-        return aÃ¡Ã¡reaMatch && respMatch;
+        return aÃÃreaMatch && respMatch;
     });
 
     if (filteredProcesses.length === 0) {
@@ -1290,7 +1290,7 @@ function renderBalancingTable() {
             emptyState.style.display = 'none';
             document.getElementById('balancing-table').style.display = 'table';
             
-            const tr = document.cÃ¡Ã¡reateElement('tr');
+            const tr = document.cÃÃreateElement('tr');
             tr.innerHTML = `<td colspan="7" style="text-align: center; color: var(--text-muted); padding: 2rem;">Nenhuma atividade cadastrada nesta busca/filtro.</td>`;
             balancingBody.appendChild(tr);
         }
@@ -1302,7 +1302,7 @@ function renderBalancingTable() {
     }
 
     filteredProcesses.forEach(proc => {
-        const tr = document.cÃ¡Ã¡reateElement('tr');
+        const tr = document.cÃÃreateElement('tr');
         tr.dataset.id = proc.id;
         tr.style.cursor = 'pointer';
         if (proc.reviewStatus === 'Parar') {
@@ -1334,11 +1334,11 @@ function renderBalancingTable() {
             </td>
             <td>
                 <span class="badge" style="margin-left: 0; background: rgba(235, 92, 39, 0.15); border: 1px solid var(--color-primary); color: var(--color-primary); box-shadow: none;">
-                    ${escapeHtml(proc.aÃ¡Ã¡rea)}
+                    ${escapeHtml(proc.aÃÃrea)}
                 </span>
             </td>
             <td>
-                <span style="font-size: 0.9rem; color: var(--text-secondary);">${escapeHtml(proc.responsavel || 'Sem ResponsÃ¡vel')}</span>
+                <span style="font-size: 0.9rem; color: var(--text-secondary);">${escapeHtml(proc.responsavel || 'Sem ResponsÃvel')}</span>
             </td>
             <td>${minutes.toFixed(0)} min</td>
             <td>
@@ -1360,7 +1360,7 @@ function renderBalancingTable() {
             }
         }
         
-        // Click event to highlight corresponding aÃ¡Ã¡rea card on the right (ignore for ResponsÃ¡vel and Backlog inputs)
+        // Click event to highlight corresponding aÃÃrea card on the right (ignore for ResponsÃvel and Backlog inputs)
         tr.addEventListener('click', (e) => {
             const td = e.target.closest('td');
             if (!td) return;
@@ -1370,8 +1370,8 @@ function renderBalancingTable() {
                 return;
             }
             
-            const aÃ¡Ã¡reaName = proc.aÃ¡Ã¡rea;
-            highlightAndFocusAÃ¡Ã¡rea(aÃ¡Ã¡reaName);
+            const aÃÃreaName = proc.aÃÃrea;
+            highlightAndFocusAÃÃrea(aÃÃreaName);
         });
         
         balancingBody.appendChild(tr);
@@ -1380,16 +1380,16 @@ function renderBalancingTable() {
     updateBalancingCalculations();
 }
 
-function highlightAndFocusAÃ¡Ã¡rea(aÃ¡Ã¡reaName) {
-    document.querySelectorAll('.aÃ¡Ã¡rea-alloc-card').forEach(card => {
+function highlightAndFocusAÃÃrea(aÃÃreaName) {
+    document.querySelectorAll('.aÃÃrea-alloc-card').forEach(card => {
         card.classList.remove('active-highlight');
     });
     
-    const card = document.querySelector(`.aÃ¡Ã¡rea-alloc-card[data-aÃ¡Ã¡rea="${aÃ¡Ã¡reaName}"]`);
+    const card = document.querySelector(`.aÃÃrea-alloc-card[data-aÃÃrea="${aÃÃreaName}"]`);
     if (card) {
         card.classList.add('active-highlight');
         card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-        const input = card.querySelector('.input-aÃ¡Ã¡rea-allocation');
+        const input = card.querySelector('.input-aÃÃrea-allocation');
         if (input) {
             input.focus();
             input.select();
@@ -1418,13 +1418,13 @@ function updateCalculations() {
     const horasDia = state.params.horasDia;
     const absenteismo = state.params.absenteismo / 100;
     const diasUteis = state.params.diasUteis;
-    const filterValue = document.getElementById('filter-aÃ¡Ã¡rea').value;
+    const filterValue = document.getElementById('filter-aÃÃrea').value;
 
     const horasRealDia = horasDia * (1 - absenteismo);
     const horasTrabalhoMes = horasRealDia * diasUteis;
 
-    // Render global Ã¡Ã¡read-only parameter fields
-    const elHorasReal = document.getElementById('val-horas-Ã¡Ã¡real');
+    // Render global ÃÃread-only parameter fields
+    const elHorasReal = document.getElementById('val-horas-ÃÃreal');
     if (elHorasReal) elHorasReal.textContent = horasRealDia.toFixed(1) + 'h';
     
     const elHorasMes = document.getElementById('val-horas-mes');
@@ -1551,7 +1551,7 @@ function updateCalculations() {
 // UPDATE BALANCE LOGIC & CALCULATIONS (BALANCEAMENTO TAB)
 function updateBalancingCalculations() {
     const teamSize = state.params.teamSize;
-    const filterValue = document.getElementById('filter-aÃ¡Ã¡rea-balancing').value;
+    const filterValue = document.getElementById('filter-aÃÃrea-balancing').value;
 
     let totalHoursAccum = 0;
     let totalFtePctAccum = 0;
@@ -1648,15 +1648,15 @@ function updateBalancingCalculations() {
 
 
 
-    // Update AÃ¡Ã¡rea Allocations Side Panel
-    renderAÃ¡Ã¡reaAllocations();
+    // Update AÃÃrea Allocations Side Panel
+    renderAÃÃreaAllocations();
 }
 
-function renderAÃ¡Ã¡reaAllocations() {
-    const listContainer = document.getElementById('aÃ¡Ã¡rea-allocations-list');
+function renderAÃÃreaAllocations() {
+    const listContainer = document.getElementById('aÃÃrea-allocations-list');
     if (!listContainer) return;
     
-    const aÃ¡Ã¡Ã¡Ã¡reas = ['Backoffice', 'GovernanÃ§a', 'Seguros/N2', 'EficiÃªncia Operacional', ...state.customAÃ¡Ã¡Ã¡Ã¡reas];
+    const aÃÃÃÃreas = ['Backoffice', 'GovernanÃ§a', 'Seguros/N2', 'EficiÃªncia Operacional', ...state.customAÃÃÃÃreas];
     
     const horasDia = state.params.horasDia;
     const absenteismo = state.params.absenteismo / 100;
@@ -1664,18 +1664,18 @@ function renderAÃ¡Ã¡reaAllocations() {
     const diasUteis = state.params.diasUteis;
     
     // Check if we need to do a full rebuild or if we can just update in place
-    const existingCards = listContainer.querySelectorAll('.aÃ¡Ã¡rea-alloc-card');
-    const needsFullRebuild = existingCards.length !== aÃ¡Ã¡Ã¡Ã¡reas.length;
+    const existingCards = listContainer.querySelectorAll('.aÃÃrea-alloc-card');
+    const needsFullRebuild = existingCards.length !== aÃÃÃÃreas.length;
     
     if (needsFullRebuild) {
         listContainer.innerHTML = '';
     }
     
-    aÃ¡Ã¡Ã¡Ã¡reas.forEach(aÃ¡Ã¡reaName => {
-        let aÃ¡Ã¡reaDailyHours = 0;
+    aÃÃÃÃreas.forEach(aÃÃreaName => {
+        let aÃÃreaDailyHours = 0;
         
         state.processes.forEach(proc => {
-            if (proc.aÃ¡Ã¡rea !== aÃ¡Ã¡reaName) return;
+            if (proc.aÃÃrea !== aÃÃreaName) return;
             if (proc.reviewStatus === 'Parar') return;
             
             const isTempoFrequencia = proc.qtdExecucao !== null && proc.qtdExecucao !== '' && parseFloat(proc.qtdExecucao) > 0;
@@ -1683,17 +1683,17 @@ function renderAÃ¡Ã¡reaAllocations() {
             
             if (isTempoFrequencia) {
                 const qtdExec = parseFloat(proc.qtdExecucao) || 0;
-                aÃ¡Ã¡reaDailyHours += (qtdExec * minutes) / 60 / diasUteis;
+                aÃÃreaDailyHours += (qtdExec * minutes) / 60 / diasUteis;
             } else {
                 const hasBacklog = proc.backlogVolume !== undefined && proc.backlogVolume !== '';
                 const backlogVol = hasBacklog ? parseFloat(proc.backlogVolume) : 0;
-                aÃ¡Ã¡reaDailyHours += (backlogVol * minutes) / 60;
+                aÃÃreaDailyHours += (backlogVol * minutes) / 60;
             }
         });
         
-        const requiredFte = horasRealDia > 0 ? (aÃ¡Ã¡reaDailyHours / horasRealDia) : 0;
+        const requiredFte = horasRealDia > 0 ? (aÃÃreaDailyHours / horasRealDia) : 0;
         
-        const allocatedNum = (state.responsaveis || []).filter(r => r.aÃ¡Ã¡rea === aÃ¡Ã¡reaName).length;
+        const allocatedNum = (state.responsaveis || []).filter(r => r.aÃÃrea === aÃÃreaName).length;
         
         let statusHtml = '';
         if (allocatedNum === 0) {
@@ -1715,39 +1715,39 @@ function renderAÃ¡Ã¡reaAllocations() {
         
         if (!needsFullRebuild) {
             // Update in place to preserve input focus
-            const card = listContainer.querySelector(`.aÃ¡Ã¡rea-alloc-card[data-aÃ¡Ã¡rea="${aÃ¡Ã¡reaName}"]`);
+            const card = listContainer.querySelector(`.aÃÃrea-alloc-card[data-aÃÃrea="${aÃÃreaName}"]`);
             if (card) {
-                const header = card.querySelector('.aÃ¡Ã¡rea-alloc-header');
+                const header = card.querySelector('.aÃÃrea-alloc-header');
                 if (header) {
-                    header.innerHTML = `<span class="aÃ¡Ã¡rea-alloc-name">${escapeHtml(aÃ¡Ã¡reaName)}</span> ${statusHtml}`;
+                    header.innerHTML = `<span class="aÃÃrea-alloc-name">${escapeHtml(aÃÃreaName)}</span> ${statusHtml}`;
                 }
-                const statVal = card.querySelector('.aÃ¡Ã¡rea-alloc-stat span');
+                const statVal = card.querySelector('.aÃÃrea-alloc-stat span');
                 if (statVal) {
                     statVal.textContent = requiredFte.toFixed(2);
                 }
-                const allocValDiv = card.querySelector('.aÃ¡Ã¡rea-allocation-value');
+                const allocValDiv = card.querySelector('.aÃÃrea-allocation-value');
                 if (allocValDiv) {
                     allocValDiv.textContent = allocatedNum;
                 }
             }
         } else {
-            // CÃ¡Ã¡reate new card
-            const card = document.cÃ¡Ã¡reateElement('div');
-            card.className = 'aÃ¡Ã¡rea-alloc-card';
-            card.dataset.aÃ¡Ã¡rea = aÃ¡Ã¡reaName;
+            // CÃÃreate new card
+            const card = document.cÃÃreateElement('div');
+            card.className = 'aÃÃrea-alloc-card';
+            card.dataset.aÃÃrea = aÃÃreaName;
             
             card.innerHTML = `
-                <div class="aÃ¡Ã¡rea-alloc-header">
-                    <span class="aÃ¡Ã¡rea-alloc-name">${escapeHtml(aÃ¡Ã¡reaName)}</span>
+                <div class="aÃÃrea-alloc-header">
+                    <span class="aÃÃrea-alloc-name">${escapeHtml(aÃÃreaName)}</span>
                     ${statusHtml}
                 </div>
-                <div class="aÃ¡Ã¡rea-alloc-body">
-                    <div class="aÃ¡Ã¡rea-alloc-stat">
+                <div class="aÃÃrea-alloc-body">
+                    <div class="aÃÃrea-alloc-stat">
                         FTE Requerido: <span>${requiredFte.toFixed(2)}</span>
                     </div>
                     <div style="display: flex; align-items: center; gap: 0.5rem;">
                         <span style="font-size: 0.75rem; color: var(--text-secondary);">Alocado:</span>
-                        <div class="aÃ¡Ã¡rea-allocation-value" style="padding: 0.2rem 0.6rem; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 4px; font-weight: 500; font-size: 0.9rem; min-width: 40px; text-align: center;">
+                        <div class="aÃÃrea-allocation-value" style="padding: 0.2rem 0.6rem; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 4px; font-weight: 500; font-size: 0.9rem; min-width: 40px; text-align: center;">
                             ${allocatedNum}
                         </div>
                     </div>
@@ -1761,14 +1761,14 @@ function renderAÃ¡Ã¡reaAllocations() {
 
 // NEW PROCESS MANAGEMENT
 function addNewProcess() {
-    if (!verificarPermissao('OPERADOR')) { alert('Acesso negado: Perfil OPERADOR necessÃ¡rio.'); return; }
+    if (!verificarPermissao('OPERADOR')) { alert('Acesso negado: Perfil OPERADOR necessÃrio.'); return; }
     const newId = 'proc-' + Date.now();
-    const defaultAÃ¡Ã¡rea = state.teams.length > 0 ? state.teams[0] : '';
+    const defaultAÃÃrea = state.teams.length > 0 ? state.teams[0] : '';
     
     state.processes.push({
         id: newId,
         name: `Nova Atividade ${state.processes.length + 1}`,
-        aÃ¡Ã¡rea: defaultAÃ¡Ã¡rea,
+        aÃÃrea: defaultAÃÃrea,
         responsavel: '',
         volume: '',
         minutos: 0,
@@ -1786,19 +1786,19 @@ function addNewProcess() {
 }
 
 function deleteProcess(id) {
-    if (!verificarPermissao('ADMIN')) { alert('Acesso negado: Perfil ADMIN necessÃ¡rio.'); return; }
+    if (!verificarPermissao('ADMIN')) { alert('Acesso negado: Perfil ADMIN necessÃrio.'); return; }
     state.processes = state.processes.filter(p => p.id !== id);
     renderTable();
     renderBalancingTable();
 }
 
 function duplicateProcess(proc) {
-    if (!verificarPermissao('OPERADOR')) { alert('Acesso negado: Perfil OPERADOR necessÃ¡rio.'); return; }
+    if (!verificarPermissao('OPERADOR')) { alert('Acesso negado: Perfil OPERADOR necessÃrio.'); return; }
     const newId = 'proc-' + Date.now() + '-' + Math.floor(Math.random() * 100);
     state.processes.push({
         id: newId,
         name: `${proc.name} (CÃ³pia)`,
-        aÃ¡Ã¡rea: proc.aÃ¡Ã¡rea,
+        aÃÃrea: proc.aÃÃrea,
         volume: proc.volume,
         minutos: proc.minutos,
         qtdExecucao: proc.qtdExecucao,
@@ -1811,7 +1811,7 @@ function duplicateProcess(proc) {
 }
 
 function loadExampleData() {
-    if (!verificarPermissao('ADMIN')) { alert('Acesso negado: Perfil ADMIN necessÃ¡rio.'); return; }
+    if (!verificarPermissao('ADMIN')) { alert('Acesso negado: Perfil ADMIN necessÃrio.'); return; }
     state.processes = JSON.parse(JSON.stringify(EXAMPLE_PROCESSES));
     state.params = {
         horasDia: 8.0,
@@ -1819,7 +1819,7 @@ function loadExampleData() {
         diasUteis: 21,
         teamSize: 5.0
     };
-    state.customAÃ¡Ã¡Ã¡Ã¡reas = [];
+    state.customAÃÃÃÃreas = [];
     state.teams = ['Backoffice', 'GovernanÃ§a', 'Seguros/N2', 'EficiÃªncia Operacional'];
     state.teamHierarchy = {
         'Backoffice': { gerencia: 'ConciliaÃ§Ã£o', diretoria: 'OperaÃ§Ãµes' },
@@ -1831,8 +1831,8 @@ function loadExampleData() {
     const uniqueResps = [...new Set(state.processes.map(p => p.responsavel || '').filter(r => r.trim() !== ''))].sort();
     state.responsaveis = uniqueResps.map(r => {
         const procWithResp = state.processes.find(p => p.responsavel === r);
-        const inheritedAÃ¡Ã¡rea = procWithResp ? procWithResp.aÃ¡Ã¡rea : '';
-        return { name: r, aÃ¡Ã¡rea: inheritedAÃ¡Ã¡rea, horasDia: null, absenteismo: null, diasUteis: null };
+        const inheritedAÃÃrea = procWithResp ? procWithResp.aÃÃrea : '';
+        return { name: r, aÃÃrea: inheritedAÃÃrea, horasDia: null, absenteismo: null, diasUteis: null };
     });
     
     const elInputHoras = document.getElementById('input-horas-dia');
@@ -1843,36 +1843,36 @@ function loadExampleData() {
     if (elInputDias) elInputDias.value = 21;
     const elInputTeam = document.getElementById('input-team-size');
     if (elInputTeam) elInputTeam.value = 5.0;
-    document.getElementById('filter-aÃ¡Ã¡rea').value = 'all';
-    document.getElementById('filter-aÃ¡Ã¡rea-balancing').value = 'all';
-    document.getElementById('filter-aÃ¡Ã¡rea-review').value = 'all';
+    document.getElementById('filter-aÃÃrea').value = 'all';
+    document.getElementById('filter-aÃÃrea-balancing').value = 'all';
+    document.getElementById('filter-aÃÃrea-review').value = 'all';
     document.getElementById('filter-responsavel').value = 'all';
     document.getElementById('filter-responsavel-balancing').value = 'all';
     document.getElementById('filter-responsavel-review').value = 'all';
 
-    renderAÃ¡Ã¡reaFilterOptions();
+    renderAÃÃreaFilterOptions();
     renderResponsavelFilterOptions();
     renderTable();
     renderBalancingTable();
 }
 
 function resetSimulator() {
-    if (!verificarPermissao('ADMIN')) { alert('Acesso negado: Perfil ADMIN necessÃ¡rio.'); return; }
+    if (!verificarPermissao('ADMIN')) { alert('Acesso negado: Perfil ADMIN necessÃrio.'); return; }
     state.processes = [];
-    document.getElementById('filter-aÃ¡Ã¡rea').value = 'all';
-    document.getElementById('filter-aÃ¡Ã¡rea-balancing').value = 'all';
-    document.getElementById('filter-aÃ¡Ã¡rea-review').value = 'all';
+    document.getElementById('filter-aÃÃrea').value = 'all';
+    document.getElementById('filter-aÃÃrea-balancing').value = 'all';
+    document.getElementById('filter-aÃÃrea-review').value = 'all';
     document.getElementById('filter-responsavel').value = 'all';
     document.getElementById('filter-responsavel-balancing').value = 'all';
     document.getElementById('filter-responsavel-review').value = 'all';
     
-    renderAÃ¡Ã¡reaFilterOptions();
+    renderAÃÃreaFilterOptions();
     renderResponsavelFilterOptions();
     renderTable();
     renderBalancingTable();
 }
 
-// CHART RENDER ENGINE (Grouped by AÃ¡Ã¡rea or Process based on filter selection)
+// CHART RENDER ENGINE (Grouped by AÃÃrea or Process based on filter selection)
 function renderCharts(totalFteRequired) {
     const isDark = document.body.classList.contains('dark-theme');
     
@@ -1882,22 +1882,22 @@ function renderCharts(totalFteRequired) {
     const primaryColor = style.getPropertyValue('--color-primary').trim();
     const successColor = style.getPropertyValue('--color-success').trim();
 
-    // 1. Doughnut Chart (Aggregated by AÃ¡Ã¡rea or by Process)
+    // 1. Doughnut Chart (Aggregated by AÃÃrea or by Process)
     const pieCanvas = document.getElementById('chart-pie');
     if (!pieCanvas) return;
 
-    const filterValue = document.getElementById('filter-aÃ¡Ã¡rea').value;
+    const filterValue = document.getElementById('filter-aÃÃrea').value;
     const chartTitleElement = document.getElementById('chart-pie-title');
 
-    const aÃ¡Ã¡reaMap = {};
+    const aÃÃreaMap = {};
     const processMap = {};
     const horasRealDia = state.params.horasDia * (1 - state.params.absenteismo / 100);
     const horasTrabalhoMes = horasRealDia * state.params.diasUteis;
 
-    // Filter processes list based on active aÃ¡Ã¡rea selection
+    // Filter processes list based on active aÃÃrea selection
     const filteredList = filterValue === 'all' 
         ? state.processes 
-        : state.processes.filter(p => p.aÃ¡Ã¡rea === filterValue);
+        : state.processes.filter(p => p.aÃÃrea === filterValue);
 
     filteredList.forEach(p => {
         const hasVolume = p.volume !== null && p.volume !== '';
@@ -1908,11 +1908,11 @@ function renderCharts(totalFteRequired) {
         const fte = horasTrabalhoMes > 0 ? (totalHours / horasTrabalhoMes) : 0;
 
         if (filterValue === 'all') {
-            const aÃ¡Ã¡reaName = p.aÃ¡Ã¡rea || 'Outras';
-            if (!aÃ¡Ã¡reaMap[aÃ¡Ã¡reaName]) {
-                aÃ¡Ã¡reaMap[aÃ¡Ã¡reaName] = 0;
+            const aÃÃreaName = p.aÃÃrea || 'Outras';
+            if (!aÃÃreaMap[aÃÃreaName]) {
+                aÃÃreaMap[aÃÃreaName] = 0;
             }
-            aÃ¡Ã¡reaMap[aÃ¡Ã¡reaName] += fte;
+            aÃÃreaMap[aÃÃreaName] += fte;
         } else {
             const procName = p.name || 'Sem nome';
             if (!processMap[procName]) {
@@ -1926,10 +1926,10 @@ function renderCharts(totalFteRequired) {
     let pieData = [];
 
     if (filterValue === 'all') {
-        pieLabels = Object.keys(aÃ¡Ã¡reaMap).filter(k => aÃ¡Ã¡reaMap[k] > 0);
-        pieData = pieLabels.map(k => parseFloat(aÃ¡Ã¡reaMap[k].toFixed(2)));
+        pieLabels = Object.keys(aÃÃreaMap).filter(k => aÃÃreaMap[k] > 0);
+        pieData = pieLabels.map(k => parseFloat(aÃÃreaMap[k].toFixed(2)));
         if (chartTitleElement) {
-            chartTitleElement.innerHTML = '<i class="fa-solid fa-chart-pie"></i> DistribuiÃ§Ã£o de FTE por ÃÃ¡Ã¡rea';
+            chartTitleElement.innerHTML = '<i class="fa-solid fa-chart-pie"></i> DistribuiÃ§Ã£o de FTE por ÃÃÃrea';
         }
     } else {
         pieLabels = Object.keys(processMap).filter(k => processMap[k] > 0);
@@ -1952,7 +1952,7 @@ function renderCharts(totalFteRequired) {
         pieChartInstance = new Chart(pieCanvas, {
             type: 'doughnut',
             data: {
-                labels: ['Nenhuma Ã¡Ã¡Ã¡rea com dados'],
+                labels: ['Nenhuma ÃÃÃrea com dados'],
                 datasets: [{
                     data: [1],
                     backgroundColor: [isDark ? '#081e13' : '#cbd5e1'],
@@ -2087,7 +2087,7 @@ function updateChartsTheme() {
 // EXPORT TO CSV (Excel Compatible - Exports active tab content)
 function exportToCSV() {
     if (state.processes.length === 0) {
-        alert("NÃ£o hÃ¡ dados para exportar.");
+        alert("NÃ£o hÃ dados para exportar.");
         return;
     }
 
@@ -2103,11 +2103,11 @@ function exportToCSV() {
 
     csvContent += "PARAMETROS GLOBAIS\n";
     csvContent += `Horas Trabalho / Dia;${state.params.horasDia}\n`;
-    csvContent += `AbsenteÃ­smo (%);${state.params.absenteismo}%\n`;
+    csvContent += `AbsenteÃsmo (%);${state.params.absenteismo}%\n`;
     csvContent += `Dias Ãšteis;${state.params.diasUteis}\n`;
     csvContent += `Horas Trabalho Real / Dia;${horasRealDia.toFixed(2)}\n`;
     csvContent += `Horas Trabalho MÃªs (1 FTE);${horasTrabalhoMes.toFixed(2)}\n`;
-    csvContent += `Tamanho da Equipe (DisponÃ­vel);${state.params.teamSize}\n\n`;
+    csvContent += `Tamanho da Equipe (DisponÃvel);${state.params.teamSize}\n\n`;
 
     if (activeTab === 'dashboard') {
         csvContent += "RELATORIO DE CAPACIDADE E FTE (DASHBOARD)\n";
@@ -2128,12 +2128,12 @@ function exportToCSV() {
             totalFtePct += ftePct;
 
             const name = `"${(proc.name || '').replace(/"/g, '""')}"`;
-            const aÃ¡Ã¡rea = `"${(proc.aÃ¡Ã¡rea || '').replace(/"/g, '""')}"`;
+            const aÃÃrea = `"${(proc.aÃÃrea || '').replace(/"/g, '""')}"`;
             const vol = proc.volume !== '' ? proc.volume : '""';
             const mins = proc.minutos !== '' ? proc.minutos : 0;
             const qtd = proc.qtdExecucao !== '' ? proc.qtdExecucao : '""';
 
-            csvContent += `${name};${aÃ¡Ã¡rea};${vol};${mins};${qtd};${totalHoursRow.toFixed(2).replace('.', ',')};${ftePct.toFixed(2).replace('.', ',')}%\n`;
+            csvContent += `${name};${aÃÃrea};${vol};${mins};${qtd};${totalHoursRow.toFixed(2).replace('.', ',')};${ftePct.toFixed(2).replace('.', ',')}%\n`;
         });
 
         csvContent += `TOTAL GERAL;;;;;;${totalHours.toFixed(2).replace('.', ',')};${totalFtePct.toFixed(2).replace('.', ',')}%\n`;
@@ -2171,10 +2171,10 @@ function exportToCSV() {
             totalFtePct += ftePct;
 
             const name = `"${(proc.name || '').replace(/"/g, '""')}"`;
-            const aÃ¡Ã¡rea = `"${(proc.aÃ¡Ã¡rea || '').replace(/"/g, '""')}"`;
+            const aÃÃrea = `"${(proc.aÃÃrea || '').replace(/"/g, '""')}"`;
             const mins = proc.minutos !== '' ? proc.minutos : 0;
 
-            csvContent += `${name};${aÃ¡Ã¡rea};${mins};${typeStr};${volStr};${totalHoursRow.toFixed(2).replace('.', ',')};${ftePct.toFixed(2).replace('.', ',')}%\n`;
+            csvContent += `${name};${aÃÃrea};${mins};${typeStr};${volStr};${totalHoursRow.toFixed(2).replace('.', ',')};${ftePct.toFixed(2).replace('.', ',')}%\n`;
         });
 
         csvContent += `TOTAL GERAL;;;;;${totalHours.toFixed(2).replace('.', ',')};${totalFtePct.toFixed(2).replace('.', ',')}%\n\n`;
@@ -2183,29 +2183,29 @@ function exportToCSV() {
         csvContent += "BALANCEAMENTO DE CAPACIDADE POR EQUIPE / AREA\n";
         csvContent += "AREA / EQUIPE;FTE REQUERIDO DIARIO;RECURSO ALOCADO (FTE);STATUS CAPACIDADE\n";
 
-        const aÃ¡Ã¡Ã¡Ã¡reasList = ['Backoffice', 'GovernanÃ§a', 'Seguros/N2', 'EficiÃªncia Operacional', ...state.customAÃ¡Ã¡Ã¡Ã¡reas];
+        const aÃÃÃÃreasList = ['Backoffice', 'GovernanÃ§a', 'Seguros/N2', 'EficiÃªncia Operacional', ...state.customAÃÃÃÃreas];
         let sumRequiredFte = 0;
         let sumAllocatedFte = 0;
 
-        aÃ¡Ã¡Ã¡Ã¡reasList.forEach(aÃ¡Ã¡reaName => {
-            let aÃ¡Ã¡reaDailyHours = 0;
+        aÃÃÃÃreasList.forEach(aÃÃreaName => {
+            let aÃÃreaDailyHours = 0;
             state.processes.forEach(proc => {
-                if (proc.aÃ¡Ã¡rea !== aÃ¡Ã¡reaName) return;
+                if (proc.aÃÃrea !== aÃÃreaName) return;
                 const isTempoFrequencia = proc.qtdExecucao !== null && proc.qtdExecucao !== '' && parseFloat(proc.qtdExecucao) > 0;
                 const minutes = proc.minutos || 0;
                 
                 if (isTempoFrequencia) {
                     const qtdExec = parseFloat(proc.qtdExecucao) || 0;
-                    aÃ¡Ã¡reaDailyHours += (qtdExec * minutes) / 60 / diasUteis;
+                    aÃÃreaDailyHours += (qtdExec * minutes) / 60 / diasUteis;
                 } else {
                     const hasBacklog = proc.backlogVolume !== undefined && proc.backlogVolume !== '';
                     const backlogVol = hasBacklog ? parseFloat(proc.backlogVolume) : 0;
-                    aÃ¡Ã¡reaDailyHours += (backlogVol * minutes) / 60;
+                    aÃÃreaDailyHours += (backlogVol * minutes) / 60;
                 }
             });
 
-            const requiredFte = horasRealDia > 0 ? (aÃ¡Ã¡reaDailyHours / horasRealDia) : 0;
-            const allocatedVal = state.aÃ¡Ã¡reaAllocations[aÃ¡Ã¡reaName] !== undefined && state.aÃ¡Ã¡reaAllocations[aÃ¡Ã¡reaName] !== '' ? parseFloat(state.aÃ¡Ã¡reaAllocations[aÃ¡Ã¡reaName]) : 0;
+            const requiredFte = horasRealDia > 0 ? (aÃÃreaDailyHours / horasRealDia) : 0;
+            const allocatedVal = state.aÃÃreaAllocations[aÃÃreaName] !== undefined && state.aÃÃreaAllocations[aÃÃreaName] !== '' ? parseFloat(state.aÃÃreaAllocations[aÃÃreaName]) : 0;
 
             let statusStr = "";
             if (allocatedVal === 0) {
@@ -2224,7 +2224,7 @@ function exportToCSV() {
             sumRequiredFte += requiredFte;
             sumAllocatedFte += allocatedVal;
 
-            csvContent += `"${aÃ¡Ã¡reaName.replace(/"/g, '""')}";${requiredFte.toFixed(2).replace('.', ',')};${allocatedVal.toFixed(2).replace('.', ',')};${statusStr}\n`;
+            csvContent += `"${aÃÃreaName.replace(/"/g, '""')}";${requiredFte.toFixed(2).replace('.', ',')};${allocatedVal.toFixed(2).replace('.', ',')};${statusStr}\n`;
         });
 
         csvContent += `TOTAL GERAL;${sumRequiredFte.toFixed(2).replace('.', ',')};${sumAllocatedFte.toFixed(2).replace('.', ',')};\n`;
@@ -2232,7 +2232,7 @@ function exportToCSV() {
 
     // Trigger download
     const encodedUri = encodeURI(csvContent);
-    const link = document.cÃ¡Ã¡reateElement("a");
+    const link = document.cÃÃreateElement("a");
     link.setAttribute("href", encodedUri);
     link.setAttribute("download", `Capacity_FTE_${activeTab === 'dashboard' ? 'Report' : 'Backlog'}_${new Date().toISOString().slice(0,10)}.csv`);
     document.body.appendChild(link);
@@ -2252,40 +2252,40 @@ function escapeHtml(str) {
 }
 
 // DYNAMICALLY RENDER THE FILTER OPTIONS FOR AREAS (ALL TABLES)
-function renderAÃ¡Ã¡reaFilterOptions() {
-    const filterSelect = document.getElementById('filter-aÃ¡Ã¡rea');
-    const filterSelectBalancing = document.getElementById('filter-aÃ¡Ã¡rea-balancing');
-    const filterSelectReview = document.getElementById('filter-aÃ¡Ã¡rea-review');
+function renderAÃÃreaFilterOptions() {
+    const filterSelect = document.getElementById('filter-aÃÃrea');
+    const filterSelectBalancing = document.getElementById('filter-aÃÃrea-balancing');
+    const filterSelectReview = document.getElementById('filter-aÃÃrea-review');
     if (!filterSelect || !filterSelectBalancing || !filterSelectReview) return;
     
     const currentValue = filterSelect.value;
     const currentValueBalancing = filterSelectBalancing.value;
     const currentValueReview = filterSelectReview.value;
     
-    const optionsHtml = '<option value="all">Todas as ÃÃ¡Ã¡Ã¡Ã¡reas</option>' +
-        (state.teams || []).map(aÃ¡Ã¡rea =>
-            `<option value="${escapeHtml(aÃ¡Ã¡rea)}">${escapeHtml(aÃ¡Ã¡rea)}</option>`
+    const optionsHtml = '<option value="all">Todas as ÃÃÃÃÃreas</option>' +
+        (state.teams || []).map(aÃÃrea =>
+            `<option value="${escapeHtml(aÃÃrea)}">${escapeHtml(aÃÃrea)}</option>`
         ).join('');
         
     filterSelect.innerHTML = optionsHtml;
     filterSelectBalancing.innerHTML = optionsHtml;
     filterSelectReview.innerHTML = optionsHtml;
     
-    const allAÃ¡Ã¡Ã¡Ã¡reas = state.teams || [];
+    const allAÃÃÃÃreas = state.teams || [];
     
-    if (allAÃ¡Ã¡Ã¡Ã¡reas.includes(currentValue)) {
+    if (allAÃÃÃÃreas.includes(currentValue)) {
         filterSelect.value = currentValue;
     } else {
         filterSelect.value = 'all';
     }
     
-    if (allAÃ¡Ã¡Ã¡Ã¡reas.includes(currentValueBalancing)) {
+    if (allAÃÃÃÃreas.includes(currentValueBalancing)) {
         filterSelectBalancing.value = currentValueBalancing;
     } else {
         filterSelectBalancing.value = 'all';
     }
 
-    if (allAÃ¡Ã¡Ã¡Ã¡reas.includes(currentValueReview)) {
+    if (allAÃÃÃÃreas.includes(currentValueReview)) {
         filterSelectReview.value = currentValueReview;
     } else {
         filterSelectReview.value = 'all';
@@ -2296,16 +2296,16 @@ function renderAÃ¡Ã¡reaFilterOptions() {
 function renderReviewTable() {
     const tableBody = document.getElementById('review-table-body');
     const emptyState = document.getElementById('review-empty-state');
-    const filterValue = document.getElementById('filter-aÃ¡Ã¡rea-review').value;
+    const filterValue = document.getElementById('filter-aÃÃrea-review').value;
     const respFilter = document.getElementById('filter-responsavel-review').value;
 
     if (!tableBody) return;
     tableBody.innerHTML = '';
 
     const filteredProcesses = state.processes.filter(p => {
-        const aÃ¡Ã¡reaMatch = filterValue === 'all' || p.aÃ¡Ã¡rea === filterValue;
+        const aÃÃreaMatch = filterValue === 'all' || p.aÃÃrea === filterValue;
         const respMatch = respFilter === 'all' || p.responsavel === respFilter;
-        return aÃ¡Ã¡reaMatch && respMatch;
+        return aÃÃreaMatch && respMatch;
     });
 
     if (filteredProcesses.length === 0) {
@@ -2350,7 +2350,7 @@ function renderReviewTable() {
         const pHorasTrabalhoMes = pHorasRealDia * respParams.diasUteis;
         const ftePct = pHorasTrabalhoMes > 0 ? (totalHours / pHorasTrabalhoMes) * 100 : 0;
 
-        // Metric Description (Ã¡Ã¡read-only)
+        // Metric Description (ÃÃread-only)
         let metricDesc = '';
         if (proc.qtdExecucao !== null && proc.qtdExecucao !== '' && parseFloat(proc.qtdExecucao) > 0) {
             metricDesc = `Tempo x Freq: ${proc.minutos}m / ${proc.qtdExecucao}x`;
@@ -2365,7 +2365,7 @@ function renderReviewTable() {
         ).join('');
         const statusSelectHtml = `<select class="select-review-status" data-id="${proc.id}" data-status="${proc.reviewStatus || 'Manter'}">${statusOptionsHtml}</select>`;
 
-        const tr = document.cÃ¡Ã¡reateElement('tr');
+        const tr = document.cÃÃreateElement('tr');
         if (proc.reviewStatus === 'Parar') {
             tr.className = 'row-review-stopped';
         }
@@ -2376,10 +2376,10 @@ function renderReviewTable() {
                 ${proc.reviewStatus && proc.reviewStatus !== 'Manter' ? `<span class="badge-review badge-review-${proc.reviewStatus.toLowerCase()}">${proc.reviewStatus}</span>` : ''}
             </td>
             <td>
-                <span class="badge-aÃ¡Ã¡rea" style="font-size: 0.85rem; padding: 0.25rem 0.5rem; border-radius: 4px; background: rgba(235, 92, 39, 0.08); color: var(--color-primary); border: 1px solid rgba(235, 92, 39, 0.15);">${escapeHtml(proc.aÃ¡Ã¡rea || 'Sem Equipe')}</span>
+                <span class="badge-aÃÃrea" style="font-size: 0.85rem; padding: 0.25rem 0.5rem; border-radius: 4px; background: rgba(235, 92, 39, 0.08); color: var(--color-primary); border: 1px solid rgba(235, 92, 39, 0.15);">${escapeHtml(proc.aÃÃrea || 'Sem Equipe')}</span>
             </td>
             <td>
-                <span style="font-size: 0.9rem; color: var(--text-secondary);">${escapeHtml(proc.responsavel || 'Sem ResponsÃ¡vel')}</span>
+                <span style="font-size: 0.9rem; color: var(--text-secondary);">${escapeHtml(proc.responsavel || 'Sem ResponsÃvel')}</span>
             </td>
             <td style="color: var(--text-secondary); font-size: 0.85rem;">${metricDesc}</td>
             <td style="font-weight: 700; color: ${proc.reviewStatus === 'Parar' ? 'var(--text-muted)' : 'var(--text-primary)'};">${proc.reviewStatus === 'Parar' ? '0.00%' : ftePct.toFixed(2) + '%'}</td>
@@ -2414,7 +2414,7 @@ function renderResponsavelFilterOptions() {
     const uniqueResponsaveis = state.responsaveis || [];
     const names = uniqueResponsaveis.map(r => r.name);
     
-    const optionsHtml = '<option value="all">Todos os ResponsÃ¡veis</option>' +
+    const optionsHtml = '<option value="all">Todos os ResponsÃveis</option>' +
         names.map(name =>
             `<option value="${escapeHtml(name)}">${escapeHtml(name)}</option>`
         ).join('');
@@ -2444,12 +2444,12 @@ function renderResponsavelFilterOptions() {
 
 // IMPORT PROCESSES FROM EXCEL/CSV SPREADSHEET (SHEETJS)
 function importExcelFile(file) {
-    if (!verificarPermissao('ADMIN')) { alert('Acesso negado: Perfil ADMIN necessÃ¡rio.'); return; }
-    const Ã¡Ã¡reader = new FileReader();
-    Ã¡Ã¡reader.onload = function(e) {
+    if (!verificarPermissao('ADMIN')) { alert('Acesso negado: Perfil ADMIN necessÃrio.'); return; }
+    const ÃÃreader = new FileReader();
+    ÃÃreader.onload = function(e) {
         try {
             const data = new Uint8Array(e.target.result);
-            const workbook = XLSX.Ã¡Ã¡read(data, { type: 'array' });
+            const workbook = XLSX.ÃÃread(data, { type: 'array' });
             
             let importCount = 0;
             const importedProcesses = [];
@@ -2465,8 +2465,8 @@ function importExcelFile(file) {
                 const headers = rows[0].map(h => String(h || '').trim().toLowerCase());
                 
                 let activityIdx = headers.findIndex(h => h.includes('atividade') || h.includes('nome') || h.includes('processo'));
-                let teamIdx = headers.findIndex(h => h.includes('equipe') || h.includes('Ã¡Ã¡Ã¡rea') || h.includes('aÃ¡Ã¡rea') || h.includes('grupo'));
-                let respIdx = headers.findIndex(h => h.includes('responsÃ¡vel') || h.includes('responsavel') || h.includes('dono') || h.includes('colaborador'));
+                let teamIdx = headers.findIndex(h => h.includes('equipe') || h.includes('ÃÃÃrea') || h.includes('aÃÃrea') || h.includes('grupo'));
+                let respIdx = headers.findIndex(h => h.includes('responsÃvel') || h.includes('responsavel') || h.includes('dono') || h.includes('colaborador'));
                 let volIdx = headers.findIndex(h => h.includes('volume') || h.includes('qtd. mÃªs') || h.includes('qtd. mes') || h.includes('quantidade') || h.includes('qtd. mes'));
                 let minIdx = headers.findIndex(h => h.includes('tempo') || h.includes('minutos') || h.includes('duraÃ§Ã£o') || h.includes('duracao'));
                 let freqIdx = headers.findIndex(h => h.includes('freq') || h.includes('execuÃ§Ã£o') || h.includes('execucao'));
@@ -2516,7 +2516,7 @@ function importExcelFile(file) {
                     importedProcesses.push({
                         id: 'proc-' + Date.now() + '-' + Math.floor(Math.random() * 1000) + '-' + importCount,
                         name: activityName,
-                        aÃ¡Ã¡rea: teamName || (state.teams.length > 0 ? state.teams[0] : ''),
+                        aÃÃrea: teamName || (state.teams.length > 0 ? state.teams[0] : ''),
                         responsavel: respName,
                         volume: volumeVal,
                         minutos: minutesVal,
@@ -2530,22 +2530,22 @@ function importExcelFile(file) {
             });
             
             if (importedProcesses.length > 0) {
-                const mode = confirm(`ImportaÃ§Ã£o ConcluÃ­da!\n\nForam encontradas ${importCount} atividades.\n\nDeseja SUBSTITUIR as atividades existentes no simulador pelas novas?\n\n(Clique em 'OK' para substituir ou 'Cancelar' para adicionar ao final)`);
+                const mode = confirm(`ImportaÃ§Ã£o ConcluÃda!\n\nForam encontradas ${importCount} atividades.\n\nDeseja SUBSTITUIR as atividades existentes no simulador pelas novas?\n\n(Clique em 'OK' para substituir ou 'Cancelar' para adicionar ao final)`);
                 
                 state.teams = [...newTeams];
                 const existingResps = state.responsaveis || [];
                 state.responsaveis = [...newResps].sort().map(name => {
                     const existing = existingResps.find(r => r.name === name);
                     const importedAct = importedProcesses.find(ip => ip.responsavel === name);
-                    const importedAÃ¡Ã¡rea = importedAct ? importedAct.aÃ¡Ã¡rea : '';
+                    const importedAÃÃrea = importedAct ? importedAct.aÃÃrea : '';
                     
                     if (existing) {
-                        if (!existing.aÃ¡Ã¡rea) {
-                            existing.aÃ¡Ã¡rea = importedAÃ¡Ã¡rea;
+                        if (!existing.aÃÃrea) {
+                            existing.aÃÃrea = importedAÃÃrea;
                         }
                         return existing;
                     }
-                    return { name, aÃ¡Ã¡rea: importedAÃ¡Ã¡rea, horasDia: null, absenteismo: null, diasUteis: null };
+                    return { name, aÃÃrea: importedAÃÃrea, horasDia: null, absenteismo: null, diasUteis: null };
                 });
                 
                 if (mode) {
@@ -2556,7 +2556,7 @@ function importExcelFile(file) {
                 
                 saveState();
                 renderResponsavelFilterOptions();
-                renderAÃ¡Ã¡reaFilterOptions();
+                renderAÃÃreaFilterOptions();
                 
                 renderCadastrosView();
                 renderTable();
@@ -2569,10 +2569,10 @@ function importExcelFile(file) {
             }
         } catch (err) {
             console.error(err);
-            alert("Erro ao ler o arquivo Excel. Certifique-se de que Ã© um arquivo .xlsx, .xls ou .csv vÃ¡lido.");
+            alert("Erro ao ler o arquivo Excel. Certifique-se de que Ã© um arquivo .xlsx, .xls ou .csv vÃlido.");
         }
     };
-    Ã¡Ã¡reader.Ã¡Ã¡readAsArrayBuffer(file);
+    ÃÃreader.ÃÃreadAsArrayBuffer(file);
 }
 
 // ----------------------------------------------------
@@ -2600,10 +2600,10 @@ function initHistoryView() {
 }
 
 function saveHistorySnapshot() {
-    if (!verificarPermissao('OPERADOR')) { alert('Acesso negado: Perfil OPERADOR necessÃ¡rio.'); return; }
+    if (!verificarPermissao('OPERADOR')) { alert('Acesso negado: Perfil OPERADOR necessÃrio.'); return; }
     const monthInput = document.getElementById('history-month-input');
     if (!monthInput || !monthInput.value) {
-        alert("Selecione um mÃªs vÃ¡lido.");
+        alert("Selecione um mÃªs vÃlido.");
         return;
     }
     
@@ -2611,21 +2611,21 @@ function saveHistorySnapshot() {
     
     // Check if current processes are empty
     if (state.processes.length === 0) {
-        alert("NÃ£o hÃ¡ atividades cadastradas no Dashboard para salvar.");
+        alert("NÃ£o hÃ atividades cadastradas no Dashboard para salvar.");
         return;
     }
     
     const existingIndex = state.history.findIndex(h => h.month === selectedMonth);
     if (existingIndex !== -1) {
-        if (!confirm(`JÃ¡ existe um registro de volume para ${formatMonth(selectedMonth)}. Deseja sobrescrevÃª-lo com os dados atuais do Dashboard?`)) {
+        if (!confirm(`JÃ existe um registro de volume para ${formatMonth(selectedMonth)}. Deseja sobrescrevÃª-lo com os dados atuais do Dashboard?`)) {
             return;
         }
     }
     
     const snapshotData = state.processes.map(p => ({
         name: p.name,
-        aÃ¡Ã¡rea: p.aÃ¡Ã¡rea,
-        responsavel: p.responsavel || 'Sem ResponsÃ¡vel',
+        aÃÃrea: p.aÃÃrea,
+        responsavel: p.responsavel || 'Sem ResponsÃvel',
         volume: p.volume !== null && p.volume !== '' ? parseFloat(p.volume) : 0
     }));
     
@@ -2672,7 +2672,7 @@ function renderSnapshotsList() {
             <div class="glass-panel" style="display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 1rem; border-radius: 8px; border: 1px solid rgba(255,255,255,0.05); background: rgba(255,255,255,0.01);">
                 <div>
                     <h4 style="margin: 0; font-size: 0.95rem; font-weight: 600; color: var(--text-primary);">${formatMonth(h.month)}</h4>
-                    <span style="font-size: 0.8rem; color: var(--text-secondary);">${h.data.length} atividades â€¢ Vol: ${totalVolume.toFixed(0)}</span>
+                    <span style="font-size: 0.8rem; color: var(--text-secondary);">${h.data.length} atividades â€ Vol: ${totalVolume.toFixed(0)}</span>
                 </div>
                 <button class="btn-row-action btn-delete-snapshot" data-month="${h.month}" title="Excluir Registro" style="color: var(--color-danger); background: transparent; border: none; cursor: pointer; font-size: 0.9rem; padding: 0.2rem;">
                     <i class="fa-solid fa-trash-can"></i>
@@ -2686,7 +2686,7 @@ function renderSnapshotsList() {
     // Add delete listeners
     container.querySelectorAll('.btn-delete-snapshot').forEach(btn => {
         btn.addEventListener('click', (e) => {
-            if (!verificarPermissao('ADMIN')) { alert('Acesso negado: Perfil ADMIN necessÃ¡rio.'); return; }
+            if (!verificarPermissao('ADMIN')) { alert('Acesso negado: Perfil ADMIN necessÃrio.'); return; }
             const btnEl = e.currentTarget;
             const month = btnEl.dataset.month;
             if (confirm(`Tem certeza que deseja excluir o registro de ${formatMonth(month)}?`)) {
@@ -2707,7 +2707,7 @@ function populateHistoryItemOptions() {
         state.history.forEach(h => {
             h.data.forEach(d => {
                 if (type === 'atividade') itemsSet.add(d.name);
-                else if (type === 'aÃ¡Ã¡rea') itemsSet.add(d.aÃ¡Ã¡rea);
+                else if (type === 'aÃÃrea') itemsSet.add(d.aÃÃrea);
                 else if (type === 'responsavel') itemsSet.add(d.responsavel);
             });
         });
@@ -2716,8 +2716,8 @@ function populateHistoryItemOptions() {
     // Collect from current processes as fallback/addition
     state.processes.forEach(p => {
         if (type === 'atividade') itemsSet.add(p.name);
-        else if (type === 'aÃ¡Ã¡rea') itemsSet.add(p.aÃ¡Ã¡rea);
-        else if (type === 'responsavel') itemsSet.add(p.responsavel || 'Sem ResponsÃ¡vel');
+        else if (type === 'aÃÃrea') itemsSet.add(p.aÃÃrea);
+        else if (type === 'responsavel') itemsSet.add(p.responsavel || 'Sem ResponsÃvel');
     });
     
     const items = [...itemsSet].sort();
@@ -2725,7 +2725,7 @@ function populateHistoryItemOptions() {
     if (!selectItem) return;
     
     if (items.length === 0) {
-        selectItem.innerHTML = '<option value="">Nenhum item disponÃ­vel</option>';
+        selectItem.innerHTML = '<option value="">Nenhum item disponÃvel</option>';
         return;
     }
     
@@ -2763,7 +2763,7 @@ function renderHistoryChart() {
         h.data.forEach(d => {
             if (type === 'atividade' && d.name === selectedItem) {
                 sum += d.volume;
-            } else if (type === 'aÃ¡Ã¡rea' && d.aÃ¡Ã¡rea === selectedItem) {
+            } else if (type === 'aÃÃrea' && d.aÃÃrea === selectedItem) {
                 sum += d.volume;
             } else if (type === 'responsavel' && d.responsavel === selectedItem) {
                 sum += d.volume;
@@ -2780,8 +2780,8 @@ function renderHistoryChart() {
     
     const ctx = chartCanvas.getContext('2d');
     
-    // CÃ¡Ã¡reate gradient fill under line
-    const gradient = ctx.cÃ¡Ã¡reateLinearGradient(0, 0, 0, 300);
+    // CÃÃreate gradient fill under line
+    const gradient = ctx.cÃÃreateLinearGradient(0, 0, 0, 300);
     gradient.addColorStop(0, 'rgba(235, 92, 39, 0.35)');
     gradient.addColorStop(1, 'rgba(235, 92, 39, 0.0)');
     
@@ -2876,14 +2876,14 @@ function renderCadastrosView() {
                     e.stopPropagation();
                     if (!verificarPermissao('ADMIN')) { alert('Acesso negado: Perfil ADMIN necessário.'); return; }
                     const team = btn.getAttribute('data-team');
-                    if (confirm(`Deseja Ã¡Ã¡realmente excluir a equipe "${team}"? Todos os responsáveis e atividades desta equipe ficarão "Sem Equipe".`)) {
+                    if (confirm(`Deseja ÃÃrealmente excluir a equipe "${team}"? Todos os responsáveis e atividades desta equipe ficarão "Sem Equipe".`)) {
                         state.teams = state.teams.filter(t => t !== team);
                         state.processes.forEach(p => {
-                            if (p.aÃ¡Ã¡rea === team) p.aÃ¡Ã¡rea = '';
+                            if (p.aÃÃrea === team) p.aÃÃrea = '';
                         });
                         if (state.responsaveis) {
                             state.responsaveis.forEach(r => {
-                                if (r.aÃ¡Ã¡rea === team) r.aÃ¡Ã¡rea = '';
+                                if (r.aÃÃrea === team) r.aÃÃrea = '';
                             });
                         }
                         if (state.teamHierarchy) {
@@ -2891,7 +2891,7 @@ function renderCadastrosView() {
                         }
                         saveState();
                         renderCadastrosView();
-                        renderAÃ¡Ã¡reaFilterOptions();
+                        renderAÃÃreaFilterOptions();
                         renderTable();
                         renderBalancingTable();
                         renderReviewTable();
@@ -2936,32 +2936,32 @@ function renderCadastrosView() {
         teamsToRender.forEach(team => {
             let teamResps = [];
             if (team === 'Outros / Sem Equipe') {
-                teamResps = state.responsaveis.filter(r => !r.aÃ¡Ã¡rea || !state.teams.includes(r.aÃ¡Ã¡rea));
+                teamResps = state.responsaveis.filter(r => !r.aÃÃrea || !state.teams.includes(r.aÃÃrea));
             } else {
-                teamResps = state.responsaveis.filter(r => r.aÃ¡Ã¡rea === team);
+                teamResps = state.responsaveis.filter(r => r.aÃÃrea === team);
             }
             
             if (teamResps.length === 0) return;
             
             // Accordion Header
-            const header = document.cÃ¡Ã¡reateElement('div');
+            const header = document.cÃÃreateElement('div');
             header.style.cssText = 'display: flex; align-items: center; gap: 0.5rem; cursor: pointer; padding: 0.5rem; background: rgba(255,255,255,0.05); border-radius: 4px; font-weight: 500; font-size: 0.85rem; user-select: none; border: 1px solid rgba(255,255,255,0.02); margin-top: 0.5rem;';
             header.innerHTML = `<i class="fa-solid fa-chevron-right" style="width: 15px; text-align: center;"></i> ${escapeHtml(team)} <span style="background: rgba(255,255,255,0.1); padding: 0.1rem 0.4rem; border-radius: 10px; font-size: 0.7rem; margin-left: auto;">${teamResps.length}</span>`;
             
-            const contentContainer = document.cÃ¡Ã¡reateElement('div');
+            const contentContainer = document.cÃÃreateElement('div');
             contentContainer.style.cssText = 'display: none; flex-direction: column; gap: 0.5rem; padding-left: 0.5rem; margin-top: 0.5rem; margin-bottom: 0.5rem;';
             
             header.addEventListener('click', () => toggleAccordion(header, contentContainer));
             
             teamResps.forEach(resp => {
-                const container = document.cÃ¡Ã¡reateElement('div');
+                const container = document.cÃÃreateElement('div');
                 container.className = 'resp-item-container';
                 container.style.cssText = 'display: flex; flex-direction: column; gap: 0.5rem; padding: 0.5rem 0.6rem; border-radius: 6px; border: 1px solid rgba(255,255,255,0.03); background: rgba(255,255,255,0.01);';
                 
-                const headerRow = document.cÃ¡Ã¡reateElement('div');
+                const headerRow = document.cÃÃreateElement('div');
                 headerRow.style.cssText = 'display: flex; justify-content: space-between; align-items: center;';
                 
-                const nameSpan = document.cÃ¡Ã¡reateElement('span');
+                const nameSpan = document.cÃÃreateElement('span');
                 nameSpan.style.cssText = 'font-size: 0.85rem; font-weight: 500; color: var(--text-primary);';
                 
                 const hasOverrides = resp.horasDia !== null || resp.absenteismo !== null || resp.diasUteis !== null;
@@ -2972,16 +2972,16 @@ function renderCadastrosView() {
                     ${hasOverrides ? '<i class="fa-solid fa-user-gear" style="color: var(--color-primary); font-size: 0.75rem; margin-left: 0.25rem;" title="Parâmetros customizados ativos"></i>' : ''}
                 `;
                 
-                const btnGroup = document.cÃ¡Ã¡reateElement('div');
+                const btnGroup = document.cÃÃreateElement('div');
                 btnGroup.style.cssText = 'display: flex; align-items: center; gap: 0.5rem;';
                 
-                const btnConfig = document.cÃ¡Ã¡reateElement('button');
+                const btnConfig = document.cÃÃreateElement('button');
                 btnConfig.className = 'btn-config-resp-item';
                 btnConfig.style.cssText = 'background: transparent; border: none; color: var(--color-primary); cursor: pointer; font-size: 0.85rem; padding: 0.2rem; display: flex; align-items: center; justify-content: center;';
                 btnConfig.title = 'Configurar Parâmetros de Capacidade';
                 btnConfig.innerHTML = '<i class="fa-solid fa-cog"></i>';
                 
-                const btnDelete = document.cÃ¡Ã¡reateElement('button');
+                const btnDelete = document.cÃÃreateElement('button');
                 btnDelete.className = 'btn-delete-resp-item';
                 btnDelete.setAttribute('data-permissao', 'ADMIN');
                 btnDelete.style.cssText = 'background: transparent; border: none; color: var(--color-danger); cursor: pointer; font-size: 0.85rem; padding: 0.2rem; display: flex; align-items: center; justify-content: center;';
@@ -3048,9 +3048,9 @@ function renderCadastrosView() {
     activityTeamsToRender.forEach((team, teamIndex) => {
         let teamProcs = [];
         if (team === 'Outros / Sem Equipe') {
-            teamProcs = state.processes.filter(p => !p.aÃ¡Ã¡rea || !state.teams.includes(p.aÃ¡Ã¡rea));
+            teamProcs = state.processes.filter(p => !p.aÃÃrea || !state.teams.includes(p.aÃÃrea));
         } else {
-            teamProcs = state.processes.filter(p => p.aÃ¡Ã¡rea === team);
+            teamProcs = state.processes.filter(p => p.aÃÃrea === team);
         }
         
         if (teamProcs.length === 0) return;
@@ -3058,7 +3058,7 @@ function renderCadastrosView() {
         const rowClass = 'team-activity-row-' + teamIndex;
         
         // Header Row
-        const headerTr = document.cÃ¡Ã¡reateElement('tr');
+        const headerTr = document.cÃÃreateElement('tr');
         headerTr.style.cssText = 'background: rgba(255,255,255,0.03); cursor: pointer; user-select: none;';
         headerTr.innerHTML = `
             <td colspan="5" style="padding: 0.8rem; font-weight: 600; color: var(--text-primary); border-top: 1px solid rgba(255,255,255,0.05); border-bottom: 1px solid rgba(255,255,255,0.05);">
@@ -3070,20 +3070,20 @@ function renderCadastrosView() {
         
         // Activity Rows
         teamProcs.forEach(proc => {
-            const tr = document.cÃ¡Ã¡reateElement('tr');
+            const tr = document.cÃÃreateElement('tr');
             tr.className = rowClass;
             tr.style.display = 'none'; // Initially collapsed
             tr.dataset.id = proc.id;
             
             const teamOptions = '<option value="">-- Sem Equipe --</option>' +
                 state.teams.map(t => `
-                    <option value="${escapeHtml(t)}" ${proc.aÃ¡Ã¡rea === t ? 'selected' : ''}>${escapeHtml(t)}</option>
+                    <option value="${escapeHtml(t)}" ${proc.aÃÃrea === t ? 'selected' : ''}>${escapeHtml(t)}</option>
                 `).join('');
                 
             const teamResps = (state.responsaveis || []).filter(resp => {
                 const rName = typeof resp === 'object' ? resp.name : resp;
-                const rAÃ¡Ã¡rea = typeof resp === 'object' ? resp.aÃ¡Ã¡rea : '';
-                return !proc.aÃ¡Ã¡rea || !rAÃ¡Ã¡rea || rAÃ¡Ã¡rea === proc.aÃ¡Ã¡rea || proc.responsavel === rName;
+                const rAÃÃrea = typeof resp === 'object' ? resp.aÃÃrea : '';
+                return !proc.aÃÃrea || !rAÃÃrea || rAÃÃrea === proc.aÃÃrea || proc.responsavel === rName;
             });
             const respsToDisplay = teamResps.length > 0 ? teamResps : (state.responsaveis || []);
             const respOptions = '<option value="">-- Sem Responsável --</option>' +
@@ -3143,12 +3143,12 @@ function renderCadastrosView() {
             const teamSelect = tr.querySelector('.select-activity-team-cell');
             teamSelect.addEventListener('change', (e) => {
                 const newTeam = e.target.value;
-                proc.aÃ¡Ã¡rea = newTeam;
+                proc.aÃÃrea = newTeam;
                 proc.responsavel = '';
                 saveState();
                 
                 renderCadastrosView();
-                renderAÃ¡Ã¡reaFilterOptions();
+                renderAÃÃreaFilterOptions();
                 renderResponsavelFilterOptions();
                 renderTable();
                 renderBalancingTable();
@@ -3184,7 +3184,7 @@ function renderCadastrosView() {
             const deleteBtn = tr.querySelector('.btn-delete-activity-cell');
             deleteBtn.addEventListener('click', () => {
                 if (!verificarPermissao('ADMIN')) { alert('Acesso negado: Perfil ADMIN necessário.'); return; }
-                if (confirm(`Deseja Ã¡Ã¡realmente excluir a atividade "${proc.name}"?`)) {
+                if (confirm(`Deseja ÃÃrealmente excluir a atividade "${proc.name}"?`)) {
                     state.processes = state.processes.filter(p => p.id !== proc.id);
                     saveState();
                     renderCadastrosView();
@@ -3200,7 +3200,7 @@ function renderCadastrosView() {
     
     updateBulkDeleteState();
     
-    // Re-apply permission logic after recÃ¡Ã¡reating DOM elements
+    // Re-apply permission logic after recÃÃreating DOM elements
     aplicarPerfilDeAcesso();
 }
 
@@ -3246,7 +3246,7 @@ function setupModalParametersListeners() {
     const valAbs = document.getElementById('modal-val-absenteismo');
     const valDias = document.getElementById('modal-val-dias-uteis');
     
-    const calcReal = document.getElementById('modal-calc-Ã¡Ã¡real-dia');
+    const calcReal = document.getElementById('modal-calc-ÃÃreal-dia');
     const calcMes = document.getElementById('modal-calc-mes');
     
     function updateModalCalculations() {
@@ -3354,7 +3354,7 @@ function openCapacityModal(respName = '') {
     
     if (!respName) {
         // Global defaults mode
-        title.innerHTML = '<i class="fa-solid fa-sliders"></i> ParÃ¢metros PadrÃ£o de Capacidade';
+        title.innerHTML = '<i class="fa-solid fa-sliders"></i> ParÃmetros PadrÃ£o de Capacidade';
         if (clearBtn) clearBtn.style.display = 'none';
         
         inputHoras.value = state.params.horasDia;
@@ -3414,7 +3414,7 @@ function openCapacityModal(respName = '') {
 }
 
 // ============================================================
-// ACCESS CONTROL VIEW - GESTÃƒO DE PERFIS DE USUÃRIO
+// ACCESS CONTROL VIEW - GESTÃO DE PERFIS DE USUÃRIO
 // ============================================================
 
 const SETUP_SQL = `-- Execute no SQL Editor do Supabase:

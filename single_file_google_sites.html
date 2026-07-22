@@ -2496,10 +2496,10 @@ const SUPABASE_URL = 'https://maguyzjhldcgpcvkvkqe.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1hZ3V5empobGRjZ3Bjdmt2a3FlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQ2NTU0MDMsImV4cCI6MjEwMDIzMTQwM30.Ow9xruE1qAFTX3mqELERxrY3CRBOdV_n4MoXXhtt3Y8';
 
 let supabaseClient = null;
-let ÃƒÂ¡ÃƒÂ¡realtimeChannel = null;
+let ÃƒÃƒrealtimeChannel = null;
 if (window.supabase) {
     try {
-        supabaseClient = window.supabase.cÃƒÂ¡ÃƒÂ¡reateClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        supabaseClient = window.supabase.cÃƒÃƒreateClient(SUPABASE_URL, SUPABASE_ANON_KEY);
     } catch (err) {
         console.warn('Erro ao inicializar Supabase Client:', err);
     }
@@ -2520,7 +2520,7 @@ function verificarPermissao(perfilMinimo) {
     return (hierarquia[currentUser.perfil] || 0) >= (hierarquia[perfilMinimo] || 0);
 }
 
-// Varre o DOM e oculta/exibe elementos conforme o perfil do usuÃƒÂ¡rio
+// Varre o DOM e oculta/exibe elementos conforme o perfil do usuÃƒrio
 function aplicarPerfilDeAcesso() {
     const perfil = currentUser.perfil;
 
@@ -2555,9 +2555,9 @@ function aplicarPerfilDeAcesso() {
         el.style.display = isAdmin ? '' : 'none';
     });
 
-    // Controla inputs editÃƒÂ¡veis para perfil CONSULTA
+    // Controla inputs editÃƒveis para perfil CONSULTA
     const isConsulta = perfil === 'CONSULTA';
-    document.querySelectorAll('.input-volume, .input-minutes, .input-qtd, .input-backlog-volume, .input-aÃƒÂ¡ÃƒÂ¡rea-allocation').forEach(el => {
+    document.querySelectorAll('.input-volume, .input-minutes, .input-qtd, .input-backlog-volume, .input-aÃƒÃƒrea-allocation').forEach(el => {
         el.disabled = isConsulta;
         el.style.opacity = isConsulta ? '0.5' : '1';
     });
@@ -2565,7 +2565,7 @@ function aplicarPerfilDeAcesso() {
         el.disabled = isConsulta;
         el.style.opacity = isConsulta ? '0.5' : '1';
     });
-    // Controla inputs editÃƒÂ¡veis na tabela de Cadastros
+    // Controla inputs editÃƒveis na tabela de Cadastros
     document.querySelectorAll('.input-activity-name-cell, .select-activity-team-cell, .select-activity-resp-cell').forEach(el => {
         el.disabled = isConsulta;
         el.style.opacity = isConsulta ? '0.5' : '1';
@@ -2581,8 +2581,8 @@ let state = {
         teamSize: 5.0
     },
     processes: [],
-    customAÃƒÂ¡ÃƒÂ¡ÃƒÂ¡ÃƒÂ¡reas: [],
-    aÃƒÂ¡ÃƒÂ¡reaAllocations: {}
+    customAÃƒÃƒÃƒÃƒreas: [],
+    aÃƒÃƒreaAllocations: {}
 };
 
 // CHART INSTANCES
@@ -2591,28 +2591,28 @@ let barChartInstance = null;
 
 // DEFAULT EXAMPLE DATA WITH AREAS
 const EXAMPLE_PROCESSES = [
-    { id: 'ex-1', name: 'Cancelamento DY - SolicitaÃƒÂ§ÃƒÂ£o CB (Fila Projeto)', aÃƒÂ¡ÃƒÂ¡rea: 'Backoffice', volume: '', minutos: 0, qtdExecucao: '', backlogVolume: '', allocatedResource: '' },
-    { id: 'ex-2', name: 'ProrrogaÃƒÂ§ÃƒÂ£o', aÃƒÂ¡ÃƒÂ¡rea: 'Backoffice', volume: '', minutos: 0, qtdExecucao: '', backlogVolume: '', allocatedResource: '' },
-    { id: 'ex-3', name: 'Baixa de Parcela (RobÃƒÂ´ Baixas) - Demandas BKO + Baixa em lote + Baixa manual', aÃƒÂ¡ÃƒÂ¡rea: 'Backoffice', volume: '', minutos: 0, qtdExecucao: '', backlogVolume: '', allocatedResource: '' },
-    { id: 'ex-4', name: 'Improcedente DY', aÃƒÂ¡ÃƒÂ¡rea: 'Backoffice', volume: '', minutos: 0, qtdExecucao: '', backlogVolume: '', allocatedResource: '' },
-    { id: 'ex-5', name: 'DevoluÃƒÂ§ÃƒÂ£o de pagamento em duplicidade', aÃƒÂ¡ÃƒÂ¡rea: 'Backoffice', volume: '', minutos: 0, qtdExecucao: '', backlogVolume: '', allocatedResource: '' },
-    { id: 'ex-6', name: 'Reembolso (RobÃƒÂ´ Reembolsos) Montagem Arquivo + Upload Zord + Monitoria/Retorno', aÃƒÂ¡ÃƒÂ¡rea: 'Backoffice', volume: '', minutos: 0, qtdExecucao: '', backlogVolume: '', allocatedResource: '' },
-    { id: 'ex-7', name: 'Cancelamento CAPTA + Cancelamento Jira', aÃƒÂ¡ÃƒÂ¡rea: 'Backoffice', volume: '', minutos: 0, qtdExecucao: '', backlogVolume: '', allocatedResource: '' },
-    { id: 'ex-8', name: 'Cancelamento SAP + Cancelamento Jira', aÃƒÂ¡ÃƒÂ¡rea: 'Backoffice', volume: '', minutos: 0, qtdExecucao: '', backlogVolume: '', allocatedResource: '' },
-    { id: 'ex-9', name: 'DÃƒÂ©bitos Pag Emana Pay', aÃƒÂ¡ÃƒÂ¡rea: 'Backoffice', volume: '', minutos: 0, qtdExecucao: '', backlogVolume: '', allocatedResource: '' },
-    { id: 'ex-10', name: 'Cancelamento DY - SolicitaÃƒÂ§ÃƒÂ£o CB (Fila N3) + Cancelamento Jira', aÃƒÂ¡ÃƒÂ¡rea: 'Backoffice', volume: '', minutos: 0, qtdExecucao: '', backlogVolume: '', allocatedResource: '' },
-    { id: 'ex-11', name: 'Pagamento nÃƒÂ£o processado', aÃƒÂ¡ÃƒÂ¡rea: 'Backoffice', volume: '', minutos: 0, qtdExecucao: '', backlogVolume: '', allocatedResource: '' },
-    { id: 'ex-12', name: 'Parcela invertida', aÃƒÂ¡ÃƒÂ¡rea: 'Backoffice', volume: '', minutos: 0, qtdExecucao: '', backlogVolume: '', allocatedResource: '' },
-    { id: 'ex-13', name: 'Cancelamento Parcial/AmortizaÃƒÂ§ÃƒÂ£o', aÃƒÂ¡ÃƒÂ¡rea: 'Backoffice', volume: '', minutos: 0, qtdExecucao: '', backlogVolume: '', allocatedResource: '' },
-    { id: 'ex-14', name: 'AmortizaÃƒÂ§ÃƒÂ£o Nota de credito', aÃƒÂ¡ÃƒÂ¡rea: 'Backoffice', volume: '', minutos: 0, qtdExecucao: '', backlogVolume: '', allocatedResource: '' },
-    { id: 'ex-15', name: 'Recompra (AmortizaÃƒÂ§ÃƒÂ£o e Recompra Proativa)', aÃƒÂ¡ÃƒÂ¡rea: 'Backoffice', volume: '', minutos: 0, qtdExecucao: '', backlogVolume: '', allocatedResource: '' },
-    { id: 'ex-16', name: 'DÃƒÂºvidas - Pagamento, CobranÃƒÂ§a e Espelhamento', aÃƒÂ¡ÃƒÂ¡rea: 'Backoffice', volume: '', minutos: 0, qtdExecucao: '', backlogVolume: '', allocatedResource: '' }
+    { id: 'ex-1', name: 'Cancelamento DY - SolicitaÃƒÂ§ÃƒÂ£o CB (Fila Projeto)', aÃƒÃƒrea: 'Backoffice', volume: '', minutos: 0, qtdExecucao: '', backlogVolume: '', allocatedResource: '' },
+    { id: 'ex-2', name: 'ProrrogaÃƒÂ§ÃƒÂ£o', aÃƒÃƒrea: 'Backoffice', volume: '', minutos: 0, qtdExecucao: '', backlogVolume: '', allocatedResource: '' },
+    { id: 'ex-3', name: 'Baixa de Parcela (RobÃƒÂ´ Baixas) - Demandas BKO + Baixa em lote + Baixa manual', aÃƒÃƒrea: 'Backoffice', volume: '', minutos: 0, qtdExecucao: '', backlogVolume: '', allocatedResource: '' },
+    { id: 'ex-4', name: 'Improcedente DY', aÃƒÃƒrea: 'Backoffice', volume: '', minutos: 0, qtdExecucao: '', backlogVolume: '', allocatedResource: '' },
+    { id: 'ex-5', name: 'DevoluÃƒÂ§ÃƒÂ£o de pagamento em duplicidade', aÃƒÃƒrea: 'Backoffice', volume: '', minutos: 0, qtdExecucao: '', backlogVolume: '', allocatedResource: '' },
+    { id: 'ex-6', name: 'Reembolso (RobÃƒÂ´ Reembolsos) Montagem Arquivo + Upload Zord + Monitoria/Retorno', aÃƒÃƒrea: 'Backoffice', volume: '', minutos: 0, qtdExecucao: '', backlogVolume: '', allocatedResource: '' },
+    { id: 'ex-7', name: 'Cancelamento CAPTA + Cancelamento Jira', aÃƒÃƒrea: 'Backoffice', volume: '', minutos: 0, qtdExecucao: '', backlogVolume: '', allocatedResource: '' },
+    { id: 'ex-8', name: 'Cancelamento SAP + Cancelamento Jira', aÃƒÃƒrea: 'Backoffice', volume: '', minutos: 0, qtdExecucao: '', backlogVolume: '', allocatedResource: '' },
+    { id: 'ex-9', name: 'DÃƒÂ©bitos Pag Emana Pay', aÃƒÃƒrea: 'Backoffice', volume: '', minutos: 0, qtdExecucao: '', backlogVolume: '', allocatedResource: '' },
+    { id: 'ex-10', name: 'Cancelamento DY - SolicitaÃƒÂ§ÃƒÂ£o CB (Fila N3) + Cancelamento Jira', aÃƒÃƒrea: 'Backoffice', volume: '', minutos: 0, qtdExecucao: '', backlogVolume: '', allocatedResource: '' },
+    { id: 'ex-11', name: 'Pagamento nÃƒÂ£o processado', aÃƒÃƒrea: 'Backoffice', volume: '', minutos: 0, qtdExecucao: '', backlogVolume: '', allocatedResource: '' },
+    { id: 'ex-12', name: 'Parcela invertida', aÃƒÃƒrea: 'Backoffice', volume: '', minutos: 0, qtdExecucao: '', backlogVolume: '', allocatedResource: '' },
+    { id: 'ex-13', name: 'Cancelamento Parcial/AmortizaÃƒÂ§ÃƒÂ£o', aÃƒÃƒrea: 'Backoffice', volume: '', minutos: 0, qtdExecucao: '', backlogVolume: '', allocatedResource: '' },
+    { id: 'ex-14', name: 'AmortizaÃƒÂ§ÃƒÂ£o Nota de credito', aÃƒÃƒrea: 'Backoffice', volume: '', minutos: 0, qtdExecucao: '', backlogVolume: '', allocatedResource: '' },
+    { id: 'ex-15', name: 'Recompra (AmortizaÃƒÂ§ÃƒÂ£o e Recompra Proativa)', aÃƒÃƒrea: 'Backoffice', volume: '', minutos: 0, qtdExecucao: '', backlogVolume: '', allocatedResource: '' },
+    { id: 'ex-16', name: 'DÃƒÂºvidas - Pagamento, CobranÃƒÂ§a e Espelhamento', aÃƒÃƒrea: 'Backoffice', volume: '', minutos: 0, qtdExecucao: '', backlogVolume: '', allocatedResource: '' }
 ];
 
 function getSupabase() {
-    if (!supabaseClient && window.supabase && typeof window.supabase.cÃƒÂ¡ÃƒÂ¡reateClient === 'function') {
+    if (!supabaseClient && window.supabase && typeof window.supabase.cÃƒÃƒreateClient === 'function') {
         try {
-            supabaseClient = window.supabase.cÃƒÂ¡ÃƒÂ¡reateClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+            supabaseClient = window.supabase.cÃƒÃƒreateClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         } catch (err) {
             console.error('Erro ao inicializar Supabase Client:', err);
         }
@@ -2639,7 +2639,7 @@ async function handleLogin() {
     
     const client = getSupabase();
     if (!client) {
-        showAuthError("NÃƒÂ£o foi possÃƒÂ­vel conectar ao Supabase SDK. Verifique sua conexÃƒÂ£o ou se o SDK foi carregado.");
+        showAuthError("NÃƒÂ£o foi possÃƒvel conectar ao Supabase SDK. Verifique sua conexÃƒÂ£o ou se o SDK foi carregado.");
         return;
     }
 
@@ -2657,7 +2657,7 @@ async function handleLogin() {
         } else if (data && data.session && data.session.user) {
             setupUserSession(data.session.user);
         } else {
-            showAuthError("UsuÃƒÂ¡rio ou senha incorretos.");
+            showAuthError("UsuÃƒrio ou senha incorretos.");
         }
     } catch (err) {
         showAuthError(err.message || "Ocorreu um erro inesperado ao tentar fazer login.");
@@ -2692,7 +2692,7 @@ async function handleSignup() {
     
     const client = getSupabase();
     if (!client) {
-        showAuthError("NÃƒÂ£o foi possÃƒÂ­vel conectar ao Supabase. Verifique sua conexÃƒÂ£o com a internet.");
+        showAuthError("NÃƒÂ£o foi possÃƒvel conectar ao Supabase. Verifique sua conexÃƒÂ£o com a internet.");
         return;
     }
 
@@ -2703,7 +2703,7 @@ async function handleSignup() {
     }
 
     try {
-        // Todo usuÃƒÂ¡rio recÃƒÂ©m cadastrado recebe perfil 'CONSULTA' por padrÃƒÂ£o nos metadados
+        // Todo usuÃƒrio recÃƒÂ©m cadastrado recebe perfil 'CONSULTA' por padrÃƒÂ£o nos metadados
         const { data, error } = await client.auth.signUp({
             email,
             password,
@@ -2716,7 +2716,7 @@ async function handleSignup() {
         });
 
         if (error) {
-            showAuthError(error.message || "Erro ao cadastrar usuÃƒÂ¡rio.");
+            showAuthError(error.message || "Erro ao cadastrar usuÃƒrio.");
         } else if (data) {
             if (data.session && data.session.user) {
                 showAuthInfo("Conta criada e autenticada com sucesso!");
@@ -2724,7 +2724,7 @@ async function handleSignup() {
             } else if (data.user) {
                 showAuthInfo("Conta criada com sucesso! Se a confirmaÃƒÂ§ÃƒÂ£o de e-mail estiver ativa no seu projeto Supabase, verifique sua caixa de entrada para ativar a conta.");
             } else {
-                showAuthInfo("Cadastro ÃƒÂ¡ÃƒÂ¡realizado com sucesso.");
+                showAuthInfo("Cadastro ÃƒÃƒrealizado com sucesso.");
             }
         }
     } catch (err) {
@@ -2893,7 +2893,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         showAuthError("Aviso: Configure o SUPABASE_URL e SUPABASE_ANON_KEY no app.js para utilizar a autenticaÃ§Ã£o.");
     }
     
-    renderAÃƒÂ¡ÃƒÂ¡reaFilterOptions();
+    renderAÃƒÃƒreaFilterOptions();
     renderResponsavelFilterOptions();
     renderCadastrosView();
     renderTable();
@@ -2906,7 +2906,7 @@ function showToast(message, type = 'info', duration = 5000) {
     const container = document.getElementById('toast-container');
     if (!container) return;
 
-    const toast = document.cÃƒÂ¡ÃƒÂ¡reateElement('div');
+    const toast = document.cÃƒÃƒreateElement('div');
     toast.style.cssText = `
         pointer-events: auto;
         padding: 0.75rem 1rem;
@@ -2936,7 +2936,7 @@ function showToast(message, type = 'info', duration = 5000) {
 
 // REALTIME STATUS UI INDICATOR
 function updateRealtimeStatusUI(status, customMessage) {
-    const badge = document.getElementById('ÃƒÂ¡ÃƒÂ¡realtime-status-badge');
+    const badge = document.getElementById('ÃƒÃƒrealtime-status-badge');
     if (!badge) return;
 
     const dot = badge.querySelector('.status-dot');
@@ -2949,11 +2949,11 @@ function updateRealtimeStatusUI(status, customMessage) {
     } else if (status === 'CONNECTING') {
         if (dot) dot.style.background = '#eab308'; // Yellow
         if (text) text.textContent = 'Conectando...';
-        badge.title = 'Conectando ao canal de tempo ÃƒÂ¡ÃƒÂ¡real...';
+        badge.title = 'Conectando ao canal de tempo ÃƒÃƒreal...';
     } else if (status === 'ERROR' || status === 'CLOSED' || status === 'CHANNEL_ERROR') {
         if (dot) dot.style.background = '#ef4444'; // Red
         if (text) text.textContent = customMessage || 'Offline (Local)';
-        badge.title = 'Sem sincronizaÃ§Ã£o remota em tempo ÃƒÂ¡ÃƒÂ¡real. Verifique se a tabela board_state existe no Supabase.';
+        badge.title = 'Sem sincronizaÃ§Ã£o remota em tempo ÃƒÃƒreal. Verifique se a tabela board_state existe no Supabase.';
     }
 }
 
@@ -2963,7 +2963,7 @@ function refreshAllViews() {
     renderTable();
     renderBalancingTable();
     renderReviewTable();
-    renderAÃƒÂ¡ÃƒÂ¡reaFilterOptions();
+    renderAÃƒÃƒreaFilterOptions();
     renderResponsavelFilterOptions();
     aplicarPerfilDeAcesso();
 }
@@ -2973,14 +2973,14 @@ function subscribeRealtime() {
     const client = getSupabase();
     if (!client) return;
 
-    if (ÃƒÂ¡ÃƒÂ¡realtimeChannel) {
-        client.removeChannel(ÃƒÂ¡ÃƒÂ¡realtimeChannel);
-        ÃƒÂ¡ÃƒÂ¡realtimeChannel = null;
+    if (ÃƒÃƒrealtimeChannel) {
+        client.removeChannel(ÃƒÃƒrealtimeChannel);
+        ÃƒÃƒrealtimeChannel = null;
     }
 
     updateRealtimeStatusUI('CONNECTING');
 
-    ÃƒÂ¡ÃƒÂ¡realtimeChannel = client
+    ÃƒÃƒrealtimeChannel = client
         .channel('board-changes')
         .on('postgres_changes', {
             event: '*',
@@ -3000,7 +3000,7 @@ function subscribeRealtime() {
                 applyStateMigrations();
                 localStorage.setItem('capacity_fte_hub_state', JSON.stringify(state));
                 refreshAllViews();
-                showToast('âš¡ O painel foi atualizado em tempo ÃƒÂ¡ÃƒÂ¡real por outro usuÃ¡rio!', 'info', 4000);
+                showToast('âš¡ O painel foi atualizado em tempo ÃƒÃƒreal por outro usuÃ¡rio!', 'info', 4000);
             }
         })
         .subscribe((status, err) => {
@@ -3009,7 +3009,7 @@ function subscribeRealtime() {
                 updateRealtimeStatusUI('SUBSCRIBED');
             } else if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
                 updateRealtimeStatusUI('ERROR', 'Erro Realtime');
-                console.warn('[Realtime Error] Certifique-se de que a publicaÃ§Ã£o Realtime estÃ¡ ativa no Supabase (ALTER PUBLICATION supabase_ÃƒÂ¡ÃƒÂ¡realtime ADD TABLE board_state).');
+                console.warn('[Realtime Error] Certifique-se de que a publicaÃ§Ã£o Realtime estÃ¡ ativa no Supabase (ALTER PUBLICATION supabase_ÃƒÃƒrealtime ADD TABLE board_state).');
             } else if (status === 'CLOSED') {
                 updateRealtimeStatusUI('ERROR', 'Desconectado');
             }
@@ -3018,9 +3018,9 @@ function subscribeRealtime() {
 
 function unsubscribeRealtime() {
     const client = getSupabase();
-    if (ÃƒÂ¡ÃƒÂ¡realtimeChannel && client) {
-        client.removeChannel(ÃƒÂ¡ÃƒÂ¡realtimeChannel);
-        ÃƒÂ¡ÃƒÂ¡realtimeChannel = null;
+    if (ÃƒÃƒrealtimeChannel && client) {
+        client.removeChannel(ÃƒÃƒrealtimeChannel);
+        ÃƒÃƒrealtimeChannel = null;
         updateRealtimeStatusUI('CLOSED');
         console.log('[Realtime] Canal desconectado.');
     }
@@ -3068,7 +3068,7 @@ async function forceResetGlobalState() {
         return;
     }
 
-    if (!confirm('Deseja ÃƒÂ¡ÃƒÂ¡realmente definir e publicar a sua visÃ£o atual como a base oficial para TODOS os usuÃ¡rios? Isso sincronizarÃ¡ a tela de todos imediatamente.')) {
+    if (!confirm('Deseja ÃƒÃƒrealmente definir e publicar a sua visÃ£o atual como a base oficial para TODOS os usuÃ¡rios? Isso sincronizarÃ¡ a tela de todos imediatamente.')) {
         return;
     }
 
@@ -3138,13 +3138,13 @@ async function loadStateFromSupabase() {
 // STATE MIGRATIONS HELPER
 function applyStateMigrations() {
     if (!state) return;
-    if (!state.customAÃƒÂ¡ÃƒÂ¡ÃƒÂ¡ÃƒÂ¡reas) state.customAÃƒÂ¡ÃƒÂ¡ÃƒÂ¡ÃƒÂ¡reas = [];
-    if (!state.aÃƒÂ¡ÃƒÂ¡reaAllocations) state.aÃƒÂ¡ÃƒÂ¡reaAllocations = {};
+    if (!state.customAÃƒÃƒÃƒÃƒreas) state.customAÃƒÃƒÃƒÃƒreas = [];
+    if (!state.aÃƒÃƒreaAllocations) state.aÃƒÃƒreaAllocations = {};
     if (!state.processes) state.processes = [];
 
     state.processes.forEach(p => {
         const match = EXAMPLE_PROCESSES.find(ep => ep.name === p.name);
-        if (match) p.aÃƒÂ¡ÃƒÂ¡rea = 'Backoffice';
+        if (match) p.aÃƒÃƒrea = 'Backoffice';
         if (p.backlogVolume === undefined) p.backlogVolume = '';
         if (p.allocatedResource === undefined) p.allocatedResource = '';
         if (p.reviewStatus === undefined) p.reviewStatus = 'Manter';
@@ -3152,8 +3152,8 @@ function applyStateMigrations() {
     });
     if (state.history === undefined) state.history = [];
     if (state.teams === undefined) {
-        if (state.customAÃƒÂ¡ÃƒÂ¡ÃƒÂ¡ÃƒÂ¡reas && state.customAÃƒÂ¡ÃƒÂ¡ÃƒÂ¡ÃƒÂ¡reas.length > 0) {
-            state.teams = ['Backoffice', 'GovernanÃ§a', 'Seguros/N2', 'EficiÃªncia Operacional', ...state.customAÃƒÂ¡ÃƒÂ¡ÃƒÂ¡ÃƒÂ¡reas];
+        if (state.customAÃƒÃƒÃƒÃƒreas && state.customAÃƒÃƒÃƒÃƒreas.length > 0) {
+            state.teams = ['Backoffice', 'GovernanÃ§a', 'Seguros/N2', 'EficiÃªncia Operacional', ...state.customAÃƒÃƒÃƒÃƒreas];
         } else {
             state.teams = ['Backoffice', 'GovernanÃ§a', 'Seguros/N2', 'EficiÃªncia Operacional'];
         }
@@ -3177,20 +3177,20 @@ function applyStateMigrations() {
         const uniqueResps = [...new Set(state.processes.map(p => p.responsavel || '').filter(r => r.trim() !== ''))].sort();
         state.responsaveis = uniqueResps.map(r => {
             const procWithResp = state.processes.find(p => p.responsavel === r);
-            const inheritedAÃƒÂ¡ÃƒÂ¡rea = procWithResp ? procWithResp.aÃƒÂ¡ÃƒÂ¡rea : '';
-            return { name: r, aÃƒÂ¡ÃƒÂ¡rea: inheritedAÃƒÂ¡ÃƒÂ¡rea, horasDia: null, absenteismo: null, diasUteis: null };
+            const inheritedAÃƒÃƒrea = procWithResp ? procWithResp.aÃƒÃƒrea : '';
+            return { name: r, aÃƒÃƒrea: inheritedAÃƒÃƒrea, horasDia: null, absenteismo: null, diasUteis: null };
         });
     } else if (Array.isArray(state.responsaveis) && state.responsaveis.length > 0 && typeof state.responsaveis[0] === 'string') {
         state.responsaveis = state.responsaveis.map(r => {
             const procWithResp = state.processes.find(p => p.responsavel === r);
-            const inheritedAÃƒÂ¡ÃƒÂ¡rea = procWithResp ? procWithResp.aÃƒÂ¡ÃƒÂ¡rea : '';
-            return { name: r, aÃƒÂ¡ÃƒÂ¡rea: inheritedAÃƒÂ¡ÃƒÂ¡rea, horasDia: null, absenteismo: null, diasUteis: null };
+            const inheritedAÃƒÃƒrea = procWithResp ? procWithResp.aÃƒÃƒrea : '';
+            return { name: r, aÃƒÃƒrea: inheritedAÃƒÃƒrea, horasDia: null, absenteismo: null, diasUteis: null };
         });
     } else if (Array.isArray(state.responsaveis)) {
         state.responsaveis.forEach(r => {
-            if (r && typeof r === 'object' && r.aÃƒÂ¡ÃƒÂ¡rea === undefined) {
+            if (r && typeof r === 'object' && r.aÃƒÃƒrea === undefined) {
                 const procWithResp = state.processes.find(p => p.responsavel === r.name);
-                r.aÃƒÂ¡ÃƒÂ¡rea = procWithResp ? procWithResp.aÃƒÂ¡ÃƒÂ¡rea : '';
+                r.aÃƒÃƒrea = procWithResp ? procWithResp.aÃƒÃƒrea : '';
             }
         });
     } else {
@@ -3223,14 +3223,14 @@ function loadState() {
 
     if (useDefaults) {
         state.processes = JSON.parse(JSON.stringify(EXAMPLE_PROCESSES));
-        state.customAÃƒÂ¡ÃƒÂ¡ÃƒÂ¡ÃƒÂ¡reas = [];
-        state.aÃƒÂ¡ÃƒÂ¡reaAllocations = {};
+        state.customAÃƒÃƒÃƒÃƒreas = [];
+        state.aÃƒÃƒreaAllocations = {};
         state.teams = ['Backoffice', 'GovernanÃ§a', 'Seguros/N2', 'EficiÃªncia Operacional'];
         const uniqueResps = [...new Set(state.processes.map(p => p.responsavel || '').filter(r => r.trim() !== ''))].sort();
         state.responsaveis = uniqueResps.map(r => {
             const procWithResp = state.processes.find(p => p.responsavel === r);
-            const inheritedAÃƒÂ¡ÃƒÂ¡rea = procWithResp ? procWithResp.aÃƒÂ¡ÃƒÂ¡rea : '';
-            return { name: r, aÃƒÂ¡ÃƒÂ¡rea: inheritedAÃƒÂ¡ÃƒÂ¡rea, horasDia: null, absenteismo: null, diasUteis: null };
+            const inheritedAÃƒÃƒrea = procWithResp ? procWithResp.aÃƒÃƒrea : '';
+            return { name: r, aÃƒÃƒrea: inheritedAÃƒÃƒrea, horasDia: null, absenteismo: null, diasUteis: null };
         });
         state.history = [];
         state.params = {
@@ -3312,7 +3312,7 @@ function closeNewTeamModal() {
 }
 
 function saveNewTeamFromModal() {
-    if (!verificarPermissao('OPERADOR')) { alert('Acesso negado: Perfil OPERADOR necessÃƒÂ¡rio.'); return; }
+    if (!verificarPermissao('OPERADOR')) { alert('Acesso negado: Perfil OPERADOR necessÃƒrio.'); return; }
     const nameInput = document.getElementById('modal-input-new-team');
     const gerenciaSelect = document.getElementById('modal-select-team-gerencia');
     const diretoriaSelect = document.getElementById('modal-select-team-diretoria');
@@ -3326,7 +3326,7 @@ function saveNewTeamFromModal() {
         return;
     }
     if ((state.teams || []).map(t => t.toLowerCase()).includes(teamName.toLowerCase())) {
-        if (errorDiv) { errorDiv.textContent = 'Esta equipe jÃƒÂ¡ estÃƒÂ¡ cadastrada.'; errorDiv.style.display = 'block'; }
+        if (errorDiv) { errorDiv.textContent = 'Esta equipe jÃƒ estÃƒ cadastrada.'; errorDiv.style.display = 'block'; }
         if (nameInput) nameInput.focus();
         return;
     }
@@ -3341,7 +3341,7 @@ function saveNewTeamFromModal() {
     saveState();
     if (modal) modal.style.display = 'none';
     renderCadastrosView();
-    renderAÃƒÂ¡ÃƒÂ¡reaFilterOptions();
+    renderAÃƒÃƒreaFilterOptions();
     renderTable();
     renderBalancingTable();
     renderReviewTable();
@@ -3415,12 +3415,12 @@ function setupEventListeners() {
     const btnBulkDeleteSelected = document.getElementById('btn-cadastros-delete-selected');
     if (btnBulkDeleteSelected) {
         btnBulkDeleteSelected.addEventListener('click', () => {
-            if (!verificarPermissao('ADMIN')) { alert('Acesso negado: Perfil ADMIN necessÃƒÂ¡rio.'); return; }
+            if (!verificarPermissao('ADMIN')) { alert('Acesso negado: Perfil ADMIN necessÃƒrio.'); return; }
             const checkedBoxes = document.querySelectorAll('.cadastros-row-checkbox:checked');
             const idsToDelete = [...checkedBoxes].map(cb => cb.dataset.id);
             if (idsToDelete.length === 0) return;
             
-            if (confirm(`Deseja ÃƒÂ¡ÃƒÂ¡realmente excluir as ${idsToDelete.length} atividades selecionadas?`)) {
+            if (confirm(`Deseja ÃƒÃƒrealmente excluir as ${idsToDelete.length} atividades selecionadas?`)) {
                 state.processes = state.processes.filter(p => !idsToDelete.includes(p.id));
                 saveState();
                 
@@ -3455,10 +3455,10 @@ function setupEventListeners() {
         });
     }
 
-    // AÃƒÂ¡ÃƒÂ¡rea & Owner filter triggers
-    const filterAÃƒÂ¡ÃƒÂ¡reaEl = document.getElementById('filter-aÃƒÂ¡ÃƒÂ¡rea');
-    if (filterAÃƒÂ¡ÃƒÂ¡reaEl) {
-        filterAÃƒÂ¡ÃƒÂ¡reaEl.addEventListener('change', () => {
+    // AÃƒÃƒrea & Owner filter triggers
+    const filterAÃƒÃƒreaEl = document.getElementById('filter-aÃƒÃƒrea');
+    if (filterAÃƒÃƒreaEl) {
+        filterAÃƒÃƒreaEl.addEventListener('change', () => {
             renderTable();
         });
     }
@@ -3470,9 +3470,9 @@ function setupEventListeners() {
         });
     }
 
-    const filterAÃƒÂ¡ÃƒÂ¡reaBalEl = document.getElementById('filter-aÃƒÂ¡ÃƒÂ¡rea-balancing');
-    if (filterAÃƒÂ¡ÃƒÂ¡reaBalEl) {
-        filterAÃƒÂ¡ÃƒÂ¡reaBalEl.addEventListener('change', () => {
+    const filterAÃƒÃƒreaBalEl = document.getElementById('filter-aÃƒÃƒrea-balancing');
+    if (filterAÃƒÃƒreaBalEl) {
+        filterAÃƒÃƒreaBalEl.addEventListener('change', () => {
             renderBalancingTable();
         });
     }
@@ -3484,9 +3484,9 @@ function setupEventListeners() {
         });
     }
 
-    const filterAÃƒÂ¡ÃƒÂ¡reaRevEl = document.getElementById('filter-aÃƒÂ¡ÃƒÂ¡rea-review');
-    if (filterAÃƒÂ¡ÃƒÂ¡reaRevEl) {
-        filterAÃƒÂ¡ÃƒÂ¡reaRevEl.addEventListener('change', () => {
+    const filterAÃƒÃƒreaRevEl = document.getElementById('filter-aÃƒÃƒrea-review');
+    if (filterAÃƒÃƒreaRevEl) {
+        filterAÃƒÃƒreaRevEl.addEventListener('change', () => {
             renderReviewTable();
         });
     }
@@ -3515,12 +3515,12 @@ function setupEventListeners() {
 
     // Cadastros - Add Responsible button
     const handleAddResponsible = () => {
-        if (!verificarPermissao('OPERADOR')) { alert('Acesso negado: Perfil OPERADOR necessÃƒÂ¡rio.'); return; }
+        if (!verificarPermissao('OPERADOR')) { alert('Acesso negado: Perfil OPERADOR necessÃƒrio.'); return; }
         const respInput = document.getElementById('input-new-responsible');
         if (!respInput) return;
         const respName = respInput.value.trim();
         if (!respName) {
-            alert("Por favor, digite o nome do responsÃƒÂ¡vel.");
+            alert("Por favor, digite o nome do responsÃƒvel.");
             return;
         }
         
@@ -3536,13 +3536,13 @@ function setupEventListeners() {
         
         const currentNames = state.responsaveis.map(r => (r && r.name ? r.name : String(r)).toLowerCase());
         if (currentNames.includes(respName.toLowerCase())) {
-            alert("Este responsÃƒÂ¡vel jÃƒÂ¡ estÃƒÂ¡ cadastrado.");
+            alert("Este responsÃƒvel jÃƒ estÃƒ cadastrado.");
             return;
         }
         
         state.responsaveis.push({
             name: respName,
-            aÃƒÂ¡ÃƒÂ¡rea: selectedTeam || '',
+            aÃƒÃƒrea: selectedTeam || '',
             horasDia: null,
             absenteismo: null,
             diasUteis: null
@@ -3602,7 +3602,7 @@ function setupEventListeners() {
     });
 
     document.getElementById('btn-clear-backlog-volumes').addEventListener('click', () => {
-        if (!verificarPermissao('ADMIN')) { alert('Acesso negado: Perfil ADMIN necessÃƒÂ¡rio.'); return; }
+        if (!verificarPermissao('ADMIN')) { alert('Acesso negado: Perfil ADMIN necessÃƒrio.'); return; }
         state.processes.forEach(proc => {
             proc.backlogVolume = '';
         });
@@ -3657,16 +3657,16 @@ function setupEventListeners() {
 function renderTable() {
     const tableBody = document.getElementById('table-body');
     const emptyState = document.getElementById('empty-state');
-    const filterValue = document.getElementById('filter-aÃƒÂ¡ÃƒÂ¡rea').value;
+    const filterValue = document.getElementById('filter-aÃƒÃƒrea').value;
     const respFilter = document.getElementById('filter-responsavel').value;
     
     if (!tableBody) return;
     tableBody.innerHTML = '';
     
     const filteredProcesses = state.processes.filter(p => {
-        const aÃƒÂ¡ÃƒÂ¡reaMatch = filterValue === 'all' || p.aÃƒÂ¡ÃƒÂ¡rea === filterValue;
+        const aÃƒÃƒreaMatch = filterValue === 'all' || p.aÃƒÃƒrea === filterValue;
         const respMatch = respFilter === 'all' || p.responsavel === respFilter;
-        return aÃƒÂ¡ÃƒÂ¡reaMatch && respMatch;
+        return aÃƒÃƒreaMatch && respMatch;
     });
 
     if (filteredProcesses.length === 0) {
@@ -3677,7 +3677,7 @@ function renderTable() {
             emptyState.style.display = 'none';
             document.getElementById('fte-table').style.display = 'table';
             
-            const tr = document.cÃƒÂ¡ÃƒÂ¡reateElement('tr');
+            const tr = document.cÃƒÃƒreateElement('tr');
             tr.innerHTML = `<td colspan="8" style="text-align: center; color: var(--text-muted); padding: 2rem;">Nenhuma atividade cadastrada nesta busca/filtro.</td>`;
             tableBody.appendChild(tr);
         }
@@ -3689,7 +3689,7 @@ function renderTable() {
     }
 
     filteredProcesses.forEach((proc) => {
-        const tr = document.cÃƒÂ¡ÃƒÂ¡reateElement('tr');
+        const tr = document.cÃƒÃƒreateElement('tr');
         tr.dataset.id = proc.id;
         if (proc.reviewStatus === 'Parar') {
             tr.className = 'row-review-stopped';
@@ -3703,10 +3703,10 @@ function renderTable() {
                 </div>
             </td>
             <td>
-                <span class="badge-aÃƒÂ¡ÃƒÂ¡rea" style="font-size: 0.85rem; padding: 0.25rem 0.5rem; border-radius: 4px; background: rgba(235, 92, 39, 0.08); color: var(--color-primary); border: 1px solid rgba(235, 92, 39, 0.15);">${escapeHtml(proc.aÃƒÂ¡ÃƒÂ¡rea || 'Sem Equipe')}</span>
+                <span class="badge-aÃƒÃƒrea" style="font-size: 0.85rem; padding: 0.25rem 0.5rem; border-radius: 4px; background: rgba(235, 92, 39, 0.08); color: var(--color-primary); border: 1px solid rgba(235, 92, 39, 0.15);">${escapeHtml(proc.aÃƒÃƒrea || 'Sem Equipe')}</span>
             </td>
             <td>
-                <span style="font-size: 0.9rem; color: var(--text-secondary);">${escapeHtml(proc.responsavel || 'Sem ResponsÃƒÂ¡vel')}</span>
+                <span style="font-size: 0.9rem; color: var(--text-secondary);">${escapeHtml(proc.responsavel || 'Sem ResponsÃƒvel')}</span>
             </td>
             <td>
                 <input type="number" class="input-volume" value="${proc.volume}" placeholder="---" min="0">
@@ -3761,15 +3761,15 @@ function renderTable() {
 function renderBalancingTable() {
     const balancingBody = document.getElementById('balancing-table-body');
     const emptyState = document.getElementById('balancing-empty-state');
-    const filterValue = document.getElementById('filter-aÃƒÂ¡ÃƒÂ¡rea-balancing').value;
+    const filterValue = document.getElementById('filter-aÃƒÃƒrea-balancing').value;
     
     balancingBody.innerHTML = '';
     
     const respFilter = document.getElementById('filter-responsavel-balancing').value;
     const filteredProcesses = state.processes.filter(p => {
-        const aÃƒÂ¡ÃƒÂ¡reaMatch = filterValue === 'all' || p.aÃƒÂ¡ÃƒÂ¡rea === filterValue;
+        const aÃƒÃƒreaMatch = filterValue === 'all' || p.aÃƒÃƒrea === filterValue;
         const respMatch = respFilter === 'all' || p.responsavel === respFilter;
-        return aÃƒÂ¡ÃƒÂ¡reaMatch && respMatch;
+        return aÃƒÃƒreaMatch && respMatch;
     });
 
     if (filteredProcesses.length === 0) {
@@ -3780,7 +3780,7 @@ function renderBalancingTable() {
             emptyState.style.display = 'none';
             document.getElementById('balancing-table').style.display = 'table';
             
-            const tr = document.cÃƒÂ¡ÃƒÂ¡reateElement('tr');
+            const tr = document.cÃƒÃƒreateElement('tr');
             tr.innerHTML = `<td colspan="7" style="text-align: center; color: var(--text-muted); padding: 2rem;">Nenhuma atividade cadastrada nesta busca/filtro.</td>`;
             balancingBody.appendChild(tr);
         }
@@ -3792,7 +3792,7 @@ function renderBalancingTable() {
     }
 
     filteredProcesses.forEach(proc => {
-        const tr = document.cÃƒÂ¡ÃƒÂ¡reateElement('tr');
+        const tr = document.cÃƒÃƒreateElement('tr');
         tr.dataset.id = proc.id;
         tr.style.cursor = 'pointer';
         if (proc.reviewStatus === 'Parar') {
@@ -3824,11 +3824,11 @@ function renderBalancingTable() {
             </td>
             <td>
                 <span class="badge" style="margin-left: 0; background: rgba(235, 92, 39, 0.15); border: 1px solid var(--color-primary); color: var(--color-primary); box-shadow: none;">
-                    ${escapeHtml(proc.aÃƒÂ¡ÃƒÂ¡rea)}
+                    ${escapeHtml(proc.aÃƒÃƒrea)}
                 </span>
             </td>
             <td>
-                <span style="font-size: 0.9rem; color: var(--text-secondary);">${escapeHtml(proc.responsavel || 'Sem ResponsÃƒÂ¡vel')}</span>
+                <span style="font-size: 0.9rem; color: var(--text-secondary);">${escapeHtml(proc.responsavel || 'Sem ResponsÃƒvel')}</span>
             </td>
             <td>${minutes.toFixed(0)} min</td>
             <td>
@@ -3850,7 +3850,7 @@ function renderBalancingTable() {
             }
         }
         
-        // Click event to highlight corresponding aÃƒÂ¡ÃƒÂ¡rea card on the right (ignore for ResponsÃƒÂ¡vel and Backlog inputs)
+        // Click event to highlight corresponding aÃƒÃƒrea card on the right (ignore for ResponsÃƒvel and Backlog inputs)
         tr.addEventListener('click', (e) => {
             const td = e.target.closest('td');
             if (!td) return;
@@ -3860,8 +3860,8 @@ function renderBalancingTable() {
                 return;
             }
             
-            const aÃƒÂ¡ÃƒÂ¡reaName = proc.aÃƒÂ¡ÃƒÂ¡rea;
-            highlightAndFocusAÃƒÂ¡ÃƒÂ¡rea(aÃƒÂ¡ÃƒÂ¡reaName);
+            const aÃƒÃƒreaName = proc.aÃƒÃƒrea;
+            highlightAndFocusAÃƒÃƒrea(aÃƒÃƒreaName);
         });
         
         balancingBody.appendChild(tr);
@@ -3870,16 +3870,16 @@ function renderBalancingTable() {
     updateBalancingCalculations();
 }
 
-function highlightAndFocusAÃƒÂ¡ÃƒÂ¡rea(aÃƒÂ¡ÃƒÂ¡reaName) {
-    document.querySelectorAll('.aÃƒÂ¡ÃƒÂ¡rea-alloc-card').forEach(card => {
+function highlightAndFocusAÃƒÃƒrea(aÃƒÃƒreaName) {
+    document.querySelectorAll('.aÃƒÃƒrea-alloc-card').forEach(card => {
         card.classList.remove('active-highlight');
     });
     
-    const card = document.querySelector(`.aÃƒÂ¡ÃƒÂ¡rea-alloc-card[data-aÃƒÂ¡ÃƒÂ¡rea="${aÃƒÂ¡ÃƒÂ¡reaName}"]`);
+    const card = document.querySelector(`.aÃƒÃƒrea-alloc-card[data-aÃƒÃƒrea="${aÃƒÃƒreaName}"]`);
     if (card) {
         card.classList.add('active-highlight');
         card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-        const input = card.querySelector('.input-aÃƒÂ¡ÃƒÂ¡rea-allocation');
+        const input = card.querySelector('.input-aÃƒÃƒrea-allocation');
         if (input) {
             input.focus();
             input.select();
@@ -3908,13 +3908,13 @@ function updateCalculations() {
     const horasDia = state.params.horasDia;
     const absenteismo = state.params.absenteismo / 100;
     const diasUteis = state.params.diasUteis;
-    const filterValue = document.getElementById('filter-aÃƒÂ¡ÃƒÂ¡rea').value;
+    const filterValue = document.getElementById('filter-aÃƒÃƒrea').value;
 
     const horasRealDia = horasDia * (1 - absenteismo);
     const horasTrabalhoMes = horasRealDia * diasUteis;
 
-    // Render global ÃƒÂ¡ÃƒÂ¡read-only parameter fields
-    const elHorasReal = document.getElementById('val-horas-ÃƒÂ¡ÃƒÂ¡real');
+    // Render global ÃƒÃƒread-only parameter fields
+    const elHorasReal = document.getElementById('val-horas-ÃƒÃƒreal');
     if (elHorasReal) elHorasReal.textContent = horasRealDia.toFixed(1) + 'h';
     
     const elHorasMes = document.getElementById('val-horas-mes');
@@ -4041,7 +4041,7 @@ function updateCalculations() {
 // UPDATE BALANCE LOGIC & CALCULATIONS (BALANCEAMENTO TAB)
 function updateBalancingCalculations() {
     const teamSize = state.params.teamSize;
-    const filterValue = document.getElementById('filter-aÃƒÂ¡ÃƒÂ¡rea-balancing').value;
+    const filterValue = document.getElementById('filter-aÃƒÃƒrea-balancing').value;
 
     let totalHoursAccum = 0;
     let totalFtePctAccum = 0;
@@ -4138,15 +4138,15 @@ function updateBalancingCalculations() {
 
 
 
-    // Update AÃƒÂ¡ÃƒÂ¡rea Allocations Side Panel
-    renderAÃƒÂ¡ÃƒÂ¡reaAllocations();
+    // Update AÃƒÃƒrea Allocations Side Panel
+    renderAÃƒÃƒreaAllocations();
 }
 
-function renderAÃƒÂ¡ÃƒÂ¡reaAllocations() {
-    const listContainer = document.getElementById('aÃƒÂ¡ÃƒÂ¡rea-allocations-list');
+function renderAÃƒÃƒreaAllocations() {
+    const listContainer = document.getElementById('aÃƒÃƒrea-allocations-list');
     if (!listContainer) return;
     
-    const aÃƒÂ¡ÃƒÂ¡ÃƒÂ¡ÃƒÂ¡reas = ['Backoffice', 'GovernanÃƒÂ§a', 'Seguros/N2', 'EficiÃƒÂªncia Operacional', ...state.customAÃƒÂ¡ÃƒÂ¡ÃƒÂ¡ÃƒÂ¡reas];
+    const aÃƒÃƒÃƒÃƒreas = ['Backoffice', 'GovernanÃƒÂ§a', 'Seguros/N2', 'EficiÃƒÂªncia Operacional', ...state.customAÃƒÃƒÃƒÃƒreas];
     
     const horasDia = state.params.horasDia;
     const absenteismo = state.params.absenteismo / 100;
@@ -4154,18 +4154,18 @@ function renderAÃƒÂ¡ÃƒÂ¡reaAllocations() {
     const diasUteis = state.params.diasUteis;
     
     // Check if we need to do a full rebuild or if we can just update in place
-    const existingCards = listContainer.querySelectorAll('.aÃƒÂ¡ÃƒÂ¡rea-alloc-card');
-    const needsFullRebuild = existingCards.length !== aÃƒÂ¡ÃƒÂ¡ÃƒÂ¡ÃƒÂ¡reas.length;
+    const existingCards = listContainer.querySelectorAll('.aÃƒÃƒrea-alloc-card');
+    const needsFullRebuild = existingCards.length !== aÃƒÃƒÃƒÃƒreas.length;
     
     if (needsFullRebuild) {
         listContainer.innerHTML = '';
     }
     
-    aÃƒÂ¡ÃƒÂ¡ÃƒÂ¡ÃƒÂ¡reas.forEach(aÃƒÂ¡ÃƒÂ¡reaName => {
-        let aÃƒÂ¡ÃƒÂ¡reaDailyHours = 0;
+    aÃƒÃƒÃƒÃƒreas.forEach(aÃƒÃƒreaName => {
+        let aÃƒÃƒreaDailyHours = 0;
         
         state.processes.forEach(proc => {
-            if (proc.aÃƒÂ¡ÃƒÂ¡rea !== aÃƒÂ¡ÃƒÂ¡reaName) return;
+            if (proc.aÃƒÃƒrea !== aÃƒÃƒreaName) return;
             if (proc.reviewStatus === 'Parar') return;
             
             const isTempoFrequencia = proc.qtdExecucao !== null && proc.qtdExecucao !== '' && parseFloat(proc.qtdExecucao) > 0;
@@ -4173,17 +4173,17 @@ function renderAÃƒÂ¡ÃƒÂ¡reaAllocations() {
             
             if (isTempoFrequencia) {
                 const qtdExec = parseFloat(proc.qtdExecucao) || 0;
-                aÃƒÂ¡ÃƒÂ¡reaDailyHours += (qtdExec * minutes) / 60 / diasUteis;
+                aÃƒÃƒreaDailyHours += (qtdExec * minutes) / 60 / diasUteis;
             } else {
                 const hasBacklog = proc.backlogVolume !== undefined && proc.backlogVolume !== '';
                 const backlogVol = hasBacklog ? parseFloat(proc.backlogVolume) : 0;
-                aÃƒÂ¡ÃƒÂ¡reaDailyHours += (backlogVol * minutes) / 60;
+                aÃƒÃƒreaDailyHours += (backlogVol * minutes) / 60;
             }
         });
         
-        const requiredFte = horasRealDia > 0 ? (aÃƒÂ¡ÃƒÂ¡reaDailyHours / horasRealDia) : 0;
+        const requiredFte = horasRealDia > 0 ? (aÃƒÃƒreaDailyHours / horasRealDia) : 0;
         
-        const allocatedNum = (state.responsaveis || []).filter(r => r.aÃƒÂ¡ÃƒÂ¡rea === aÃƒÂ¡ÃƒÂ¡reaName).length;
+        const allocatedNum = (state.responsaveis || []).filter(r => r.aÃƒÃƒrea === aÃƒÃƒreaName).length;
         
         let statusHtml = '';
         if (allocatedNum === 0) {
@@ -4205,39 +4205,39 @@ function renderAÃƒÂ¡ÃƒÂ¡reaAllocations() {
         
         if (!needsFullRebuild) {
             // Update in place to preserve input focus
-            const card = listContainer.querySelector(`.aÃƒÂ¡ÃƒÂ¡rea-alloc-card[data-aÃƒÂ¡ÃƒÂ¡rea="${aÃƒÂ¡ÃƒÂ¡reaName}"]`);
+            const card = listContainer.querySelector(`.aÃƒÃƒrea-alloc-card[data-aÃƒÃƒrea="${aÃƒÃƒreaName}"]`);
             if (card) {
-                const header = card.querySelector('.aÃƒÂ¡ÃƒÂ¡rea-alloc-header');
+                const header = card.querySelector('.aÃƒÃƒrea-alloc-header');
                 if (header) {
-                    header.innerHTML = `<span class="aÃƒÂ¡ÃƒÂ¡rea-alloc-name">${escapeHtml(aÃƒÂ¡ÃƒÂ¡reaName)}</span> ${statusHtml}`;
+                    header.innerHTML = `<span class="aÃƒÃƒrea-alloc-name">${escapeHtml(aÃƒÃƒreaName)}</span> ${statusHtml}`;
                 }
-                const statVal = card.querySelector('.aÃƒÂ¡ÃƒÂ¡rea-alloc-stat span');
+                const statVal = card.querySelector('.aÃƒÃƒrea-alloc-stat span');
                 if (statVal) {
                     statVal.textContent = requiredFte.toFixed(2);
                 }
-                const allocValDiv = card.querySelector('.aÃƒÂ¡ÃƒÂ¡rea-allocation-value');
+                const allocValDiv = card.querySelector('.aÃƒÃƒrea-allocation-value');
                 if (allocValDiv) {
                     allocValDiv.textContent = allocatedNum;
                 }
             }
         } else {
-            // CÃƒÂ¡ÃƒÂ¡reate new card
-            const card = document.cÃƒÂ¡ÃƒÂ¡reateElement('div');
-            card.className = 'aÃƒÂ¡ÃƒÂ¡rea-alloc-card';
-            card.dataset.aÃƒÂ¡ÃƒÂ¡rea = aÃƒÂ¡ÃƒÂ¡reaName;
+            // CÃƒÃƒreate new card
+            const card = document.cÃƒÃƒreateElement('div');
+            card.className = 'aÃƒÃƒrea-alloc-card';
+            card.dataset.aÃƒÃƒrea = aÃƒÃƒreaName;
             
             card.innerHTML = `
-                <div class="aÃƒÂ¡ÃƒÂ¡rea-alloc-header">
-                    <span class="aÃƒÂ¡ÃƒÂ¡rea-alloc-name">${escapeHtml(aÃƒÂ¡ÃƒÂ¡reaName)}</span>
+                <div class="aÃƒÃƒrea-alloc-header">
+                    <span class="aÃƒÃƒrea-alloc-name">${escapeHtml(aÃƒÃƒreaName)}</span>
                     ${statusHtml}
                 </div>
-                <div class="aÃƒÂ¡ÃƒÂ¡rea-alloc-body">
-                    <div class="aÃƒÂ¡ÃƒÂ¡rea-alloc-stat">
+                <div class="aÃƒÃƒrea-alloc-body">
+                    <div class="aÃƒÃƒrea-alloc-stat">
                         FTE Requerido: <span>${requiredFte.toFixed(2)}</span>
                     </div>
                     <div style="display: flex; align-items: center; gap: 0.5rem;">
                         <span style="font-size: 0.75rem; color: var(--text-secondary);">Alocado:</span>
-                        <div class="aÃƒÂ¡ÃƒÂ¡rea-allocation-value" style="padding: 0.2rem 0.6rem; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 4px; font-weight: 500; font-size: 0.9rem; min-width: 40px; text-align: center;">
+                        <div class="aÃƒÃƒrea-allocation-value" style="padding: 0.2rem 0.6rem; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 4px; font-weight: 500; font-size: 0.9rem; min-width: 40px; text-align: center;">
                             ${allocatedNum}
                         </div>
                     </div>
@@ -4251,14 +4251,14 @@ function renderAÃƒÂ¡ÃƒÂ¡reaAllocations() {
 
 // NEW PROCESS MANAGEMENT
 function addNewProcess() {
-    if (!verificarPermissao('OPERADOR')) { alert('Acesso negado: Perfil OPERADOR necessÃƒÂ¡rio.'); return; }
+    if (!verificarPermissao('OPERADOR')) { alert('Acesso negado: Perfil OPERADOR necessÃƒrio.'); return; }
     const newId = 'proc-' + Date.now();
-    const defaultAÃƒÂ¡ÃƒÂ¡rea = state.teams.length > 0 ? state.teams[0] : '';
+    const defaultAÃƒÃƒrea = state.teams.length > 0 ? state.teams[0] : '';
     
     state.processes.push({
         id: newId,
         name: `Nova Atividade ${state.processes.length + 1}`,
-        aÃƒÂ¡ÃƒÂ¡rea: defaultAÃƒÂ¡ÃƒÂ¡rea,
+        aÃƒÃƒrea: defaultAÃƒÃƒrea,
         responsavel: '',
         volume: '',
         minutos: 0,
@@ -4276,19 +4276,19 @@ function addNewProcess() {
 }
 
 function deleteProcess(id) {
-    if (!verificarPermissao('ADMIN')) { alert('Acesso negado: Perfil ADMIN necessÃƒÂ¡rio.'); return; }
+    if (!verificarPermissao('ADMIN')) { alert('Acesso negado: Perfil ADMIN necessÃƒrio.'); return; }
     state.processes = state.processes.filter(p => p.id !== id);
     renderTable();
     renderBalancingTable();
 }
 
 function duplicateProcess(proc) {
-    if (!verificarPermissao('OPERADOR')) { alert('Acesso negado: Perfil OPERADOR necessÃƒÂ¡rio.'); return; }
+    if (!verificarPermissao('OPERADOR')) { alert('Acesso negado: Perfil OPERADOR necessÃƒrio.'); return; }
     const newId = 'proc-' + Date.now() + '-' + Math.floor(Math.random() * 100);
     state.processes.push({
         id: newId,
         name: `${proc.name} (CÃƒÂ³pia)`,
-        aÃƒÂ¡ÃƒÂ¡rea: proc.aÃƒÂ¡ÃƒÂ¡rea,
+        aÃƒÃƒrea: proc.aÃƒÃƒrea,
         volume: proc.volume,
         minutos: proc.minutos,
         qtdExecucao: proc.qtdExecucao,
@@ -4301,7 +4301,7 @@ function duplicateProcess(proc) {
 }
 
 function loadExampleData() {
-    if (!verificarPermissao('ADMIN')) { alert('Acesso negado: Perfil ADMIN necessÃƒÂ¡rio.'); return; }
+    if (!verificarPermissao('ADMIN')) { alert('Acesso negado: Perfil ADMIN necessÃƒrio.'); return; }
     state.processes = JSON.parse(JSON.stringify(EXAMPLE_PROCESSES));
     state.params = {
         horasDia: 8.0,
@@ -4309,7 +4309,7 @@ function loadExampleData() {
         diasUteis: 21,
         teamSize: 5.0
     };
-    state.customAÃƒÂ¡ÃƒÂ¡ÃƒÂ¡ÃƒÂ¡reas = [];
+    state.customAÃƒÃƒÃƒÃƒreas = [];
     state.teams = ['Backoffice', 'GovernanÃƒÂ§a', 'Seguros/N2', 'EficiÃƒÂªncia Operacional'];
     state.teamHierarchy = {
         'Backoffice': { gerencia: 'ConciliaÃƒÂ§ÃƒÂ£o', diretoria: 'OperaÃƒÂ§ÃƒÂµes' },
@@ -4321,8 +4321,8 @@ function loadExampleData() {
     const uniqueResps = [...new Set(state.processes.map(p => p.responsavel || '').filter(r => r.trim() !== ''))].sort();
     state.responsaveis = uniqueResps.map(r => {
         const procWithResp = state.processes.find(p => p.responsavel === r);
-        const inheritedAÃƒÂ¡ÃƒÂ¡rea = procWithResp ? procWithResp.aÃƒÂ¡ÃƒÂ¡rea : '';
-        return { name: r, aÃƒÂ¡ÃƒÂ¡rea: inheritedAÃƒÂ¡ÃƒÂ¡rea, horasDia: null, absenteismo: null, diasUteis: null };
+        const inheritedAÃƒÃƒrea = procWithResp ? procWithResp.aÃƒÃƒrea : '';
+        return { name: r, aÃƒÃƒrea: inheritedAÃƒÃƒrea, horasDia: null, absenteismo: null, diasUteis: null };
     });
     
     const elInputHoras = document.getElementById('input-horas-dia');
@@ -4333,36 +4333,36 @@ function loadExampleData() {
     if (elInputDias) elInputDias.value = 21;
     const elInputTeam = document.getElementById('input-team-size');
     if (elInputTeam) elInputTeam.value = 5.0;
-    document.getElementById('filter-aÃƒÂ¡ÃƒÂ¡rea').value = 'all';
-    document.getElementById('filter-aÃƒÂ¡ÃƒÂ¡rea-balancing').value = 'all';
-    document.getElementById('filter-aÃƒÂ¡ÃƒÂ¡rea-review').value = 'all';
+    document.getElementById('filter-aÃƒÃƒrea').value = 'all';
+    document.getElementById('filter-aÃƒÃƒrea-balancing').value = 'all';
+    document.getElementById('filter-aÃƒÃƒrea-review').value = 'all';
     document.getElementById('filter-responsavel').value = 'all';
     document.getElementById('filter-responsavel-balancing').value = 'all';
     document.getElementById('filter-responsavel-review').value = 'all';
 
-    renderAÃƒÂ¡ÃƒÂ¡reaFilterOptions();
+    renderAÃƒÃƒreaFilterOptions();
     renderResponsavelFilterOptions();
     renderTable();
     renderBalancingTable();
 }
 
 function resetSimulator() {
-    if (!verificarPermissao('ADMIN')) { alert('Acesso negado: Perfil ADMIN necessÃƒÂ¡rio.'); return; }
+    if (!verificarPermissao('ADMIN')) { alert('Acesso negado: Perfil ADMIN necessÃƒrio.'); return; }
     state.processes = [];
-    document.getElementById('filter-aÃƒÂ¡ÃƒÂ¡rea').value = 'all';
-    document.getElementById('filter-aÃƒÂ¡ÃƒÂ¡rea-balancing').value = 'all';
-    document.getElementById('filter-aÃƒÂ¡ÃƒÂ¡rea-review').value = 'all';
+    document.getElementById('filter-aÃƒÃƒrea').value = 'all';
+    document.getElementById('filter-aÃƒÃƒrea-balancing').value = 'all';
+    document.getElementById('filter-aÃƒÃƒrea-review').value = 'all';
     document.getElementById('filter-responsavel').value = 'all';
     document.getElementById('filter-responsavel-balancing').value = 'all';
     document.getElementById('filter-responsavel-review').value = 'all';
     
-    renderAÃƒÂ¡ÃƒÂ¡reaFilterOptions();
+    renderAÃƒÃƒreaFilterOptions();
     renderResponsavelFilterOptions();
     renderTable();
     renderBalancingTable();
 }
 
-// CHART RENDER ENGINE (Grouped by AÃƒÂ¡ÃƒÂ¡rea or Process based on filter selection)
+// CHART RENDER ENGINE (Grouped by AÃƒÃƒrea or Process based on filter selection)
 function renderCharts(totalFteRequired) {
     const isDark = document.body.classList.contains('dark-theme');
     
@@ -4372,22 +4372,22 @@ function renderCharts(totalFteRequired) {
     const primaryColor = style.getPropertyValue('--color-primary').trim();
     const successColor = style.getPropertyValue('--color-success').trim();
 
-    // 1. Doughnut Chart (Aggregated by AÃƒÂ¡ÃƒÂ¡rea or by Process)
+    // 1. Doughnut Chart (Aggregated by AÃƒÃƒrea or by Process)
     const pieCanvas = document.getElementById('chart-pie');
     if (!pieCanvas) return;
 
-    const filterValue = document.getElementById('filter-aÃƒÂ¡ÃƒÂ¡rea').value;
+    const filterValue = document.getElementById('filter-aÃƒÃƒrea').value;
     const chartTitleElement = document.getElementById('chart-pie-title');
 
-    const aÃƒÂ¡ÃƒÂ¡reaMap = {};
+    const aÃƒÃƒreaMap = {};
     const processMap = {};
     const horasRealDia = state.params.horasDia * (1 - state.params.absenteismo / 100);
     const horasTrabalhoMes = horasRealDia * state.params.diasUteis;
 
-    // Filter processes list based on active aÃƒÂ¡ÃƒÂ¡rea selection
+    // Filter processes list based on active aÃƒÃƒrea selection
     const filteredList = filterValue === 'all' 
         ? state.processes 
-        : state.processes.filter(p => p.aÃƒÂ¡ÃƒÂ¡rea === filterValue);
+        : state.processes.filter(p => p.aÃƒÃƒrea === filterValue);
 
     filteredList.forEach(p => {
         const hasVolume = p.volume !== null && p.volume !== '';
@@ -4398,11 +4398,11 @@ function renderCharts(totalFteRequired) {
         const fte = horasTrabalhoMes > 0 ? (totalHours / horasTrabalhoMes) : 0;
 
         if (filterValue === 'all') {
-            const aÃƒÂ¡ÃƒÂ¡reaName = p.aÃƒÂ¡ÃƒÂ¡rea || 'Outras';
-            if (!aÃƒÂ¡ÃƒÂ¡reaMap[aÃƒÂ¡ÃƒÂ¡reaName]) {
-                aÃƒÂ¡ÃƒÂ¡reaMap[aÃƒÂ¡ÃƒÂ¡reaName] = 0;
+            const aÃƒÃƒreaName = p.aÃƒÃƒrea || 'Outras';
+            if (!aÃƒÃƒreaMap[aÃƒÃƒreaName]) {
+                aÃƒÃƒreaMap[aÃƒÃƒreaName] = 0;
             }
-            aÃƒÂ¡ÃƒÂ¡reaMap[aÃƒÂ¡ÃƒÂ¡reaName] += fte;
+            aÃƒÃƒreaMap[aÃƒÃƒreaName] += fte;
         } else {
             const procName = p.name || 'Sem nome';
             if (!processMap[procName]) {
@@ -4416,10 +4416,10 @@ function renderCharts(totalFteRequired) {
     let pieData = [];
 
     if (filterValue === 'all') {
-        pieLabels = Object.keys(aÃƒÂ¡ÃƒÂ¡reaMap).filter(k => aÃƒÂ¡ÃƒÂ¡reaMap[k] > 0);
-        pieData = pieLabels.map(k => parseFloat(aÃƒÂ¡ÃƒÂ¡reaMap[k].toFixed(2)));
+        pieLabels = Object.keys(aÃƒÃƒreaMap).filter(k => aÃƒÃƒreaMap[k] > 0);
+        pieData = pieLabels.map(k => parseFloat(aÃƒÃƒreaMap[k].toFixed(2)));
         if (chartTitleElement) {
-            chartTitleElement.innerHTML = '<i class="fa-solid fa-chart-pie"></i> DistribuiÃƒÂ§ÃƒÂ£o de FTE por ÃƒÂÃƒÂ¡ÃƒÂ¡rea';
+            chartTitleElement.innerHTML = '<i class="fa-solid fa-chart-pie"></i> DistribuiÃƒÂ§ÃƒÂ£o de FTE por ÃƒÂÃƒÃƒrea';
         }
     } else {
         pieLabels = Object.keys(processMap).filter(k => processMap[k] > 0);
@@ -4442,7 +4442,7 @@ function renderCharts(totalFteRequired) {
         pieChartInstance = new Chart(pieCanvas, {
             type: 'doughnut',
             data: {
-                labels: ['Nenhuma ÃƒÂ¡ÃƒÂ¡ÃƒÂ¡rea com dados'],
+                labels: ['Nenhuma ÃƒÃƒÃƒrea com dados'],
                 datasets: [{
                     data: [1],
                     backgroundColor: [isDark ? '#081e13' : '#cbd5e1'],
@@ -4577,7 +4577,7 @@ function updateChartsTheme() {
 // EXPORT TO CSV (Excel Compatible - Exports active tab content)
 function exportToCSV() {
     if (state.processes.length === 0) {
-        alert("NÃƒÂ£o hÃƒÂ¡ dados para exportar.");
+        alert("NÃƒÂ£o hÃƒ dados para exportar.");
         return;
     }
 
@@ -4593,11 +4593,11 @@ function exportToCSV() {
 
     csvContent += "PARAMETROS GLOBAIS\n";
     csvContent += `Horas Trabalho / Dia;${state.params.horasDia}\n`;
-    csvContent += `AbsenteÃƒÂ­smo (%);${state.params.absenteismo}%\n`;
+    csvContent += `AbsenteÃƒsmo (%);${state.params.absenteismo}%\n`;
     csvContent += `Dias ÃƒÅ¡teis;${state.params.diasUteis}\n`;
     csvContent += `Horas Trabalho Real / Dia;${horasRealDia.toFixed(2)}\n`;
     csvContent += `Horas Trabalho MÃƒÂªs (1 FTE);${horasTrabalhoMes.toFixed(2)}\n`;
-    csvContent += `Tamanho da Equipe (DisponÃƒÂ­vel);${state.params.teamSize}\n\n`;
+    csvContent += `Tamanho da Equipe (DisponÃƒvel);${state.params.teamSize}\n\n`;
 
     if (activeTab === 'dashboard') {
         csvContent += "RELATORIO DE CAPACIDADE E FTE (DASHBOARD)\n";
@@ -4618,12 +4618,12 @@ function exportToCSV() {
             totalFtePct += ftePct;
 
             const name = `"${(proc.name || '').replace(/"/g, '""')}"`;
-            const aÃƒÂ¡ÃƒÂ¡rea = `"${(proc.aÃƒÂ¡ÃƒÂ¡rea || '').replace(/"/g, '""')}"`;
+            const aÃƒÃƒrea = `"${(proc.aÃƒÃƒrea || '').replace(/"/g, '""')}"`;
             const vol = proc.volume !== '' ? proc.volume : '""';
             const mins = proc.minutos !== '' ? proc.minutos : 0;
             const qtd = proc.qtdExecucao !== '' ? proc.qtdExecucao : '""';
 
-            csvContent += `${name};${aÃƒÂ¡ÃƒÂ¡rea};${vol};${mins};${qtd};${totalHoursRow.toFixed(2).replace('.', ',')};${ftePct.toFixed(2).replace('.', ',')}%\n`;
+            csvContent += `${name};${aÃƒÃƒrea};${vol};${mins};${qtd};${totalHoursRow.toFixed(2).replace('.', ',')};${ftePct.toFixed(2).replace('.', ',')}%\n`;
         });
 
         csvContent += `TOTAL GERAL;;;;;;${totalHours.toFixed(2).replace('.', ',')};${totalFtePct.toFixed(2).replace('.', ',')}%\n`;
@@ -4661,10 +4661,10 @@ function exportToCSV() {
             totalFtePct += ftePct;
 
             const name = `"${(proc.name || '').replace(/"/g, '""')}"`;
-            const aÃƒÂ¡ÃƒÂ¡rea = `"${(proc.aÃƒÂ¡ÃƒÂ¡rea || '').replace(/"/g, '""')}"`;
+            const aÃƒÃƒrea = `"${(proc.aÃƒÃƒrea || '').replace(/"/g, '""')}"`;
             const mins = proc.minutos !== '' ? proc.minutos : 0;
 
-            csvContent += `${name};${aÃƒÂ¡ÃƒÂ¡rea};${mins};${typeStr};${volStr};${totalHoursRow.toFixed(2).replace('.', ',')};${ftePct.toFixed(2).replace('.', ',')}%\n`;
+            csvContent += `${name};${aÃƒÃƒrea};${mins};${typeStr};${volStr};${totalHoursRow.toFixed(2).replace('.', ',')};${ftePct.toFixed(2).replace('.', ',')}%\n`;
         });
 
         csvContent += `TOTAL GERAL;;;;;${totalHours.toFixed(2).replace('.', ',')};${totalFtePct.toFixed(2).replace('.', ',')}%\n\n`;
@@ -4673,29 +4673,29 @@ function exportToCSV() {
         csvContent += "BALANCEAMENTO DE CAPACIDADE POR EQUIPE / AREA\n";
         csvContent += "AREA / EQUIPE;FTE REQUERIDO DIARIO;RECURSO ALOCADO (FTE);STATUS CAPACIDADE\n";
 
-        const aÃƒÂ¡ÃƒÂ¡ÃƒÂ¡ÃƒÂ¡reasList = ['Backoffice', 'GovernanÃƒÂ§a', 'Seguros/N2', 'EficiÃƒÂªncia Operacional', ...state.customAÃƒÂ¡ÃƒÂ¡ÃƒÂ¡ÃƒÂ¡reas];
+        const aÃƒÃƒÃƒÃƒreasList = ['Backoffice', 'GovernanÃƒÂ§a', 'Seguros/N2', 'EficiÃƒÂªncia Operacional', ...state.customAÃƒÃƒÃƒÃƒreas];
         let sumRequiredFte = 0;
         let sumAllocatedFte = 0;
 
-        aÃƒÂ¡ÃƒÂ¡ÃƒÂ¡ÃƒÂ¡reasList.forEach(aÃƒÂ¡ÃƒÂ¡reaName => {
-            let aÃƒÂ¡ÃƒÂ¡reaDailyHours = 0;
+        aÃƒÃƒÃƒÃƒreasList.forEach(aÃƒÃƒreaName => {
+            let aÃƒÃƒreaDailyHours = 0;
             state.processes.forEach(proc => {
-                if (proc.aÃƒÂ¡ÃƒÂ¡rea !== aÃƒÂ¡ÃƒÂ¡reaName) return;
+                if (proc.aÃƒÃƒrea !== aÃƒÃƒreaName) return;
                 const isTempoFrequencia = proc.qtdExecucao !== null && proc.qtdExecucao !== '' && parseFloat(proc.qtdExecucao) > 0;
                 const minutes = proc.minutos || 0;
                 
                 if (isTempoFrequencia) {
                     const qtdExec = parseFloat(proc.qtdExecucao) || 0;
-                    aÃƒÂ¡ÃƒÂ¡reaDailyHours += (qtdExec * minutes) / 60 / diasUteis;
+                    aÃƒÃƒreaDailyHours += (qtdExec * minutes) / 60 / diasUteis;
                 } else {
                     const hasBacklog = proc.backlogVolume !== undefined && proc.backlogVolume !== '';
                     const backlogVol = hasBacklog ? parseFloat(proc.backlogVolume) : 0;
-                    aÃƒÂ¡ÃƒÂ¡reaDailyHours += (backlogVol * minutes) / 60;
+                    aÃƒÃƒreaDailyHours += (backlogVol * minutes) / 60;
                 }
             });
 
-            const requiredFte = horasRealDia > 0 ? (aÃƒÂ¡ÃƒÂ¡reaDailyHours / horasRealDia) : 0;
-            const allocatedVal = state.aÃƒÂ¡ÃƒÂ¡reaAllocations[aÃƒÂ¡ÃƒÂ¡reaName] !== undefined && state.aÃƒÂ¡ÃƒÂ¡reaAllocations[aÃƒÂ¡ÃƒÂ¡reaName] !== '' ? parseFloat(state.aÃƒÂ¡ÃƒÂ¡reaAllocations[aÃƒÂ¡ÃƒÂ¡reaName]) : 0;
+            const requiredFte = horasRealDia > 0 ? (aÃƒÃƒreaDailyHours / horasRealDia) : 0;
+            const allocatedVal = state.aÃƒÃƒreaAllocations[aÃƒÃƒreaName] !== undefined && state.aÃƒÃƒreaAllocations[aÃƒÃƒreaName] !== '' ? parseFloat(state.aÃƒÃƒreaAllocations[aÃƒÃƒreaName]) : 0;
 
             let statusStr = "";
             if (allocatedVal === 0) {
@@ -4714,7 +4714,7 @@ function exportToCSV() {
             sumRequiredFte += requiredFte;
             sumAllocatedFte += allocatedVal;
 
-            csvContent += `"${aÃƒÂ¡ÃƒÂ¡reaName.replace(/"/g, '""')}";${requiredFte.toFixed(2).replace('.', ',')};${allocatedVal.toFixed(2).replace('.', ',')};${statusStr}\n`;
+            csvContent += `"${aÃƒÃƒreaName.replace(/"/g, '""')}";${requiredFte.toFixed(2).replace('.', ',')};${allocatedVal.toFixed(2).replace('.', ',')};${statusStr}\n`;
         });
 
         csvContent += `TOTAL GERAL;${sumRequiredFte.toFixed(2).replace('.', ',')};${sumAllocatedFte.toFixed(2).replace('.', ',')};\n`;
@@ -4722,7 +4722,7 @@ function exportToCSV() {
 
     // Trigger download
     const encodedUri = encodeURI(csvContent);
-    const link = document.cÃƒÂ¡ÃƒÂ¡reateElement("a");
+    const link = document.cÃƒÃƒreateElement("a");
     link.setAttribute("href", encodedUri);
     link.setAttribute("download", `Capacity_FTE_${activeTab === 'dashboard' ? 'Report' : 'Backlog'}_${new Date().toISOString().slice(0,10)}.csv`);
     document.body.appendChild(link);
@@ -4742,40 +4742,40 @@ function escapeHtml(str) {
 }
 
 // DYNAMICALLY RENDER THE FILTER OPTIONS FOR AREAS (ALL TABLES)
-function renderAÃƒÂ¡ÃƒÂ¡reaFilterOptions() {
-    const filterSelect = document.getElementById('filter-aÃƒÂ¡ÃƒÂ¡rea');
-    const filterSelectBalancing = document.getElementById('filter-aÃƒÂ¡ÃƒÂ¡rea-balancing');
-    const filterSelectReview = document.getElementById('filter-aÃƒÂ¡ÃƒÂ¡rea-review');
+function renderAÃƒÃƒreaFilterOptions() {
+    const filterSelect = document.getElementById('filter-aÃƒÃƒrea');
+    const filterSelectBalancing = document.getElementById('filter-aÃƒÃƒrea-balancing');
+    const filterSelectReview = document.getElementById('filter-aÃƒÃƒrea-review');
     if (!filterSelect || !filterSelectBalancing || !filterSelectReview) return;
     
     const currentValue = filterSelect.value;
     const currentValueBalancing = filterSelectBalancing.value;
     const currentValueReview = filterSelectReview.value;
     
-    const optionsHtml = '<option value="all">Todas as ÃƒÂÃƒÂ¡ÃƒÂ¡ÃƒÂ¡ÃƒÂ¡reas</option>' +
-        (state.teams || []).map(aÃƒÂ¡ÃƒÂ¡rea =>
-            `<option value="${escapeHtml(aÃƒÂ¡ÃƒÂ¡rea)}">${escapeHtml(aÃƒÂ¡ÃƒÂ¡rea)}</option>`
+    const optionsHtml = '<option value="all">Todas as ÃƒÂÃƒÃƒÃƒÃƒreas</option>' +
+        (state.teams || []).map(aÃƒÃƒrea =>
+            `<option value="${escapeHtml(aÃƒÃƒrea)}">${escapeHtml(aÃƒÃƒrea)}</option>`
         ).join('');
         
     filterSelect.innerHTML = optionsHtml;
     filterSelectBalancing.innerHTML = optionsHtml;
     filterSelectReview.innerHTML = optionsHtml;
     
-    const allAÃƒÂ¡ÃƒÂ¡ÃƒÂ¡ÃƒÂ¡reas = state.teams || [];
+    const allAÃƒÃƒÃƒÃƒreas = state.teams || [];
     
-    if (allAÃƒÂ¡ÃƒÂ¡ÃƒÂ¡ÃƒÂ¡reas.includes(currentValue)) {
+    if (allAÃƒÃƒÃƒÃƒreas.includes(currentValue)) {
         filterSelect.value = currentValue;
     } else {
         filterSelect.value = 'all';
     }
     
-    if (allAÃƒÂ¡ÃƒÂ¡ÃƒÂ¡ÃƒÂ¡reas.includes(currentValueBalancing)) {
+    if (allAÃƒÃƒÃƒÃƒreas.includes(currentValueBalancing)) {
         filterSelectBalancing.value = currentValueBalancing;
     } else {
         filterSelectBalancing.value = 'all';
     }
 
-    if (allAÃƒÂ¡ÃƒÂ¡ÃƒÂ¡ÃƒÂ¡reas.includes(currentValueReview)) {
+    if (allAÃƒÃƒÃƒÃƒreas.includes(currentValueReview)) {
         filterSelectReview.value = currentValueReview;
     } else {
         filterSelectReview.value = 'all';
@@ -4786,16 +4786,16 @@ function renderAÃƒÂ¡ÃƒÂ¡reaFilterOptions() {
 function renderReviewTable() {
     const tableBody = document.getElementById('review-table-body');
     const emptyState = document.getElementById('review-empty-state');
-    const filterValue = document.getElementById('filter-aÃƒÂ¡ÃƒÂ¡rea-review').value;
+    const filterValue = document.getElementById('filter-aÃƒÃƒrea-review').value;
     const respFilter = document.getElementById('filter-responsavel-review').value;
 
     if (!tableBody) return;
     tableBody.innerHTML = '';
 
     const filteredProcesses = state.processes.filter(p => {
-        const aÃƒÂ¡ÃƒÂ¡reaMatch = filterValue === 'all' || p.aÃƒÂ¡ÃƒÂ¡rea === filterValue;
+        const aÃƒÃƒreaMatch = filterValue === 'all' || p.aÃƒÃƒrea === filterValue;
         const respMatch = respFilter === 'all' || p.responsavel === respFilter;
-        return aÃƒÂ¡ÃƒÂ¡reaMatch && respMatch;
+        return aÃƒÃƒreaMatch && respMatch;
     });
 
     if (filteredProcesses.length === 0) {
@@ -4840,7 +4840,7 @@ function renderReviewTable() {
         const pHorasTrabalhoMes = pHorasRealDia * respParams.diasUteis;
         const ftePct = pHorasTrabalhoMes > 0 ? (totalHours / pHorasTrabalhoMes) * 100 : 0;
 
-        // Metric Description (ÃƒÂ¡ÃƒÂ¡read-only)
+        // Metric Description (ÃƒÃƒread-only)
         let metricDesc = '';
         if (proc.qtdExecucao !== null && proc.qtdExecucao !== '' && parseFloat(proc.qtdExecucao) > 0) {
             metricDesc = `Tempo x Freq: ${proc.minutos}m / ${proc.qtdExecucao}x`;
@@ -4855,7 +4855,7 @@ function renderReviewTable() {
         ).join('');
         const statusSelectHtml = `<select class="select-review-status" data-id="${proc.id}" data-status="${proc.reviewStatus || 'Manter'}">${statusOptionsHtml}</select>`;
 
-        const tr = document.cÃƒÂ¡ÃƒÂ¡reateElement('tr');
+        const tr = document.cÃƒÃƒreateElement('tr');
         if (proc.reviewStatus === 'Parar') {
             tr.className = 'row-review-stopped';
         }
@@ -4866,10 +4866,10 @@ function renderReviewTable() {
                 ${proc.reviewStatus && proc.reviewStatus !== 'Manter' ? `<span class="badge-review badge-review-${proc.reviewStatus.toLowerCase()}">${proc.reviewStatus}</span>` : ''}
             </td>
             <td>
-                <span class="badge-aÃƒÂ¡ÃƒÂ¡rea" style="font-size: 0.85rem; padding: 0.25rem 0.5rem; border-radius: 4px; background: rgba(235, 92, 39, 0.08); color: var(--color-primary); border: 1px solid rgba(235, 92, 39, 0.15);">${escapeHtml(proc.aÃƒÂ¡ÃƒÂ¡rea || 'Sem Equipe')}</span>
+                <span class="badge-aÃƒÃƒrea" style="font-size: 0.85rem; padding: 0.25rem 0.5rem; border-radius: 4px; background: rgba(235, 92, 39, 0.08); color: var(--color-primary); border: 1px solid rgba(235, 92, 39, 0.15);">${escapeHtml(proc.aÃƒÃƒrea || 'Sem Equipe')}</span>
             </td>
             <td>
-                <span style="font-size: 0.9rem; color: var(--text-secondary);">${escapeHtml(proc.responsavel || 'Sem ResponsÃƒÂ¡vel')}</span>
+                <span style="font-size: 0.9rem; color: var(--text-secondary);">${escapeHtml(proc.responsavel || 'Sem ResponsÃƒvel')}</span>
             </td>
             <td style="color: var(--text-secondary); font-size: 0.85rem;">${metricDesc}</td>
             <td style="font-weight: 700; color: ${proc.reviewStatus === 'Parar' ? 'var(--text-muted)' : 'var(--text-primary)'};">${proc.reviewStatus === 'Parar' ? '0.00%' : ftePct.toFixed(2) + '%'}</td>
@@ -4904,7 +4904,7 @@ function renderResponsavelFilterOptions() {
     const uniqueResponsaveis = state.responsaveis || [];
     const names = uniqueResponsaveis.map(r => r.name);
     
-    const optionsHtml = '<option value="all">Todos os ResponsÃƒÂ¡veis</option>' +
+    const optionsHtml = '<option value="all">Todos os ResponsÃƒveis</option>' +
         names.map(name =>
             `<option value="${escapeHtml(name)}">${escapeHtml(name)}</option>`
         ).join('');
@@ -4934,12 +4934,12 @@ function renderResponsavelFilterOptions() {
 
 // IMPORT PROCESSES FROM EXCEL/CSV SPREADSHEET (SHEETJS)
 function importExcelFile(file) {
-    if (!verificarPermissao('ADMIN')) { alert('Acesso negado: Perfil ADMIN necessÃƒÂ¡rio.'); return; }
-    const ÃƒÂ¡ÃƒÂ¡reader = new FileReader();
-    ÃƒÂ¡ÃƒÂ¡reader.onload = function(e) {
+    if (!verificarPermissao('ADMIN')) { alert('Acesso negado: Perfil ADMIN necessÃƒrio.'); return; }
+    const ÃƒÃƒreader = new FileReader();
+    ÃƒÃƒreader.onload = function(e) {
         try {
             const data = new Uint8Array(e.target.result);
-            const workbook = XLSX.ÃƒÂ¡ÃƒÂ¡read(data, { type: 'array' });
+            const workbook = XLSX.ÃƒÃƒread(data, { type: 'array' });
             
             let importCount = 0;
             const importedProcesses = [];
@@ -4955,8 +4955,8 @@ function importExcelFile(file) {
                 const headers = rows[0].map(h => String(h || '').trim().toLowerCase());
                 
                 let activityIdx = headers.findIndex(h => h.includes('atividade') || h.includes('nome') || h.includes('processo'));
-                let teamIdx = headers.findIndex(h => h.includes('equipe') || h.includes('ÃƒÂ¡ÃƒÂ¡ÃƒÂ¡rea') || h.includes('aÃƒÂ¡ÃƒÂ¡rea') || h.includes('grupo'));
-                let respIdx = headers.findIndex(h => h.includes('responsÃƒÂ¡vel') || h.includes('responsavel') || h.includes('dono') || h.includes('colaborador'));
+                let teamIdx = headers.findIndex(h => h.includes('equipe') || h.includes('ÃƒÃƒÃƒrea') || h.includes('aÃƒÃƒrea') || h.includes('grupo'));
+                let respIdx = headers.findIndex(h => h.includes('responsÃƒvel') || h.includes('responsavel') || h.includes('dono') || h.includes('colaborador'));
                 let volIdx = headers.findIndex(h => h.includes('volume') || h.includes('qtd. mÃƒÂªs') || h.includes('qtd. mes') || h.includes('quantidade') || h.includes('qtd. mes'));
                 let minIdx = headers.findIndex(h => h.includes('tempo') || h.includes('minutos') || h.includes('duraÃƒÂ§ÃƒÂ£o') || h.includes('duracao'));
                 let freqIdx = headers.findIndex(h => h.includes('freq') || h.includes('execuÃƒÂ§ÃƒÂ£o') || h.includes('execucao'));
@@ -5006,7 +5006,7 @@ function importExcelFile(file) {
                     importedProcesses.push({
                         id: 'proc-' + Date.now() + '-' + Math.floor(Math.random() * 1000) + '-' + importCount,
                         name: activityName,
-                        aÃƒÂ¡ÃƒÂ¡rea: teamName || (state.teams.length > 0 ? state.teams[0] : ''),
+                        aÃƒÃƒrea: teamName || (state.teams.length > 0 ? state.teams[0] : ''),
                         responsavel: respName,
                         volume: volumeVal,
                         minutos: minutesVal,
@@ -5020,22 +5020,22 @@ function importExcelFile(file) {
             });
             
             if (importedProcesses.length > 0) {
-                const mode = confirm(`ImportaÃƒÂ§ÃƒÂ£o ConcluÃƒÂ­da!\n\nForam encontradas ${importCount} atividades.\n\nDeseja SUBSTITUIR as atividades existentes no simulador pelas novas?\n\n(Clique em 'OK' para substituir ou 'Cancelar' para adicionar ao final)`);
+                const mode = confirm(`ImportaÃƒÂ§ÃƒÂ£o ConcluÃƒda!\n\nForam encontradas ${importCount} atividades.\n\nDeseja SUBSTITUIR as atividades existentes no simulador pelas novas?\n\n(Clique em 'OK' para substituir ou 'Cancelar' para adicionar ao final)`);
                 
                 state.teams = [...newTeams];
                 const existingResps = state.responsaveis || [];
                 state.responsaveis = [...newResps].sort().map(name => {
                     const existing = existingResps.find(r => r.name === name);
                     const importedAct = importedProcesses.find(ip => ip.responsavel === name);
-                    const importedAÃƒÂ¡ÃƒÂ¡rea = importedAct ? importedAct.aÃƒÂ¡ÃƒÂ¡rea : '';
+                    const importedAÃƒÃƒrea = importedAct ? importedAct.aÃƒÃƒrea : '';
                     
                     if (existing) {
-                        if (!existing.aÃƒÂ¡ÃƒÂ¡rea) {
-                            existing.aÃƒÂ¡ÃƒÂ¡rea = importedAÃƒÂ¡ÃƒÂ¡rea;
+                        if (!existing.aÃƒÃƒrea) {
+                            existing.aÃƒÃƒrea = importedAÃƒÃƒrea;
                         }
                         return existing;
                     }
-                    return { name, aÃƒÂ¡ÃƒÂ¡rea: importedAÃƒÂ¡ÃƒÂ¡rea, horasDia: null, absenteismo: null, diasUteis: null };
+                    return { name, aÃƒÃƒrea: importedAÃƒÃƒrea, horasDia: null, absenteismo: null, diasUteis: null };
                 });
                 
                 if (mode) {
@@ -5046,7 +5046,7 @@ function importExcelFile(file) {
                 
                 saveState();
                 renderResponsavelFilterOptions();
-                renderAÃƒÂ¡ÃƒÂ¡reaFilterOptions();
+                renderAÃƒÃƒreaFilterOptions();
                 
                 renderCadastrosView();
                 renderTable();
@@ -5059,10 +5059,10 @@ function importExcelFile(file) {
             }
         } catch (err) {
             console.error(err);
-            alert("Erro ao ler o arquivo Excel. Certifique-se de que ÃƒÂ© um arquivo .xlsx, .xls ou .csv vÃƒÂ¡lido.");
+            alert("Erro ao ler o arquivo Excel. Certifique-se de que ÃƒÂ© um arquivo .xlsx, .xls ou .csv vÃƒlido.");
         }
     };
-    ÃƒÂ¡ÃƒÂ¡reader.ÃƒÂ¡ÃƒÂ¡readAsArrayBuffer(file);
+    ÃƒÃƒreader.ÃƒÃƒreadAsArrayBuffer(file);
 }
 
 // ----------------------------------------------------
@@ -5090,10 +5090,10 @@ function initHistoryView() {
 }
 
 function saveHistorySnapshot() {
-    if (!verificarPermissao('OPERADOR')) { alert('Acesso negado: Perfil OPERADOR necessÃƒÂ¡rio.'); return; }
+    if (!verificarPermissao('OPERADOR')) { alert('Acesso negado: Perfil OPERADOR necessÃƒrio.'); return; }
     const monthInput = document.getElementById('history-month-input');
     if (!monthInput || !monthInput.value) {
-        alert("Selecione um mÃƒÂªs vÃƒÂ¡lido.");
+        alert("Selecione um mÃƒÂªs vÃƒlido.");
         return;
     }
     
@@ -5101,21 +5101,21 @@ function saveHistorySnapshot() {
     
     // Check if current processes are empty
     if (state.processes.length === 0) {
-        alert("NÃƒÂ£o hÃƒÂ¡ atividades cadastradas no Dashboard para salvar.");
+        alert("NÃƒÂ£o hÃƒ atividades cadastradas no Dashboard para salvar.");
         return;
     }
     
     const existingIndex = state.history.findIndex(h => h.month === selectedMonth);
     if (existingIndex !== -1) {
-        if (!confirm(`JÃƒÂ¡ existe um registro de volume para ${formatMonth(selectedMonth)}. Deseja sobrescrevÃƒÂª-lo com os dados atuais do Dashboard?`)) {
+        if (!confirm(`JÃƒ existe um registro de volume para ${formatMonth(selectedMonth)}. Deseja sobrescrevÃƒÂª-lo com os dados atuais do Dashboard?`)) {
             return;
         }
     }
     
     const snapshotData = state.processes.map(p => ({
         name: p.name,
-        aÃƒÂ¡ÃƒÂ¡rea: p.aÃƒÂ¡ÃƒÂ¡rea,
-        responsavel: p.responsavel || 'Sem ResponsÃƒÂ¡vel',
+        aÃƒÃƒrea: p.aÃƒÃƒrea,
+        responsavel: p.responsavel || 'Sem ResponsÃƒvel',
         volume: p.volume !== null && p.volume !== '' ? parseFloat(p.volume) : 0
     }));
     
@@ -5162,7 +5162,7 @@ function renderSnapshotsList() {
             <div class="glass-panel" style="display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 1rem; border-radius: 8px; border: 1px solid rgba(255,255,255,0.05); background: rgba(255,255,255,0.01);">
                 <div>
                     <h4 style="margin: 0; font-size: 0.95rem; font-weight: 600; color: var(--text-primary);">${formatMonth(h.month)}</h4>
-                    <span style="font-size: 0.8rem; color: var(--text-secondary);">${h.data.length} atividades Ã¢â‚¬Â¢ Vol: ${totalVolume.toFixed(0)}</span>
+                    <span style="font-size: 0.8rem; color: var(--text-secondary);">${h.data.length} atividades Ã¢â‚¬ Vol: ${totalVolume.toFixed(0)}</span>
                 </div>
                 <button class="btn-row-action btn-delete-snapshot" data-month="${h.month}" title="Excluir Registro" style="color: var(--color-danger); background: transparent; border: none; cursor: pointer; font-size: 0.9rem; padding: 0.2rem;">
                     <i class="fa-solid fa-trash-can"></i>
@@ -5176,7 +5176,7 @@ function renderSnapshotsList() {
     // Add delete listeners
     container.querySelectorAll('.btn-delete-snapshot').forEach(btn => {
         btn.addEventListener('click', (e) => {
-            if (!verificarPermissao('ADMIN')) { alert('Acesso negado: Perfil ADMIN necessÃƒÂ¡rio.'); return; }
+            if (!verificarPermissao('ADMIN')) { alert('Acesso negado: Perfil ADMIN necessÃƒrio.'); return; }
             const btnEl = e.currentTarget;
             const month = btnEl.dataset.month;
             if (confirm(`Tem certeza que deseja excluir o registro de ${formatMonth(month)}?`)) {
@@ -5197,7 +5197,7 @@ function populateHistoryItemOptions() {
         state.history.forEach(h => {
             h.data.forEach(d => {
                 if (type === 'atividade') itemsSet.add(d.name);
-                else if (type === 'aÃƒÂ¡ÃƒÂ¡rea') itemsSet.add(d.aÃƒÂ¡ÃƒÂ¡rea);
+                else if (type === 'aÃƒÃƒrea') itemsSet.add(d.aÃƒÃƒrea);
                 else if (type === 'responsavel') itemsSet.add(d.responsavel);
             });
         });
@@ -5206,8 +5206,8 @@ function populateHistoryItemOptions() {
     // Collect from current processes as fallback/addition
     state.processes.forEach(p => {
         if (type === 'atividade') itemsSet.add(p.name);
-        else if (type === 'aÃƒÂ¡ÃƒÂ¡rea') itemsSet.add(p.aÃƒÂ¡ÃƒÂ¡rea);
-        else if (type === 'responsavel') itemsSet.add(p.responsavel || 'Sem ResponsÃƒÂ¡vel');
+        else if (type === 'aÃƒÃƒrea') itemsSet.add(p.aÃƒÃƒrea);
+        else if (type === 'responsavel') itemsSet.add(p.responsavel || 'Sem ResponsÃƒvel');
     });
     
     const items = [...itemsSet].sort();
@@ -5215,7 +5215,7 @@ function populateHistoryItemOptions() {
     if (!selectItem) return;
     
     if (items.length === 0) {
-        selectItem.innerHTML = '<option value="">Nenhum item disponÃƒÂ­vel</option>';
+        selectItem.innerHTML = '<option value="">Nenhum item disponÃƒvel</option>';
         return;
     }
     
@@ -5253,7 +5253,7 @@ function renderHistoryChart() {
         h.data.forEach(d => {
             if (type === 'atividade' && d.name === selectedItem) {
                 sum += d.volume;
-            } else if (type === 'aÃƒÂ¡ÃƒÂ¡rea' && d.aÃƒÂ¡ÃƒÂ¡rea === selectedItem) {
+            } else if (type === 'aÃƒÃƒrea' && d.aÃƒÃƒrea === selectedItem) {
                 sum += d.volume;
             } else if (type === 'responsavel' && d.responsavel === selectedItem) {
                 sum += d.volume;
@@ -5270,8 +5270,8 @@ function renderHistoryChart() {
     
     const ctx = chartCanvas.getContext('2d');
     
-    // CÃƒÂ¡ÃƒÂ¡reate gradient fill under line
-    const gradient = ctx.cÃƒÂ¡ÃƒÂ¡reateLinearGradient(0, 0, 0, 300);
+    // CÃƒÃƒreate gradient fill under line
+    const gradient = ctx.cÃƒÃƒreateLinearGradient(0, 0, 0, 300);
     gradient.addColorStop(0, 'rgba(235, 92, 39, 0.35)');
     gradient.addColorStop(1, 'rgba(235, 92, 39, 0.0)');
     
@@ -5366,14 +5366,14 @@ function renderCadastrosView() {
                     e.stopPropagation();
                     if (!verificarPermissao('ADMIN')) { alert('Acesso negado: Perfil ADMIN necessÃ¡rio.'); return; }
                     const team = btn.getAttribute('data-team');
-                    if (confirm(`Deseja ÃƒÂ¡ÃƒÂ¡realmente excluir a equipe "${team}"? Todos os responsÃ¡veis e atividades desta equipe ficarÃ£o "Sem Equipe".`)) {
+                    if (confirm(`Deseja ÃƒÃƒrealmente excluir a equipe "${team}"? Todos os responsÃ¡veis e atividades desta equipe ficarÃ£o "Sem Equipe".`)) {
                         state.teams = state.teams.filter(t => t !== team);
                         state.processes.forEach(p => {
-                            if (p.aÃƒÂ¡ÃƒÂ¡rea === team) p.aÃƒÂ¡ÃƒÂ¡rea = '';
+                            if (p.aÃƒÃƒrea === team) p.aÃƒÃƒrea = '';
                         });
                         if (state.responsaveis) {
                             state.responsaveis.forEach(r => {
-                                if (r.aÃƒÂ¡ÃƒÂ¡rea === team) r.aÃƒÂ¡ÃƒÂ¡rea = '';
+                                if (r.aÃƒÃƒrea === team) r.aÃƒÃƒrea = '';
                             });
                         }
                         if (state.teamHierarchy) {
@@ -5381,7 +5381,7 @@ function renderCadastrosView() {
                         }
                         saveState();
                         renderCadastrosView();
-                        renderAÃƒÂ¡ÃƒÂ¡reaFilterOptions();
+                        renderAÃƒÃƒreaFilterOptions();
                         renderTable();
                         renderBalancingTable();
                         renderReviewTable();
@@ -5426,32 +5426,32 @@ function renderCadastrosView() {
         teamsToRender.forEach(team => {
             let teamResps = [];
             if (team === 'Outros / Sem Equipe') {
-                teamResps = state.responsaveis.filter(r => !r.aÃƒÂ¡ÃƒÂ¡rea || !state.teams.includes(r.aÃƒÂ¡ÃƒÂ¡rea));
+                teamResps = state.responsaveis.filter(r => !r.aÃƒÃƒrea || !state.teams.includes(r.aÃƒÃƒrea));
             } else {
-                teamResps = state.responsaveis.filter(r => r.aÃƒÂ¡ÃƒÂ¡rea === team);
+                teamResps = state.responsaveis.filter(r => r.aÃƒÃƒrea === team);
             }
             
             if (teamResps.length === 0) return;
             
             // Accordion Header
-            const header = document.cÃƒÂ¡ÃƒÂ¡reateElement('div');
+            const header = document.cÃƒÃƒreateElement('div');
             header.style.cssText = 'display: flex; align-items: center; gap: 0.5rem; cursor: pointer; padding: 0.5rem; background: rgba(255,255,255,0.05); border-radius: 4px; font-weight: 500; font-size: 0.85rem; user-select: none; border: 1px solid rgba(255,255,255,0.02); margin-top: 0.5rem;';
             header.innerHTML = `<i class="fa-solid fa-chevron-right" style="width: 15px; text-align: center;"></i> ${escapeHtml(team)} <span style="background: rgba(255,255,255,0.1); padding: 0.1rem 0.4rem; border-radius: 10px; font-size: 0.7rem; margin-left: auto;">${teamResps.length}</span>`;
             
-            const contentContainer = document.cÃƒÂ¡ÃƒÂ¡reateElement('div');
+            const contentContainer = document.cÃƒÃƒreateElement('div');
             contentContainer.style.cssText = 'display: none; flex-direction: column; gap: 0.5rem; padding-left: 0.5rem; margin-top: 0.5rem; margin-bottom: 0.5rem;';
             
             header.addEventListener('click', () => toggleAccordion(header, contentContainer));
             
             teamResps.forEach(resp => {
-                const container = document.cÃƒÂ¡ÃƒÂ¡reateElement('div');
+                const container = document.cÃƒÃƒreateElement('div');
                 container.className = 'resp-item-container';
                 container.style.cssText = 'display: flex; flex-direction: column; gap: 0.5rem; padding: 0.5rem 0.6rem; border-radius: 6px; border: 1px solid rgba(255,255,255,0.03); background: rgba(255,255,255,0.01);';
                 
-                const headerRow = document.cÃƒÂ¡ÃƒÂ¡reateElement('div');
+                const headerRow = document.cÃƒÃƒreateElement('div');
                 headerRow.style.cssText = 'display: flex; justify-content: space-between; align-items: center;';
                 
-                const nameSpan = document.cÃƒÂ¡ÃƒÂ¡reateElement('span');
+                const nameSpan = document.cÃƒÃƒreateElement('span');
                 nameSpan.style.cssText = 'font-size: 0.85rem; font-weight: 500; color: var(--text-primary);';
                 
                 const hasOverrides = resp.horasDia !== null || resp.absenteismo !== null || resp.diasUteis !== null;
@@ -5462,16 +5462,16 @@ function renderCadastrosView() {
                     ${hasOverrides ? '<i class="fa-solid fa-user-gear" style="color: var(--color-primary); font-size: 0.75rem; margin-left: 0.25rem;" title="ParÃ¢metros customizados ativos"></i>' : ''}
                 `;
                 
-                const btnGroup = document.cÃƒÂ¡ÃƒÂ¡reateElement('div');
+                const btnGroup = document.cÃƒÃƒreateElement('div');
                 btnGroup.style.cssText = 'display: flex; align-items: center; gap: 0.5rem;';
                 
-                const btnConfig = document.cÃƒÂ¡ÃƒÂ¡reateElement('button');
+                const btnConfig = document.cÃƒÃƒreateElement('button');
                 btnConfig.className = 'btn-config-resp-item';
                 btnConfig.style.cssText = 'background: transparent; border: none; color: var(--color-primary); cursor: pointer; font-size: 0.85rem; padding: 0.2rem; display: flex; align-items: center; justify-content: center;';
                 btnConfig.title = 'Configurar ParÃ¢metros de Capacidade';
                 btnConfig.innerHTML = '<i class="fa-solid fa-cog"></i>';
                 
-                const btnDelete = document.cÃƒÂ¡ÃƒÂ¡reateElement('button');
+                const btnDelete = document.cÃƒÃƒreateElement('button');
                 btnDelete.className = 'btn-delete-resp-item';
                 btnDelete.setAttribute('data-permissao', 'ADMIN');
                 btnDelete.style.cssText = 'background: transparent; border: none; color: var(--color-danger); cursor: pointer; font-size: 0.85rem; padding: 0.2rem; display: flex; align-items: center; justify-content: center;';
@@ -5538,9 +5538,9 @@ function renderCadastrosView() {
     activityTeamsToRender.forEach((team, teamIndex) => {
         let teamProcs = [];
         if (team === 'Outros / Sem Equipe') {
-            teamProcs = state.processes.filter(p => !p.aÃƒÂ¡ÃƒÂ¡rea || !state.teams.includes(p.aÃƒÂ¡ÃƒÂ¡rea));
+            teamProcs = state.processes.filter(p => !p.aÃƒÃƒrea || !state.teams.includes(p.aÃƒÃƒrea));
         } else {
-            teamProcs = state.processes.filter(p => p.aÃƒÂ¡ÃƒÂ¡rea === team);
+            teamProcs = state.processes.filter(p => p.aÃƒÃƒrea === team);
         }
         
         if (teamProcs.length === 0) return;
@@ -5548,7 +5548,7 @@ function renderCadastrosView() {
         const rowClass = 'team-activity-row-' + teamIndex;
         
         // Header Row
-        const headerTr = document.cÃƒÂ¡ÃƒÂ¡reateElement('tr');
+        const headerTr = document.cÃƒÃƒreateElement('tr');
         headerTr.style.cssText = 'background: rgba(255,255,255,0.03); cursor: pointer; user-select: none;';
         headerTr.innerHTML = `
             <td colspan="5" style="padding: 0.8rem; font-weight: 600; color: var(--text-primary); border-top: 1px solid rgba(255,255,255,0.05); border-bottom: 1px solid rgba(255,255,255,0.05);">
@@ -5560,20 +5560,20 @@ function renderCadastrosView() {
         
         // Activity Rows
         teamProcs.forEach(proc => {
-            const tr = document.cÃƒÂ¡ÃƒÂ¡reateElement('tr');
+            const tr = document.cÃƒÃƒreateElement('tr');
             tr.className = rowClass;
             tr.style.display = 'none'; // Initially collapsed
             tr.dataset.id = proc.id;
             
             const teamOptions = '<option value="">-- Sem Equipe --</option>' +
                 state.teams.map(t => `
-                    <option value="${escapeHtml(t)}" ${proc.aÃƒÂ¡ÃƒÂ¡rea === t ? 'selected' : ''}>${escapeHtml(t)}</option>
+                    <option value="${escapeHtml(t)}" ${proc.aÃƒÃƒrea === t ? 'selected' : ''}>${escapeHtml(t)}</option>
                 `).join('');
                 
             const teamResps = (state.responsaveis || []).filter(resp => {
                 const rName = typeof resp === 'object' ? resp.name : resp;
-                const rAÃƒÂ¡ÃƒÂ¡rea = typeof resp === 'object' ? resp.aÃƒÂ¡ÃƒÂ¡rea : '';
-                return !proc.aÃƒÂ¡ÃƒÂ¡rea || !rAÃƒÂ¡ÃƒÂ¡rea || rAÃƒÂ¡ÃƒÂ¡rea === proc.aÃƒÂ¡ÃƒÂ¡rea || proc.responsavel === rName;
+                const rAÃƒÃƒrea = typeof resp === 'object' ? resp.aÃƒÃƒrea : '';
+                return !proc.aÃƒÃƒrea || !rAÃƒÃƒrea || rAÃƒÃƒrea === proc.aÃƒÃƒrea || proc.responsavel === rName;
             });
             const respsToDisplay = teamResps.length > 0 ? teamResps : (state.responsaveis || []);
             const respOptions = '<option value="">-- Sem ResponsÃ¡vel --</option>' +
@@ -5633,12 +5633,12 @@ function renderCadastrosView() {
             const teamSelect = tr.querySelector('.select-activity-team-cell');
             teamSelect.addEventListener('change', (e) => {
                 const newTeam = e.target.value;
-                proc.aÃƒÂ¡ÃƒÂ¡rea = newTeam;
+                proc.aÃƒÃƒrea = newTeam;
                 proc.responsavel = '';
                 saveState();
                 
                 renderCadastrosView();
-                renderAÃƒÂ¡ÃƒÂ¡reaFilterOptions();
+                renderAÃƒÃƒreaFilterOptions();
                 renderResponsavelFilterOptions();
                 renderTable();
                 renderBalancingTable();
@@ -5674,7 +5674,7 @@ function renderCadastrosView() {
             const deleteBtn = tr.querySelector('.btn-delete-activity-cell');
             deleteBtn.addEventListener('click', () => {
                 if (!verificarPermissao('ADMIN')) { alert('Acesso negado: Perfil ADMIN necessÃ¡rio.'); return; }
-                if (confirm(`Deseja ÃƒÂ¡ÃƒÂ¡realmente excluir a atividade "${proc.name}"?`)) {
+                if (confirm(`Deseja ÃƒÃƒrealmente excluir a atividade "${proc.name}"?`)) {
                     state.processes = state.processes.filter(p => p.id !== proc.id);
                     saveState();
                     renderCadastrosView();
@@ -5690,7 +5690,7 @@ function renderCadastrosView() {
     
     updateBulkDeleteState();
     
-    // Re-apply permission logic after recÃƒÂ¡ÃƒÂ¡reating DOM elements
+    // Re-apply permission logic after recÃƒÃƒreating DOM elements
     aplicarPerfilDeAcesso();
 }
 
@@ -5736,7 +5736,7 @@ function setupModalParametersListeners() {
     const valAbs = document.getElementById('modal-val-absenteismo');
     const valDias = document.getElementById('modal-val-dias-uteis');
     
-    const calcReal = document.getElementById('modal-calc-ÃƒÂ¡ÃƒÂ¡real-dia');
+    const calcReal = document.getElementById('modal-calc-ÃƒÃƒreal-dia');
     const calcMes = document.getElementById('modal-calc-mes');
     
     function updateModalCalculations() {
@@ -5844,7 +5844,7 @@ function openCapacityModal(respName = '') {
     
     if (!respName) {
         // Global defaults mode
-        title.innerHTML = '<i class="fa-solid fa-sliders"></i> ParÃƒÂ¢metros PadrÃƒÂ£o de Capacidade';
+        title.innerHTML = '<i class="fa-solid fa-sliders"></i> ParÃƒmetros PadrÃƒÂ£o de Capacidade';
         if (clearBtn) clearBtn.style.display = 'none';
         
         inputHoras.value = state.params.horasDia;
@@ -5904,7 +5904,7 @@ function openCapacityModal(respName = '') {
 }
 
 // ============================================================
-// ACCESS CONTROL VIEW - GESTÃƒÆ’O DE PERFIS DE USUÃƒÂRIO
+// ACCESS CONTROL VIEW - GESTÃƒO DE PERFIS DE USUÃƒÂRIO
 // ============================================================
 
 const SETUP_SQL = `-- Execute no SQL Editor do Supabase:
