@@ -2969,14 +2969,17 @@ function refreshAllViews() {
 }
 
 // REALTIME SUBSCRIPTION HELPERS
+let _lastSelfSaveTime = 0;
+let _lastRealtimeToastTime = 0;
+
 function subscribeRealtime() {
     const client = getSupabase();
     if (!client) return;
 
-    if (realtimeChannel) {
-        client.removeChannel(realtimeChannel);
-        realtimeChannel = null;
-    }
+    try {
+        client.removeAllChannels();
+    } catch (_) {}
+    realtimeChannel = null;
 
     updateRealtimeStatusUI('CONNECTING');
 
@@ -2992,15 +2995,28 @@ function subscribeRealtime() {
             const payloadData = payload.new || payload.record;
             if (payloadData && payloadData.data) {
                 const myUserId = window._authUserId;
-                if (payloadData.updated_by && payloadData.updated_by === myUserId) {
-                    return; // Ignore local updates sent by current user
+                
+                // 1. Ignore updates saved by current user ID
+                if (payloadData.updated_by && myUserId && payloadData.updated_by === myUserId) {
+                    return;
+                }
+                
+                // 2. Ignore self-echoes that arrive within 3 seconds of a local save
+                if (Date.now() - _lastSelfSaveTime < 3000) {
+                    return;
                 }
                 
                 state = payloadData.data;
                 applyStateMigrations();
                 localStorage.setItem('capacity_fte_hub_state', JSON.stringify(state));
                 refreshAllViews();
-                showToast('âš¡ O painel foi atualizado em tempo real por outro usuÃ¡rio!', 'info', 4000);
+
+                // 3. Debounce toast popups so multiple rapid events show at most 1 clean notification
+                const now = Date.now();
+                if (now - _lastRealtimeToastTime > 6000) {
+                    _lastRealtimeToastTime = now;
+                    showToast('âš¡ O painel foi atualizado em tempo real por outro usuÃ¡rio!', 'info', 4000);
+                }
             }
         })
         .subscribe((status, err) => {
@@ -3018,12 +3034,14 @@ function subscribeRealtime() {
 
 function unsubscribeRealtime() {
     const client = getSupabase();
-    if (realtimeChannel && client) {
-        client.removeChannel(realtimeChannel);
-        realtimeChannel = null;
-        updateRealtimeStatusUI('CLOSED');
-        console.log('[Realtime] Canal desconectado.');
+    if (client) {
+        try {
+            client.removeAllChannels();
+        } catch (_) {}
     }
+    realtimeChannel = null;
+    updateRealtimeStatusUI('CLOSED');
+    console.log('[Realtime] Canal desconectado.');
 }
 
 // SUPABASE BOARD STATE PERSISTENCE
@@ -3031,14 +3049,24 @@ async function saveStateToSupabase() {
     const client = getSupabase();
     if (!client) return;
 
+    _lastSelfSaveTime = Date.now();
+
     try {
-        const { data: { user } } = await client.auth.getUser();
+        let myUserId = window._authUserId;
+        if (!myUserId) {
+            const { data: { user } } = await client.auth.getUser();
+            if (user) {
+                myUserId = user.id;
+                window._authUserId = user.id;
+            }
+        }
+
         const { error } = await client
             .from('board_state')
             .upsert({
                 id: 'default',
                 data: state,
-                updated_by: user ? user.id : null,
+                updated_by: myUserId || null,
                 updated_at: new Date().toISOString()
             });
 
