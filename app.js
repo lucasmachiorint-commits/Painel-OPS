@@ -556,6 +556,42 @@ async function saveStateToSupabase() {
     }
 }
 
+async function forceResetGlobalState() {
+    if (!verificarPermissao('ADMIN')) {
+        alert('Acesso negado: Perfil ADMIN necessário para publicar a base global.');
+        return;
+    }
+
+    if (!confirm('Deseja realmente definir e publicar a sua visão atual como a base oficial para TODOS os usuários? Isso sincronizará a tela de todos imediatamente.')) {
+        return;
+    }
+
+    const client = getSupabase();
+    if (!client) return;
+
+    try {
+        const { data: { user } } = await client.auth.getUser();
+        const { error } = await client
+            .from('board_state')
+            .upsert({
+                id: 'default',
+                data: state,
+                updated_by: user ? user.id : null,
+                updated_at: new Date().toISOString()
+            });
+
+        if (error) {
+            showToast(`Erro ao publicar base no Supabase: ${error.message}`, 'error', 8000);
+        } else {
+            showToast('✅ Sua visão atual foi publicada com sucesso como a base global para todos!', 'success', 6000);
+            updateRealtimeStatusUI('SUBSCRIBED');
+        }
+    } catch (err) {
+        console.error('[Supabase Force Reset Error]', err);
+        showToast('Erro de conexão ao publicar a base.', 'error');
+    }
+}
+
 async function loadStateFromSupabase() {
     const client = getSupabase();
     if (!client) return false;

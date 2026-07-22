@@ -1708,6 +1708,9 @@ body.light-theme .select-review-area option, body.light-theme .select-review-sta
                         <span class="status-dot" style="width: 8px; height: 8px; border-radius: 50%; background: #eab308; display: inline-block;"></span>
                         <span class="status-text">Conectando...</span>
                     </div>
+                    <button id="btn-reset-global-state" class="btn btn-secondary" data-permissao="ADMIN" title="Publicar sua visÃ£o atual como a base oficial para todos os usuÃ¡rios" onclick="forceResetGlobalState()">
+                        <i class="fa-solid fa-cloud-arrow-up"></i> Publicar para Todos
+                    </button>
                     <button id="btn-export-csv" class="btn btn-primary-outline" title="Exportar CSV (Excel)">
                         <i class="fa-solid fa-file-csv"></i> Exportar Excel
                     </button>
@@ -3040,6 +3043,42 @@ async function saveStateToSupabase() {
         console.error('[Supabase Save Exception]', err);
         showToast('Falha na conexÃ£o ao salvar no Supabase.', 'warning');
         updateRealtimeStatusUI('ERROR', 'Erro ConexÃ£o');
+    }
+}
+
+async function forceResetGlobalState() {
+    if (!verificarPermissao('ADMIN')) {
+        alert('Acesso negado: Perfil ADMIN necessÃ¡rio para publicar a base global.');
+        return;
+    }
+
+    if (!confirm('Deseja realmente definir e publicar a sua visÃ£o atual como a base oficial para TODOS os usuÃ¡rios? Isso sincronizarÃ¡ a tela de todos imediatamente.')) {
+        return;
+    }
+
+    const client = getSupabase();
+    if (!client) return;
+
+    try {
+        const { data: { user } } = await client.auth.getUser();
+        const { error } = await client
+            .from('board_state')
+            .upsert({
+                id: 'default',
+                data: state,
+                updated_by: user ? user.id : null,
+                updated_at: new Date().toISOString()
+            });
+
+        if (error) {
+            showToast(`Erro ao publicar base no Supabase: ${error.message}`, 'error', 8000);
+        } else {
+            showToast('âœ… Sua visÃ£o atual foi publicada com sucesso como a base global para todos!', 'success', 6000);
+            updateRealtimeStatusUI('SUBSCRIBED');
+        }
+    } catch (err) {
+        console.error('[Supabase Force Reset Error]', err);
+        showToast('Erro de conexÃ£o ao publicar a base.', 'error');
     }
 }
 
