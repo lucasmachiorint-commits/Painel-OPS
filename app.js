@@ -6,7 +6,7 @@ const SUPABASE_URL = 'https://maguyzjhldcgpcvkvkqe.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1hZ3V5empobGRjZ3Bjdmt2a3FlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQ2NTU0MDMsImV4cCI6MjEwMDIzMTQwM30.Ow9xruE1qAFTX3mqELERxrY3CRBOdV_n4MoXXhtt3Y8';
 
 let supabaseClient = null;
-let ÃÃrealtimeChannel = null;
+let realtimeChannel = null;
 if (window.supabase) {
     try {
         supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -446,7 +446,7 @@ function showToast(message, type = 'info', duration = 5000) {
 
 // REALTIME STATUS UI INDICATOR
 function updateRealtimeStatusUI(status, customMessage) {
-    const badge = document.getElementById('ÃÃrealtime-status-badge');
+    const badge = document.getElementById('realtime-status-badge');
     if (!badge) return;
 
     const dot = badge.querySelector('.status-dot');
@@ -459,11 +459,11 @@ function updateRealtimeStatusUI(status, customMessage) {
     } else if (status === 'CONNECTING') {
         if (dot) dot.style.background = '#eab308'; // Yellow
         if (text) text.textContent = 'Conectando...';
-        badge.title = 'Conectando ao canal de tempo ÃÃreal...';
+        badge.title = 'Conectando ao canal de tempo real...';
     } else if (status === 'ERROR' || status === 'CLOSED' || status === 'CHANNEL_ERROR') {
         if (dot) dot.style.background = '#ef4444'; // Red
         if (text) text.textContent = customMessage || 'Offline (Local)';
-        badge.title = 'Sem sincronização remota em tempo ÃÃreal. Verifique se a tabela board_state existe no Supabase.';
+        badge.title = 'Sem sincronização remota em tempo real. Verifique se a tabela board_state existe no Supabase.';
     }
 }
 
@@ -483,14 +483,14 @@ function subscribeRealtime() {
     const client = getSupabase();
     if (!client) return;
 
-    if (ÃÃrealtimeChannel) {
-        client.removeChannel(ÃÃrealtimeChannel);
-        ÃÃrealtimeChannel = null;
+    if (realtimeChannel) {
+        client.removeChannel(realtimeChannel);
+        realtimeChannel = null;
     }
 
     updateRealtimeStatusUI('CONNECTING');
 
-    ÃÃrealtimeChannel = client
+    realtimeChannel = client
         .channel('board-changes')
         .on('postgres_changes', {
             event: '*',
@@ -510,7 +510,7 @@ function subscribeRealtime() {
                 applyStateMigrations();
                 localStorage.setItem('capacity_fte_hub_state', JSON.stringify(state));
                 refreshAllViews();
-                showToast('⚡ O painel foi atualizado em tempo ÃÃreal por outro usuário!', 'info', 4000);
+                showToast('⚡ O painel foi atualizado em tempo real por outro usuário!', 'info', 4000);
             }
         })
         .subscribe((status, err) => {
@@ -519,7 +519,7 @@ function subscribeRealtime() {
                 updateRealtimeStatusUI('SUBSCRIBED');
             } else if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
                 updateRealtimeStatusUI('ERROR', 'Erro Realtime');
-                console.warn('[Realtime Error] Certifique-se de que a publicação Realtime está ativa no Supabase (ALTER PUBLICATION supabase_ÃÃrealtime ADD TABLE board_state).');
+                console.warn('[Realtime Error] Certifique-se de que a publicação Realtime está ativa no Supabase (ALTER PUBLICATION supabase_realtime ADD TABLE board_state).');
             } else if (status === 'CLOSED') {
                 updateRealtimeStatusUI('ERROR', 'Desconectado');
             }
@@ -528,9 +528,9 @@ function subscribeRealtime() {
 
 function unsubscribeRealtime() {
     const client = getSupabase();
-    if (ÃÃrealtimeChannel && client) {
-        client.removeChannel(ÃÃrealtimeChannel);
-        ÃÃrealtimeChannel = null;
+    if (realtimeChannel && client) {
+        client.removeChannel(realtimeChannel);
+        realtimeChannel = null;
         updateRealtimeStatusUI('CLOSED');
         console.log('[Realtime] Canal desconectado.');
     }
@@ -687,14 +687,14 @@ function applyStateMigrations() {
         const uniqueResps = [...new Set(state.processes.map(p => p.responsavel || '').filter(r => r.trim() !== ''))].sort();
         state.responsaveis = uniqueResps.map(r => {
             const procWithResp = state.processes.find(p => p.responsavel === r);
-            const inheritedAÃÃrea = procWithResp ? procWithResp.area : '';
-            return { name: r, area: inheritedAÃÃrea, horasDia: null, absenteismo: null, diasUteis: null };
+            const inheritedArea = procWithResp ? procWithResp.area : '';
+            return { name: r, area: inheritedArea, horasDia: null, absenteismo: null, diasUteis: null };
         });
     } else if (Array.isArray(state.responsaveis) && state.responsaveis.length > 0 && typeof state.responsaveis[0] === 'string') {
         state.responsaveis = state.responsaveis.map(r => {
             const procWithResp = state.processes.find(p => p.responsavel === r);
-            const inheritedAÃÃrea = procWithResp ? procWithResp.area : '';
-            return { name: r, area: inheritedAÃÃrea, horasDia: null, absenteismo: null, diasUteis: null };
+            const inheritedArea = procWithResp ? procWithResp.area : '';
+            return { name: r, area: inheritedArea, horasDia: null, absenteismo: null, diasUteis: null };
         });
     } else if (Array.isArray(state.responsaveis)) {
         state.responsaveis.forEach(r => {
@@ -739,8 +739,8 @@ function loadState() {
         const uniqueResps = [...new Set(state.processes.map(p => p.responsavel || '').filter(r => r.trim() !== ''))].sort();
         state.responsaveis = uniqueResps.map(r => {
             const procWithResp = state.processes.find(p => p.responsavel === r);
-            const inheritedAÃÃrea = procWithResp ? procWithResp.area : '';
-            return { name: r, area: inheritedAÃÃrea, horasDia: null, absenteismo: null, diasUteis: null };
+            const inheritedArea = procWithResp ? procWithResp.area : '';
+            return { name: r, area: inheritedArea, horasDia: null, absenteismo: null, diasUteis: null };
         });
         state.history = [];
         state.params = {
@@ -1371,7 +1371,7 @@ function renderBalancingTable() {
             }
             
             const areaName = proc.area;
-            highlightAndFocusAÃÃrea(areaName);
+            highlightAndFocusArea(areaName);
         });
         
         balancingBody.appendChild(tr);
@@ -1380,7 +1380,7 @@ function renderBalancingTable() {
     updateBalancingCalculations();
 }
 
-function highlightAndFocusAÃÃrea(areaName) {
+function highlightAndFocusArea(areaName) {
     document.querySelectorAll('.area-alloc-card').forEach(card => {
         card.classList.remove('active-highlight');
     });
@@ -1423,8 +1423,8 @@ function updateCalculations() {
     const horasRealDia = horasDia * (1 - absenteismo);
     const horasTrabalhoMes = horasRealDia * diasUteis;
 
-    // Render global ÃÃread-only parameter fields
-    const elHorasReal = document.getElementById('val-horas-ÃÃreal');
+    // Render global read-only parameter fields
+    const elHorasReal = document.getElementById('val-horas-real');
     if (elHorasReal) elHorasReal.textContent = horasRealDia.toFixed(1) + 'h';
     
     const elHorasMes = document.getElementById('val-horas-mes');
@@ -1763,12 +1763,12 @@ function renderAreaAllocations() {
 function addNewProcess() {
     if (!verificarPermissao('OPERADOR')) { alert('Acesso negado: Perfil OPERADOR necessÃ¡rio.'); return; }
     const newId = 'proc-' + Date.now();
-    const defaultAÃÃrea = state.teams.length > 0 ? state.teams[0] : '';
+    const defaultArea = state.teams.length > 0 ? state.teams[0] : '';
     
     state.processes.push({
         id: newId,
         name: `Nova Atividade ${state.processes.length + 1}`,
-        area: defaultAÃÃrea,
+        area: defaultArea,
         responsavel: '',
         volume: '',
         minutos: 0,
@@ -1831,8 +1831,8 @@ function loadExampleData() {
     const uniqueResps = [...new Set(state.processes.map(p => p.responsavel || '').filter(r => r.trim() !== ''))].sort();
     state.responsaveis = uniqueResps.map(r => {
         const procWithResp = state.processes.find(p => p.responsavel === r);
-        const inheritedAÃÃrea = procWithResp ? procWithResp.area : '';
-        return { name: r, area: inheritedAÃÃrea, horasDia: null, absenteismo: null, diasUteis: null };
+        const inheritedArea = procWithResp ? procWithResp.area : '';
+        return { name: r, area: inheritedArea, horasDia: null, absenteismo: null, diasUteis: null };
     });
     
     const elInputHoras = document.getElementById('input-horas-dia');
@@ -2262,7 +2262,7 @@ function renderAreaFilterOptions() {
     const currentValueBalancing = filterSelectBalancing.value;
     const currentValueReview = filterSelectReview.value;
     
-    const optionsHtml = '<option value="all">Todas as ÃÃÃÃÃreas</option>' +
+    const optionsHtml = '<option value="all">Todas as Áreas</option>' +
         (state.teams || []).map(area =>
             `<option value="${escapeHtml(area)}">${escapeHtml(area)}</option>`
         ).join('');
@@ -2271,21 +2271,21 @@ function renderAreaFilterOptions() {
     filterSelectBalancing.innerHTML = optionsHtml;
     filterSelectReview.innerHTML = optionsHtml;
     
-    const allAÃÃÃÃreas = state.teams || [];
+    const allAreas = state.teams || [];
     
-    if (allAÃÃÃÃreas.includes(currentValue)) {
+    if (allAreas.includes(currentValue)) {
         filterSelect.value = currentValue;
     } else {
         filterSelect.value = 'all';
     }
     
-    if (allAÃÃÃÃreas.includes(currentValueBalancing)) {
+    if (allAreas.includes(currentValueBalancing)) {
         filterSelectBalancing.value = currentValueBalancing;
     } else {
         filterSelectBalancing.value = 'all';
     }
 
-    if (allAÃÃÃÃreas.includes(currentValueReview)) {
+    if (allAreas.includes(currentValueReview)) {
         filterSelectReview.value = currentValueReview;
     } else {
         filterSelectReview.value = 'all';
@@ -3246,7 +3246,7 @@ function setupModalParametersListeners() {
     const valAbs = document.getElementById('modal-val-absenteismo');
     const valDias = document.getElementById('modal-val-dias-uteis');
     
-    const calcReal = document.getElementById('modal-calc-ÃÃreal-dia');
+    const calcReal = document.getElementById('modal-calc-real-dia');
     const calcMes = document.getElementById('modal-calc-mes');
     
     function updateModalCalculations() {
@@ -3414,7 +3414,7 @@ function openCapacityModal(respName = '') {
 }
 
 // ============================================================
-// ACCESS CONTROL VIEW - GESTÃO DE PERFIS DE USUÃRIO
+// ACCESS CONTROL VIEW - GESTÃO DE PERFIS DE USUÁRIO
 // ============================================================
 
 const SETUP_SQL = `-- Execute no SQL Editor do Supabase:
@@ -3536,11 +3536,11 @@ async function renderAccessControlView() {
                 <td>
                     <div style="display: flex; align-items: center; gap: 0.5rem;">
                         <i class="fa-solid fa-circle-user" style="color: var(--color-primary); font-size: 1.1rem;"></i>
-                        <span style="font-weight: 500;">${escapeHtml(profile.nome || 'â€“')}</span>
-                        ${isCurrentUser ? '<span style="font-size:0.7rem; color: var(--color-primary); background: rgba(235,92,39,0.12); padding: 0.1rem 0.4rem; border-radius: 4px; margin-left: 0.25rem;">VocÃª</span>' : ''}
+                        <span style="font-weight: 500;">${escapeHtml(profile.nome || '-')}</span>
+                        ${isCurrentUser ? '<span style="font-size:0.7rem; color: var(--color-primary); background: rgba(235,92,39,0.12); padding: 0.1rem 0.4rem; border-radius: 4px; margin-left: 0.25rem;">Você</span>' : ''}
                     </div>
                 </td>
-                <td style="color: var(--text-secondary); font-size: 0.85rem;">${escapeHtml(profile.email || 'â€“')}</td>
+                <td style="color: var(--text-secondary); font-size: 0.85rem;">${escapeHtml(profile.email || '-')}</td>
                 <td>
                     <select class="access-perfil-select" data-user-id="${profile.id}"
                         style="background: transparent; border: 1px solid var(--border-color); color: var(--text-primary); border-radius: 6px; padding: 0.3rem 0.6rem; font-size: 0.85rem; cursor: pointer;"
