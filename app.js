@@ -869,10 +869,10 @@ function setupEventListeners() {
                 headerTitle.textContent = 'Balanceamento de Backlog';
                 renderBalancingTable();
             } else if (view === 'review') {
-                headerTitle.textContent = 'RevisÃ£o de Atividades';
+                headerTitle.textContent = 'Revisão de Atividades';
                 renderReviewTable();
             } else if (view === 'history') {
-                headerTitle.textContent = 'HistÃ³rico de Volumes';
+                headerTitle.textContent = 'Histórico de Volumes';
                 initHistoryView();
             } else if (view === 'access-control') {
                 headerTitle.textContent = 'Controle de Acesso';
