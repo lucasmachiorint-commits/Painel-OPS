@@ -101,22 +101,22 @@ let barChartInstance = null;
 
 // DEFAULT EXAMPLE DATA WITH AREAS
 const EXAMPLE_PROCESSES = [
-    { id: 'ex-1', name: 'Cancelamento DY - SolicitaÃ§Ã£o CB (Fila Projeto)', area: 'Backoffice', volume: '', minutos: 0, qtdExecucao: '', backlogVolume: '', allocatedResource: '' },
-    { id: 'ex-2', name: 'ProrrogaÃ§Ã£o', area: 'Backoffice', volume: '', minutos: 0, qtdExecucao: '', backlogVolume: '', allocatedResource: '' },
-    { id: 'ex-3', name: 'Baixa de Parcela (RobÃ´ Baixas) - Demandas BKO + Baixa em lote + Baixa manual', area: 'Backoffice', volume: '', minutos: 0, qtdExecucao: '', backlogVolume: '', allocatedResource: '' },
+    { id: 'ex-1', name: 'Cancelamento DY - Solicitação CB (Fila Projeto)', area: 'Backoffice', volume: '', minutos: 0, qtdExecucao: '', backlogVolume: '', allocatedResource: '' },
+    { id: 'ex-2', name: 'Prorrogação', area: 'Backoffice', volume: '', minutos: 0, qtdExecucao: '', backlogVolume: '', allocatedResource: '' },
+    { id: 'ex-3', name: 'Baixa de Parcela (Robô Baixas) - Demandas BKO + Baixa em lote + Baixa manual', area: 'Backoffice', volume: '', minutos: 0, qtdExecucao: '', backlogVolume: '', allocatedResource: '' },
     { id: 'ex-4', name: 'Improcedente DY', area: 'Backoffice', volume: '', minutos: 0, qtdExecucao: '', backlogVolume: '', allocatedResource: '' },
-    { id: 'ex-5', name: 'DevoluÃ§Ã£o de pagamento em duplicidade', area: 'Backoffice', volume: '', minutos: 0, qtdExecucao: '', backlogVolume: '', allocatedResource: '' },
-    { id: 'ex-6', name: 'Reembolso (RobÃ´ Reembolsos) Montagem Arquivo + Upload Zord + Monitoria/Retorno', area: 'Backoffice', volume: '', minutos: 0, qtdExecucao: '', backlogVolume: '', allocatedResource: '' },
+    { id: 'ex-5', name: 'Devolução de pagamento em duplicidade', area: 'Backoffice', volume: '', minutos: 0, qtdExecucao: '', backlogVolume: '', allocatedResource: '' },
+    { id: 'ex-6', name: 'Reembolso (Robô Reembolsos) Montagem Arquivo + Upload Zord + Monitoria/Retorno', area: 'Backoffice', volume: '', minutos: 0, qtdExecucao: '', backlogVolume: '', allocatedResource: '' },
     { id: 'ex-7', name: 'Cancelamento CAPTA + Cancelamento Jira', area: 'Backoffice', volume: '', minutos: 0, qtdExecucao: '', backlogVolume: '', allocatedResource: '' },
     { id: 'ex-8', name: 'Cancelamento SAP + Cancelamento Jira', area: 'Backoffice', volume: '', minutos: 0, qtdExecucao: '', backlogVolume: '', allocatedResource: '' },
-    { id: 'ex-9', name: 'DÃ©bitos Pag Emana Pay', area: 'Backoffice', volume: '', minutos: 0, qtdExecucao: '', backlogVolume: '', allocatedResource: '' },
-    { id: 'ex-10', name: 'Cancelamento DY - SolicitaÃ§Ã£o CB (Fila N3) + Cancelamento Jira', area: 'Backoffice', volume: '', minutos: 0, qtdExecucao: '', backlogVolume: '', allocatedResource: '' },
-    { id: 'ex-11', name: 'Pagamento nÃ£o processado', area: 'Backoffice', volume: '', minutos: 0, qtdExecucao: '', backlogVolume: '', allocatedResource: '' },
+    { id: 'ex-9', name: 'Débitos Pag Emana Pay', area: 'Backoffice', volume: '', minutos: 0, qtdExecucao: '', backlogVolume: '', allocatedResource: '' },
+    { id: 'ex-10', name: 'Cancelamento DY - Solicitação CB (Fila N3) + Cancelamento Jira', area: 'Backoffice', volume: '', minutos: 0, qtdExecucao: '', backlogVolume: '', allocatedResource: '' },
+    { id: 'ex-11', name: 'Pagamento não processado', area: 'Backoffice', volume: '', minutos: 0, qtdExecucao: '', backlogVolume: '', allocatedResource: '' },
     { id: 'ex-12', name: 'Parcela invertida', area: 'Backoffice', volume: '', minutos: 0, qtdExecucao: '', backlogVolume: '', allocatedResource: '' },
-    { id: 'ex-13', name: 'Cancelamento Parcial/AmortizaÃ§Ã£o', area: 'Backoffice', volume: '', minutos: 0, qtdExecucao: '', backlogVolume: '', allocatedResource: '' },
-    { id: 'ex-14', name: 'AmortizaÃ§Ã£o Nota de credito', area: 'Backoffice', volume: '', minutos: 0, qtdExecucao: '', backlogVolume: '', allocatedResource: '' },
-    { id: 'ex-15', name: 'Recompra (AmortizaÃ§Ã£o e Recompra Proativa)', area: 'Backoffice', volume: '', minutos: 0, qtdExecucao: '', backlogVolume: '', allocatedResource: '' },
-    { id: 'ex-16', name: 'DÃºvidas - Pagamento, CobranÃ§a e Espelhamento', area: 'Backoffice', volume: '', minutos: 0, qtdExecucao: '', backlogVolume: '', allocatedResource: '' }
+    { id: 'ex-13', name: 'Cancelamento Parcial/Amortização', area: 'Backoffice', volume: '', minutos: 0, qtdExecucao: '', backlogVolume: '', allocatedResource: '' },
+    { id: 'ex-14', name: 'Amortização Nota de credito', area: 'Backoffice', volume: '', minutos: 0, qtdExecucao: '', backlogVolume: '', allocatedResource: '' },
+    { id: 'ex-15', name: 'Recompra (Amortização e Recompra Proativa)', area: 'Backoffice', volume: '', minutos: 0, qtdExecucao: '', backlogVolume: '', allocatedResource: '' },
+    { id: 'ex-16', name: 'Dúvidas - Pagamento, Cobrança e Espelhamento', area: 'Backoffice', volume: '', minutos: 0, qtdExecucao: '', backlogVolume: '', allocatedResource: '' }
 ];
 
 function getSupabase() {
@@ -1656,7 +1656,7 @@ function renderAreaAllocations() {
     const listContainer = document.getElementById('area-allocations-list');
     if (!listContainer) return;
     
-    const areas = ['Backoffice', 'GovernanÃ§a', 'Seguros/N2', 'EficiÃªncia Operacional', ...state.customAreas];
+    const areas = ['Backoffice', 'Governança', 'Seguros/N2', 'Eficiência Operacional', ...state.customAreas];
     
     const horasDia = state.params.horasDia;
     const absenteismo = state.params.absenteismo / 100;
@@ -1820,12 +1820,12 @@ function loadExampleData() {
         teamSize: 5.0
     };
     state.customAreas = [];
-    state.teams = ['Backoffice', 'GovernanÃ§a', 'Seguros/N2', 'EficiÃªncia Operacional'];
+    state.teams = ['Backoffice', 'Governança', 'Seguros/N2', 'Eficiência Operacional'];
     state.teamHierarchy = {
-        'Backoffice': { gerencia: 'ConciliaÃ§Ã£o', diretoria: 'OperaÃ§Ãµes' },
-        'GovernanÃ§a': { gerencia: 'Suporte Operacional', diretoria: 'OperaÃ§Ãµes' },
-        'Seguros/N2': { gerencia: 'Atendimento', diretoria: 'OperaÃ§Ãµes' },
-        'EficiÃªncia Operacional': { gerencia: 'Suporte Operacional', diretoria: 'OperaÃ§Ãµes' }
+        'Backoffice': { gerencia: 'Conciliação', diretoria: 'Operações' },
+        'Governança': { gerencia: 'Suporte Operacional', diretoria: 'Operações' },
+        'Seguros/N2': { gerencia: 'Atendimento', diretoria: 'Operações' },
+        'Eficiência Operacional': { gerencia: 'Suporte Operacional', diretoria: 'Operações' }
     };
     
     const uniqueResps = [...new Set(state.processes.map(p => p.responsavel || '').filter(r => r.trim() !== ''))].sort();
@@ -1929,13 +1929,13 @@ function renderCharts(totalFteRequired) {
         pieLabels = Object.keys(areaMap).filter(k => areaMap[k] > 0);
         pieData = pieLabels.map(k => parseFloat(areaMap[k].toFixed(2)));
         if (chartTitleElement) {
-            chartTitleElement.innerHTML = '<i class="fa-solid fa-chart-pie"></i> DistribuiÃ§Ã£o de FTE por ÃÃÃrea';
+            chartTitleElement.innerHTML = '<i class="fa-solid fa-chart-pie"></i> Distribuição de FTE por Área';
         }
     } else {
         pieLabels = Object.keys(processMap).filter(k => processMap[k] > 0);
         pieData = pieLabels.map(k => parseFloat(processMap[k].toFixed(2)));
         if (chartTitleElement) {
-            chartTitleElement.innerHTML = `<i class="fa-solid fa-chart-pie"></i> DistribuiÃ§Ã£o de FTE em ${filterValue}`;
+            chartTitleElement.innerHTML = `<i class="fa-solid fa-chart-pie"></i> Distribuição de FTE em ${filterValue}`;
         }
     }
 
@@ -2087,7 +2087,7 @@ function updateChartsTheme() {
 // EXPORT TO CSV (Excel Compatible - Exports active tab content)
 function exportToCSV() {
     if (state.processes.length === 0) {
-        alert("NÃ£o hÃ dados para exportar.");
+        alert("Não há dados para exportar.");
         return;
     }
 
@@ -2103,11 +2103,11 @@ function exportToCSV() {
 
     csvContent += "PARAMETROS GLOBAIS\n";
     csvContent += `Horas Trabalho / Dia;${state.params.horasDia}\n`;
-    csvContent += `AbsenteÃsmo (%);${state.params.absenteismo}%\n`;
-    csvContent += `Dias Ãšteis;${state.params.diasUteis}\n`;
+    csvContent += `Absenteísmo (%);${state.params.absenteismo}%\n`;
+    csvContent += `Dias Úteis;${state.params.diasUteis}\n`;
     csvContent += `Horas Trabalho Real / Dia;${horasRealDia.toFixed(2)}\n`;
-    csvContent += `Horas Trabalho MÃªs (1 FTE);${horasTrabalhoMes.toFixed(2)}\n`;
-    csvContent += `Tamanho da Equipe (DisponÃvel);${state.params.teamSize}\n\n`;
+    csvContent += `Horas Trabalho Mês (1 FTE);${horasTrabalhoMes.toFixed(2)}\n`;
+    csvContent += `Tamanho da Equipe (Disponível);${state.params.teamSize}\n\n`;
 
     if (activeTab === 'dashboard') {
         csvContent += "RELATORIO DE CAPACIDADE E FTE (DASHBOARD)\n";
@@ -2183,7 +2183,7 @@ function exportToCSV() {
         csvContent += "BALANCEAMENTO DE CAPACIDADE POR EQUIPE / AREA\n";
         csvContent += "AREA / EQUIPE;FTE REQUERIDO DIARIO;RECURSO ALOCADO (FTE);STATUS CAPACIDADE\n";
 
-        const areasList = ['Backoffice', 'GovernanÃ§a', 'Seguros/N2', 'EficiÃªncia Operacional', ...state.customAreas];
+        const areasList = ['Backoffice', 'Governança', 'Seguros/N2', 'Eficiência Operacional', ...state.customAreas];
         let sumRequiredFte = 0;
         let sumAllocatedFte = 0;
 
@@ -2331,7 +2331,7 @@ function renderReviewTable() {
         const status = p.reviewStatus || 'Manter';
         if (status === 'Manter') countManter++;
         else if (status === 'Parar') countParar++;
-        else if (status === 'ComeÃ§ar') countComecar++;
+        else if (status === 'Começar') countComecar++;
     });
 
     document.getElementById('widget-review-manter').textContent = countManter;
@@ -2350,7 +2350,7 @@ function renderReviewTable() {
         const pHorasTrabalhoMes = pHorasRealDia * respParams.diasUteis;
         const ftePct = pHorasTrabalhoMes > 0 ? (totalHours / pHorasTrabalhoMes) * 100 : 0;
 
-        // Metric Description (ÃÃread-only)
+        // Metric Description (read-only)
         let metricDesc = '';
         if (proc.qtdExecucao !== null && proc.qtdExecucao !== '' && parseFloat(proc.qtdExecucao) > 0) {
             metricDesc = `Tempo x Freq: ${proc.minutos}m / ${proc.qtdExecucao}x`;
@@ -2359,7 +2359,7 @@ function renderReviewTable() {
         }
 
         // Review Action select box
-        const statusOptions = ['Manter', 'Parar', 'ComeÃ§ar'];
+        const statusOptions = ['Manter', 'Parar', 'Começar'];
         const statusOptionsHtml = statusOptions.map(opt =>
             `<option value="${opt}" ${proc.reviewStatus === opt ? 'selected' : ''}>${opt}</option>`
         ).join('');
@@ -2414,7 +2414,7 @@ function renderResponsavelFilterOptions() {
     const uniqueResponsaveis = state.responsaveis || [];
     const names = uniqueResponsaveis.map(r => r.name);
     
-    const optionsHtml = '<option value="all">Todos os ResponsÃveis</option>' +
+    const optionsHtml = '<option value="all">Todos os Responsáveis</option>' +
         names.map(name =>
             `<option value="${escapeHtml(name)}">${escapeHtml(name)}</option>`
         ).join('');
@@ -2530,7 +2530,7 @@ function importExcelFile(file) {
             });
             
             if (importedProcesses.length > 0) {
-                const mode = confirm(`ImportaÃ§Ã£o ConcluÃda!\n\nForam encontradas ${importCount} atividades.\n\nDeseja SUBSTITUIR as atividades existentes no simulador pelas novas?\n\n(Clique em 'OK' para substituir ou 'Cancelar' para adicionar ao final)`);
+                const mode = confirm(`Importação Concluída!\n\nForam encontradas ${importCount} atividades.\n\nDeseja SUBSTITUIR as atividades existentes no simulador pelas novas?\n\n(Clique em 'OK' para substituir ou 'Cancelar' para adicionar ao final)`);
                 
                 state.teams = [...newTeams];
                 const existingResps = state.responsaveis || [];
@@ -2565,11 +2565,11 @@ function importExcelFile(file) {
                 
                 alert(`Sucesso! ${importCount} atividades foram importadas e salvas.`);
             } else {
-                alert("Nenhuma atividade encontrada na planilha. Verifique se as colunas estÃ£o no formato correto.");
+                alert("Nenhuma atividade encontrada na planilha. Verifique se as colunas estão no formato correto.");
             }
         } catch (err) {
             console.error(err);
-            alert("Erro ao ler o arquivo Excel. Certifique-se de que Ã© um arquivo .xlsx, .xls ou .csv vÃlido.");
+            alert("Erro ao ler o arquivo Excel. Certifique-se de que é um arquivo .xlsx, .xls ou .csv válido.");
         }
     };
     reader.readAsArrayBuffer(file);
@@ -2600,10 +2600,10 @@ function initHistoryView() {
 }
 
 function saveHistorySnapshot() {
-    if (!verificarPermissao('OPERADOR')) { alert('Acesso negado: Perfil OPERADOR necessÃ¡rio.'); return; }
+    if (!verificarPermissao('OPERADOR')) { alert('Acesso negado: Perfil OPERADOR necessário.'); return; }
     const monthInput = document.getElementById('history-month-input');
     if (!monthInput || !monthInput.value) {
-        alert("Selecione um mÃªs vÃlido.");
+        alert("Selecione um mês válido.");
         return;
     }
     
@@ -2611,13 +2611,13 @@ function saveHistorySnapshot() {
     
     // Check if current processes are empty
     if (state.processes.length === 0) {
-        alert("NÃ£o hÃ atividades cadastradas no Dashboard para salvar.");
+        alert("Não há atividades cadastradas no Dashboard para salvar.");
         return;
     }
     
     const existingIndex = state.history.findIndex(h => h.month === selectedMonth);
     if (existingIndex !== -1) {
-        if (!confirm(`JÃ existe um registro de volume para ${formatMonth(selectedMonth)}. Deseja sobrescrevÃª-lo com os dados atuais do Dashboard?`)) {
+        if (!confirm(`Já existe um registro de volume para ${formatMonth(selectedMonth)}. Deseja sobrescrevê-lo com os dados atuais do Dashboard?`)) {
             return;
         }
     }
@@ -2625,7 +2625,7 @@ function saveHistorySnapshot() {
     const snapshotData = state.processes.map(p => ({
         name: p.name,
         area: p.area,
-        responsavel: p.responsavel || 'Sem ResponsÃvel',
+        responsavel: p.responsavel || 'Sem Responsável',
         volume: p.volume !== null && p.volume !== '' ? parseFloat(p.volume) : 0
     }));
     
@@ -2717,7 +2717,7 @@ function populateHistoryItemOptions() {
     state.processes.forEach(p => {
         if (type === 'atividade') itemsSet.add(p.name);
         else if (type === 'area') itemsSet.add(p.area);
-        else if (type === 'responsavel') itemsSet.add(p.responsavel || 'Sem ResponsÃvel');
+        else if (type === 'responsavel') itemsSet.add(p.responsavel || 'Sem Responsável');
     });
     
     const items = [...itemsSet].sort();
@@ -2725,7 +2725,7 @@ function populateHistoryItemOptions() {
     if (!selectItem) return;
     
     if (items.length === 0) {
-        selectItem.innerHTML = '<option value="">Nenhum item disponÃ­vel</option>';
+        selectItem.innerHTML = '<option value="">Nenhum item disponível</option>';
         return;
     }
     
@@ -2929,7 +2929,7 @@ function renderCadastrosView() {
     // 2. Render Responsibles List (Accordion by Team)
     responsiblesList.innerHTML = '';
     if (!state.responsaveis || state.responsaveis.length === 0) {
-        responsiblesList.innerHTML = '<div style="color: var(--text-muted); font-size: 0.85rem; padding: 0.5rem;">Nenhum responsÃ¡vel cadastrado.</div>';
+        responsiblesList.innerHTML = '<div style="color: var(--text-muted); font-size: 0.85rem; padding: 0.5rem;">Nenhum responsável cadastrado.</div>';
     } else {
         const teamsToRender = [...(state.teams || []), 'Outros / Sem Equipe'];
         
@@ -3354,7 +3354,7 @@ function openCapacityModal(respName = '') {
     
     if (!respName) {
         // Global defaults mode
-        title.innerHTML = '<i class="fa-solid fa-sliders"></i> ParÃmetros PadrÃ£o de Capacidade';
+        title.innerHTML = '<i class="fa-solid fa-sliders"></i> Parâmetros Padrão de Capacidade';
         if (clearBtn) clearBtn.style.display = 'none';
         
         inputHoras.value = state.params.horasDia;
@@ -3377,15 +3377,15 @@ function openCapacityModal(respName = '') {
         }
         
         if (lblHoras) {
-            lblHoras.textContent = `PadrÃ£o Global: ${state.params.horasDia.toFixed(1)}h`;
+            lblHoras.textContent = `Padrão Global: ${state.params.horasDia.toFixed(1)}h`;
             lblHoras.style.display = 'block';
         }
         if (lblAbs) {
-            lblAbs.textContent = `PadrÃ£o Global: ${state.params.absenteismo}%`;
+            lblAbs.textContent = `Padrão Global: ${state.params.absenteismo}%`;
             lblAbs.style.display = 'block';
         }
         if (lblDias) {
-            lblDias.textContent = `PadrÃ£o Global: ${state.params.diasUteis}d`;
+            lblDias.textContent = `Padrão Global: ${state.params.diasUteis}d`;
             lblDias.style.display = 'block';
         }
     }
