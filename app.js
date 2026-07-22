@@ -366,25 +366,41 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Check existing Supabase session
     if (supabaseClient) {
-        const { data: { session } } = await supabaseClient.auth.getSession();
-        if (session && session.user) {
-            setupUserSession(session.user);
-        } else {
+        try {
+            const { data: { session } } = await supabaseClient.auth.getSession();
+            if (session && session.user) {
+                setupUserSession(session.user);
+            } else {
+                showAuthOverlay();
+            }
+        } catch (sessionErr) {
+            console.error('Erro ao recuperar sessão existente do Supabase:', sessionErr);
+            try {
+                // Tentativa de limpar token corrompido
+                const projName = SUPABASE_URL.split('//')[1]?.split('.')[0];
+                if (projName) {
+                    localStorage.removeItem(`sb-${projName}-auth-token`);
+                }
+            } catch (_) {}
             showAuthOverlay();
         }
 
-        // Listen to auth changes
-        supabaseClient.auth.onAuthStateChange((event, session) => {
-            if (event === 'SIGNED_IN' && session) {
-                setupUserSession(session.user);
-            } else if (event === 'SIGNED_OUT') {
-                showAuthOverlay();
-            }
-        });
+        try {
+            // Listen to auth changes
+            supabaseClient.auth.onAuthStateChange((event, session) => {
+                if (event === 'SIGNED_IN' && session) {
+                    setupUserSession(session.user);
+                } else if (event === 'SIGNED_OUT') {
+                    showAuthOverlay();
+                }
+            });
+        } catch (authListenerErr) {
+            console.error('Erro ao registrar listener de mudanças de autenticação:', authListenerErr);
+        }
     } else {
         // Fallback for demonstration if Supabase SDK is not loaded or missing credentials
         showAuthOverlay();
-        showAuthError("Aviso: Configure o SUPABASE_URL e SUPABASE_ANON_KEY no app.js para utilizar a autenticaÃ§Ã£o.");
+        showAuthError("Aviso: Configure o SUPABASE_URL e SUPABASE_ANON_KEY no app.js para utilizar a autenticação.");
     }
     
     renderAreaFilterOptions();
