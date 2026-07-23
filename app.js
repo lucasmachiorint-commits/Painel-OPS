@@ -1980,7 +1980,7 @@ function renderCharts(totalFteRequired) {
         pieChartInstance = new Chart(pieCanvas, {
             type: 'doughnut',
             data: {
-                labels: ['Nenhuma ÃÃÃrea com dados'],
+                labels: ['Nenhuma Área com dados'],
                 datasets: [{
                     data: [1],
                     backgroundColor: [isDark ? '#081e13' : '#cbd5e1'],
