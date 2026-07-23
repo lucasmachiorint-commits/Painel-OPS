@@ -4996,31 +4996,32 @@ function importExcelFile(file) {
                 
                 const headers = rows[0].map(h => String(h || '').trim().toLowerCase());
                 
-                let activityIdx = headers.findIndex(h => h.includes('atividade') || h.includes('nome') || h.includes('processo'));
-                let teamIdx = headers.findIndex(h => h.includes('equipe') || h.includes('Ã¡rea') || h.includes('area') || h.includes('grupo'));
-                let respIdx = headers.findIndex(h => h.includes('responsÃ¡vel') || h.includes('responsavel') || h.includes('dono') || h.includes('colaborador'));
-                let productIdx = headers.findIndex(h => h.includes('produto') || h.includes('product'));
-                let volIdx = headers.findIndex(h => h.includes('volume') || h.includes('qtd. mÃªs') || h.includes('qtd. mes') || h.includes('quantidade'));
-                let minIdx = headers.findIndex(h => h.includes('tempo') || h.includes('minutos') || h.includes('duraÃ§Ã£o') || h.includes('duracao'));
+                let activityIdx = headers.findIndex(h => h.includes('atividade') || h.includes('nome') || h.includes('processo') || h.includes('demanda') || h.includes('descriÃ§Ã£o') || h.includes('descricao'));
+                let teamIdx = headers.findIndex(h => h.includes('equipe') || h.includes('Ã¡rea') || h.includes('area') || h.includes('grupo') || h.includes('setor') || h.includes('time'));
+                let respIdx = headers.findIndex(h => h.includes('responsÃ¡vel') || h.includes('responsavel') || h.includes('dono') || h.includes('colaborador') || h.includes('owner') || h.includes('analista'));
+                let productIdx = headers.findIndex(h => h.includes('produto') || h.includes('produtos') || h.includes('product') || h.includes('products') || h.includes('prod') || h.includes('serviÃ§o') || h.includes('servico') || h.includes('item'));
+                let volIdx = headers.findIndex(h => h.includes('volume') || h.includes('qtd. mÃªs') || h.includes('qtd. mes') || h.includes('quantidade') || h.includes('vol'));
+                let minIdx = headers.findIndex(h => h.includes('tempo') || h.includes('minuto') || h.includes('minutos') || h.includes('duraÃ§Ã£o') || h.includes('duracao'));
                 let freqIdx = headers.findIndex(h => h.includes('freq') || h.includes('execuÃ§Ã£o') || h.includes('execucao'));
                 
-                if (activityIdx === -1) activityIdx = 0;
-                if (teamIdx === -1) teamIdx = headers.length > 1 ? 1 : -1;
-                if (respIdx === -1) respIdx = headers.length > 2 ? 2 : -1;
-                if (volIdx === -1) volIdx = headers.length > 3 ? 3 : -1;
-                if (minIdx === -1) minIdx = headers.length > 4 ? 4 : -1;
-                if (freqIdx === -1) freqIdx = headers.length > 5 ? 5 : -1;
+                // Track claimed column indices to avoid positional fallback collisions
+                const claimed = new Set([activityIdx, teamIdx, respIdx, productIdx, volIdx, minIdx, freqIdx].filter(i => i !== -1));
+                
+                if (activityIdx === -1 && !claimed.has(0) && headers.length > 0) { activityIdx = 0; claimed.add(0); }
+                if (teamIdx === -1 && !claimed.has(1) && headers.length > 1) { teamIdx = 1; claimed.add(1); }
+                if (respIdx === -1 && !claimed.has(2) && headers.length > 2) { respIdx = 2; claimed.add(2); }
+                if (productIdx === -1 && !claimed.has(3) && headers.length > 3) { productIdx = 3; claimed.add(3); }
                 
                 for (let i = 1; i < rows.length; i++) {
                     const row = rows[i];
                     if (!row || row.length === 0) continue;
                     
-                    const activityName = activityIdx !== -1 && row[activityIdx] ? String(row[activityIdx]).trim() : '';
+                    const activityName = activityIdx !== -1 && row[activityIdx] !== undefined && row[activityIdx] !== null ? String(row[activityIdx]).trim() : '';
                     if (!activityName) continue;
                     
-                    const teamName = teamIdx !== -1 && row[teamIdx] ? String(row[teamIdx]).trim() : '';
-                    const respName = respIdx !== -1 && row[respIdx] ? String(row[respIdx]).trim() : '';
-                    const productName = productIdx !== -1 && row[productIdx] ? String(row[productIdx]).trim() : '';
+                    const teamName = teamIdx !== -1 && row[teamIdx] !== undefined && row[teamIdx] !== null ? String(row[teamIdx]).trim() : '';
+                    const respName = respIdx !== -1 && row[respIdx] !== undefined && row[respIdx] !== null ? String(row[respIdx]).trim() : '';
+                    const productName = productIdx !== -1 && row[productIdx] !== undefined && row[productIdx] !== null ? String(row[productIdx]).trim() : '';
                     
                     let volumeVal = '';
                     if (volIdx !== -1 && row[volIdx] !== undefined && row[volIdx] !== null && row[volIdx] !== '') {
