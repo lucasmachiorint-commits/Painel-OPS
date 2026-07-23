@@ -131,6 +131,24 @@ function getSupabase() {
 }
 
 // AUTHENTICATION LOGIC (SUPABASE)
+async function formatAuthError(msg) {
+    if (!msg) return "Erro ao efetuar login.";
+    const lower = String(msg).toLowerCase();
+    if (lower.includes("invalid login credentials") || lower.includes("invalid_grant")) {
+        return "E-mail ou senha incorretos.";
+    }
+    if (lower.includes("email not confirmed")) {
+        return "E-mail ainda não foi confirmado no Supabase. Verifique sua caixa de entrada.";
+    }
+    if (lower.includes("too many requests") || lower.includes("rate limit")) {
+        return "Muitas tentativas de acesso. Por favor, aguarde alguns instantes.";
+    }
+    if (lower.includes("user not found")) {
+        return "Usuário não cadastrado.";
+    }
+    return msg;
+}
+
 async function handleLogin() {
     hideAuthError();
     hideAuthInfo();
@@ -149,7 +167,7 @@ async function handleLogin() {
     
     const client = getSupabase();
     if (!client) {
-        showAuthError("NÃ£o foi possÃvel conectar ao Supabase SDK. Verifique sua conexÃ£o ou se o SDK foi carregado.");
+        showAuthError("Não foi possível conectar ao Supabase. Verifique sua conexão com a internet.");
         return;
     }
 
@@ -163,14 +181,14 @@ async function handleLogin() {
         const { data, error } = await client.auth.signInWithPassword({ email, password });
         
         if (error) {
-            showAuthError(error.message || "Erro ao efetuar login.");
+            showAuthError(formatAuthError(error.message));
         } else if (data && data.session && data.session.user) {
-            setupUserSession(data.session.user);
+            await setupUserSession(data.session.user);
         } else {
-            showAuthError("UsuÃrio ou senha incorretos.");
+            showAuthError("E-mail ou senha incorretos.");
         }
     } catch (err) {
-        showAuthError(err.message || "Ocorreu um erro inesperado ao tentar fazer login.");
+        showAuthError(formatAuthError(err.message));
     } finally {
         if (btnLogin) {
             btnLogin.disabled = false;
@@ -202,7 +220,7 @@ async function handleSignup() {
     
     const client = getSupabase();
     if (!client) {
-        showAuthError("NÃ£o foi possÃvel conectar ao Supabase. Verifique sua conexÃ£o com a internet.");
+        showAuthError("Não foi possível conectar ao Supabase. Verifique sua conexão com a internet.");
         return;
     }
 
@@ -213,32 +231,28 @@ async function handleSignup() {
     }
 
     try {
-        // Todo usuÃrio recÃ©m cadastrado recebe perfil 'CONSULTA' por padrÃ£o nos metadados
         const { data, error } = await client.auth.signUp({
             email,
             password,
             options: {
-                data: {
-                    perfil: 'CONSULTA',
-                    nome: email.split('@')[0]
-                }
+                data: { perfil: 'CONSULTA' }
             }
         });
-
+        
         if (error) {
-            showAuthError(error.message || "Erro ao cadastrar usuÃrio.");
-        } else if (data) {
+            showAuthError(formatAuthError(error.message));
+        } else {
             if (data.session && data.session.user) {
                 showAuthInfo("Conta criada e autenticada com sucesso!");
-                setupUserSession(data.session.user);
+                await setupUserSession(data.session.user);
             } else if (data.user) {
-                showAuthInfo("Conta criada com sucesso! Se a confirmaÃ§Ã£o de e-mail estiver ativa no seu projeto Supabase, verifique sua caixa de entrada para ativar a conta.");
+                showAuthInfo("Conta criada com sucesso! Se a confirmação de e-mail estiver ativa no seu Supabase, ative sua conta pelo link enviado.");
             } else {
-                showAuthInfo("Cadastro ÃÃrealizado com sucesso.");
+                showAuthInfo("Cadastro realizado com sucesso.");
             }
         }
     } catch (err) {
-        showAuthError(err.message || "Ocorreu um erro inesperado ao cadastrar.");
+        showAuthError(formatAuthError(err.message));
     } finally {
         if (btnSignup) {
             btnSignup.disabled = false;
@@ -257,6 +271,7 @@ async function handleLogout() {
             console.error('Erro no logout:', e);
         }
     }
+    window._authUserId = null;
     showAuthOverlay();
 }
 
@@ -293,6 +308,10 @@ function hideAuthInfo() {
 function showAuthOverlay() {
     const overlay = document.getElementById('auth-overlay');
     if (overlay) overlay.style.display = 'flex';
+    hideAuthError();
+    hideAuthInfo();
+    const emailEl = document.getElementById('auth-email');
+    if (emailEl) setTimeout(() => emailEl.focus(), 150);
 }
 
 function hideAuthOverlay() {
@@ -300,54 +319,62 @@ function hideAuthOverlay() {
     if (overlay) overlay.style.display = 'none';
 }
 
+let _isSettingUpSession = false;
+
 async function setupUserSession(user) {
     if (!user) {
         showAuthOverlay();
         return;
     }
     
-    // Store user ID globally for "Você" badge in access control table
-    window._authUserId = user.id;
-    
-    const userMetadata = user.user_metadata || {};
-    currentUser.email = user.email || '';
-    currentUser.nome  = userMetadata.nome || user.email.split('@')[0];
-    
-    // Try to fetch profile from the `profiles` table first; fallback to user_metadata
-    const client = getSupabase();
-    if (client) {
-        try {
-            const { data: profile } = await client
-                .from('profiles')
-                .select('perfil, nome')
-                .eq('id', user.id)
-                .single();
-            if (profile) {
-                currentUser.perfil = profile.perfil || 'CONSULTA';
-                currentUser.nome   = profile.nome   || currentUser.nome;
-            } else {
+    if (_isSettingUpSession && window._authUserId === user.id) {
+        hideAuthOverlay();
+        return;
+    }
+    _isSettingUpSession = true;
+
+    try {
+        window._authUserId = user.id;
+        
+        const userMetadata = user.user_metadata || {};
+        currentUser.email = user.email || '';
+        currentUser.nome  = userMetadata.nome || (user.email ? user.email.split('@')[0] : 'Usuário');
+        
+        const client = getSupabase();
+        if (client) {
+            try {
+                const { data: profile } = await client
+                    .from('profiles')
+                    .select('perfil, nome')
+                    .eq('id', user.id)
+                    .maybeSingle();
+                if (profile) {
+                    currentUser.perfil = profile.perfil || 'CONSULTA';
+                    currentUser.nome   = profile.nome   || currentUser.nome;
+                } else {
+                    currentUser.perfil = userMetadata.perfil || 'CONSULTA';
+                }
+            } catch (_) {
                 currentUser.perfil = userMetadata.perfil || 'CONSULTA';
             }
-        } catch (_) {
+        } else {
             currentUser.perfil = userMetadata.perfil || 'CONSULTA';
         }
-    } else {
-        currentUser.perfil = userMetadata.perfil || 'CONSULTA';
+        
+        hideAuthOverlay();
+
+        const loaded = await loadStateFromSupabase();
+        if (!loaded) {
+            await saveStateToSupabase();
+        }
+
+        subscribeRealtime();
+        refreshAllViews();
+    } catch (err) {
+        console.error('Erro em setupUserSession:', err);
+    } finally {
+        _isSettingUpSession = false;
     }
-    
-    hideAuthOverlay();
-
-    // Carregar estado do Supabase (prioridade sobre localStorage)
-    const loaded = await loadStateFromSupabase();
-    if (!loaded) {
-        // Se não houver dados no Supabase ainda, faz o primeiro envio do estado local
-        await saveStateToSupabase();
-    }
-
-    // Iniciar inscrição no Supabase Realtime
-    subscribeRealtime();
-
-    refreshAllViews();
 }
 
 // INITIALIZATION
@@ -355,7 +382,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     loadState();
     setupEventListeners();
     
-    // Bind Auth buttons
+    // Bind Auth buttons & Enter key
     const btnLogin = document.getElementById('btn-auth-login');
     const btnSignup = document.getElementById('btn-auth-signup');
     const btnLogout = document.getElementById('btn-logout');
@@ -364,19 +391,31 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (btnSignup) btnSignup.addEventListener('click', handleSignup);
     if (btnLogout) btnLogout.addEventListener('click', handleLogout);
 
+    const authEmailEl = document.getElementById('auth-email');
+    const authPassEl = document.getElementById('auth-password');
+    [authEmailEl, authPassEl].forEach(input => {
+        if (input) {
+            input.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    handleLogin();
+                }
+            });
+        }
+    });
+
     // Check existing Supabase session
     if (supabaseClient) {
         try {
             const { data: { session } } = await supabaseClient.auth.getSession();
             if (session && session.user) {
-                setupUserSession(session.user);
+                await setupUserSession(session.user);
             } else {
                 showAuthOverlay();
             }
         } catch (sessionErr) {
             console.error('Erro ao recuperar sessão existente do Supabase:', sessionErr);
             try {
-                // Tentativa de limpar token corrompido
                 const projName = SUPABASE_URL.split('//')[1]?.split('.')[0];
                 if (projName) {
                     localStorage.removeItem(`sb-${projName}-auth-token`);
@@ -386,10 +425,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
 
         try {
-            // Listen to auth changes
-            supabaseClient.auth.onAuthStateChange((event, session) => {
+            supabaseClient.auth.onAuthStateChange(async (event, session) => {
                 if (event === 'SIGNED_IN' && session) {
-                    setupUserSession(session.user);
+                    await setupUserSession(session.user);
                 } else if (event === 'SIGNED_OUT') {
                     showAuthOverlay();
                 }
@@ -398,7 +436,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             console.error('Erro ao registrar listener de mudanças de autenticação:', authListenerErr);
         }
     } else {
-        // Fallback for demonstration if Supabase SDK is not loaded or missing credentials
         showAuthOverlay();
         showAuthError("Aviso: Configure o SUPABASE_URL e SUPABASE_ANON_KEY no app.js para utilizar a autenticação.");
     }
