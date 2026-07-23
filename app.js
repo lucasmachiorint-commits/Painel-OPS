@@ -311,19 +311,6 @@ function hideAuthInfo() {
     }
 }
 
-function enterGuestMode() {
-    currentUser = {
-        nome: 'Convidado (ADMIN)',
-        email: 'admin@local',
-        perfil: 'ADMIN'
-    };
-    window._authUserId = 'guest-local-user';
-    hideAuthOverlay();
-    loadState();
-    refreshAllViews();
-    showToast('Acesso liberado no Modo Convidado (Acesso ADMIN)!', 'success', 5000);
-}
-
 function showAuthOverlay() {
     const overlay = document.getElementById('auth-overlay');
     if (overlay) {
@@ -407,10 +394,7 @@ async function setupUserSession(user) {
 
 // INITIALIZATION
 document.addEventListener('DOMContentLoaded', async () => {
-    loadState();
-    setupEventListeners();
-    
-    // Bind Auth buttons & Enter key
+    // Bind Auth buttons & Enter key FIRST to prevent silent failures if other init steps crash
     const btnLogin = document.getElementById('btn-auth-login');
     const btnSignup = document.getElementById('btn-auth-signup');
     const btnLogout = document.getElementById('btn-logout');
@@ -419,6 +403,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (btnSignup) btnSignup.addEventListener('click', handleSignup);
     if (btnLogout) btnLogout.addEventListener('click', handleLogout);
 
+    loadState();
+    setupEventListeners();
+    
     const authEmailEl = document.getElementById('auth-email');
     const authPassEl = document.getElementById('auth-password');
     [authEmailEl, authPassEl].forEach(input => {
@@ -458,7 +445,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             client.auth.onAuthStateChange(async (event, session) => {
                 if (event === 'SIGNED_IN' && session && session.user) {
                     await setupUserSession(session.user);
-                } else if (event === 'SIGNED_OUT' && window._authUserId && window._authUserId !== 'guest-local-user') {
+                } else if (event === 'SIGNED_OUT' && window._authUserId) {
                     showAuthOverlay();
                 }
             });
@@ -1198,17 +1185,24 @@ function setupEventListeners() {
         });
     }
 
+    // Helper para vincular eventos de forma segura
+    const safeAddListener = (id, event, handler) => {
+        const el = document.getElementById(id);
+        if (el) el.addEventListener(event, handler);
+    };
+
     // Cadastros - Add Activity row
-    document.getElementById('btn-cadastros-add-row').addEventListener('click', () => {
+    safeAddListener('btn-cadastros-add-row', 'click', () => {
         addNewProcess();
     });
 
     // Cadastros - Import Excel buttons
-    document.getElementById('btn-cadastros-import-excel').addEventListener('click', () => {
-        document.getElementById('cadastros-import-excel-file').click();
+    safeAddListener('btn-cadastros-import-excel', 'click', () => {
+        const input = document.getElementById('cadastros-import-excel-file');
+        if (input) input.click();
     });
 
-    document.getElementById('cadastros-import-excel-file').addEventListener('change', (e) => {
+    safeAddListener('cadastros-import-excel-file', 'change', (e) => {
         const file = e.target.files[0];
         if (file) {
             importExcelFile(file);
@@ -1217,7 +1211,7 @@ function setupEventListeners() {
     });
 
     // Backlog Action Buttons
-    document.getElementById('btn-import-active-volumes').addEventListener('click', () => {
+    safeAddListener('btn-import-active-volumes', 'click', () => {
         state.processes.forEach(proc => {
             const hasVolume = proc.volume !== null && proc.volume !== '';
             proc.backlogVolume = hasVolume ? proc.volume : (proc.qtdExecucao !== null && proc.qtdExecucao !== '' ? proc.qtdExecucao : '');
@@ -1226,7 +1220,7 @@ function setupEventListeners() {
         renderBalancingTable();
     });
 
-    document.getElementById('btn-clear-backlog-volumes').addEventListener('click', () => {
+    safeAddListener('btn-clear-backlog-volumes', 'click', () => {
         if (!verificarPermissao('ADMIN')) { alert('Acesso negado: Perfil ADMIN necessÃ¡rio.'); return; }
         state.processes.forEach(proc => {
             proc.backlogVolume = '';
@@ -1235,45 +1229,39 @@ function setupEventListeners() {
         renderBalancingTable();
     });
 
-    const btnLoadExample = document.getElementById('btn-load-example');
-    if (btnLoadExample) {
-        btnLoadExample.addEventListener('click', () => {
-            loadExampleData();
-        });
-    }
-
-    document.getElementById('btn-empty-load-example').addEventListener('click', () => {
+    safeAddListener('btn-load-example', 'click', () => {
         loadExampleData();
     });
 
-    const btnReset = document.getElementById('btn-reset');
-    if (btnReset) {
-        btnReset.addEventListener('click', () => {
-            if (confirm('Tem certeza que deseja limpar todos os dados do simulador?')) {
-                resetSimulator();
-            }
-        });
-    }
+    safeAddListener('btn-empty-load-example', 'click', () => {
+        loadExampleData();
+    });
 
-    document.getElementById('btn-export-csv').addEventListener('click', () => {
+    safeAddListener('btn-reset', 'click', () => {
+        if (confirm('Tem certeza que deseja limpar todos os dados do simulador?')) {
+            resetSimulator();
+        }
+    });
+
+    safeAddListener('btn-export-csv', 'click', () => {
         exportToCSV();
     });
 
     // History View Event Listeners
-    document.getElementById('btn-save-history').addEventListener('click', () => {
+    safeAddListener('btn-save-history', 'click', () => {
         saveHistorySnapshot();
     });
 
-    document.getElementById('filter-history-type').addEventListener('change', () => {
+    safeAddListener('filter-history-type', 'change', () => {
         populateHistoryItemOptions();
         renderHistoryChart();
     });
 
-    document.getElementById('filter-history-item').addEventListener('change', () => {
+    safeAddListener('filter-history-item', 'change', () => {
         renderHistoryChart();
     });
 
-    document.getElementById('btn-print').addEventListener('click', () => {
+    safeAddListener('btn-print', 'click', () => {
         window.print();
     });
 }
