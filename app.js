@@ -675,9 +675,12 @@ async function loadStateFromSupabase() {
 
 function isRpaActivity(proc) {
     if (!proc) return false;
-    if (proc.isRpa === true || proc.isRpa === 'true' || proc.isRpa === 1) return true;
-    const resp = (proc.responsavel || '').toLowerCase();
-    return resp.includes('rpa') || resp.includes('robô') || resp.includes('robo') || resp.includes('bot') || resp.includes('automação') || resp.includes('automacao');
+    return proc.isRpa === true || proc.isRpa === 'true' || proc.isRpa === 1;
+}
+
+function isRpaResponsavel(name) {
+    const s = (name || '').toLowerCase();
+    return s.includes('rpa') || s.includes('robô') || s.includes('robo') || s.includes('bot') || s.includes('automação') || s.includes('automacao');
 }
 
 // STATE MIGRATIONS HELPER
@@ -701,7 +704,7 @@ function applyStateMigrations() {
         if (p.reviewStatus === undefined) p.reviewStatus = 'Manter';
         if (p.responsavel === undefined) p.responsavel = '';
         if (p.produto === undefined) p.produto = '';
-        if (p.isRpa === undefined) p.isRpa = false;
+        if (p.isRpa === undefined) p.isRpa = isRpaResponsavel(p.responsavel);
     });
     if (state.history === undefined) state.history = [];
     if (state.teams === undefined) {
@@ -3301,11 +3304,17 @@ function renderCadastrosView() {
             const respSelect = tr.querySelector('.select-activity-resp-cell');
             respSelect.addEventListener('change', (e) => {
                 proc.responsavel = e.target.value;
+                // Auto-flag RPA when responsável name matches RPA keywords
+                if (isRpaResponsavel(e.target.value)) {
+                    proc.isRpa = true;
+                }
                 saveState();
+                renderCadastrosView();
                 renderResponsavelFilterOptions();
                 renderTable();
                 renderBalancingTable();
                 renderReviewTable();
+                renderAutomationsView();
             });
             respSelect.addEventListener('focus', () => {
                 respSelect.style.background = 'rgba(255, 255, 255, 0.08)';
