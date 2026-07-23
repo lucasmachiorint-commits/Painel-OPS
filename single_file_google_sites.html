@@ -4146,7 +4146,46 @@ function updateCalculations() {
         if (pctCell) pctCell.textContent = ftePct.toFixed(2) + '%';
     });
 
-    // Calculate global stats (over ALL processes, even hidden ones)
+    const filterValue = document.getElementById('filter-area') ? document.getElementById('filter-area').value : 'all';
+    const respFilter = document.getElementById('filter-responsavel') ? document.getElementById('filter-responsavel').value : 'all';
+    const isFiltered = (filterValue !== 'all' || respFilter !== 'all');
+
+    const targetProcesses = isFiltered ? state.processes.filter(p => {
+        const areaMatch = filterValue === 'all' || p.area === filterValue;
+        const respMatch = respFilter === 'all' || p.responsavel === respFilter;
+        return areaMatch && respMatch;
+    }) : state.processes;
+
+    // Calculate stats for target processes (filtered or global)
+    let targetHoursAccum = 0;
+    let targetFtePctAccum = 0;
+    let targetRpaCount = 0;
+    let targetRpaFtePctAccum = 0;
+
+    targetProcesses.forEach(proc => {
+        const isStopped = proc.reviewStatus === 'Parar';
+        const hasVolume = proc.volume !== null && proc.volume !== '';
+        const multiplier = isStopped ? 0 : (hasVolume ? parseFloat(proc.volume) : (proc.qtdExecucao !== null && proc.qtdExecucao !== '' ? parseFloat(proc.qtdExecucao) : 0));
+        const minutes = isStopped ? 0 : (proc.minutos !== null && proc.minutos !== '' ? parseFloat(proc.minutos) : 0);
+        
+        const totalMinutes = multiplier * minutes;
+        const totalHours = totalMinutes / 60;
+        
+        const respParams = getResponsibleParams(proc.responsavel);
+        const pHorasRealDia = respParams.horasDia * (1 - respParams.absenteismo / 100);
+        const pHorasTrabalhoMes = pHorasRealDia * respParams.diasUteis;
+        const ftePct = pHorasTrabalhoMes > 0 ? (totalHours / pHorasTrabalhoMes) * 100 : 0;
+
+        targetHoursAccum += totalHours;
+        targetFtePctAccum += ftePct;
+
+        if (isRpaActivity(proc)) {
+            targetRpaCount++;
+            targetRpaFtePctAccum += ftePct;
+        }
+    });
+
+    // Also calculate global total stats for global table footer
     state.processes.forEach(proc => {
         const isStopped = proc.reviewStatus === 'Parar';
         const hasVolume = proc.volume !== null && proc.volume !== '';
@@ -4156,7 +4195,6 @@ function updateCalculations() {
         const totalMinutes = multiplier * minutes;
         const totalHours = totalMinutes / 60;
         
-        // Dynamic capacity per process
         const respParams = getResponsibleParams(proc.responsavel);
         const pHorasRealDia = respParams.horasDia * (1 - respParams.absenteismo / 100);
         const pHorasTrabalhoMes = pHorasRealDia * respParams.diasUteis;
@@ -4166,14 +4204,18 @@ function updateCalculations() {
         totalFtePctAccum += ftePct;
     });
 
-    const totalFteDecAccum = totalFtePctAccum / 100;
+    const targetFteDecAccum = targetFtePctAccum / 100;
+    const targetRpaFteDecAccum = targetRpaFtePctAccum / 100;
+    const totalCount = targetProcesses.length;
+    const pctRpaCount = totalCount > 0 ? (targetRpaCount / totalCount * 100) : 0;
+    const pctRpaFte = targetFtePctAccum > 0 ? (targetRpaFtePctAccum / targetFtePctAccum * 100) : 0;
 
-    // Render Totals Rows
+    // Render Totals Rows in table footer
     document.getElementById('total-hours').textContent = totalHoursAccum.toFixed(1) + 'h';
     document.getElementById('total-fte-pct').textContent = totalFtePctAccum.toFixed(2) + '%';
 
     const rowTotalFiltered = document.getElementById('row-total-filtered');
-    if (filterValue !== 'all') {
+    if (isFiltered) {
         rowTotalFiltered.style.display = 'table-row';
         document.getElementById('total-hours-filtered').textContent = filteredHoursAccum.toFixed(1) + 'h';
         document.getElementById('total-fte-pct-filtered').textContent = filteredFtePctAccum.toFixed(2) + '%';
@@ -4181,57 +4223,25 @@ function updateCalculations() {
         rowTotalFiltered.style.display = 'none';
     }
 
-    // Render Summary Widgets
-    document.getElementById('widget-fte-required').textContent = totalFteDecAccum.toFixed(2);
+    // Render Summary Widgets dynamically for the target (filtered or global) selection
+    document.getElementById('widget-fte-required').textContent = targetFteDecAccum.toFixed(2);
     
-    // Update total activity count widget
     const widgetActivity = document.getElementById('widget-activity-count');
     if (widgetActivity) {
-        widgetActivity.textContent = state.processes.length;
+        widgetActivity.textContent = totalCount;
     }
 
-    // Calculate & Update RPA Widgets
-    let rpaCount = 0;
-    let rpaHoursAccum = 0;
-    let rpaFtePctAccum = 0;
-
-    state.processes.forEach(proc => {
-        if (!isRpaActivity(proc)) return;
-        rpaCount++;
-
-        const isStopped = proc.reviewStatus === 'Parar';
-        const hasVolume = proc.volume !== null && proc.volume !== '';
-        const multiplier = isStopped ? 0 : (hasVolume ? parseFloat(proc.volume) : (proc.qtdExecucao !== null && proc.qtdExecucao !== '' ? parseFloat(proc.qtdExecucao) : 0));
-        const minutes = isStopped ? 0 : (proc.minutos !== null && proc.minutos !== '' ? parseFloat(proc.minutos) : 0);
-        
-        const totalMinutes = multiplier * minutes;
-        const totalHours = totalMinutes / 60;
-        
-        const respParams = getResponsibleParams(proc.responsavel);
-        const pHorasRealDia = respParams.horasDia * (1 - respParams.absenteismo / 100);
-        const pHorasTrabalhoMes = pHorasRealDia * respParams.diasUteis;
-        const ftePct = pHorasTrabalhoMes > 0 ? (totalHours / pHorasTrabalhoMes) * 100 : 0;
-
-        rpaHoursAccum += totalHours;
-        rpaFtePctAccum += ftePct;
-    });
-
-    const rpaFteDecAccum = rpaFtePctAccum / 100;
-    const totalCount = state.processes.length;
-    const pctRpaCount = totalCount > 0 ? (rpaCount / totalCount * 100) : 0;
-    const pctRpaFte = totalFtePctAccum > 0 ? (rpaFtePctAccum / totalFtePctAccum * 100) : 0;
-
     const elRpaCount = document.getElementById('widget-rpa-count');
-    if (elRpaCount) elRpaCount.textContent = rpaCount;
+    if (elRpaCount) elRpaCount.textContent = targetRpaCount;
 
     const elRpaCountSub = document.getElementById('widget-rpa-count-sub');
     if (elRpaCountSub) elRpaCountSub.textContent = `${pctRpaCount.toFixed(1)}% das atividades`;
 
     const elRpaFte = document.getElementById('widget-rpa-fte');
-    if (elRpaFte) elRpaFte.textContent = rpaFteDecAccum.toFixed(2);
+    if (elRpaFte) elRpaFte.textContent = targetRpaFteDecAccum.toFixed(2);
 
     const elRpaFteSub = document.getElementById('widget-rpa-fte-sub');
-    if (elRpaFteSub) elRpaFteSub.textContent = `${pctRpaFte.toFixed(1)}% do capacity total`;
+    if (elRpaFteSub) elRpaFteSub.textContent = `${pctRpaFte.toFixed(1)}% do capacity`;
 
     // Update placeholders for responsible overrides inputs in-place to avoid re-rendering layout
     const horasInputs = document.querySelectorAll('.override-horas');
