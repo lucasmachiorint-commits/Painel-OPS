@@ -676,8 +676,8 @@ async function loadStateFromSupabase() {
 function isRpaActivity(proc) {
     if (!proc) return false;
     if (proc.isRpa === true || proc.isRpa === 'true' || proc.isRpa === 1) return true;
-    const str = `${proc.name || ''} ${proc.area || ''} ${proc.produto || ''} ${proc.responsavel || ''}`.toLowerCase();
-    return str.includes('rpa') || str.includes('robô') || str.includes('robo') || str.includes('bot') || str.includes('automação') || str.includes('automacao');
+    const resp = (proc.responsavel || '').toLowerCase();
+    return resp.includes('rpa') || resp.includes('robô') || resp.includes('robo') || resp.includes('bot') || resp.includes('automação') || resp.includes('automacao');
 }
 
 // STATE MIGRATIONS HELPER
