@@ -185,13 +185,22 @@ async function handleLogin() {
         } else {
             const user = (data && data.session && data.session.user) ? data.session.user : (data ? data.user : null);
             if (user) {
-                hideAuthOverlay();
-                await setupUserSession(user);
+                // Forçar ocultação do overlay de login e exibição do painel principal
+                const overlay = document.getElementById('auth-overlay');
+                if (overlay) overlay.style.setProperty('display', 'none', 'important');
+                
+                try {
+                    await setupUserSession(user);
+                } catch (sessionErr) {
+                    alert('[DIAGNÓSTICO] Erro em setupUserSession: ' + (sessionErr.message || sessionErr));
+                    console.error('Erro em setupUserSession após login:', sessionErr);
+                }
             } else {
                 showAuthError("E-mail ou senha incorretos.");
             }
         }
     } catch (err) {
+        alert('[DIAGNÓSTICO] Erro fatal no handleLogin: ' + (err.message || err));
         showAuthError(formatAuthError(err ? err.message : ''));
     } finally {
         if (btnLogin) {
@@ -341,7 +350,9 @@ async function setupUserSession(user) {
         return;
     }
     
-    hideAuthOverlay();
+    // Forçar ocultação do overlay de login
+    const overlay = document.getElementById('auth-overlay');
+    if (overlay) overlay.style.setProperty('display', 'none', 'important');
 
     try {
         window._authUserId = user.id;
@@ -349,6 +360,9 @@ async function setupUserSession(user) {
         const userMetadata = user.user_metadata || {};
         currentUser.email = user.email || '';
         currentUser.nome  = userMetadata.nome || (user.email ? user.email.split('@')[0] : 'Usuário');
+        
+        // Definir perfil padrão CONSULTA antes de qualquer tentativa
+        currentUser.perfil = 'CONSULTA';
         
         const client = getSupabase();
         if (client) {
@@ -358,17 +372,18 @@ async function setupUserSession(user) {
                     .select('perfil, nome')
                     .eq('id', user.id)
                     .maybeSingle();
-                if (profile) {
-                    currentUser.perfil = profile.perfil || 'CONSULTA';
-                    currentUser.nome   = profile.nome   || currentUser.nome;
-                } else {
-                    currentUser.perfil = userMetadata.perfil || 'CONSULTA';
+                if (profile && profile.perfil) {
+                    currentUser.perfil = profile.perfil;
+                    currentUser.nome   = profile.nome || currentUser.nome;
+                } else if (userMetadata.perfil) {
+                    currentUser.perfil = userMetadata.perfil;
                 }
-            } catch (_) {
-                currentUser.perfil = userMetadata.perfil || 'CONSULTA';
+            } catch (profileErr) {
+                console.warn('Aviso ao buscar perfil, usando CONSULTA como fallback:', profileErr);
+                if (userMetadata.perfil) currentUser.perfil = userMetadata.perfil;
             }
-        } else {
-            currentUser.perfil = userMetadata.perfil || 'CONSULTA';
+        } else if (userMetadata.perfil) {
+            currentUser.perfil = userMetadata.perfil;
         }
 
         try {
@@ -388,6 +403,7 @@ async function setupUserSession(user) {
 
         refreshAllViews();
     } catch (err) {
+        alert('[DIAGNÓSTICO] Erro em setupUserSession: ' + (err.message || err));
         console.error('Erro em setupUserSession:', err);
     }
 }
@@ -1591,13 +1607,14 @@ function updateCalculations() {
         if (pctCell) pctCell.textContent = ftePct.toFixed(2) + '%';
     });
 
-    const filterValue = document.getElementById('filter-area') ? document.getElementById('filter-area').value : 'all';
-    const respFilter = document.getElementById('filter-responsavel') ? document.getElementById('filter-responsavel').value : 'all';
-    const isFiltered = (filterValue !== 'all' || respFilter !== 'all');
+    // Reutiliza filterValue e respFilter já declarados no topo da função (sem re-declarar com const)
+    const currentFilterValue = document.getElementById('filter-area') ? document.getElementById('filter-area').value : 'all';
+    const currentRespFilter = document.getElementById('filter-responsavel') ? document.getElementById('filter-responsavel').value : 'all';
+    const isFiltered = (currentFilterValue !== 'all' || currentRespFilter !== 'all');
 
     const targetProcesses = isFiltered ? state.processes.filter(p => {
-        const areaMatch = filterValue === 'all' || p.area === filterValue;
-        const respMatch = respFilter === 'all' || p.responsavel === respFilter;
+        const areaMatch = currentFilterValue === 'all' || p.area === currentFilterValue;
+        const respMatch = currentRespFilter === 'all' || p.responsavel === currentRespFilter;
         return areaMatch && respMatch;
     }) : state.processes;
 
