@@ -2599,6 +2599,9 @@ body.light-theme .select-review-area option, body.light-theme .select-review-sta
                     <span style="color: var(--text-muted); font-size: 0.8rem;">ou</span>
                 </div>
                 <button id="btn-auth-signup" class="btn btn-secondary" style="width: 100%; justify-content: center; padding: 0.6rem; font-size: 0.9rem;">Criar nova conta</button>
+                <button id="btn-auth-guest" class="btn btn-secondary-outline" onclick="enterGuestMode()" style="width: 100%; justify-content: center; padding: 0.55rem; font-size: 0.85rem; margin-top: 0.5rem; border: 1px dashed var(--border-color); color: var(--text-muted);" title="Acessar o painel diretamente no modo local">
+                    <i class="fa-solid fa-user-shield"></i> Entrar sem Login (Modo Convidado)
+                </button>
             </div>
         </div>
     </div>
@@ -2920,12 +2923,26 @@ function hideAuthInfo() {
     }
 }
 
+function enterGuestMode() {
+    currentUser = {
+        nome: 'Convidado (ADMIN)',
+        email: 'admin@local',
+        perfil: 'ADMIN'
+    };
+    window._authUserId = 'guest-local-user';
+    hideAuthOverlay();
+    loadState();
+    refreshAllViews();
+    showToast('Acesso liberado no Modo Convidado (Acesso ADMIN)!', 'success', 5000);
+}
+
 function showAuthOverlay() {
     const overlay = document.getElementById('auth-overlay');
     if (overlay) {
-        overlay.style.display = 'flex';
-        overlay.style.opacity = '1';
-        overlay.style.pointerEvents = 'auto';
+        overlay.style.setProperty('display', 'flex', 'important');
+        overlay.style.setProperty('opacity', '1', 'important');
+        overlay.style.setProperty('pointer-events', 'auto', 'important');
+        overlay.style.setProperty('visibility', 'visible', 'important');
     }
     hideAuthError();
     hideAuthInfo();
@@ -2936,9 +2953,10 @@ function showAuthOverlay() {
 function hideAuthOverlay() {
     const overlay = document.getElementById('auth-overlay');
     if (overlay) {
-        overlay.style.display = 'none';
-        overlay.style.opacity = '0';
-        overlay.style.pointerEvents = 'none';
+        overlay.style.setProperty('display', 'none', 'important');
+        overlay.style.setProperty('opacity', '0', 'important');
+        overlay.style.setProperty('pointer-events', 'none', 'important');
+        overlay.style.setProperty('visibility', 'hidden', 'important');
     }
 }
 
@@ -3052,7 +3070,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             client.auth.onAuthStateChange(async (event, session) => {
                 if (event === 'SIGNED_IN' && session && session.user) {
                     await setupUserSession(session.user);
-                } else if (event === 'SIGNED_OUT') {
+                } else if (event === 'SIGNED_OUT' && window._authUserId && window._authUserId !== 'guest-local-user') {
                     showAuthOverlay();
                 }
             });

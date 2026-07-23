@@ -311,12 +311,26 @@ function hideAuthInfo() {
     }
 }
 
+function enterGuestMode() {
+    currentUser = {
+        nome: 'Convidado (ADMIN)',
+        email: 'admin@local',
+        perfil: 'ADMIN'
+    };
+    window._authUserId = 'guest-local-user';
+    hideAuthOverlay();
+    loadState();
+    refreshAllViews();
+    showToast('Acesso liberado no Modo Convidado (Acesso ADMIN)!', 'success', 5000);
+}
+
 function showAuthOverlay() {
     const overlay = document.getElementById('auth-overlay');
     if (overlay) {
-        overlay.style.display = 'flex';
-        overlay.style.opacity = '1';
-        overlay.style.pointerEvents = 'auto';
+        overlay.style.setProperty('display', 'flex', 'important');
+        overlay.style.setProperty('opacity', '1', 'important');
+        overlay.style.setProperty('pointer-events', 'auto', 'important');
+        overlay.style.setProperty('visibility', 'visible', 'important');
     }
     hideAuthError();
     hideAuthInfo();
@@ -327,9 +341,10 @@ function showAuthOverlay() {
 function hideAuthOverlay() {
     const overlay = document.getElementById('auth-overlay');
     if (overlay) {
-        overlay.style.display = 'none';
-        overlay.style.opacity = '0';
-        overlay.style.pointerEvents = 'none';
+        overlay.style.setProperty('display', 'none', 'important');
+        overlay.style.setProperty('opacity', '0', 'important');
+        overlay.style.setProperty('pointer-events', 'none', 'important');
+        overlay.style.setProperty('visibility', 'hidden', 'important');
     }
 }
 
@@ -443,7 +458,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             client.auth.onAuthStateChange(async (event, session) => {
                 if (event === 'SIGNED_IN' && session && session.user) {
                     await setupUserSession(session.user);
-                } else if (event === 'SIGNED_OUT') {
+                } else if (event === 'SIGNED_OUT' && window._authUserId && window._authUserId !== 'guest-local-user') {
                     showAuthOverlay();
                 }
             });
