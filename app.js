@@ -673,10 +673,23 @@ async function loadStateFromSupabase() {
     }
 }
 
+function isRpaActivity(proc) {
+    if (!proc) return false;
+    if (proc.isRpa === true || proc.isRpa === 'true' || proc.isRpa === 1) return true;
+    const str = `${proc.name || ''} ${proc.area || ''} ${proc.produto || ''} ${proc.responsavel || ''}`.toLowerCase();
+    return str.includes('rpa') || str.includes('robô') || str.includes('robo') || str.includes('bot') || str.includes('automação') || str.includes('automacao');
+}
+
 // STATE MIGRATIONS HELPER
 function applyStateMigrations() {
-    if (!state) return;
-    if (!state.customAreas) state.customAreas = [];
+    if (!state.params) {
+        state.params = {
+            horasDia: 8.0,
+            absenteismo: 0,
+            diasUteis: 21,
+            teamSize: 1
+        };
+    }
     if (!state.areaAllocations) state.areaAllocations = {};
     if (!state.processes) state.processes = [];
 
@@ -688,6 +701,7 @@ function applyStateMigrations() {
         if (p.reviewStatus === undefined) p.reviewStatus = 'Manter';
         if (p.responsavel === undefined) p.responsavel = '';
         if (p.produto === undefined) p.produto = '';
+        if (p.isRpa === undefined) p.isRpa = false;
     });
     if (state.history === undefined) state.history = [];
     if (state.teams === undefined) {
@@ -914,10 +928,13 @@ function setupEventListeners() {
                 headerTitle.textContent = 'Balanceamento de Backlog';
                 renderBalancingTable();
             } else if (view === 'review') {
-                headerTitle.textContent = 'RevisÃ£o de Atividades';
+                headerTitle.textContent = 'Revisão de Atividades';
                 renderReviewTable();
+            } else if (view === 'automations') {
+                headerTitle.textContent = 'Quadro de Automações (RPA)';
+                renderAutomationsView();
             } else if (view === 'history') {
-                headerTitle.textContent = 'HistÃ³rico de Volumes';
+                headerTitle.textContent = 'Histórico de Volumes';
                 initHistoryView();
             } else if (view === 'access-control') {
                 headerTitle.textContent = 'Controle de Acesso';
@@ -1240,6 +1257,7 @@ function renderTable() {
                     <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
                         <span style="font-weight: 500; color: var(--text-primary);">${escapeHtml(proc.name)}</span>
                         ${proc.produto ? `<span style="font-size: 0.72rem; padding: 0.15rem 0.45rem; border-radius: 12px; background: rgba(99, 102, 241, 0.12); color: #818cf8; border: 1px solid rgba(99, 102, 241, 0.25); font-weight: 500;"><i class="fa-solid fa-box-open" style="font-size: 0.65rem; margin-right: 0.25rem;"></i>${escapeHtml(proc.produto)}</span>` : ''}
+                        ${isRpaActivity(proc) ? `<span style="font-size: 0.72rem; padding: 0.15rem 0.45rem; border-radius: 12px; background: rgba(139, 92, 246, 0.15); color: #a78bfa; border: 1px solid rgba(139, 92, 246, 0.3); font-weight: 600;"><i class="fa-solid fa-robot" style="font-size: 0.65rem; margin-right: 0.25rem;"></i>RPA</span>` : ''}
                     </div>
                     ${proc.reviewStatus && proc.reviewStatus !== 'Manter' ? `<span class="badge-review badge-review-${proc.reviewStatus.toLowerCase()}">${proc.reviewStatus}</span>` : ''}
                 </div>
@@ -1560,6 +1578,49 @@ function updateCalculations() {
         widgetActivity.textContent = state.processes.length;
     }
 
+    // Calculate & Update RPA Widgets
+    let rpaCount = 0;
+    let rpaHoursAccum = 0;
+    let rpaFtePctAccum = 0;
+
+    state.processes.forEach(proc => {
+        if (!isRpaActivity(proc)) return;
+        rpaCount++;
+
+        const isStopped = proc.reviewStatus === 'Parar';
+        const hasVolume = proc.volume !== null && proc.volume !== '';
+        const multiplier = isStopped ? 0 : (hasVolume ? parseFloat(proc.volume) : (proc.qtdExecucao !== null && proc.qtdExecucao !== '' ? parseFloat(proc.qtdExecucao) : 0));
+        const minutes = isStopped ? 0 : (proc.minutos !== null && proc.minutos !== '' ? parseFloat(proc.minutos) : 0);
+        
+        const totalMinutes = multiplier * minutes;
+        const totalHours = totalMinutes / 60;
+        
+        const respParams = getResponsibleParams(proc.responsavel);
+        const pHorasRealDia = respParams.horasDia * (1 - respParams.absenteismo / 100);
+        const pHorasTrabalhoMes = pHorasRealDia * respParams.diasUteis;
+        const ftePct = pHorasTrabalhoMes > 0 ? (totalHours / pHorasTrabalhoMes) * 100 : 0;
+
+        rpaHoursAccum += totalHours;
+        rpaFtePctAccum += ftePct;
+    });
+
+    const rpaFteDecAccum = rpaFtePctAccum / 100;
+    const totalCount = state.processes.length;
+    const pctRpaCount = totalCount > 0 ? (rpaCount / totalCount * 100) : 0;
+    const pctRpaFte = totalFtePctAccum > 0 ? (rpaFtePctAccum / totalFtePctAccum * 100) : 0;
+
+    const elRpaCount = document.getElementById('widget-rpa-count');
+    if (elRpaCount) elRpaCount.textContent = rpaCount;
+
+    const elRpaCountSub = document.getElementById('widget-rpa-count-sub');
+    if (elRpaCountSub) elRpaCountSub.textContent = `${pctRpaCount.toFixed(1)}% das atividades`;
+
+    const elRpaFte = document.getElementById('widget-rpa-fte');
+    if (elRpaFte) elRpaFte.textContent = rpaFteDecAccum.toFixed(2);
+
+    const elRpaFteSub = document.getElementById('widget-rpa-fte-sub');
+    if (elRpaFteSub) elRpaFteSub.textContent = `${pctRpaFte.toFixed(1)}% do capacity total`;
+
     // Update placeholders for responsible overrides inputs in-place to avoid re-rendering layout
     const horasInputs = document.querySelectorAll('.override-horas');
     horasInputs.forEach(inp => {
@@ -1806,6 +1867,7 @@ function addNewProcess() {
         area: defaultArea,
         responsavel: '',
         produto: '',
+        isRpa: false,
         volume: '',
         minutos: 0,
         qtdExecucao: '',
@@ -1837,6 +1899,7 @@ function duplicateProcess(proc) {
         area: proc.area,
         responsavel: proc.responsavel || '',
         produto: proc.produto || '',
+        isRpa: proc.isRpa || false,
         volume: proc.volume,
         minutos: proc.minutos,
         qtdExecucao: proc.qtdExecucao,
@@ -3076,7 +3139,7 @@ function renderCadastrosView() {
     if (state.processes.length === 0) {
         tableBody.innerHTML = `
             <tr>
-                <td colspan="6" style="text-align: center; color: var(--text-muted); padding: 2rem;">
+                <td colspan="7" style="text-align: center; color: var(--text-muted); padding: 2rem;">
                     Nenhuma atividade cadastrada. Clique em "Adicionar Atividade" para iniciar.
                 </td>
             </tr>
@@ -3106,7 +3169,7 @@ function renderCadastrosView() {
         const headerTr = document.createElement('tr');
         headerTr.style.cssText = 'background: rgba(255,255,255,0.03); cursor: pointer; user-select: none;';
         headerTr.innerHTML = `
-            <td colspan="6" style="padding: 0.8rem; font-weight: 600; color: var(--text-primary); border-top: 1px solid rgba(255,255,255,0.05); border-bottom: 1px solid rgba(255,255,255,0.05);">
+            <td colspan="7" style="padding: 0.8rem; font-weight: 600; color: var(--text-primary); border-top: 1px solid rgba(255,255,255,0.05); border-bottom: 1px solid rgba(255,255,255,0.05);">
                 <i class="fa-solid fa-chevron-right" style="width: 20px;"></i> ${escapeHtml(team)} <span style="background: rgba(255,255,255,0.1); color: var(--text-secondary); padding: 0.1rem 0.5rem; border-radius: 10px; font-size: 0.75rem; margin-left: 0.5rem;">${teamProcs.length} atividades</span>
             </td>
         `;
@@ -3137,6 +3200,8 @@ function renderCadastrosView() {
                     return `<option value="${escapeHtml(rName)}" ${proc.responsavel === rName ? 'selected' : ''}>${escapeHtml(rName)}</option>`;
                 }).join('');
                 
+            const isRpa = isRpaActivity(proc);
+            
             tr.innerHTML = `
                 <td style="text-align: center;">
                     <input type="checkbox" class="cadastros-row-checkbox" data-id="${proc.id}">
@@ -3157,6 +3222,12 @@ function renderCadastrosView() {
                 <td>
                     <input type="text" class="input-activity-product-cell" value="${escapeHtml(proc.produto || '')}" placeholder="Produto (Opcional)" style="width: 100%; border: none; background: transparent; color: var(--text-primary); outline: none; padding: 0.3rem 0.5rem; border-radius: 4px;">
                 </td>
+                <td style="text-align: center;">
+                    <label style="display: inline-flex; align-items: center; gap: 0.35rem; cursor: pointer; font-size: 0.8rem; user-select: none;">
+                        <input type="checkbox" class="cb-activity-rpa" ${isRpa ? 'checked' : ''}>
+                        <span class="label-rpa-text" style="${isRpa ? 'color: #a78bfa; font-weight: 600;' : 'color: var(--text-muted);'}">🤖 RPA</span>
+                    </label>
+                </td>
                 <td class="col-excluir-admin" style="text-align: center;">
                     <button class="btn-row-action btn-delete-activity-cell" style="background: transparent; border: none; color: var(--color-danger); cursor: pointer; font-size: 0.95rem; padding: 0.2rem;" title="Excluir Atividade">
                         <i class="fa-solid fa-trash-can"></i>
@@ -3167,6 +3238,22 @@ function renderCadastrosView() {
             const rowCheckbox = tr.querySelector('.cadastros-row-checkbox');
             rowCheckbox.addEventListener('change', () => {
                 updateBulkDeleteState();
+            });
+            
+            const rpaCheckbox = tr.querySelector('.cb-activity-rpa');
+            rpaCheckbox.addEventListener('change', (e) => {
+                proc.isRpa = e.target.checked;
+                saveState();
+                renderTable();
+                renderBalancingTable();
+                renderReviewTable();
+                renderAutomationsView();
+                
+                const labelText = tr.querySelector('.label-rpa-text');
+                if (labelText) {
+                    labelText.style.color = e.target.checked ? '#a78bfa' : 'var(--text-muted)';
+                    labelText.style.fontWeight = e.target.checked ? '600' : 'normal';
+                }
             });
             
             const nameInput = tr.querySelector('.input-activity-name-cell');
@@ -3660,5 +3747,138 @@ async function updateUserProfile(userId, newPerfil, selectEl) {
     } finally {
         if (selectEl) selectEl.disabled = false;
     }
+}
+
+// RENDER AUTOMATIONS VIEW (QUADRO DE AUTOMAÇÕES & RPA)
+function renderAutomationsView() {
+    const tableBody = document.getElementById('rpa-table-body');
+    const emptyState = document.getElementById('rpa-empty-state');
+    const areaFilter = document.getElementById('filter-area-rpa') ? document.getElementById('filter-area-rpa').value : 'all';
+    
+    if (!tableBody) return;
+    tableBody.innerHTML = '';
+    
+    // Populate area filter options for RPA view if needed
+    const filterSelect = document.getElementById('filter-area-rpa');
+    if (filterSelect) {
+        const currentVal = filterSelect.value;
+        filterSelect.innerHTML = '<option value="all">Todas as Áreas</option>';
+        (state.teams || []).forEach(t => {
+            const opt = document.createElement('option');
+            opt.value = t;
+            opt.textContent = t;
+            if (t === currentVal) opt.selected = true;
+            filterSelect.appendChild(opt);
+        });
+    }
+    
+    const rpaProcesses = (state.processes || []).filter(p => {
+        if (!isRpaActivity(p)) return false;
+        if (areaFilter !== 'all' && p.area !== areaFilter) return false;
+        return true;
+    });
+    
+    let totalRpaCount = 0;
+    let totalRpaHours = 0;
+    let totalRpaFtePct = 0;
+    
+    // Calculate stats over all RPA processes
+    (state.processes || []).filter(p => isRpaActivity(p)).forEach(p => {
+        totalRpaCount++;
+        const isStopped = p.reviewStatus === 'Parar';
+        const hasVolume = p.volume !== null && p.volume !== '';
+        const multiplier = isStopped ? 0 : (hasVolume ? parseFloat(p.volume) : (p.qtdExecucao !== null && p.qtdExecucao !== '' ? parseFloat(p.qtdExecucao) : 0));
+        const minutes = isStopped ? 0 : (p.minutos !== null && p.minutos !== '' ? parseFloat(p.minutos) : 0);
+        const totalHours = (multiplier * minutes) / 60;
+        
+        const respParams = getResponsibleParams(p.responsavel);
+        const pHorasRealDia = respParams.horasDia * (1 - respParams.absenteismo / 100);
+        const pHorasTrabalhoMes = pHorasRealDia * respParams.diasUteis;
+        const ftePct = pHorasTrabalhoMes > 0 ? (totalHours / pHorasTrabalhoMes) * 100 : 0;
+        
+        totalRpaHours += totalHours;
+        totalRpaFtePct += ftePct;
+    });
+    
+    const totalCount = (state.processes || []).length;
+    const totalFtePct = (state.processes || []).reduce((acc, p) => {
+        const isStopped = p.reviewStatus === 'Parar';
+        const hasVolume = p.volume !== null && p.volume !== '';
+        const multiplier = isStopped ? 0 : (hasVolume ? parseFloat(p.volume) : (p.qtdExecucao !== null && p.qtdExecucao !== '' ? parseFloat(p.qtdExecucao) : 0));
+        const minutes = isStopped ? 0 : (p.minutos !== null && p.minutos !== '' ? parseFloat(p.minutos) : 0);
+        const totalHours = (multiplier * minutes) / 60;
+        const respParams = getResponsibleParams(p.responsavel);
+        const pHorasRealDia = respParams.horasDia * (1 - respParams.absenteismo / 100);
+        const pHorasTrabalhoMes = pHorasRealDia * respParams.diasUteis;
+        return acc + (pHorasTrabalhoMes > 0 ? (totalHours / pHorasTrabalhoMes) * 100 : 0);
+    }, 0);
+    
+    const totalRpaFteDec = totalRpaFtePct / 100;
+    const pctRpaCount = totalCount > 0 ? (totalRpaCount / totalCount * 100) : 0;
+    const pctRpaFte = totalFtePct > 0 ? (totalRpaFtePct / totalFtePct * 100) : 0;
+    
+    const elViewCount = document.getElementById('rpa-view-total-count');
+    if (elViewCount) elViewCount.textContent = totalRpaCount;
+    const elViewCountSub = document.getElementById('rpa-view-total-count-sub');
+    if (elViewCountSub) elViewCountSub.textContent = `${pctRpaCount.toFixed(1)}% das atividades`;
+    
+    const elViewFte = document.getElementById('rpa-view-total-fte');
+    if (elViewFte) elViewFte.textContent = totalRpaFteDec.toFixed(2);
+    const elViewFteSub = document.getElementById('rpa-view-total-fte-sub');
+    if (elViewFteSub) elViewFteSub.textContent = `${pctRpaFte.toFixed(1)}% do capacity total`;
+    
+    const elViewHours = document.getElementById('rpa-view-total-hours');
+    if (elViewHours) elViewHours.textContent = totalRpaHours.toFixed(1) + 'h';
+    
+    if (rpaProcesses.length === 0) {
+        const rpaTableEl = document.getElementById('rpa-table');
+        if (rpaTableEl) rpaTableEl.style.display = 'none';
+        if (emptyState) emptyState.style.display = 'block';
+        return;
+    }
+    
+    const rpaTableEl = document.getElementById('rpa-table');
+    if (rpaTableEl) rpaTableEl.style.display = 'table';
+    if (emptyState) emptyState.style.display = 'none';
+    
+    rpaProcesses.forEach(proc => {
+        const isStopped = proc.reviewStatus === 'Parar';
+        const hasVolume = proc.volume !== null && proc.volume !== '';
+        const multiplier = isStopped ? 0 : (hasVolume ? parseFloat(proc.volume) : (proc.qtdExecucao !== null && proc.qtdExecucao !== '' ? parseFloat(proc.qtdExecucao) : 0));
+        const minutes = isStopped ? 0 : (proc.minutos !== null && proc.minutos !== '' ? parseFloat(proc.minutos) : 0);
+        const totalHours = (multiplier * minutes) / 60;
+        
+        const respParams = getResponsibleParams(proc.responsavel);
+        const pHorasRealDia = respParams.horasDia * (1 - respParams.absenteismo / 100);
+        const pHorasTrabalhoMes = pHorasRealDia * respParams.diasUteis;
+        const ftePct = pHorasTrabalhoMes > 0 ? (totalHours / pHorasTrabalhoMes) * 100 : 0;
+        const fteDec = ftePct / 100;
+        
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td>
+                <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                    <span style="font-weight: 600; color: var(--text-primary);">${escapeHtml(proc.name)}</span>
+                    <span style="font-size: 0.72rem; padding: 0.15rem 0.45rem; border-radius: 12px; background: rgba(139, 92, 246, 0.15); color: #a78bfa; border: 1px solid rgba(139, 92, 246, 0.3); font-weight: 600;"><i class="fa-solid fa-robot" style="font-size: 0.65rem; margin-right: 0.25rem;"></i>RPA</span>
+                </div>
+            </td>
+            <td>
+                <span class="badge-area" style="font-size: 0.85rem; padding: 0.25rem 0.5rem; border-radius: 4px; background: rgba(235, 92, 39, 0.08); color: var(--color-primary); border: 1px solid rgba(235, 92, 39, 0.15);">${escapeHtml(proc.area || 'Sem Equipe')}</span>
+            </td>
+            <td>
+                <span style="font-size: 0.9rem; color: var(--text-secondary);">${escapeHtml(proc.responsavel || 'Sem Responsável')}</span>
+            </td>
+            <td>
+                <span style="font-size: 0.9rem; color: var(--text-primary);">${escapeHtml(proc.produto || '-')}</span>
+            </td>
+            <td>
+                <div style="display: flex; flex-direction: column;">
+                    <span style="font-weight: 700; color: #a78bfa;">${fteDec.toFixed(2)} FTE (${ftePct.toFixed(2)}%)</span>
+                    <span style="font-size: 0.75rem; color: var(--text-muted);">${totalHours.toFixed(1)}h/mês</span>
+                </div>
+            </td>
+        `;
+        tableBody.appendChild(tr);
+    });
 }
 

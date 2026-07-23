@@ -567,6 +567,16 @@ body.light-theme .readonly-group {
     color: var(--color-danger);
     box-shadow: 0 0 15px rgba(244, 63, 94, 0.2);
 }
+.cyan-glow {
+    background: rgba(6, 182, 212, 0.1);
+    color: #06b6d4;
+    box-shadow: 0 0 15px rgba(6, 182, 212, 0.25);
+}
+.robot-glow {
+    background: rgba(139, 92, 246, 0.12);
+    color: #a78bfa;
+    box-shadow: 0 0 15px rgba(139, 92, 246, 0.25);
+}
 
 .widget-info h3 {
     font-size: 0.85rem;
@@ -1685,6 +1695,10 @@ body.light-theme .select-review-area option, body.light-theme .select-review-sta
                     <i class="fa-solid fa-clipboard-check"></i>
                     <span>RevisÃ£o</span>
                 </li>
+                <li class="menu-item" data-view="automations" title="Quadro de AutomaÃ§Ãµes (RPA)">
+                    <i class="fa-solid fa-robot"></i>
+                    <span>AutomaÃ§Ãµes</span>
+                </li>
                 <li class="menu-item" data-view="history" title="HistÃ³rico de Volumes">
                     <i class="fa-solid fa-chart-line"></i>
                     <span>HistÃ³rico</span>
@@ -1798,10 +1812,11 @@ body.light-theme .select-review-area option, body.light-theme .select-review-sta
                                     <thead>
                                         <tr>
                                             <th class="col-excluir-admin" style="width: 4%; text-align: center;"><input type="checkbox" id="cadastros-select-all" data-permissao="ADMIN"></th>
-                                            <th style="width: 32%;">Nome da Atividade / Demanda</th>
-                                            <th style="width: 20%;">Equipe / Ãrea ResponsÃ¡vel</th>
-                                            <th style="width: 20%;">ResponsÃ¡vel</th>
-                                            <th style="width: 19%;">Produto</th>
+                                            <th style="width: 28%;">Nome da Atividade / Demanda</th>
+                                            <th style="width: 18%;">Equipe / Ãrea ResponsÃ¡vel</th>
+                                            <th style="width: 18%;">ResponsÃ¡vel</th>
+                                            <th style="width: 15%;">Produto</th>
+                                            <th style="width: 12%; text-align: center;">AutomaÃ§Ã£o (RPA)</th>
                                             <th class="col-excluir-admin" style="width: 5%; text-align: center;">Excluir</th>
                                         </tr>
                                     </thead>
@@ -1840,6 +1855,28 @@ body.light-theme .select-review-area option, body.light-theme .select-review-sta
                                         <h3>Total de Atividades</h3>
                                         <p class="widget-value" id="widget-activity-count">0</p>
                                         <span class="widget-sub">Atividades cadastradas</span>
+                                    </div>
+                                </div>
+
+                                <div class="widget-card glass-panel count-card">
+                                    <div class="widget-icon robot-glow">
+                                        <i class="fa-solid fa-robot"></i>
+                                    </div>
+                                    <div class="widget-info">
+                                        <h3>Atividades em RPA</h3>
+                                        <p class="widget-value" id="widget-rpa-count">0</p>
+                                        <span class="widget-sub" id="widget-rpa-count-sub">0.0% das atividades</span>
+                                    </div>
+                                </div>
+
+                                <div class="widget-card glass-panel count-card">
+                                    <div class="widget-icon cyan-glow">
+                                        <i class="fa-solid fa-microchip"></i>
+                                    </div>
+                                    <div class="widget-info">
+                                        <h3>Capacity RPA (FTEs)</h3>
+                                        <p class="widget-value" id="widget-rpa-fte">0.00</p>
+                                        <span class="widget-sub" id="widget-rpa-fte-sub">0.0% do capacity total</span>
                                     </div>
                                 </div>
                             </section>
@@ -2141,6 +2178,87 @@ body.light-theme .select-review-area option, body.light-theme .select-review-sta
                             <i class="fa-solid fa-folder-open empty-icon"></i>
                             <h3>Nenhuma atividade cadastrada</h3>
                             <p>Cadastre atividades no menu Dashboard para poder revisÃ¡-las aqui.</p>
+                        </div>
+                    </section>
+                </div>
+
+                <!-- AUTOMATIONS VIEW (QUADRO DE AUTOMAÃ‡Ã•ES & RPA) -->
+                <div id="view-automations" class="tab-view" style="display: none;">
+                    <!-- TOP AUTOMATIONS KPI CARDS -->
+                    <section class="dashboard-widgets" style="grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));">
+                        <div class="widget-card glass-panel count-card">
+                            <div class="widget-icon robot-glow">
+                                <i class="fa-solid fa-robot"></i>
+                            </div>
+                            <div class="widget-info">
+                                <h3>Total de AutomaÃ§Ãµes (RPA)</h3>
+                                <p class="widget-value" id="rpa-view-total-count">0</p>
+                                <span class="widget-sub" id="rpa-view-total-count-sub">0.0% das atividades</span>
+                            </div>
+                        </div>
+
+                        <div class="widget-card glass-panel count-card">
+                            <div class="widget-icon cyan-glow">
+                                <i class="fa-solid fa-microchip"></i>
+                            </div>
+                            <div class="widget-info">
+                                <h3>Capacity Automatizado (FTEs)</h3>
+                                <p class="widget-value" id="rpa-view-total-fte">0.00</p>
+                                <span class="widget-sub" id="rpa-view-total-fte-sub">0.0% do capacity total</span>
+                            </div>
+                        </div>
+
+                        <div class="widget-card glass-panel count-card">
+                            <div class="widget-icon primary-glow">
+                                <i class="fa-solid fa-hourglass-half"></i>
+                            </div>
+                            <div class="widget-info">
+                                <h3>Horas Economizadas / MÃªs</h3>
+                                <p class="widget-value" id="rpa-view-total-hours">0.0h</p>
+                                <span class="widget-sub">em execuÃ§Ã£o automÃ¡tica</span>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- MAIN QUADRO DE AUTOMAÃ‡Ã•ES PANEL -->
+                    <section class="panel glass-panel table-panel">
+                        <div class="panel-header-actions">
+                            <h2 class="panel-title">
+                                <i class="fa-solid fa-robot"></i> Quadro de AutomaÃ§Ãµes (RPA)
+                            </h2>
+                            <div class="header-table-controls">
+                                <div class="filter-group">
+                                    <i class="fa-solid fa-filter"></i>
+                                    <select id="filter-area-rpa">
+                                        <option value="all">Todas as Ãreas</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="table-responsive">
+                            <table class="fte-table" id="rpa-table">
+                                <thead>
+                                    <tr>
+                                        <th style="width: 32%;">Processo / Atividade Automatizada</th>
+                                        <th style="width: 18%;">Equipe / Ãrea</th>
+                                        <th style="width: 18%;">ResponsÃ¡vel</th>
+                                        <th style="width: 15%;">Produto</th>
+                                        <th style="width: 17%;">Capacity (FTE / %)</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="rpa-table-body">
+                                    <!-- Populated dynamically -->
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="empty-state-container" id="rpa-empty-state" style="display: none; padding: 3rem 1.5rem; text-align: center;">
+                            <i class="fa-solid fa-robot empty-icon" style="font-size: 3rem; color: #a78bfa; margin-bottom: 1rem; opacity: 0.8;"></i>
+                            <h3 style="color: var(--text-primary); font-size: 1.2rem; margin-bottom: 0.5rem;">Nenhuma atividade configurada como RPA / AutomaÃ§Ã£o</h3>
+                            <p style="color: var(--text-muted); font-size: 0.9rem; max-width: 500px; margin: 0 auto;">
+                                Para adicionar uma atividade ao quadro de AutomaÃ§Ãµes, marque a opÃ§Ã£o <strong>ðŸ¤– RPA</strong> no menu <strong>Cadastro</strong> ou inclua <strong>RPA / RobÃ´</strong> no nome da atividade.
+                            </p>
                         </div>
                     </section>
                 </div>
@@ -3164,10 +3282,23 @@ async function loadStateFromSupabase() {
     }
 }
 
+function isRpaActivity(proc) {
+    if (!proc) return false;
+    if (proc.isRpa === true || proc.isRpa === 'true' || proc.isRpa === 1) return true;
+    const str = `${proc.name || ''} ${proc.area || ''} ${proc.produto || ''} ${proc.responsavel || ''}`.toLowerCase();
+    return str.includes('rpa') || str.includes('robÃ´') || str.includes('robo') || str.includes('bot') || str.includes('automaÃ§Ã£o') || str.includes('automacao');
+}
+
 // STATE MIGRATIONS HELPER
 function applyStateMigrations() {
-    if (!state) return;
-    if (!state.customAreas) state.customAreas = [];
+    if (!state.params) {
+        state.params = {
+            horasDia: 8.0,
+            absenteismo: 0,
+            diasUteis: 21,
+            teamSize: 1
+        };
+    }
     if (!state.areaAllocations) state.areaAllocations = {};
     if (!state.processes) state.processes = [];
 
@@ -3179,6 +3310,7 @@ function applyStateMigrations() {
         if (p.reviewStatus === undefined) p.reviewStatus = 'Manter';
         if (p.responsavel === undefined) p.responsavel = '';
         if (p.produto === undefined) p.produto = '';
+        if (p.isRpa === undefined) p.isRpa = false;
     });
     if (state.history === undefined) state.history = [];
     if (state.teams === undefined) {
@@ -3405,10 +3537,13 @@ function setupEventListeners() {
                 headerTitle.textContent = 'Balanceamento de Backlog';
                 renderBalancingTable();
             } else if (view === 'review') {
-                headerTitle.textContent = 'RevisÃƒÂ£o de Atividades';
+                headerTitle.textContent = 'RevisÃ£o de Atividades';
                 renderReviewTable();
+            } else if (view === 'automations') {
+                headerTitle.textContent = 'Quadro de AutomaÃ§Ãµes (RPA)';
+                renderAutomationsView();
             } else if (view === 'history') {
-                headerTitle.textContent = 'HistÃƒÂ³rico de Volumes';
+                headerTitle.textContent = 'HistÃ³rico de Volumes';
                 initHistoryView();
             } else if (view === 'access-control') {
                 headerTitle.textContent = 'Controle de Acesso';
@@ -3731,6 +3866,7 @@ function renderTable() {
                     <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
                         <span style="font-weight: 500; color: var(--text-primary);">${escapeHtml(proc.name)}</span>
                         ${proc.produto ? `<span style="font-size: 0.72rem; padding: 0.15rem 0.45rem; border-radius: 12px; background: rgba(99, 102, 241, 0.12); color: #818cf8; border: 1px solid rgba(99, 102, 241, 0.25); font-weight: 500;"><i class="fa-solid fa-box-open" style="font-size: 0.65rem; margin-right: 0.25rem;"></i>${escapeHtml(proc.produto)}</span>` : ''}
+                        ${isRpaActivity(proc) ? `<span style="font-size: 0.72rem; padding: 0.15rem 0.45rem; border-radius: 12px; background: rgba(139, 92, 246, 0.15); color: #a78bfa; border: 1px solid rgba(139, 92, 246, 0.3); font-weight: 600;"><i class="fa-solid fa-robot" style="font-size: 0.65rem; margin-right: 0.25rem;"></i>RPA</span>` : ''}
                     </div>
                     ${proc.reviewStatus && proc.reviewStatus !== 'Manter' ? `<span class="badge-review badge-review-${proc.reviewStatus.toLowerCase()}">${proc.reviewStatus}</span>` : ''}
                 </div>
@@ -4051,6 +4187,49 @@ function updateCalculations() {
         widgetActivity.textContent = state.processes.length;
     }
 
+    // Calculate & Update RPA Widgets
+    let rpaCount = 0;
+    let rpaHoursAccum = 0;
+    let rpaFtePctAccum = 0;
+
+    state.processes.forEach(proc => {
+        if (!isRpaActivity(proc)) return;
+        rpaCount++;
+
+        const isStopped = proc.reviewStatus === 'Parar';
+        const hasVolume = proc.volume !== null && proc.volume !== '';
+        const multiplier = isStopped ? 0 : (hasVolume ? parseFloat(proc.volume) : (proc.qtdExecucao !== null && proc.qtdExecucao !== '' ? parseFloat(proc.qtdExecucao) : 0));
+        const minutes = isStopped ? 0 : (proc.minutos !== null && proc.minutos !== '' ? parseFloat(proc.minutos) : 0);
+        
+        const totalMinutes = multiplier * minutes;
+        const totalHours = totalMinutes / 60;
+        
+        const respParams = getResponsibleParams(proc.responsavel);
+        const pHorasRealDia = respParams.horasDia * (1 - respParams.absenteismo / 100);
+        const pHorasTrabalhoMes = pHorasRealDia * respParams.diasUteis;
+        const ftePct = pHorasTrabalhoMes > 0 ? (totalHours / pHorasTrabalhoMes) * 100 : 0;
+
+        rpaHoursAccum += totalHours;
+        rpaFtePctAccum += ftePct;
+    });
+
+    const rpaFteDecAccum = rpaFtePctAccum / 100;
+    const totalCount = state.processes.length;
+    const pctRpaCount = totalCount > 0 ? (rpaCount / totalCount * 100) : 0;
+    const pctRpaFte = totalFtePctAccum > 0 ? (rpaFtePctAccum / totalFtePctAccum * 100) : 0;
+
+    const elRpaCount = document.getElementById('widget-rpa-count');
+    if (elRpaCount) elRpaCount.textContent = rpaCount;
+
+    const elRpaCountSub = document.getElementById('widget-rpa-count-sub');
+    if (elRpaCountSub) elRpaCountSub.textContent = `${pctRpaCount.toFixed(1)}% das atividades`;
+
+    const elRpaFte = document.getElementById('widget-rpa-fte');
+    if (elRpaFte) elRpaFte.textContent = rpaFteDecAccum.toFixed(2);
+
+    const elRpaFteSub = document.getElementById('widget-rpa-fte-sub');
+    if (elRpaFteSub) elRpaFteSub.textContent = `${pctRpaFte.toFixed(1)}% do capacity total`;
+
     // Update placeholders for responsible overrides inputs in-place to avoid re-rendering layout
     const horasInputs = document.querySelectorAll('.override-horas');
     horasInputs.forEach(inp => {
@@ -4297,6 +4476,7 @@ function addNewProcess() {
         area: defaultArea,
         responsavel: '',
         produto: '',
+        isRpa: false,
         volume: '',
         minutos: 0,
         qtdExecucao: '',
@@ -4328,6 +4508,7 @@ function duplicateProcess(proc) {
         area: proc.area,
         responsavel: proc.responsavel || '',
         produto: proc.produto || '',
+        isRpa: proc.isRpa || false,
         volume: proc.volume,
         minutos: proc.minutos,
         qtdExecucao: proc.qtdExecucao,
@@ -5567,7 +5748,7 @@ function renderCadastrosView() {
     if (state.processes.length === 0) {
         tableBody.innerHTML = `
             <tr>
-                <td colspan="6" style="text-align: center; color: var(--text-muted); padding: 2rem;">
+                <td colspan="7" style="text-align: center; color: var(--text-muted); padding: 2rem;">
                     Nenhuma atividade cadastrada. Clique em "Adicionar Atividade" para iniciar.
                 </td>
             </tr>
@@ -5597,7 +5778,7 @@ function renderCadastrosView() {
         const headerTr = document.createElement('tr');
         headerTr.style.cssText = 'background: rgba(255,255,255,0.03); cursor: pointer; user-select: none;';
         headerTr.innerHTML = `
-            <td colspan="6" style="padding: 0.8rem; font-weight: 600; color: var(--text-primary); border-top: 1px solid rgba(255,255,255,0.05); border-bottom: 1px solid rgba(255,255,255,0.05);">
+            <td colspan="7" style="padding: 0.8rem; font-weight: 600; color: var(--text-primary); border-top: 1px solid rgba(255,255,255,0.05); border-bottom: 1px solid rgba(255,255,255,0.05);">
                 <i class="fa-solid fa-chevron-right" style="width: 20px;"></i> ${escapeHtml(team)} <span style="background: rgba(255,255,255,0.1); color: var(--text-secondary); padding: 0.1rem 0.5rem; border-radius: 10px; font-size: 0.75rem; margin-left: 0.5rem;">${teamProcs.length} atividades</span>
             </td>
         `;
@@ -5628,6 +5809,8 @@ function renderCadastrosView() {
                     return `<option value="${escapeHtml(rName)}" ${proc.responsavel === rName ? 'selected' : ''}>${escapeHtml(rName)}</option>`;
                 }).join('');
                 
+            const isRpa = isRpaActivity(proc);
+            
             tr.innerHTML = `
                 <td style="text-align: center;">
                     <input type="checkbox" class="cadastros-row-checkbox" data-id="${proc.id}">
@@ -5648,6 +5831,12 @@ function renderCadastrosView() {
                 <td>
                     <input type="text" class="input-activity-product-cell" value="${escapeHtml(proc.produto || '')}" placeholder="Produto (Opcional)" style="width: 100%; border: none; background: transparent; color: var(--text-primary); outline: none; padding: 0.3rem 0.5rem; border-radius: 4px;">
                 </td>
+                <td style="text-align: center;">
+                    <label style="display: inline-flex; align-items: center; gap: 0.35rem; cursor: pointer; font-size: 0.8rem; user-select: none;">
+                        <input type="checkbox" class="cb-activity-rpa" ${isRpa ? 'checked' : ''}>
+                        <span class="label-rpa-text" style="${isRpa ? 'color: #a78bfa; font-weight: 600;' : 'color: var(--text-muted);'}">ðŸ¤– RPA</span>
+                    </label>
+                </td>
                 <td class="col-excluir-admin" style="text-align: center;">
                     <button class="btn-row-action btn-delete-activity-cell" style="background: transparent; border: none; color: var(--color-danger); cursor: pointer; font-size: 0.95rem; padding: 0.2rem;" title="Excluir Atividade">
                         <i class="fa-solid fa-trash-can"></i>
@@ -5658,6 +5847,22 @@ function renderCadastrosView() {
             const rowCheckbox = tr.querySelector('.cadastros-row-checkbox');
             rowCheckbox.addEventListener('change', () => {
                 updateBulkDeleteState();
+            });
+            
+            const rpaCheckbox = tr.querySelector('.cb-activity-rpa');
+            rpaCheckbox.addEventListener('change', (e) => {
+                proc.isRpa = e.target.checked;
+                saveState();
+                renderTable();
+                renderBalancingTable();
+                renderReviewTable();
+                renderAutomationsView();
+                
+                const labelText = tr.querySelector('.label-rpa-text');
+                if (labelText) {
+                    labelText.style.color = e.target.checked ? '#a78bfa' : 'var(--text-muted)';
+                    labelText.style.fontWeight = e.target.checked ? '600' : 'normal';
+                }
             });
             
             const nameInput = tr.querySelector('.input-activity-name-cell');
@@ -6151,6 +6356,139 @@ async function updateUserProfile(userId, newPerfil, selectEl) {
     } finally {
         if (selectEl) selectEl.disabled = false;
     }
+}
+
+// RENDER AUTOMATIONS VIEW (QUADRO DE AUTOMAÃ‡Ã•ES & RPA)
+function renderAutomationsView() {
+    const tableBody = document.getElementById('rpa-table-body');
+    const emptyState = document.getElementById('rpa-empty-state');
+    const areaFilter = document.getElementById('filter-area-rpa') ? document.getElementById('filter-area-rpa').value : 'all';
+    
+    if (!tableBody) return;
+    tableBody.innerHTML = '';
+    
+    // Populate area filter options for RPA view if needed
+    const filterSelect = document.getElementById('filter-area-rpa');
+    if (filterSelect) {
+        const currentVal = filterSelect.value;
+        filterSelect.innerHTML = '<option value="all">Todas as Ãreas</option>';
+        (state.teams || []).forEach(t => {
+            const opt = document.createElement('option');
+            opt.value = t;
+            opt.textContent = t;
+            if (t === currentVal) opt.selected = true;
+            filterSelect.appendChild(opt);
+        });
+    }
+    
+    const rpaProcesses = (state.processes || []).filter(p => {
+        if (!isRpaActivity(p)) return false;
+        if (areaFilter !== 'all' && p.area !== areaFilter) return false;
+        return true;
+    });
+    
+    let totalRpaCount = 0;
+    let totalRpaHours = 0;
+    let totalRpaFtePct = 0;
+    
+    // Calculate stats over all RPA processes
+    (state.processes || []).filter(p => isRpaActivity(p)).forEach(p => {
+        totalRpaCount++;
+        const isStopped = p.reviewStatus === 'Parar';
+        const hasVolume = p.volume !== null && p.volume !== '';
+        const multiplier = isStopped ? 0 : (hasVolume ? parseFloat(p.volume) : (p.qtdExecucao !== null && p.qtdExecucao !== '' ? parseFloat(p.qtdExecucao) : 0));
+        const minutes = isStopped ? 0 : (p.minutos !== null && p.minutos !== '' ? parseFloat(p.minutos) : 0);
+        const totalHours = (multiplier * minutes) / 60;
+        
+        const respParams = getResponsibleParams(p.responsavel);
+        const pHorasRealDia = respParams.horasDia * (1 - respParams.absenteismo / 100);
+        const pHorasTrabalhoMes = pHorasRealDia * respParams.diasUteis;
+        const ftePct = pHorasTrabalhoMes > 0 ? (totalHours / pHorasTrabalhoMes) * 100 : 0;
+        
+        totalRpaHours += totalHours;
+        totalRpaFtePct += ftePct;
+    });
+    
+    const totalCount = (state.processes || []).length;
+    const totalFtePct = (state.processes || []).reduce((acc, p) => {
+        const isStopped = p.reviewStatus === 'Parar';
+        const hasVolume = p.volume !== null && p.volume !== '';
+        const multiplier = isStopped ? 0 : (hasVolume ? parseFloat(p.volume) : (p.qtdExecucao !== null && p.qtdExecucao !== '' ? parseFloat(p.qtdExecucao) : 0));
+        const minutes = isStopped ? 0 : (p.minutos !== null && p.minutos !== '' ? parseFloat(p.minutos) : 0);
+        const totalHours = (multiplier * minutes) / 60;
+        const respParams = getResponsibleParams(p.responsavel);
+        const pHorasRealDia = respParams.horasDia * (1 - respParams.absenteismo / 100);
+        const pHorasTrabalhoMes = pHorasRealDia * respParams.diasUteis;
+        return acc + (pHorasTrabalhoMes > 0 ? (totalHours / pHorasTrabalhoMes) * 100 : 0);
+    }, 0);
+    
+    const totalRpaFteDec = totalRpaFtePct / 100;
+    const pctRpaCount = totalCount > 0 ? (totalRpaCount / totalCount * 100) : 0;
+    const pctRpaFte = totalFtePct > 0 ? (totalRpaFtePct / totalFtePct * 100) : 0;
+    
+    const elViewCount = document.getElementById('rpa-view-total-count');
+    if (elViewCount) elViewCount.textContent = totalRpaCount;
+    const elViewCountSub = document.getElementById('rpa-view-total-count-sub');
+    if (elViewCountSub) elViewCountSub.textContent = `${pctRpaCount.toFixed(1)}% das atividades`;
+    
+    const elViewFte = document.getElementById('rpa-view-total-fte');
+    if (elViewFte) elViewFte.textContent = totalRpaFteDec.toFixed(2);
+    const elViewFteSub = document.getElementById('rpa-view-total-fte-sub');
+    if (elViewFteSub) elViewFteSub.textContent = `${pctRpaFte.toFixed(1)}% do capacity total`;
+    
+    const elViewHours = document.getElementById('rpa-view-total-hours');
+    if (elViewHours) elViewHours.textContent = totalRpaHours.toFixed(1) + 'h';
+    
+    if (rpaProcesses.length === 0) {
+        const rpaTableEl = document.getElementById('rpa-table');
+        if (rpaTableEl) rpaTableEl.style.display = 'none';
+        if (emptyState) emptyState.style.display = 'block';
+        return;
+    }
+    
+    const rpaTableEl = document.getElementById('rpa-table');
+    if (rpaTableEl) rpaTableEl.style.display = 'table';
+    if (emptyState) emptyState.style.display = 'none';
+    
+    rpaProcesses.forEach(proc => {
+        const isStopped = proc.reviewStatus === 'Parar';
+        const hasVolume = proc.volume !== null && proc.volume !== '';
+        const multiplier = isStopped ? 0 : (hasVolume ? parseFloat(proc.volume) : (proc.qtdExecucao !== null && proc.qtdExecucao !== '' ? parseFloat(proc.qtdExecucao) : 0));
+        const minutes = isStopped ? 0 : (proc.minutos !== null && proc.minutos !== '' ? parseFloat(proc.minutos) : 0);
+        const totalHours = (multiplier * minutes) / 60;
+        
+        const respParams = getResponsibleParams(proc.responsavel);
+        const pHorasRealDia = respParams.horasDia * (1 - respParams.absenteismo / 100);
+        const pHorasTrabalhoMes = pHorasRealDia * respParams.diasUteis;
+        const ftePct = pHorasTrabalhoMes > 0 ? (totalHours / pHorasTrabalhoMes) * 100 : 0;
+        const fteDec = ftePct / 100;
+        
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td>
+                <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                    <span style="font-weight: 600; color: var(--text-primary);">${escapeHtml(proc.name)}</span>
+                    <span style="font-size: 0.72rem; padding: 0.15rem 0.45rem; border-radius: 12px; background: rgba(139, 92, 246, 0.15); color: #a78bfa; border: 1px solid rgba(139, 92, 246, 0.3); font-weight: 600;"><i class="fa-solid fa-robot" style="font-size: 0.65rem; margin-right: 0.25rem;"></i>RPA</span>
+                </div>
+            </td>
+            <td>
+                <span class="badge-area" style="font-size: 0.85rem; padding: 0.25rem 0.5rem; border-radius: 4px; background: rgba(235, 92, 39, 0.08); color: var(--color-primary); border: 1px solid rgba(235, 92, 39, 0.15);">${escapeHtml(proc.area || 'Sem Equipe')}</span>
+            </td>
+            <td>
+                <span style="font-size: 0.9rem; color: var(--text-secondary);">${escapeHtml(proc.responsavel || 'Sem ResponsÃ¡vel')}</span>
+            </td>
+            <td>
+                <span style="font-size: 0.9rem; color: var(--text-primary);">${escapeHtml(proc.produto || '-')}</span>
+            </td>
+            <td>
+                <div style="display: flex; flex-direction: column;">
+                    <span style="font-weight: 700; color: #a78bfa;">${fteDec.toFixed(2)} FTE (${ftePct.toFixed(2)}%)</span>
+                    <span style="font-size: 0.75rem; color: var(--text-muted);">${totalHours.toFixed(1)}h/mÃªs</span>
+                </div>
+            </td>
+        `;
+        tableBody.appendChild(tr);
+    });
 }
 
 

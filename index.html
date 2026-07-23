@@ -58,6 +58,10 @@
                     <i class="fa-solid fa-clipboard-check"></i>
                     <span>Revisão</span>
                 </li>
+                <li class="menu-item" data-view="automations" title="Quadro de Automações (RPA)">
+                    <i class="fa-solid fa-robot"></i>
+                    <span>Automações</span>
+                </li>
                 <li class="menu-item" data-view="history" title="Histórico de Volumes">
                     <i class="fa-solid fa-chart-line"></i>
                     <span>Histórico</span>
@@ -171,10 +175,11 @@
                                     <thead>
                                         <tr>
                                             <th class="col-excluir-admin" style="width: 4%; text-align: center;"><input type="checkbox" id="cadastros-select-all" data-permissao="ADMIN"></th>
-                                            <th style="width: 32%;">Nome da Atividade / Demanda</th>
-                                            <th style="width: 20%;">Equipe / Área Responsável</th>
-                                            <th style="width: 20%;">Responsável</th>
-                                            <th style="width: 19%;">Produto</th>
+                                            <th style="width: 28%;">Nome da Atividade / Demanda</th>
+                                            <th style="width: 18%;">Equipe / Área Responsável</th>
+                                            <th style="width: 18%;">Responsável</th>
+                                            <th style="width: 15%;">Produto</th>
+                                            <th style="width: 12%; text-align: center;">Automação (RPA)</th>
                                             <th class="col-excluir-admin" style="width: 5%; text-align: center;">Excluir</th>
                                         </tr>
                                     </thead>
@@ -213,6 +218,28 @@
                                         <h3>Total de Atividades</h3>
                                         <p class="widget-value" id="widget-activity-count">0</p>
                                         <span class="widget-sub">Atividades cadastradas</span>
+                                    </div>
+                                </div>
+
+                                <div class="widget-card glass-panel count-card">
+                                    <div class="widget-icon robot-glow">
+                                        <i class="fa-solid fa-robot"></i>
+                                    </div>
+                                    <div class="widget-info">
+                                        <h3>Atividades em RPA</h3>
+                                        <p class="widget-value" id="widget-rpa-count">0</p>
+                                        <span class="widget-sub" id="widget-rpa-count-sub">0.0% das atividades</span>
+                                    </div>
+                                </div>
+
+                                <div class="widget-card glass-panel count-card">
+                                    <div class="widget-icon cyan-glow">
+                                        <i class="fa-solid fa-microchip"></i>
+                                    </div>
+                                    <div class="widget-info">
+                                        <h3>Capacity RPA (FTEs)</h3>
+                                        <p class="widget-value" id="widget-rpa-fte">0.00</p>
+                                        <span class="widget-sub" id="widget-rpa-fte-sub">0.0% do capacity total</span>
                                     </div>
                                 </div>
                             </section>
@@ -514,6 +541,87 @@
                             <i class="fa-solid fa-folder-open empty-icon"></i>
                             <h3>Nenhuma atividade cadastrada</h3>
                             <p>Cadastre atividades no menu Dashboard para poder revisá-las aqui.</p>
+                        </div>
+                    </section>
+                </div>
+
+                <!-- AUTOMATIONS VIEW (QUADRO DE AUTOMAÇÕES & RPA) -->
+                <div id="view-automations" class="tab-view" style="display: none;">
+                    <!-- TOP AUTOMATIONS KPI CARDS -->
+                    <section class="dashboard-widgets" style="grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));">
+                        <div class="widget-card glass-panel count-card">
+                            <div class="widget-icon robot-glow">
+                                <i class="fa-solid fa-robot"></i>
+                            </div>
+                            <div class="widget-info">
+                                <h3>Total de Automações (RPA)</h3>
+                                <p class="widget-value" id="rpa-view-total-count">0</p>
+                                <span class="widget-sub" id="rpa-view-total-count-sub">0.0% das atividades</span>
+                            </div>
+                        </div>
+
+                        <div class="widget-card glass-panel count-card">
+                            <div class="widget-icon cyan-glow">
+                                <i class="fa-solid fa-microchip"></i>
+                            </div>
+                            <div class="widget-info">
+                                <h3>Capacity Automatizado (FTEs)</h3>
+                                <p class="widget-value" id="rpa-view-total-fte">0.00</p>
+                                <span class="widget-sub" id="rpa-view-total-fte-sub">0.0% do capacity total</span>
+                            </div>
+                        </div>
+
+                        <div class="widget-card glass-panel count-card">
+                            <div class="widget-icon primary-glow">
+                                <i class="fa-solid fa-hourglass-half"></i>
+                            </div>
+                            <div class="widget-info">
+                                <h3>Horas Economizadas / Mês</h3>
+                                <p class="widget-value" id="rpa-view-total-hours">0.0h</p>
+                                <span class="widget-sub">em execução automática</span>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- MAIN QUADRO DE AUTOMAÇÕES PANEL -->
+                    <section class="panel glass-panel table-panel">
+                        <div class="panel-header-actions">
+                            <h2 class="panel-title">
+                                <i class="fa-solid fa-robot"></i> Quadro de Automações (RPA)
+                            </h2>
+                            <div class="header-table-controls">
+                                <div class="filter-group">
+                                    <i class="fa-solid fa-filter"></i>
+                                    <select id="filter-area-rpa">
+                                        <option value="all">Todas as Áreas</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="table-responsive">
+                            <table class="fte-table" id="rpa-table">
+                                <thead>
+                                    <tr>
+                                        <th style="width: 32%;">Processo / Atividade Automatizada</th>
+                                        <th style="width: 18%;">Equipe / Área</th>
+                                        <th style="width: 18%;">Responsável</th>
+                                        <th style="width: 15%;">Produto</th>
+                                        <th style="width: 17%;">Capacity (FTE / %)</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="rpa-table-body">
+                                    <!-- Populated dynamically -->
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="empty-state-container" id="rpa-empty-state" style="display: none; padding: 3rem 1.5rem; text-align: center;">
+                            <i class="fa-solid fa-robot empty-icon" style="font-size: 3rem; color: #a78bfa; margin-bottom: 1rem; opacity: 0.8;"></i>
+                            <h3 style="color: var(--text-primary); font-size: 1.2rem; margin-bottom: 0.5rem;">Nenhuma atividade configurada como RPA / Automação</h3>
+                            <p style="color: var(--text-muted); font-size: 0.9rem; max-width: 500px; margin: 0 auto;">
+                                Para adicionar uma atividade ao quadro de Automações, marque a opção <strong>🤖 RPA</strong> no menu <strong>Cadastro</strong> ou inclua <strong>RPA / Robô</strong> no nome da atividade.
+                            </p>
                         </div>
                     </section>
                 </div>
