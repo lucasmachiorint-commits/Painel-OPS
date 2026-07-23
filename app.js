@@ -131,10 +131,10 @@ function getSupabase() {
 }
 
 // AUTHENTICATION LOGIC (SUPABASE)
-async function formatAuthError(msg) {
+function formatAuthError(msg) {
     if (!msg) return "Erro ao efetuar login.";
     const lower = String(msg).toLowerCase();
-    if (lower.includes("invalid login credentials") || lower.includes("invalid_grant")) {
+    if (lower.includes("invalid login credentials") || lower.includes("invalid_grant") || lower.includes("invalid credentials")) {
         return "E-mail ou senha incorretos.";
     }
     if (lower.includes("email not confirmed")) {
@@ -171,10 +171,10 @@ async function handleLogin() {
         return;
     }
 
-    const origText = btnLogin ? btnLogin.textContent : '';
+    const origText = btnLogin ? btnLogin.textContent : 'Entrar';
     if (btnLogin) {
         btnLogin.disabled = true;
-        btnLogin.textContent = 'Aguarde...';
+        btnLogin.textContent = 'Entrando...';
     }
 
     try {
@@ -183,6 +183,7 @@ async function handleLogin() {
         if (error) {
             showAuthError(formatAuthError(error.message));
         } else if (data && data.session && data.session.user) {
+            hideAuthOverlay();
             await setupUserSession(data.session.user);
         } else {
             showAuthError("E-mail ou senha incorretos.");
@@ -224,7 +225,7 @@ async function handleSignup() {
         return;
     }
 
-    const origText = btnSignup ? btnSignup.textContent : '';
+    const origText = btnSignup ? btnSignup.textContent : 'Criar nova conta';
     if (btnSignup) {
         btnSignup.disabled = true;
         btnSignup.textContent = 'Criando conta...';
@@ -244,6 +245,7 @@ async function handleSignup() {
         } else {
             if (data.session && data.session.user) {
                 showAuthInfo("Conta criada e autenticada com sucesso!");
+                hideAuthOverlay();
                 await setupUserSession(data.session.user);
             } else if (data.user) {
                 showAuthInfo("Conta criada com sucesso! Se a confirmação de e-mail estiver ativa no seu Supabase, ative sua conta pelo link enviado.");
@@ -278,7 +280,7 @@ async function handleLogout() {
 function showAuthError(msg) {
     const errorMsg = document.getElementById('auth-error-msg');
     if (errorMsg) {
-        errorMsg.textContent = msg;
+        errorMsg.textContent = String(msg);
         errorMsg.style.display = 'block';
     }
 }
@@ -293,7 +295,7 @@ function hideAuthError() {
 function showAuthInfo(msg) {
     const infoMsg = document.getElementById('auth-info-msg');
     if (infoMsg) {
-        infoMsg.textContent = msg;
+        infoMsg.textContent = String(msg);
         infoMsg.style.display = 'block';
     }
 }
@@ -307,7 +309,11 @@ function hideAuthInfo() {
 
 function showAuthOverlay() {
     const overlay = document.getElementById('auth-overlay');
-    if (overlay) overlay.style.display = 'flex';
+    if (overlay) {
+        overlay.style.display = 'flex';
+        overlay.style.opacity = '1';
+        overlay.style.pointerEvents = 'auto';
+    }
     hideAuthError();
     hideAuthInfo();
     const emailEl = document.getElementById('auth-email');
@@ -316,7 +322,11 @@ function showAuthOverlay() {
 
 function hideAuthOverlay() {
     const overlay = document.getElementById('auth-overlay');
-    if (overlay) overlay.style.display = 'none';
+    if (overlay) {
+        overlay.style.display = 'none';
+        overlay.style.opacity = '0';
+        overlay.style.pointerEvents = 'none';
+    }
 }
 
 let _isSettingUpSession = false;
@@ -327,8 +337,9 @@ async function setupUserSession(user) {
         return;
     }
     
+    hideAuthOverlay();
+
     if (_isSettingUpSession && window._authUserId === user.id) {
-        hideAuthOverlay();
         return;
     }
     _isSettingUpSession = true;
@@ -360,8 +371,6 @@ async function setupUserSession(user) {
         } else {
             currentUser.perfil = userMetadata.perfil || 'CONSULTA';
         }
-        
-        hideAuthOverlay();
 
         const loaded = await loadStateFromSupabase();
         if (!loaded) {
