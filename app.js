@@ -182,14 +182,17 @@ async function handleLogin() {
         
         if (error) {
             showAuthError(formatAuthError(error.message));
-        } else if (data && data.session && data.session.user) {
-            hideAuthOverlay();
-            await setupUserSession(data.session.user);
         } else {
-            showAuthError("E-mail ou senha incorretos.");
+            const user = (data && data.session && data.session.user) ? data.session.user : (data ? data.user : null);
+            if (user) {
+                hideAuthOverlay();
+                await setupUserSession(user);
+            } else {
+                showAuthError("E-mail ou senha incorretos.");
+            }
         }
     } catch (err) {
-        showAuthError(formatAuthError(err.message));
+        showAuthError(formatAuthError(err ? err.message : ''));
     } finally {
         if (btnLogin) {
             btnLogin.disabled = false;
@@ -243,18 +246,19 @@ async function handleSignup() {
         if (error) {
             showAuthError(formatAuthError(error.message));
         } else {
-            if (data.session && data.session.user) {
+            const user = (data && data.session && data.session.user) ? data.session.user : (data ? data.user : null);
+            if (user) {
                 showAuthInfo("Conta criada e autenticada com sucesso!");
                 hideAuthOverlay();
-                await setupUserSession(data.session.user);
-            } else if (data.user) {
+                await setupUserSession(user);
+            } else if (data && data.user) {
                 showAuthInfo("Conta criada com sucesso! Se a confirmação de e-mail estiver ativa no seu Supabase, ative sua conta pelo link enviado.");
             } else {
                 showAuthInfo("Cadastro realizado com sucesso.");
             }
         }
     } catch (err) {
-        showAuthError(formatAuthError(err.message));
+        showAuthError(formatAuthError(err ? err.message : ''));
     } finally {
         if (btnSignup) {
             btnSignup.disabled = false;
@@ -329,8 +333,6 @@ function hideAuthOverlay() {
     }
 }
 
-let _isSettingUpSession = false;
-
 async function setupUserSession(user) {
     if (!user) {
         showAuthOverlay();
@@ -338,11 +340,6 @@ async function setupUserSession(user) {
     }
     
     hideAuthOverlay();
-
-    if (_isSettingUpSession && window._authUserId === user.id) {
-        return;
-    }
-    _isSettingUpSession = true;
 
     try {
         window._authUserId = user.id;
@@ -372,17 +369,24 @@ async function setupUserSession(user) {
             currentUser.perfil = userMetadata.perfil || 'CONSULTA';
         }
 
-        const loaded = await loadStateFromSupabase();
-        if (!loaded) {
-            await saveStateToSupabase();
+        try {
+            const loaded = await loadStateFromSupabase();
+            if (!loaded) {
+                await saveStateToSupabase();
+            }
+        } catch (e) {
+            console.warn('Aviso ao carregar estado do Supabase:', e);
         }
 
-        subscribeRealtime();
+        try {
+            subscribeRealtime();
+        } catch (e) {
+            console.warn('Aviso ao iniciar Realtime:', e);
+        }
+
         refreshAllViews();
     } catch (err) {
         console.error('Erro em setupUserSession:', err);
-    } finally {
-        _isSettingUpSession = false;
     }
 }
 
@@ -413,10 +417,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     });
 
-    // Check existing Supabase session
-    if (supabaseClient) {
+    // Check existing Supabase session using getSupabase() helper
+    const client = getSupabase();
+    if (client) {
         try {
-            const { data: { session } } = await supabaseClient.auth.getSession();
+            const { data } = await client.auth.getSession();
+            const session = data ? data.session : null;
             if (session && session.user) {
                 await setupUserSession(session.user);
             } else {
@@ -434,8 +440,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
 
         try {
-            supabaseClient.auth.onAuthStateChange(async (event, session) => {
-                if (event === 'SIGNED_IN' && session) {
+            client.auth.onAuthStateChange(async (event, session) => {
+                if (event === 'SIGNED_IN' && session && session.user) {
                     await setupUserSession(session.user);
                 } else if (event === 'SIGNED_OUT') {
                     showAuthOverlay();
@@ -446,7 +452,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     } else {
         showAuthOverlay();
-        showAuthError("Aviso: Configure o SUPABASE_URL e SUPABASE_ANON_KEY no app.js para utilizar a autenticação.");
     }
     
     renderAreaFilterOptions();
