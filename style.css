@@ -956,7 +956,7 @@ body.light-theme .icon-dark {
         padding: 0 !important;
     }
 
-    .app-header, .sidebar-config, .header-actions, .btn, .btn-row-action, .row-actions-cell, .panel-header-actions button, .app-footer, #theme-toggle {
+    .app-header, .sidebar-config, .header-actions, .btn, .btn-row-action, .row-actions-cell, .panel-header-actions button, .app-footer, #theme-toggle, #header-user-chip, #top-right-fixed-controls, .top-right-controls, #btn-logout {
         display: none !important;
     }
 
