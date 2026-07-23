@@ -687,6 +687,7 @@ function applyStateMigrations() {
         if (p.allocatedResource === undefined) p.allocatedResource = '';
         if (p.reviewStatus === undefined) p.reviewStatus = 'Manter';
         if (p.responsavel === undefined) p.responsavel = '';
+        if (p.produto === undefined) p.produto = '';
     });
     if (state.history === undefined) state.history = [];
     if (state.teams === undefined) {
@@ -1236,7 +1237,10 @@ function renderTable() {
         tr.innerHTML = `
             <td>
                 <div style="display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; width: 100%;">
-                    <span style="font-weight: 500; color: var(--text-primary);">${escapeHtml(proc.name)}</span>
+                    <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                        <span style="font-weight: 500; color: var(--text-primary);">${escapeHtml(proc.name)}</span>
+                        ${proc.produto ? `<span style="font-size: 0.72rem; padding: 0.15rem 0.45rem; border-radius: 12px; background: rgba(99, 102, 241, 0.12); color: #818cf8; border: 1px solid rgba(99, 102, 241, 0.25); font-weight: 500;"><i class="fa-solid fa-box-open" style="font-size: 0.65rem; margin-right: 0.25rem;"></i>${escapeHtml(proc.produto)}</span>` : ''}
+                    </div>
                     ${proc.reviewStatus && proc.reviewStatus !== 'Manter' ? `<span class="badge-review badge-review-${proc.reviewStatus.toLowerCase()}">${proc.reviewStatus}</span>` : ''}
                 </div>
             </td>
@@ -1244,7 +1248,7 @@ function renderTable() {
                 <span class="badge-area" style="font-size: 0.85rem; padding: 0.25rem 0.5rem; border-radius: 4px; background: rgba(235, 92, 39, 0.08); color: var(--color-primary); border: 1px solid rgba(235, 92, 39, 0.15);">${escapeHtml(proc.area || 'Sem Equipe')}</span>
             </td>
             <td>
-                <span style="font-size: 0.9rem; color: var(--text-secondary);">${escapeHtml(proc.responsavel || 'Sem ResponsÃvel')}</span>
+                <span style="font-size: 0.9rem; color: var(--text-secondary);">${escapeHtml(proc.responsavel || 'Sem Responsável')}</span>
             </td>
             <td>
                 <input type="number" class="input-volume" value="${proc.volume}" placeholder="---" min="0">
@@ -1357,8 +1361,11 @@ function renderBalancingTable() {
 
         tr.innerHTML = `
             <td style="font-weight: 500;">
-                ${escapeHtml(proc.name)}
-                ${reviewBadgeHtml}
+                <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                    <span>${escapeHtml(proc.name)}</span>
+                    ${proc.produto ? `<span style="font-size: 0.72rem; padding: 0.15rem 0.45rem; border-radius: 12px; background: rgba(99, 102, 241, 0.12); color: #818cf8; border: 1px solid rgba(99, 102, 241, 0.25); font-weight: 500;"><i class="fa-solid fa-box-open" style="font-size: 0.65rem; margin-right: 0.25rem;"></i>${escapeHtml(proc.produto)}</span>` : ''}
+                    ${reviewBadgeHtml}
+                </div>
             </td>
             <td>
                 <span class="badge" style="margin-left: 0; background: rgba(235, 92, 39, 0.15); border: 1px solid var(--color-primary); color: var(--color-primary); box-shadow: none;">
@@ -1366,7 +1373,7 @@ function renderBalancingTable() {
                 </span>
             </td>
             <td>
-                <span style="font-size: 0.9rem; color: var(--text-secondary);">${escapeHtml(proc.responsavel || 'Sem ResponsÃvel')}</span>
+                <span style="font-size: 0.9rem; color: var(--text-secondary);">${escapeHtml(proc.responsavel || 'Sem Responsável')}</span>
             </td>
             <td>${minutes.toFixed(0)} min</td>
             <td>
@@ -1789,7 +1796,7 @@ function renderAreaAllocations() {
 
 // NEW PROCESS MANAGEMENT
 function addNewProcess() {
-    if (!verificarPermissao('OPERADOR')) { alert('Acesso negado: Perfil OPERADOR necessÃ¡rio.'); return; }
+    if (!verificarPermissao('OPERADOR')) { alert('Acesso negado: Perfil OPERADOR necessário.'); return; }
     const newId = 'proc-' + Date.now();
     const defaultArea = state.teams.length > 0 ? state.teams[0] : '';
     
@@ -1798,6 +1805,7 @@ function addNewProcess() {
         name: `Nova Atividade ${state.processes.length + 1}`,
         area: defaultArea,
         responsavel: '',
+        produto: '',
         volume: '',
         minutos: 0,
         qtdExecucao: '',
@@ -1814,19 +1822,21 @@ function addNewProcess() {
 }
 
 function deleteProcess(id) {
-    if (!verificarPermissao('ADMIN')) { alert('Acesso negado: Perfil ADMIN necessÃ¡rio.'); return; }
+    if (!verificarPermissao('ADMIN')) { alert('Acesso negado: Perfil ADMIN necessário.'); return; }
     state.processes = state.processes.filter(p => p.id !== id);
     renderTable();
     renderBalancingTable();
 }
 
 function duplicateProcess(proc) {
-    if (!verificarPermissao('OPERADOR')) { alert('Acesso negado: Perfil OPERADOR necessÃ¡rio.'); return; }
+    if (!verificarPermissao('OPERADOR')) { alert('Acesso negado: Perfil OPERADOR necessário.'); return; }
     const newId = 'proc-' + Date.now() + '-' + Math.floor(Math.random() * 100);
     state.processes.push({
         id: newId,
-        name: `${proc.name} (CÃ³pia)`,
+        name: `${proc.name} (Cópia)`,
         area: proc.area,
+        responsavel: proc.responsavel || '',
+        produto: proc.produto || '',
         volume: proc.volume,
         minutos: proc.minutos,
         qtdExecucao: proc.qtdExecucao,
@@ -2400,14 +2410,17 @@ function renderReviewTable() {
 
         tr.innerHTML = `
             <td style="font-weight: 600;">
-                ${escapeHtml(proc.name)}
-                ${proc.reviewStatus && proc.reviewStatus !== 'Manter' ? `<span class="badge-review badge-review-${proc.reviewStatus.toLowerCase()}">${proc.reviewStatus}</span>` : ''}
+                <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                    <span>${escapeHtml(proc.name)}</span>
+                    ${proc.produto ? `<span style="font-size: 0.72rem; padding: 0.15rem 0.45rem; border-radius: 12px; background: rgba(99, 102, 241, 0.12); color: #818cf8; border: 1px solid rgba(99, 102, 241, 0.25); font-weight: 500;"><i class="fa-solid fa-box-open" style="font-size: 0.65rem; margin-right: 0.25rem;"></i>${escapeHtml(proc.produto)}</span>` : ''}
+                    ${proc.reviewStatus && proc.reviewStatus !== 'Manter' ? `<span class="badge-review badge-review-${proc.reviewStatus.toLowerCase()}">${proc.reviewStatus}</span>` : ''}
+                </div>
             </td>
             <td>
                 <span class="badge-area" style="font-size: 0.85rem; padding: 0.25rem 0.5rem; border-radius: 4px; background: rgba(235, 92, 39, 0.08); color: var(--color-primary); border: 1px solid rgba(235, 92, 39, 0.15);">${escapeHtml(proc.area || 'Sem Equipe')}</span>
             </td>
             <td>
-                <span style="font-size: 0.9rem; color: var(--text-secondary);">${escapeHtml(proc.responsavel || 'Sem ResponsÃvel')}</span>
+                <span style="font-size: 0.9rem; color: var(--text-secondary);">${escapeHtml(proc.responsavel || 'Sem Responsável')}</span>
             </td>
             <td style="color: var(--text-secondary); font-size: 0.85rem;">${metricDesc}</td>
             <td style="font-weight: 700; color: ${proc.reviewStatus === 'Parar' ? 'var(--text-muted)' : 'var(--text-primary)'};">${proc.reviewStatus === 'Parar' ? '0.00%' : ftePct.toFixed(2) + '%'}</td>
@@ -2493,11 +2506,12 @@ function importExcelFile(file) {
                 const headers = rows[0].map(h => String(h || '').trim().toLowerCase());
                 
                 let activityIdx = headers.findIndex(h => h.includes('atividade') || h.includes('nome') || h.includes('processo'));
-                let teamIdx = headers.findIndex(h => h.includes('equipe') || h.includes('ÃÃÃrea') || h.includes('area') || h.includes('grupo'));
-                let respIdx = headers.findIndex(h => h.includes('responsÃ¡vel') || h.includes('responsavel') || h.includes('dono') || h.includes('colaborador'));
-                let volIdx = headers.findIndex(h => h.includes('volume') || h.includes('qtd. mÃªs') || h.includes('qtd. mes') || h.includes('quantidade') || h.includes('qtd. mes'));
-                let minIdx = headers.findIndex(h => h.includes('tempo') || h.includes('minutos') || h.includes('duraÃ§Ã£o') || h.includes('duracao'));
-                let freqIdx = headers.findIndex(h => h.includes('freq') || h.includes('execuÃ§Ã£o') || h.includes('execucao'));
+                let teamIdx = headers.findIndex(h => h.includes('equipe') || h.includes('área') || h.includes('area') || h.includes('grupo'));
+                let respIdx = headers.findIndex(h => h.includes('responsável') || h.includes('responsavel') || h.includes('dono') || h.includes('colaborador'));
+                let productIdx = headers.findIndex(h => h.includes('produto') || h.includes('product'));
+                let volIdx = headers.findIndex(h => h.includes('volume') || h.includes('qtd. mês') || h.includes('qtd. mes') || h.includes('quantidade'));
+                let minIdx = headers.findIndex(h => h.includes('tempo') || h.includes('minutos') || h.includes('duração') || h.includes('duracao'));
+                let freqIdx = headers.findIndex(h => h.includes('freq') || h.includes('execução') || h.includes('execucao'));
                 
                 if (activityIdx === -1) activityIdx = 0;
                 if (teamIdx === -1) teamIdx = headers.length > 1 ? 1 : -1;
@@ -2515,6 +2529,7 @@ function importExcelFile(file) {
                     
                     const teamName = teamIdx !== -1 && row[teamIdx] ? String(row[teamIdx]).trim() : '';
                     const respName = respIdx !== -1 && row[respIdx] ? String(row[respIdx]).trim() : '';
+                    const productName = productIdx !== -1 && row[productIdx] ? String(row[productIdx]).trim() : '';
                     
                     let volumeVal = '';
                     if (volIdx !== -1 && row[volIdx] !== undefined && row[volIdx] !== null && row[volIdx] !== '') {
@@ -2546,6 +2561,7 @@ function importExcelFile(file) {
                         name: activityName,
                         area: teamName || (state.teams.length > 0 ? state.teams[0] : ''),
                         responsavel: respName,
+                        produto: productName,
                         volume: volumeVal,
                         minutos: minutesVal,
                         qtdExecucao: freqVal,
@@ -3059,7 +3075,7 @@ function renderCadastrosView() {
     if (state.processes.length === 0) {
         tableBody.innerHTML = `
             <tr>
-                <td colspan="5" style="text-align: center; color: var(--text-muted); padding: 2rem;">
+                <td colspan="6" style="text-align: center; color: var(--text-muted); padding: 2rem;">
                     Nenhuma atividade cadastrada. Clique em "Adicionar Atividade" para iniciar.
                 </td>
             </tr>
@@ -3089,7 +3105,7 @@ function renderCadastrosView() {
         const headerTr = document.createElement('tr');
         headerTr.style.cssText = 'background: rgba(255,255,255,0.03); cursor: pointer; user-select: none;';
         headerTr.innerHTML = `
-            <td colspan="5" style="padding: 0.8rem; font-weight: 600; color: var(--text-primary); border-top: 1px solid rgba(255,255,255,0.05); border-bottom: 1px solid rgba(255,255,255,0.05);">
+            <td colspan="6" style="padding: 0.8rem; font-weight: 600; color: var(--text-primary); border-top: 1px solid rgba(255,255,255,0.05); border-bottom: 1px solid rgba(255,255,255,0.05);">
                 <i class="fa-solid fa-chevron-right" style="width: 20px;"></i> ${escapeHtml(team)} <span style="background: rgba(255,255,255,0.1); color: var(--text-secondary); padding: 0.1rem 0.5rem; border-radius: 10px; font-size: 0.75rem; margin-left: 0.5rem;">${teamProcs.length} atividades</span>
             </td>
         `;
@@ -3136,6 +3152,9 @@ function renderCadastrosView() {
                     <select class="select-activity-resp-cell" style="width: 100%; border: none; background: transparent; color: var(--text-primary); outline: none; padding: 0.3rem 0.5rem; border-radius: 4px; cursor: pointer;">
                         ${respOptions}
                     </select>
+                </td>
+                <td>
+                    <input type="text" class="input-activity-product-cell" value="${escapeHtml(proc.produto || '')}" placeholder="Produto (Opcional)" style="width: 100%; border: none; background: transparent; color: var(--text-primary); outline: none; padding: 0.3rem 0.5rem; border-radius: 4px;">
                 </td>
                 <td class="col-excluir-admin" style="text-align: center;">
                     <button class="btn-row-action btn-delete-activity-cell" style="background: transparent; border: none; color: var(--color-danger); cursor: pointer; font-size: 0.95rem; padding: 0.2rem;" title="Excluir Atividade">
@@ -3207,6 +3226,20 @@ function renderCadastrosView() {
             respSelect.addEventListener('blur', () => {
                 respSelect.style.background = 'transparent';
                 respSelect.style.border = 'none';
+            });
+            
+            const productInput = tr.querySelector('.input-activity-product-cell');
+            productInput.addEventListener('change', (e) => {
+                proc.produto = e.target.value.trim();
+                saveState();
+            });
+            productInput.addEventListener('focus', () => {
+                productInput.style.background = 'rgba(255, 255, 255, 0.08)';
+                productInput.style.border = '1px solid var(--border-color)';
+            });
+            productInput.addEventListener('blur', () => {
+                productInput.style.background = 'transparent';
+                productInput.style.border = 'none';
             });
             
             const deleteBtn = tr.querySelector('.btn-delete-activity-cell');
