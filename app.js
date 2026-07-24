@@ -752,6 +752,31 @@ function isRpaResponsavel(name) {
     return s.includes('rpa') || s.includes('robô') || s.includes('robo') || s.includes('bot') || s.includes('automação') || s.includes('automacao');
 }
 
+// MULTI-RESPONSÁVEL HELPER FUNCTIONS
+function getProcessResponsaveis(proc) {
+    if (!proc) return [];
+    if (Array.isArray(proc.responsaveis) && proc.responsaveis.length > 0) {
+        return proc.responsaveis;
+    }
+    if (typeof proc.responsavel === 'string' && proc.responsavel.trim()) {
+        return proc.responsavel.split(',').map(s => s.trim()).filter(Boolean);
+    }
+    return [];
+}
+
+function setProcessResponsaveis(proc, respsArray) {
+    const cleanArray = [...new Set((respsArray || []).map(s => String(s).trim()).filter(Boolean))];
+    proc.responsaveis = cleanArray;
+    proc.responsavel = cleanArray.join(', ');
+}
+
+function matchesRespFilter(proc, filterVal) {
+    if (!filterVal || filterVal === 'all') return true;
+    const resps = getProcessResponsaveis(proc);
+    if (resps.length === 0) return filterVal === 'Sem Responsável';
+    return resps.includes(filterVal);
+}
+
 // STATE MIGRATIONS HELPER
 function applyStateMigrations() {
     if (!state.params) {
@@ -774,6 +799,9 @@ function applyStateMigrations() {
         if (p.responsavel === undefined) p.responsavel = '';
         if (p.produto === undefined) p.produto = '';
         if (p.isRpa === undefined) p.isRpa = isRpaResponsavel(p.responsavel);
+        if (!p.responsaveis || !Array.isArray(p.responsaveis)) {
+            setProcessResponsaveis(p, getProcessResponsaveis(p));
+        }
     });
     if (state.history === undefined) state.history = [];
     if (state.teams === undefined) {
@@ -1294,7 +1322,7 @@ function renderTable() {
     
     const filteredProcesses = state.processes.filter(p => {
         const areaMatch = filterValue === 'all' || p.area === filterValue;
-        const respMatch = respFilter === 'all' || p.responsavel === respFilter;
+        const respMatch = matchesRespFilter(p, respFilter);
         return areaMatch && respMatch;
     });
 
@@ -1401,7 +1429,7 @@ function renderBalancingTable() {
     const respFilter = document.getElementById('filter-responsavel-balancing').value;
     const filteredProcesses = state.processes.filter(p => {
         const areaMatch = filterValue === 'all' || p.area === filterValue;
-        const respMatch = respFilter === 'all' || p.responsavel === respFilter;
+        const respMatch = matchesRespFilter(p, respFilter);
         return areaMatch && respMatch;
     });
 
@@ -1591,11 +1619,27 @@ function updateCalculations() {
         const totalMinutes = multiplier * minutes;
         const totalHours = totalMinutes / 60;
         
-        // Dynamic capacity per process
-        const respParams = getResponsibleParams(proc.responsavel);
-        const pHorasRealDia = respParams.horasDia * (1 - respParams.absenteismo / 100);
-        const pHorasTrabalhoMes = pHorasRealDia * respParams.diasUteis;
-        const ftePct = pHorasTrabalhoMes > 0 ? (totalHours / pHorasTrabalhoMes) * 100 : 0;
+        // Dynamic capacity per process with rateio for multiple responsibles
+        const resps = getProcessResponsaveis(proc);
+        const respCount = resps.length > 0 ? resps.length : 1;
+        const hoursPerResp = totalHours / respCount;
+        let ftePct = 0;
+
+        if (resps.length > 0) {
+            resps.forEach(r => {
+                const respParams = getResponsibleParams(r);
+                const pHorasRealDia = respParams.horasDia * (1 - respParams.absenteismo / 100);
+                const pHorasTrabalhoMes = pHorasRealDia * respParams.diasUteis;
+                if (pHorasTrabalhoMes > 0) {
+                    ftePct += (hoursPerResp / pHorasTrabalhoMes) * 100;
+                }
+            });
+        } else {
+            const respParams = getResponsibleParams('');
+            const pHorasRealDia = respParams.horasDia * (1 - respParams.absenteismo / 100);
+            const pHorasTrabalhoMes = pHorasRealDia * respParams.diasUteis;
+            ftePct = pHorasTrabalhoMes > 0 ? (totalHours / pHorasTrabalhoMes) * 100 : 0;
+        }
 
         filteredHoursAccum += totalHours;
         filteredFtePctAccum += ftePct;
@@ -1614,7 +1658,7 @@ function updateCalculations() {
 
     const targetProcesses = isFiltered ? state.processes.filter(p => {
         const areaMatch = currentFilterValue === 'all' || p.area === currentFilterValue;
-        const respMatch = currentRespFilter === 'all' || p.responsavel === currentRespFilter;
+        const respMatch = matchesRespFilter(p, currentRespFilter);
         return areaMatch && respMatch;
     }) : state.processes;
 
@@ -2490,7 +2534,7 @@ function renderReviewTable() {
 
     const filteredProcesses = state.processes.filter(p => {
         const areaMatch = filterValue === 'all' || p.area === filterValue;
-        const respMatch = respFilter === 'all' || p.responsavel === respFilter;
+        const respMatch = matchesRespFilter(p, respFilter);
         return areaMatch && respMatch;
     });
 
@@ -3281,16 +3325,30 @@ function renderCadastrosView() {
                     <option value="${escapeHtml(t)}" ${proc.area === t ? 'selected' : ''}>${escapeHtml(t)}</option>
                 `).join('');
                 
+            const currentResps = getProcessResponsaveis(proc);
             const teamResps = (state.responsaveis || []).filter(resp => {
                 const rName = typeof resp === 'object' ? resp.name : resp;
                 const rArea = typeof resp === 'object' ? resp.area : '';
-                return !proc.area || !rArea || rArea === proc.area || proc.responsavel === rName;
+                return !proc.area || !rArea || rArea === proc.area || currentResps.includes(rName);
             });
             const respsToDisplay = teamResps.length > 0 ? teamResps : (state.responsaveis || []);
-            const respOptions = '<option value="">-- Sem Responsável --</option>' +
-                respsToDisplay.map(resp => {
+            
+            const assignedBadgesHtml = currentResps.map(rName => `
+                <span class="badge-resp-tag" style="font-size: 0.78rem; padding: 0.15rem 0.45rem; border-radius: 12px; background: rgba(99, 102, 241, 0.12); color: #818cf8; border: 1px solid rgba(99, 102, 241, 0.25); display: inline-flex; align-items: center; gap: 0.3rem;">
+                    ${escapeHtml(rName)}
+                    <i class="fa-solid fa-xmark remove-resp-btn" data-resp="${escapeHtml(rName)}" style="cursor: pointer; opacity: 0.7; font-size: 0.7rem;" title="Remover ${escapeHtml(rName)}"></i>
+                </span>
+            `).join('');
+
+            const unassignedResps = respsToDisplay.filter(resp => {
+                const rName = typeof resp === 'object' ? resp.name : resp;
+                return !currentResps.includes(rName);
+            });
+
+            const unassignedOptionsHtml = '<option value="">+ Responsável</option>' +
+                unassignedResps.map(resp => {
                     const rName = typeof resp === 'object' ? resp.name : resp;
-                    return `<option value="${escapeHtml(rName)}" ${proc.responsavel === rName ? 'selected' : ''}>${escapeHtml(rName)}</option>`;
+                    return `<option value="${escapeHtml(rName)}">${escapeHtml(rName)}</option>`;
                 }).join('');
                 
             const isRpa = isRpaActivity(proc);
@@ -3308,9 +3366,12 @@ function renderCadastrosView() {
                     </select>
                 </td>
                 <td>
-                    <select class="select-activity-resp-cell" style="width: 100%; border: none; background: transparent; color: var(--text-primary); outline: none; padding: 0.3rem 0.5rem; border-radius: 4px; cursor: pointer;">
-                        ${respOptions}
-                    </select>
+                    <div class="cadastros-resp-container" style="display: flex; flex-wrap: wrap; gap: 0.3rem; align-items: center; padding: 0.2rem 0;">
+                        ${assignedBadgesHtml}
+                        <select class="select-activity-add-resp" style="border: 1px dashed var(--border-color); background: rgba(255,255,255,0.03); color: var(--text-secondary); outline: none; padding: 0.2rem 0.4rem; border-radius: 4px; font-size: 0.78rem; cursor: pointer;">
+                            ${unassignedOptionsHtml}
+                        </select>
+                    </div>
                 </td>
                 <td>
                     <input type="text" class="input-activity-product-cell" value="${escapeHtml(proc.produto || '')}" placeholder="Produto (Opcional)" style="width: 100%; border: none; background: transparent; color: var(--text-primary); outline: none; padding: 0.3rem 0.5rem; border-radius: 4px;">
@@ -3372,7 +3433,7 @@ function renderCadastrosView() {
             teamSelect.addEventListener('change', (e) => {
                 const newTeam = e.target.value;
                 proc.area = newTeam;
-                proc.responsavel = '';
+                setProcessResponsaveis(proc, []);
                 saveState();
                 
                 renderCadastrosView();
@@ -3391,29 +3452,42 @@ function renderCadastrosView() {
                 teamSelect.style.border = 'none';
             });
             
-            const respSelect = tr.querySelector('.select-activity-resp-cell');
-            respSelect.addEventListener('change', (e) => {
-                proc.responsavel = e.target.value;
-                // Auto-flag RPA when responsável name matches RPA keywords
-                if (isRpaResponsavel(e.target.value)) {
-                    proc.isRpa = true;
-                }
-                saveState();
-                renderCadastrosView();
-                renderResponsavelFilterOptions();
-                renderTable();
-                renderBalancingTable();
-                renderReviewTable();
-                renderAutomationsView();
+            // Listeners for multi-responsible badges & add dropdown
+            tr.querySelectorAll('.remove-resp-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const respToRemove = btn.dataset.resp;
+                    const updated = currentResps.filter(r => r !== respToRemove);
+                    setProcessResponsaveis(proc, updated);
+                    saveState();
+                    renderCadastrosView();
+                    renderResponsavelFilterOptions();
+                    renderTable();
+                    renderBalancingTable();
+                    renderReviewTable();
+                    renderAutomationsView();
+                });
             });
-            respSelect.addEventListener('focus', () => {
-                respSelect.style.background = 'rgba(255, 255, 255, 0.08)';
-                respSelect.style.border = '1px solid var(--border-color)';
-            });
-            respSelect.addEventListener('blur', () => {
-                respSelect.style.background = 'transparent';
-                respSelect.style.border = 'none';
-            });
+
+            const addRespSelect = tr.querySelector('.select-activity-add-resp');
+            if (addRespSelect) {
+                addRespSelect.addEventListener('change', (e) => {
+                    const newResp = e.target.value;
+                    if (!newResp) return;
+                    const updated = [...currentResps, newResp];
+                    setProcessResponsaveis(proc, updated);
+                    if (isRpaResponsavel(newResp)) {
+                        proc.isRpa = true;
+                    }
+                    saveState();
+                    renderCadastrosView();
+                    renderResponsavelFilterOptions();
+                    renderTable();
+                    renderBalancingTable();
+                    renderReviewTable();
+                    renderAutomationsView();
+                });
+            }
             
             const productInput = tr.querySelector('.input-activity-product-cell');
             productInput.addEventListener('change', (e) => {
