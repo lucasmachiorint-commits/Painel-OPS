@@ -1667,6 +1667,7 @@ function updateCalculations() {
     });
 
     const targetFteDecAccum = targetFtePctAccum / 100;
+    const totalFteDecAccum = totalFtePctAccum / 100;
     const targetRpaFteDecAccum = targetRpaFtePctAccum / 100;
     const totalCount = targetProcesses.length;
     const pctRpaCount = totalCount > 0 ? (targetRpaCount / totalCount * 100) : 0;
