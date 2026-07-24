@@ -3042,6 +3042,10 @@ function renderCadastrosView() {
     
     if (!teamsList || !responsiblesList || !tableBody || !activityCountBadge) return;
     
+    // Clear new responsible input to prevent browser autofill
+    const inputNewResp = document.getElementById('input-new-responsible');
+    if (inputNewResp) inputNewResp.value = '';
+
     // Populate new responsible team select options
     const newRespTeamSelect = document.getElementById('select-new-responsible-team');
     if (newRespTeamSelect) {
