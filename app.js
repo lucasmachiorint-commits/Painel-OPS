@@ -3042,9 +3042,13 @@ function renderCadastrosView() {
     
     if (!teamsList || !responsiblesList || !tableBody || !activityCountBadge) return;
     
-    // Clear new responsible input to prevent browser autofill
+    // Clear new responsible input and set readOnly to prevent Chrome Password Manager / Autofill
     const inputNewResp = document.getElementById('input-new-responsible');
-    if (inputNewResp) inputNewResp.value = '';
+    if (inputNewResp) {
+        inputNewResp.value = '';
+        inputNewResp.readOnly = true;
+        inputNewResp.onfocus = function() { this.readOnly = false; };
+    }
 
     // Populate new responsible team select options
     const newRespTeamSelect = document.getElementById('select-new-responsible-team');
