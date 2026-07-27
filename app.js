@@ -47,6 +47,12 @@ function aplicarPerfilDeAcesso() {
     const selectProfile = document.getElementById('select-user-profile');
     if (selectProfile) selectProfile.value = perfil;
 
+    // Atualiza classe de perfil no body para controle de restrição CSS (.admin-only)
+    if (document.body) {
+        document.body.classList.remove('perfil-admin', 'perfil-operador', 'perfil-consulta');
+        document.body.classList.add('perfil-' + perfil.toLowerCase());
+    }
+
     // Varre todos os elementos com data-permissao
     document.querySelectorAll('[data-permissao]').forEach(el => {
         const permitidos = el.getAttribute('data-permissao').split(',').map(s => s.trim());
@@ -1378,8 +1384,8 @@ function renderTable() {
             <td>
                 <input type="number" class="input-qtd" value="${proc.qtdExecucao}" placeholder="---" min="0">
             </td>
-            <td class="cell-hours">0.0h</td>
-            <td class="cell-highlight-pct neon-text-secondary">0.00%</td>
+            <td class="cell-hours admin-only">0.0h</td>
+            <td class="cell-highlight-pct neon-text-secondary admin-only">0.00%</td>
         `;
 
         const volumeInput = tr.querySelector('.input-volume');
@@ -1498,8 +1504,8 @@ function renderBalancingTable() {
             <td>
                 ${volumeFieldHtml}
             </td>
-            <td class="cell-backlog-hours">0.0h</td>
-            <td class="cell-backlog-fte neon-text-secondary">0.00%</td>
+            <td class="cell-backlog-hours admin-only">0.0h</td>
+            <td class="cell-backlog-fte neon-text-secondary admin-only">0.00%</td>
         `;
         
         if (!isTempoFrequencia && proc.reviewStatus !== 'Parar') {
@@ -2615,7 +2621,7 @@ function renderReviewTable() {
                 <span style="font-size: 0.9rem; color: var(--text-secondary);">${escapeHtml(proc.responsavel || 'Sem Responsável')}</span>
             </td>
             <td style="color: var(--text-secondary); font-size: 0.85rem;">${metricDesc}</td>
-            <td style="font-weight: 700; color: ${proc.reviewStatus === 'Parar' ? 'var(--text-muted)' : 'var(--text-primary)'};">${proc.reviewStatus === 'Parar' ? '0.00%' : ftePct.toFixed(2) + '%'}</td>
+            <td class="admin-only" style="font-weight: 700; color: ${proc.reviewStatus === 'Parar' ? 'var(--text-muted)' : 'var(--text-primary)'};">${proc.reviewStatus === 'Parar' ? '0.00%' : ftePct.toFixed(2) + '%'}</td>
             <td>${statusSelectHtml}</td>
         `;
 
@@ -4044,7 +4050,7 @@ function renderAutomationsView() {
             <td>
                 <span style="font-size: 0.9rem; color: var(--text-primary);">${escapeHtml(proc.produto || '-')}</span>
             </td>
-            <td>
+            <td class="admin-only">
                 <div style="display: flex; flex-direction: column;">
                     <span style="font-weight: 700; color: #a78bfa;">${fteDec.toFixed(2)} FTE (${ftePct.toFixed(2)}%)</span>
                     <span style="font-size: 0.75rem; color: var(--text-muted);">${totalHours.toFixed(1)}h/mês</span>

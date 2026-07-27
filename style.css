@@ -1633,3 +1633,10 @@ body.light-theme .select-review-area option, body.light-theme .select-review-sta
 .select-profile:hover {
     border-color: var(--color-primary);
 }
+
+/* Restrição por perfil: Ocultar elementos exclusivos de ADMIN */
+body.perfil-consulta .admin-only,
+body.perfil-operador .admin-only {
+    display: none !important;
+}
+

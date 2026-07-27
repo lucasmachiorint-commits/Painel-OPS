@@ -1651,6 +1651,13 @@ body.light-theme .select-review-area option, body.light-theme .select-review-sta
     border-color: var(--color-primary);
 }
 
+/* RestriÃ§Ã£o por perfil: Ocultar elementos exclusivos de ADMIN */
+body.perfil-consulta .admin-only,
+body.perfil-operador .admin-only {
+    display: none !important;
+}
+
+
 </style>
 </head>
 <body class="dark-theme">
@@ -1836,7 +1843,7 @@ body.light-theme .select-review-area option, body.light-theme .select-review-sta
                         <div class="dashboard-main" style="width: 100%;">
                             <!-- WIDGETS -->
                             <section class="dashboard-widgets">
-                                <div class="widget-card glass-panel count-card">
+                                <div class="widget-card glass-panel count-card admin-only">
                                     <div class="widget-icon primary-glow">
                                         <i class="fa-solid fa-user-gear"></i>
                                     </div>
@@ -1869,7 +1876,7 @@ body.light-theme .select-review-area option, body.light-theme .select-review-sta
                                     </div>
                                 </div>
 
-                                <div class="widget-card glass-panel count-card">
+                                <div class="widget-card glass-panel count-card admin-only">
                                     <div class="widget-icon cyan-glow">
                                         <i class="fa-solid fa-microchip"></i>
                                     </div>
@@ -1917,8 +1924,8 @@ body.light-theme .select-review-area option, body.light-theme .select-review-sta
                                                 <th style="width: 12%;">Volume / Qtd. MÃªs</th>
                                                 <th style="width: 10%;">Tempo (Minutos)</th>
                                                 <th style="width: 13%;">Freq. ExecuÃ§Ã£o MÃªs</th>
-                                                <th style="width: 10%;">Horas / MÃªs</th>
-                                                <th style="width: 8%;">FTE (%)</th>
+                                                <th class="admin-only" style="width: 10%;">Horas / MÃªs</th>
+                                                <th class="admin-only" style="width: 8%;">FTE (%)</th>
                                             </tr>
                                         </thead>
                                         <tbody id="table-body">
@@ -1932,8 +1939,8 @@ body.light-theme .select-review-area option, body.light-theme .select-review-sta
                                                 <td></td>
                                                 <td></td>
                                                 <td></td>
-                                                <td id="total-hours-filtered">0.0h</td>
-                                                <td class="neon-text-secondary" id="total-fte-pct-filtered">0.00%</td>
+                                                <td class="admin-only" id="total-hours-filtered">0.0h</td>
+                                                <td class="neon-text-secondary admin-only" id="total-fte-pct-filtered">0.00%</td>
                                             </tr>
                                             <tr class="total-row">
                                                 <td>Total Geral</td>
@@ -1942,8 +1949,8 @@ body.light-theme .select-review-area option, body.light-theme .select-review-sta
                                                 <td></td>
                                                 <td></td>
                                                 <td></td>
-                                                <td id="total-hours">0.0h</td>
-                                                <td class="neon-text-secondary" id="total-fte-pct">0.00%</td>
+                                                <td class="admin-only" id="total-hours">0.0h</td>
+                                                <td class="neon-text-secondary admin-only" id="total-fte-pct">0.00%</td>
                                             </tr>
                                         </tfoot>
                                     </table>
@@ -1961,13 +1968,13 @@ body.light-theme .select-review-area option, body.light-theme .select-review-sta
 
                             <!-- VISUALIZATION DASHBOARD -->
                             <section class="charts-grid">
-                                <div class="panel glass-panel chart-container">
+                                <div class="panel glass-panel chart-container admin-only">
                                     <h3 class="panel-title" id="chart-pie-title"><i class="fa-solid fa-chart-pie"></i> DistribuiÃ§Ã£o de FTE por Processo</h3>
                                     <div class="canvas-wrapper">
                                         <canvas id="chart-pie"></canvas>
                                     </div>
                                 </div>
-                                <div class="panel glass-panel chart-container">
+                                <div class="panel glass-panel chart-container admin-only">
                                     <h3 class="panel-title"><i class="fa-solid fa-chart-bar"></i> BalanÃ§o de Capacidade (FTE)</h3>
                                     <div class="canvas-wrapper">
                                         <canvas id="chart-bar"></canvas>
@@ -1982,7 +1989,7 @@ body.light-theme .select-review-area option, body.light-theme .select-review-sta
                 <div id="view-balancing" class="tab-view" style="display: none;">
                     <!-- BALANCING SUMMARY WIDGETS -->
                     <section class="dashboard-widgets">
-                        <div class="widget-card glass-panel count-card">
+                        <div class="widget-card glass-panel count-card admin-only">
                             <div class="widget-icon primary-glow" style="background: rgba(99, 102, 241, 0.15); color: #6366f1; box-shadow: 0 0 20px rgba(99, 102, 241, 0.15);">
                                 <i class="fa-solid fa-clock"></i>
                             </div>
@@ -1993,7 +2000,7 @@ body.light-theme .select-review-area option, body.light-theme .select-review-sta
                             </div>
                         </div>
 
-                        <div class="widget-card glass-panel count-card">
+                        <div class="widget-card glass-panel count-card admin-only">
                             <div class="widget-icon secondary-glow">
                                 <i class="fa-solid fa-user-plus"></i>
                             </div>
@@ -2059,8 +2066,8 @@ body.light-theme .select-review-area option, body.light-theme .select-review-sta
                                         <th style="width: 15%;">ResponsÃ¡vel</th>
                                         <th style="width: 10%;">Tempo (Minutos)</th>
                                         <th style="width: 12%;">Volume do Backlog</th>
-                                        <th style="width: 10%;">Horas Requeridas</th>
-                                        <th style="width: 8%;">FTE Requerido (%)</th>
+                                        <th class="admin-only" style="width: 10%;">Horas Requeridas</th>
+                                        <th class="admin-only" style="width: 8%;">FTE Requerido (%)</th>
                                     </tr>
                                 </thead>
                                 <tbody id="balancing-table-body">
@@ -2073,8 +2080,8 @@ body.light-theme .select-review-area option, body.light-theme .select-review-sta
                                         <td></td>
                                         <td></td>
                                         <td></td>
-                                        <td id="balancing-total-hours-filtered">0.0h</td>
-                                        <td class="neon-text-secondary" id="balancing-total-fte-pct-filtered">0.00%</td>
+                                        <td class="admin-only" id="balancing-total-hours-filtered">0.0h</td>
+                                        <td class="neon-text-secondary admin-only" id="balancing-total-fte-pct-filtered">0.00%</td>
                                     </tr>
                                     <tr class="total-row">
                                         <td>Total Geral</td>
@@ -2082,8 +2089,8 @@ body.light-theme .select-review-area option, body.light-theme .select-review-sta
                                         <td></td>
                                         <td></td>
                                         <td></td>
-                                        <td id="balancing-total-hours">0.0h</td>
-                                        <td class="neon-text-secondary" id="balancing-total-fte-pct">0.00%</td>
+                                        <td class="admin-only" id="balancing-total-hours">0.0h</td>
+                                        <td class="neon-text-secondary admin-only" id="balancing-total-fte-pct">0.00%</td>
                                     </tr>
                                 </tfoot>
                             </table>
@@ -2164,7 +2171,7 @@ body.light-theme .select-review-area option, body.light-theme .select-review-sta
                                         <th style="width: 20%;">Ãrea ResponsÃ¡vel (Equipe)</th>
                                         <th style="width: 15%;">ResponsÃ¡vel</th>
                                         <th style="width: 12%;">MÃ©trica Atual</th>
-                                        <th style="width: 8%;">FTE (%)</th>
+                                        <th class="admin-only" style="width: 8%;">FTE (%)</th>
                                         <th style="width: 15%;">AÃ§Ã£o de RevisÃ£o (DecisÃ£o)</th>
                                     </tr>
                                 </thead>
@@ -2197,7 +2204,7 @@ body.light-theme .select-review-area option, body.light-theme .select-review-sta
                             </div>
                         </div>
 
-                        <div class="widget-card glass-panel count-card">
+                        <div class="widget-card glass-panel count-card admin-only">
                             <div class="widget-icon cyan-glow">
                                 <i class="fa-solid fa-microchip"></i>
                             </div>
@@ -2208,7 +2215,7 @@ body.light-theme .select-review-area option, body.light-theme .select-review-sta
                             </div>
                         </div>
 
-                        <div class="widget-card glass-panel count-card">
+                        <div class="widget-card glass-panel count-card admin-only">
                             <div class="widget-icon primary-glow">
                                 <i class="fa-solid fa-hourglass-half"></i>
                             </div>
@@ -2244,7 +2251,7 @@ body.light-theme .select-review-area option, body.light-theme .select-review-sta
                                         <th style="width: 18%;">Equipe / Ãrea</th>
                                         <th style="width: 18%;">ResponsÃ¡vel</th>
                                         <th style="width: 15%;">Produto</th>
-                                        <th style="width: 17%;">Capacity (FTE / %)</th>
+                                        <th class="admin-only" style="width: 17%;">Capacity (FTE / %)</th>
                                     </tr>
                                 </thead>
                                 <tbody id="rpa-table-body">
@@ -2440,7 +2447,7 @@ body.light-theme .select-review-area option, body.light-theme .select-review-sta
                 <input type="hidden" id="modal-param-target-resp" value="">
                 
                 <!-- Input: Horas Trabalho / Dia -->
-                <div class="control-group">
+                <div class="control-group admin-only">
                     <div class="control-label">
                         <span>Horas Trabalho / Dia</span>
                         <span class="value-display" id="modal-val-horas-dia">8.0h</span>
@@ -2475,7 +2482,7 @@ body.light-theme .select-review-area option, body.light-theme .select-review-sta
                         <span style="font-size: 0.75rem; color: var(--text-secondary);">Real / Dia:</span>
                         <span id="modal-calc-real-dia" style="font-size: 1.1rem; font-weight: 700; color: var(--text-primary);">6.4h</span>
                     </div>
-                    <div style="flex: 1; display: flex; flex-direction: column; gap: 0.2rem;">
+                    <div class="admin-only" style="flex: 1; display: flex; flex-direction: column; gap: 0.2rem;">
                         <span style="font-size: 0.75rem; color: var(--text-secondary);">Capacidade MÃªs (1 FTE):</span>
                         <span id="modal-calc-mes" style="font-size: 1.1rem; font-weight: 700; color: var(--color-primary);">134.4h</span>
                     </div>
@@ -2655,6 +2662,12 @@ function aplicarPerfilDeAcesso() {
     // Sincroniza o seletor de perfil
     const selectProfile = document.getElementById('select-user-profile');
     if (selectProfile) selectProfile.value = perfil;
+
+    // Atualiza classe de perfil no body para controle de restriÃ§Ã£o CSS (.admin-only)
+    if (document.body) {
+        document.body.classList.remove('perfil-admin', 'perfil-operador', 'perfil-consulta');
+        document.body.classList.add('perfil-' + perfil.toLowerCase());
+    }
 
     // Varre todos os elementos com data-permissao
     document.querySelectorAll('[data-permissao]').forEach(el => {
@@ -3987,8 +4000,8 @@ function renderTable() {
             <td>
                 <input type="number" class="input-qtd" value="${proc.qtdExecucao}" placeholder="---" min="0">
             </td>
-            <td class="cell-hours">0.0h</td>
-            <td class="cell-highlight-pct neon-text-secondary">0.00%</td>
+            <td class="cell-hours admin-only">0.0h</td>
+            <td class="cell-highlight-pct neon-text-secondary admin-only">0.00%</td>
         `;
 
         const volumeInput = tr.querySelector('.input-volume');
@@ -4107,8 +4120,8 @@ function renderBalancingTable() {
             <td>
                 ${volumeFieldHtml}
             </td>
-            <td class="cell-backlog-hours">0.0h</td>
-            <td class="cell-backlog-fte neon-text-secondary">0.00%</td>
+            <td class="cell-backlog-hours admin-only">0.0h</td>
+            <td class="cell-backlog-fte neon-text-secondary admin-only">0.00%</td>
         `;
         
         if (!isTempoFrequencia && proc.reviewStatus !== 'Parar') {
@@ -5224,7 +5237,7 @@ function renderReviewTable() {
                 <span style="font-size: 0.9rem; color: var(--text-secondary);">${escapeHtml(proc.responsavel || 'Sem ResponsÃ¡vel')}</span>
             </td>
             <td style="color: var(--text-secondary); font-size: 0.85rem;">${metricDesc}</td>
-            <td style="font-weight: 700; color: ${proc.reviewStatus === 'Parar' ? 'var(--text-muted)' : 'var(--text-primary)'};">${proc.reviewStatus === 'Parar' ? '0.00%' : ftePct.toFixed(2) + '%'}</td>
+            <td class="admin-only" style="font-weight: 700; color: ${proc.reviewStatus === 'Parar' ? 'var(--text-muted)' : 'var(--text-primary)'};">${proc.reviewStatus === 'Parar' ? '0.00%' : ftePct.toFixed(2) + '%'}</td>
             <td>${statusSelectHtml}</td>
         `;
 
@@ -6653,7 +6666,7 @@ function renderAutomationsView() {
             <td>
                 <span style="font-size: 0.9rem; color: var(--text-primary);">${escapeHtml(proc.produto || '-')}</span>
             </td>
-            <td>
+            <td class="admin-only">
                 <div style="display: flex; flex-direction: column;">
                     <span style="font-weight: 700; color: #a78bfa;">${fteDec.toFixed(2)} FTE (${ftePct.toFixed(2)}%)</span>
                     <span style="font-size: 0.75rem; color: var(--text-muted);">${totalHours.toFixed(1)}h/mÃªs</span>
