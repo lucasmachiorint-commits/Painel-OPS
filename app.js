@@ -71,7 +71,7 @@ function aplicarPerfilDeAcesso() {
         el.style.display = isAdmin ? '' : 'none';
     });
 
-    // Controla inputs editÃveis para perfil CONSULTA
+    // Controla inputs editáveis para perfil CONSULTA
     const isConsulta = perfil === 'CONSULTA';
     document.querySelectorAll('.input-volume, .input-minutes, .input-qtd, .input-backlog-volume, .input-area-allocation').forEach(el => {
         el.disabled = isConsulta;
@@ -81,10 +81,14 @@ function aplicarPerfilDeAcesso() {
         el.disabled = isConsulta;
         el.style.opacity = isConsulta ? '0.5' : '1';
     });
-    // Controla inputs editÃveis na tabela de Cadastros
-    document.querySelectorAll('.input-activity-name-cell, .select-activity-team-cell, .select-activity-resp-cell').forEach(el => {
+    // Controla inputs editáveis na tabela de Cadastros
+    document.querySelectorAll('.input-activity-name-cell, .select-activity-team-cell, .select-activity-resp-cell, .input-activity-product-cell, .select-activity-add-resp, .cadastros-row-checkbox, .cb-activity-rpa').forEach(el => {
         el.disabled = isConsulta;
         el.style.opacity = isConsulta ? '0.5' : '1';
+    });
+    document.querySelectorAll('.remove-resp-btn').forEach(el => {
+        el.style.pointerEvents = isConsulta ? 'none' : 'auto';
+        el.style.display = isConsulta ? 'none' : 'inline-block';
     });
 }
 

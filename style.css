@@ -1640,3 +1640,9 @@ body.perfil-operador .admin-only {
     display: none !important;
 }
 
+/* Restrição por perfil: Ocultar elementos exclusivos de OPERADOR/ADMIN para CONSULTA */
+body.perfil-consulta .consulta-hidden {
+    display: none !important;
+}
+
+
