@@ -1645,4 +1645,13 @@ body.perfil-consulta .consulta-hidden {
     display: none !important;
 }
 
+/* Restrição por perfil: Bloquear interação com todos os campos de formulário no perfil CONSULTA */
+body.perfil-consulta input:not(#auth-email):not(#auth-password),
+body.perfil-consulta select:not(#select-user-profile),
+body.perfil-consulta textarea {
+    pointer-events: none !important;
+    user-select: none !important;
+}
+
+
 

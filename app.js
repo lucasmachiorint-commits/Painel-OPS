@@ -3357,33 +3357,34 @@ function renderCadastrosView() {
                 }).join('');
                 
             const isRpa = isRpaActivity(proc);
+            const isConsulta = currentUser.perfil === 'CONSULTA';
             
             tr.innerHTML = `
                 <td style="text-align: center;">
-                    <input type="checkbox" class="cadastros-row-checkbox" data-id="${proc.id}">
+                    <input type="checkbox" class="cadastros-row-checkbox" data-id="${proc.id}" ${isConsulta ? 'disabled' : ''}>
                 </td>
                 <td>
-                    <input type="text" class="input-activity-name-cell" value="${escapeHtml(proc.name)}" style="width: 100%; border: none; background: transparent; color: var(--text-primary); outline: none; padding: 0.3rem 0.5rem; border-radius: 4px;">
+                    <input type="text" class="input-activity-name-cell" value="${escapeHtml(proc.name)}" ${isConsulta ? 'readonly' : ''} style="width: 100%; border: none; background: transparent; color: var(--text-primary); outline: none; padding: 0.3rem 0.5rem; border-radius: 4px;">
                 </td>
                 <td>
-                    <select class="select-activity-team-cell" style="width: 100%; border: none; background: transparent; color: var(--text-primary); outline: none; padding: 0.3rem 0.5rem; border-radius: 4px; cursor: pointer;">
+                    <select class="select-activity-team-cell" ${isConsulta ? 'disabled' : ''} style="width: 100%; border: none; background: transparent; color: var(--text-primary); outline: none; padding: 0.3rem 0.5rem; border-radius: 4px; cursor: pointer;">
                         ${teamOptions}
                     </select>
                 </td>
                 <td>
                     <div class="cadastros-resp-container" style="display: flex; flex-wrap: wrap; gap: 0.3rem; align-items: center; padding: 0.2rem 0;">
                         ${assignedBadgesHtml}
-                        <select class="select-activity-add-resp" style="border: 1px dashed var(--border-color); background: rgba(255,255,255,0.03); color: var(--text-secondary); outline: none; padding: 0.2rem 0.4rem; border-radius: 4px; font-size: 0.78rem; cursor: pointer;">
+                        <select class="select-activity-add-resp" ${isConsulta ? 'disabled' : ''} style="border: 1px dashed var(--border-color); background: rgba(255,255,255,0.03); color: var(--text-secondary); outline: none; padding: 0.2rem 0.4rem; border-radius: 4px; font-size: 0.78rem; cursor: pointer;">
                             ${unassignedOptionsHtml}
                         </select>
                     </div>
                 </td>
                 <td>
-                    <input type="text" class="input-activity-product-cell" value="${escapeHtml(proc.produto || '')}" placeholder="Produto (Opcional)" style="width: 100%; border: none; background: transparent; color: var(--text-primary); outline: none; padding: 0.3rem 0.5rem; border-radius: 4px;">
+                    <input type="text" class="input-activity-product-cell" value="${escapeHtml(proc.produto || '')}" placeholder="Produto (Opcional)" ${isConsulta ? 'readonly' : ''} style="width: 100%; border: none; background: transparent; color: var(--text-primary); outline: none; padding: 0.3rem 0.5rem; border-radius: 4px;">
                 </td>
                 <td style="text-align: center;">
                     <label style="display: inline-flex; align-items: center; gap: 0.35rem; cursor: pointer; font-size: 0.8rem; user-select: none;">
-                        <input type="checkbox" class="cb-activity-rpa" ${isRpa ? 'checked' : ''}>
+                        <input type="checkbox" class="cb-activity-rpa" ${isRpa ? 'checked' : ''} ${isConsulta ? 'disabled' : ''}>
                         <span class="label-rpa-text" style="${isRpa ? 'color: #a78bfa; font-weight: 600;' : 'color: var(--text-muted);'}">🤖 RPA</span>
                     </label>
                 </td>
@@ -3396,11 +3397,13 @@ function renderCadastrosView() {
             
             const rowCheckbox = tr.querySelector('.cadastros-row-checkbox');
             rowCheckbox.addEventListener('change', () => {
+                if (!verificarPermissao('OPERADOR')) return;
                 updateBulkDeleteState();
             });
             
             const rpaCheckbox = tr.querySelector('.cb-activity-rpa');
             rpaCheckbox.addEventListener('change', (e) => {
+                if (!verificarPermissao('OPERADOR')) return;
                 proc.isRpa = e.target.checked;
                 saveState();
                 renderTable();
@@ -3417,6 +3420,7 @@ function renderCadastrosView() {
             
             const nameInput = tr.querySelector('.input-activity-name-cell');
             nameInput.addEventListener('change', (e) => {
+                if (!verificarPermissao('OPERADOR')) return;
                 const val = e.target.value.trim();
                 if (val) {
                     proc.name = val;
@@ -3426,6 +3430,7 @@ function renderCadastrosView() {
                 }
             });
             nameInput.addEventListener('focus', () => {
+                if (isConsulta) return;
                 nameInput.style.background = 'rgba(255, 255, 255, 0.08)';
                 nameInput.style.border = '1px solid var(--border-color)';
             });
@@ -3436,6 +3441,7 @@ function renderCadastrosView() {
             
             const teamSelect = tr.querySelector('.select-activity-team-cell');
             teamSelect.addEventListener('change', (e) => {
+                if (!verificarPermissao('OPERADOR')) return;
                 const newTeam = e.target.value;
                 proc.area = newTeam;
                 setProcessResponsaveis(proc, []);
@@ -3449,6 +3455,7 @@ function renderCadastrosView() {
                 renderReviewTable();
             });
             teamSelect.addEventListener('focus', () => {
+                if (isConsulta) return;
                 teamSelect.style.background = 'rgba(255, 255, 255, 0.08)';
                 teamSelect.style.border = '1px solid var(--border-color)';
             });
@@ -3461,6 +3468,7 @@ function renderCadastrosView() {
             tr.querySelectorAll('.remove-resp-btn').forEach(btn => {
                 btn.addEventListener('click', (e) => {
                     e.stopPropagation();
+                    if (!verificarPermissao('OPERADOR')) return;
                     const respToRemove = btn.dataset.resp;
                     const updated = currentResps.filter(r => r !== respToRemove);
                     setProcessResponsaveis(proc, updated);
@@ -3477,6 +3485,7 @@ function renderCadastrosView() {
             const addRespSelect = tr.querySelector('.select-activity-add-resp');
             if (addRespSelect) {
                 addRespSelect.addEventListener('change', (e) => {
+                    if (!verificarPermissao('OPERADOR')) return;
                     const newResp = e.target.value;
                     if (!newResp) return;
                     const updated = [...currentResps, newResp];
@@ -3496,10 +3505,12 @@ function renderCadastrosView() {
             
             const productInput = tr.querySelector('.input-activity-product-cell');
             productInput.addEventListener('change', (e) => {
+                if (!verificarPermissao('OPERADOR')) return;
                 proc.produto = e.target.value.trim();
                 saveState();
             });
             productInput.addEventListener('focus', () => {
+                if (isConsulta) return;
                 productInput.style.background = 'rgba(255, 255, 255, 0.08)';
                 productInput.style.border = '1px solid var(--border-color)';
             });
