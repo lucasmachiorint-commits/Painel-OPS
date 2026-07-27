@@ -1374,13 +1374,13 @@ function renderTable() {
             <td>
                 <span style="font-size: 0.9rem; color: var(--text-secondary);">${escapeHtml(proc.responsavel || 'Sem Responsável')}</span>
             </td>
-            <td>
+            <td class="consulta-hidden">
                 <input type="number" class="input-volume" value="${proc.volume}" placeholder="---" min="0">
             </td>
-            <td>
+            <td class="consulta-hidden">
                 <input type="number" class="input-minutes" value="${proc.minutos}" placeholder="0" min="0">
             </td>
-            <td>
+            <td class="consulta-hidden">
                 <input type="number" class="input-qtd" value="${proc.qtdExecucao}" placeholder="---" min="0">
             </td>
             <td class="cell-hours admin-only">0.0h</td>

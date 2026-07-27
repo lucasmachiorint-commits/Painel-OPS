@@ -1936,9 +1936,9 @@ body.perfil-consulta textarea {
                                                 <th style="width: 25%;">Processo / Atividade</th>
                                                 <th style="width: 15%;">Ãrea ResponsÃ¡vel</th>
                                                 <th style="width: 15%;">ResponsÃ¡vel</th>
-                                                <th style="width: 12%;">Volume / Qtd. MÃªs</th>
-                                                <th style="width: 10%;">Tempo (Minutos)</th>
-                                                <th style="width: 13%;">Freq. ExecuÃ§Ã£o MÃªs</th>
+                                                <th class="consulta-hidden" style="width: 12%;">Volume / Qtd. MÃªs</th>
+                                                <th class="consulta-hidden" style="width: 10%;">Tempo (Minutos)</th>
+                                                <th class="consulta-hidden" style="width: 13%;">Freq. ExecuÃ§Ã£o MÃªs</th>
                                                 <th class="admin-only" style="width: 10%;">Horas / MÃªs</th>
                                                 <th class="admin-only" style="width: 8%;">FTE (%)</th>
                                             </tr>
@@ -1951,9 +1951,9 @@ body.perfil-consulta textarea {
                                                 <td>Total Filtrado</td>
                                                 <td></td>
                                                 <td></td>
-                                                <td></td>
-                                                <td></td>
-                                                <td></td>
+                                                <td class="consulta-hidden"></td>
+                                                <td class="consulta-hidden"></td>
+                                                <td class="consulta-hidden"></td>
                                                 <td class="admin-only" id="total-hours-filtered">0.0h</td>
                                                 <td class="neon-text-secondary admin-only" id="total-fte-pct-filtered">0.00%</td>
                                             </tr>
@@ -1961,9 +1961,9 @@ body.perfil-consulta textarea {
                                                 <td>Total Geral</td>
                                                 <td></td>
                                                 <td></td>
-                                                <td></td>
-                                                <td></td>
-                                                <td></td>
+                                                <td class="consulta-hidden"></td>
+                                                <td class="consulta-hidden"></td>
+                                                <td class="consulta-hidden"></td>
                                                 <td class="admin-only" id="total-hours">0.0h</td>
                                                 <td class="neon-text-secondary admin-only" id="total-fte-pct">0.00%</td>
                                             </tr>
@@ -4005,13 +4005,13 @@ function renderTable() {
             <td>
                 <span style="font-size: 0.9rem; color: var(--text-secondary);">${escapeHtml(proc.responsavel || 'Sem ResponsÃ¡vel')}</span>
             </td>
-            <td>
+            <td class="consulta-hidden">
                 <input type="number" class="input-volume" value="${proc.volume}" placeholder="---" min="0">
             </td>
-            <td>
+            <td class="consulta-hidden">
                 <input type="number" class="input-minutes" value="${proc.minutos}" placeholder="0" min="0">
             </td>
-            <td>
+            <td class="consulta-hidden">
                 <input type="number" class="input-qtd" value="${proc.qtdExecucao}" placeholder="---" min="0">
             </td>
             <td class="cell-hours admin-only">0.0h</td>
