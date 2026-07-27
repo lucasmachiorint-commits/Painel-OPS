@@ -1009,6 +1009,7 @@ function setupEventListeners() {
     document.querySelectorAll('.sidebar-menu .menu-item').forEach(item => {
         item.addEventListener('click', (e) => {
             const menuItem = e.currentTarget;
+            if (menuItem.getAttribute('data-rbac-hidden') === 'true' || menuItem.style.display === 'none') return;
             const view = menuItem.dataset.view;
             
             // Update active menu tab
