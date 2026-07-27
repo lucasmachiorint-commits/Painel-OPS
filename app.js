@@ -73,20 +73,13 @@ function aplicarPerfilDeAcesso() {
 
     // Controla inputs editáveis para perfil CONSULTA
     const isConsulta = perfil === 'CONSULTA';
-    document.querySelectorAll('.input-volume, .input-minutes, .input-qtd, .input-backlog-volume, .input-area-allocation').forEach(el => {
+    document.querySelectorAll('.input-volume, .input-minutes, .input-qtd, .input-backlog-volume, .input-area-allocation, .select-review-status, .input-activity-name-cell, .select-activity-team-cell, .select-activity-resp-cell, .input-activity-product-cell, .select-activity-add-resp, .cadastros-row-checkbox, .cb-activity-rpa, .access-perfil-select, #history-month-input, #modal-input-horas-dia, #modal-input-absenteismo, #modal-input-dias-uteis, #modal-input-new-team, #modal-select-team-gerencia, #modal-select-team-diretoria').forEach(el => {
         el.disabled = isConsulta;
         el.style.opacity = isConsulta ? '0.5' : '1';
+        el.style.pointerEvents = isConsulta ? 'none' : 'auto';
     });
-    document.querySelectorAll('.select-review-status').forEach(el => {
-        el.disabled = isConsulta;
-        el.style.opacity = isConsulta ? '0.5' : '1';
-    });
-    // Controla inputs editáveis na tabela de Cadastros
-    document.querySelectorAll('.input-activity-name-cell, .select-activity-team-cell, .select-activity-resp-cell, .input-activity-product-cell, .select-activity-add-resp, .cadastros-row-checkbox, .cb-activity-rpa').forEach(el => {
-        el.disabled = isConsulta;
-        el.style.opacity = isConsulta ? '0.5' : '1';
-    });
-    document.querySelectorAll('.remove-resp-btn').forEach(el => {
+    // Controla botões de ação e engrenagens na barra lateral e tabelas
+    document.querySelectorAll('.remove-resp-btn, .btn-config-resp-item').forEach(el => {
         el.style.pointerEvents = isConsulta ? 'none' : 'auto';
         el.style.display = isConsulta ? 'none' : 'inline-block';
     });
@@ -1266,6 +1259,7 @@ function setupEventListeners() {
 
     // Backlog Action Buttons
     safeAddListener('btn-import-active-volumes', 'click', () => {
+        if (!verificarPermissao('OPERADOR')) { alert('Acesso negado: Perfil OPERADOR necessário.'); return; }
         state.processes.forEach(proc => {
             const hasVolume = proc.volume !== null && proc.volume !== '';
             proc.backlogVolume = hasVolume ? proc.volume : (proc.qtdExecucao !== null && proc.qtdExecucao !== '' ? proc.qtdExecucao : '');
@@ -2921,7 +2915,7 @@ function renderSnapshotsList() {
                     <h4 style="margin: 0; font-size: 0.95rem; font-weight: 600; color: var(--text-primary);">${formatMonth(h.month)}</h4>
                     <span style="font-size: 0.8rem; color: var(--text-secondary);">${h.data.length} atividades â€ Vol: ${totalVolume.toFixed(0)}</span>
                 </div>
-                <button class="btn-row-action btn-delete-snapshot" data-month="${h.month}" title="Excluir Registro" style="color: var(--color-danger); background: transparent; border: none; cursor: pointer; font-size: 0.9rem; padding: 0.2rem;">
+                <button class="btn-row-action btn-delete-snapshot" data-permissao="ADMIN" data-month="${h.month}" title="Excluir Registro" style="color: var(--color-danger); background: transparent; border: none; cursor: pointer; font-size: 0.9rem; padding: 0.2rem;">
                     <i class="fa-solid fa-trash-can"></i>
                 </button>
             </div>
@@ -3232,6 +3226,7 @@ function renderCadastrosView() {
                 
                 const btnConfig = document.createElement('button');
                 btnConfig.className = 'btn-config-resp-item';
+                btnConfig.setAttribute('data-permissao', 'OPERADOR,ADMIN');
                 btnConfig.style.cssText = 'background: transparent; border: none; color: var(--color-primary); cursor: pointer; font-size: 0.85rem; padding: 0.2rem; display: flex; align-items: center; justify-content: center;';
                 btnConfig.title = 'Configurar Parâmetros de Capacidade';
                 btnConfig.innerHTML = '<i class="fa-solid fa-cog"></i>';
@@ -3636,6 +3631,7 @@ function setupModalParametersListeners() {
     
     if (saveBtn) {
         saveBtn.addEventListener('click', () => {
+            if (!verificarPermissao('OPERADOR')) { alert('Acesso negado: Perfil OPERADOR necessário.'); return; }
             const respName = document.getElementById('modal-param-target-resp').value;
             const hDia = parseFloat(inputHoras.value);
             const abs = parseFloat(inputAbs.value);
@@ -3896,6 +3892,11 @@ async function renderAccessControlView() {
 }
 
 async function updateUserProfile(userId, newPerfil, selectEl) {
+    if (!verificarPermissao('ADMIN')) {
+        alert('Acesso negado: Perfil ADMIN necessário.');
+        if (selectEl && selectEl.dataset.originalValue) selectEl.value = selectEl.dataset.originalValue;
+        return;
+    }
     const client = getSupabase();
     if (!client) return;
 
