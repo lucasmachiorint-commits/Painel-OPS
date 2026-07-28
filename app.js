@@ -1736,7 +1736,32 @@ function updateCalculations() {
     }
 
     // Render Summary Widgets dynamically for the target (filtered or global) selection
-    document.getElementById('widget-fte-required').textContent = targetFteDecAccum.toFixed(2);
+    let pendingTimeCount = 0;
+    targetProcesses.forEach(proc => {
+        if (proc.reviewStatus === 'Parar') return;
+        const isUnfilled = proc.minutos === null || proc.minutos === '' || proc.minutos === undefined || parseFloat(proc.minutos) <= 0;
+        if (isUnfilled) {
+            pendingTimeCount++;
+        }
+    });
+
+    const elFteReq = document.getElementById('widget-fte-required');
+    const elFteReqSub = document.getElementById('widget-fte-required-sub');
+    if (elFteReq) {
+        if (pendingTimeCount > 0) {
+            elFteReq.innerHTML = `<span style="font-size: 1.15rem; color: #f59e0b; font-weight: 700;">Em construção</span>`;
+            if (elFteReqSub) {
+                elFteReqSub.textContent = `${pendingTimeCount} atividade(s) sem tempo`;
+                elFteReqSub.style.color = '#f59e0b';
+            }
+        } else {
+            elFteReq.textContent = targetFteDecAccum.toFixed(2);
+            if (elFteReqSub) {
+                elFteReqSub.textContent = 'Recursos necessários';
+                elFteReqSub.style.color = '';
+            }
+        }
+    }
     
     const widgetActivity = document.getElementById('widget-activity-count');
     if (widgetActivity) {
@@ -1874,7 +1899,40 @@ function updateBalancingCalculations() {
 
     // Update Balancing Top Widgets
     document.getElementById('widget-backlog-hours').textContent = totalHoursAccum.toFixed(1) + 'h';
-    document.getElementById('widget-backlog-fte').textContent = totalFteDecAccum.toFixed(2);
+    
+    const filterRespBalancing = document.getElementById('filter-responsavel-balancing') ? document.getElementById('filter-responsavel-balancing').value : 'all';
+    const targetBalancingProcesses = state.processes.filter(p => {
+        const areaMatch = filterValue === 'all' || p.area === filterValue;
+        const respMatch = matchesRespFilter(p, filterRespBalancing);
+        return areaMatch && respMatch;
+    });
+
+    let pendingTimeCountBalancing = 0;
+    targetBalancingProcesses.forEach(proc => {
+        if (proc.reviewStatus === 'Parar') return;
+        const isUnfilled = proc.minutos === null || proc.minutos === '' || proc.minutos === undefined || parseFloat(proc.minutos) <= 0;
+        if (isUnfilled) {
+            pendingTimeCountBalancing++;
+        }
+    });
+
+    const elBacklogFte = document.getElementById('widget-backlog-fte');
+    const elBacklogFteSub = document.getElementById('widget-backlog-fte-sub');
+    if (elBacklogFte) {
+        if (pendingTimeCountBalancing > 0) {
+            elBacklogFte.innerHTML = `<span style="font-size: 1.15rem; color: #f59e0b; font-weight: 700;">Em construção</span>`;
+            if (elBacklogFteSub) {
+                elBacklogFteSub.textContent = `${pendingTimeCountBalancing} atividade(s) sem tempo`;
+                elBacklogFteSub.style.color = '#f59e0b';
+            }
+        } else {
+            elBacklogFte.textContent = totalFteDecAccum.toFixed(2);
+            if (elBacklogFteSub) {
+                elBacklogFteSub.textContent = 'Recursos necessários';
+                elBacklogFteSub.style.color = '';
+            }
+        }
+    }
 
 
 
