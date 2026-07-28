@@ -4975,31 +4975,48 @@ function exportToCSV() {
     csvContent += `Horas Trabalho MÃªs (1 FTE);${horasTrabalhoMes.toFixed(2)}\n`;
     csvContent += `Tamanho da Equipe (DisponÃ­vel);${state.params.teamSize}\n\n`;
 
-    if (activeTab === 'dashboard') {
-        csvContent += "RELATORIO DE CAPACIDADE E FTE (DASHBOARD)\n";
-        csvContent += "PROCESSO;AREA RESPONSAVEL;VOLUME MES;MINUTOS UNITARIO;QTD EXECUCAO MES;TOTAL HORAS MES;FTE %\n";
+    if (activeTab === 'dashboard' || activeTab === 'cadastros') {
+        csvContent += "RELATORIO DE PROCESSOS E ATIVIDADES\n";
+        csvContent += "PROCESSO / ATIVIDADE;AREA RESPONSAVEL;RESPONSAVEL;VOLUME / QTD. MES;TEMPO (MINUTOS);FREQ. EXECUCAO MES;HORAS / MES;FTE (%)\n";
 
         let totalHours = 0;
         let totalFtePct = 0;
 
-        state.processes.forEach(proc => {
+        const filterAreaEl = document.getElementById('filter-area');
+        const filterRespEl = document.getElementById('filter-responsavel');
+        const filterArea = filterAreaEl ? filterAreaEl.value : 'all';
+        const filterResp = filterRespEl ? filterRespEl.value : 'all';
+
+        const processesToExport = state.processes.filter(p => {
+            const areaMatch = filterArea === 'all' || p.area === filterArea;
+            const respMatch = matchesRespFilter(p, filterResp);
+            return areaMatch && respMatch;
+        });
+
+        processesToExport.forEach(proc => {
+            const isStopped = proc.reviewStatus === 'Parar';
             const hasVolume = proc.volume !== null && proc.volume !== '';
-            const multiplier = hasVolume ? parseFloat(proc.volume) : (proc.qtdExecucao !== null && proc.qtdExecucao !== '' ? parseFloat(proc.qtdExecucao) : 0);
-            const minutes = proc.minutos !== null && proc.minutos !== '' ? parseFloat(proc.minutos) : 0;
+            const multiplier = isStopped ? 0 : (hasVolume ? parseFloat(proc.volume) : (proc.qtdExecucao !== null && proc.qtdExecucao !== '' ? parseFloat(proc.qtdExecucao) : 0));
+            const minutes = isStopped ? 0 : (proc.minutos !== null && proc.minutos !== '' ? parseFloat(proc.minutos) : 0);
             
             const totalHoursRow = (multiplier * minutes) / 60;
-            const ftePct = horasTrabalhoMes > 0 ? (totalHoursRow / horasTrabalhoMes) * 100 : 0;
+
+            const respParams = getResponsibleParams(proc.responsavel);
+            const pHorasRealDia = respParams.horasDia * (1 - respParams.absenteismo / 100);
+            const pHorasTrabalhoMes = pHorasRealDia * respParams.diasUteis;
+            const ftePct = pHorasTrabalhoMes > 0 ? (totalHoursRow / pHorasTrabalhoMes) * 100 : 0;
 
             totalHours += totalHoursRow;
             totalFtePct += ftePct;
 
             const name = `"${(proc.name || '').replace(/"/g, '""')}"`;
-            const area = `"${(proc.area || '').replace(/"/g, '""')}"`;
-            const vol = proc.volume !== '' ? proc.volume : '""';
-            const mins = proc.minutos !== '' ? proc.minutos : 0;
-            const qtd = proc.qtdExecucao !== '' ? proc.qtdExecucao : '""';
+            const area = `"${(proc.area || 'Sem Equipe').replace(/"/g, '""')}"`;
+            const resp = `"${(proc.responsavel || 'Sem ResponsÃ¡vel').replace(/"/g, '""')}"`;
+            const vol = proc.volume !== null && proc.volume !== '' ? proc.volume : '""';
+            const mins = proc.minutos !== null && proc.minutos !== '' ? proc.minutos : 0;
+            const qtd = proc.qtdExecucao !== null && proc.qtdExecucao !== '' ? proc.qtdExecucao : '""';
 
-            csvContent += `${name};${area};${vol};${mins};${qtd};${totalHoursRow.toFixed(2).replace('.', ',')};${ftePct.toFixed(2).replace('.', ',')}%\n`;
+            csvContent += `${name};${area};${resp};${vol};${mins};${qtd};${totalHoursRow.toFixed(2).replace('.', ',')};${ftePct.toFixed(2).replace('.', ',')}%\n`;
         });
 
         csvContent += `TOTAL GERAL;;;;;;${totalHours.toFixed(2).replace('.', ',')};${totalFtePct.toFixed(2).replace('.', ',')}%\n`;
