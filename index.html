@@ -859,7 +859,7 @@
     <div id="modal-new-team" class="modal-overlay" style="display: none;">
         <div class="modal-content" style="max-width: 460px; width: 95%;">
             <div class="modal-header">
-                <h3 class="modal-title">
+                <h3 class="modal-title" id="modal-new-team-title">
                     <i class="fa-solid fa-users"></i> Nova Equipe
                 </h3>
                 <button class="modal-close" id="btn-close-new-team-modal" onclick="closeNewTeamModal()" title="Fechar">&times;</button>
@@ -868,6 +868,12 @@
                 <div style="display: flex; flex-direction: column; gap: 0.35rem;">
                     <label style="font-size: 0.8rem; font-weight: 600; color: var(--text-secondary);">Nome da Equipe <span style="color: var(--color-danger);">*</span></label>
                     <input type="text" id="modal-input-new-team" placeholder="Ex: Backoffice" style="width: 100%; padding: 0.55rem 0.85rem; border-radius: 8px; border: 1px solid var(--border-color); background: rgba(255,255,255,0.05); color: var(--text-primary); font-size: 0.95rem;">
+                </div>
+                <div style="display: flex; flex-direction: column; gap: 0.35rem;">
+                    <label style="font-size: 0.8rem; font-weight: 600; color: var(--text-secondary);">Coordenador(a) / Responsável</label>
+                    <select id="modal-select-team-coordenador" style="width: 100%; padding: 0.55rem 0.85rem; border-radius: 8px; border: 1px solid var(--border-color); background: rgba(255,255,255,0.05); color: var(--text-primary); font-size: 0.95rem; cursor: pointer;">
+                        <option value="">Sem Coordenador</option>
+                    </select>
                 </div>
                 <div style="display: flex; flex-direction: column; gap: 0.35rem;">
                     <label style="font-size: 0.8rem; font-weight: 600; color: var(--text-secondary);">Gerência <span style="color: var(--color-danger);">*</span></label>
@@ -888,7 +894,7 @@
             <div class="modal-footer" style="display: flex; justify-content: flex-end; gap: 0.75rem; border-top: 1px solid var(--border-color); padding-top: 1rem;">
                 <button id="btn-cancel-new-team-modal" onclick="closeNewTeamModal()" class="btn btn-secondary">Cancelar</button>
                 <button id="btn-save-new-team-modal" data-permissao="OPERADOR,ADMIN" onclick="saveNewTeamFromModal()" class="btn btn-primary">
-                    <i class="fa-solid fa-check"></i> Cadastrar Equipe
+                    <i class="fa-solid fa-check"></i> <span id="btn-save-new-team-modal-label">Cadastrar Equipe</span>
                 </button>
             </div>
         </div>

@@ -825,7 +825,10 @@ function applyStateMigrations() {
     
     state.teams.forEach(team => {
         if (!state.teamHierarchy[team]) {
-            state.teamHierarchy[team] = defaultRelations[team] || { gerencia: 'Suporte Operacional', diretoria: 'Operações' };
+            state.teamHierarchy[team] = defaultRelations[team] || { gerencia: 'Suporte Operacional', diretoria: 'Operações', coordenador: '' };
+        }
+        if (state.teamHierarchy[team].coordenador === undefined) {
+            state.teamHierarchy[team].coordenador = '';
         }
     });
 
@@ -952,28 +955,66 @@ function getResponsibleParams(responsavelName) {
 // GLOBAL MODAL FUNCTIONS FOR NOVA EQUIPE
 // Defined globally so they work with onclick= attributes in HTML
 
-function openNewTeamModal() {
+function populateTeamCoordenadorSelect(selectedValue = '') {
+    const select = document.getElementById('modal-select-team-coordenador');
+    if (!select) return;
+    const resps = (state.responsaveis || []).map(r => typeof r === 'object' ? r.name : r).filter(Boolean);
+    select.innerHTML = '<option value="">Sem Coordenador</option>' + resps.map(r => 
+        `<option value="${escapeHtml(r)}" ${r === selectedValue ? 'selected' : ''}>${escapeHtml(r)}</option>`
+    ).join('');
+}
+
+function openNewTeamModal(teamToEdit = null) {
     const modal = document.getElementById('modal-new-team');
     const nameInput = document.getElementById('modal-input-new-team');
+    const gerenciaSelect = document.getElementById('modal-select-team-gerencia');
+    const diretoriaSelect = document.getElementById('modal-select-team-diretoria');
+    const titleEl = document.getElementById('modal-new-team-title');
+    const btnLabelEl = document.getElementById('btn-save-new-team-modal-label');
     const errorDiv = document.getElementById('modal-new-team-error');
-    if (nameInput) nameInput.value = '';
+
     if (errorDiv) errorDiv.style.display = 'none';
+
+    if (teamToEdit) {
+        if (modal) modal.dataset.editTeam = teamToEdit;
+        if (titleEl) titleEl.innerHTML = `<i class="fa-solid fa-pen-to-square"></i> Editar Equipe`;
+        if (btnLabelEl) btnLabelEl.textContent = 'Salvar Alterações';
+        if (nameInput) nameInput.value = teamToEdit;
+
+        const info = (state.teamHierarchy && state.teamHierarchy[teamToEdit]) || {};
+        if (gerenciaSelect) gerenciaSelect.value = info.gerencia || 'Suporte Operacional';
+        if (diretoriaSelect) diretoriaSelect.value = info.diretoria || 'Operações';
+        populateTeamCoordenadorSelect(info.coordenador || '');
+    } else {
+        if (modal) delete modal.dataset.editTeam;
+        if (titleEl) titleEl.innerHTML = `<i class="fa-solid fa-users"></i> Nova Equipe`;
+        if (btnLabelEl) btnLabelEl.textContent = 'Cadastrar Equipe';
+        if (nameInput) nameInput.value = '';
+        if (gerenciaSelect) gerenciaSelect.value = 'Suporte Operacional';
+        if (diretoriaSelect) diretoriaSelect.value = 'Operações';
+        populateTeamCoordenadorSelect('');
+    }
+
     if (modal) modal.style.display = 'flex';
     if (nameInput) setTimeout(() => nameInput.focus(), 100);
 }
 
 function closeNewTeamModal() {
     const modal = document.getElementById('modal-new-team');
-    if (modal) modal.style.display = 'none';
+    if (modal) {
+        delete modal.dataset.editTeam;
+        modal.style.display = 'none';
+    }
 }
 
 function saveNewTeamFromModal() {
-    if (!verificarPermissao('OPERADOR')) { alert('Acesso negado: Perfil OPERADOR necessÃ¡rio.'); return; }
+    if (!verificarPermissao('OPERADOR')) { alert('Acesso negado: Perfil OPERADOR necessário.'); return; }
+    const modal = document.getElementById('modal-new-team');
     const nameInput = document.getElementById('modal-input-new-team');
     const gerenciaSelect = document.getElementById('modal-select-team-gerencia');
     const diretoriaSelect = document.getElementById('modal-select-team-diretoria');
+    const coordenadorSelect = document.getElementById('modal-select-team-coordenador');
     const errorDiv = document.getElementById('modal-new-team-error');
-    const modal = document.getElementById('modal-new-team');
 
     const teamName = nameInput ? nameInput.value.trim() : '';
     if (!teamName) {
@@ -981,21 +1022,50 @@ function saveNewTeamFromModal() {
         if (nameInput) nameInput.focus();
         return;
     }
-    if ((state.teams || []).map(t => t.toLowerCase()).includes(teamName.toLowerCase())) {
-        if (errorDiv) { errorDiv.textContent = 'Esta equipe jÃ estÃ cadastrada.'; errorDiv.style.display = 'block'; }
+
+    const editTeamOriginalName = modal ? modal.dataset.editTeam : null;
+    const isEdit = !!editTeamOriginalName;
+
+    const existingTeams = (state.teams || []).filter(t => isEdit ? t.toLowerCase() !== editTeamOriginalName.toLowerCase() : true);
+    if (existingTeams.map(t => t.toLowerCase()).includes(teamName.toLowerCase())) {
+        if (errorDiv) { errorDiv.textContent = 'Esta equipe já está cadastrada.'; errorDiv.style.display = 'block'; }
         if (nameInput) nameInput.focus();
         return;
     }
 
     const gerencia = gerenciaSelect ? gerenciaSelect.value : 'Suporte Operacional';
-    const diretoria = diretoriaSelect ? diretoriaSelect.value : 'OperaÃ§Ãµes';
+    const diretoria = diretoriaSelect ? diretoriaSelect.value : 'Operações';
+    const coordenador = coordenadorSelect ? coordenadorSelect.value : '';
 
-    state.teams.push(teamName);
     if (!state.teamHierarchy) state.teamHierarchy = {};
-    state.teamHierarchy[teamName] = { gerencia, diretoria };
+
+    if (isEdit) {
+        const idx = state.teams.indexOf(editTeamOriginalName);
+        if (idx !== -1) {
+            state.teams[idx] = teamName;
+        }
+
+        if (editTeamOriginalName !== teamName) {
+            delete state.teamHierarchy[editTeamOriginalName];
+            (state.processes || []).forEach(p => {
+                if (p.area === editTeamOriginalName) p.area = teamName;
+            });
+            (state.responsaveis || []).forEach(r => {
+                if (r.area === editTeamOriginalName) r.area = teamName;
+            });
+        }
+
+        state.teamHierarchy[teamName] = { gerencia, diretoria, coordenador };
+    } else {
+        state.teams.push(teamName);
+        state.teamHierarchy[teamName] = { gerencia, diretoria, coordenador };
+    }
 
     saveState();
-    if (modal) modal.style.display = 'none';
+    if (modal) {
+        delete modal.dataset.editTeam;
+        modal.style.display = 'none';
+    }
     renderCadastrosView();
     renderAreaFilterOptions();
     renderTable();
@@ -3187,21 +3257,46 @@ function renderCadastrosView() {
         if(teamsList) teamsList.innerHTML = '<div style="color: var(--text-muted); font-size: 0.85rem; padding: 0.5rem;">Nenhuma equipe cadastrada.</div>';
     } else {
         if(teamsList) {
-            teamsList.innerHTML = state.teams.map(team => `
-                <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.4rem 0.6rem; border-radius: 6px; border: 1px solid rgba(255,255,255,0.03); background: rgba(255,255,255,0.01);">
-                    <span style="font-size: 0.85rem; font-weight: 500; color: var(--text-primary);">${escapeHtml(team)}</span>
-                    <button class="btn-delete-team-item" data-permissao="ADMIN" data-team="${escapeHtml(team)}" style="background: transparent; border: none; color: var(--color-danger); cursor: pointer; font-size: 0.8rem; padding: 0.2rem;" title="Excluir Equipe">
-                        <i class="fa-solid fa-trash-can"></i>
-                    </button>
-                </div>
-            `).join('');
+            teamsList.innerHTML = state.teams.map(team => {
+                const hierarchy = (state.teamHierarchy && state.teamHierarchy[team]) || {};
+                const coordName = hierarchy.coordenador ? hierarchy.coordenador : '';
+                const coordHtml = coordName 
+                    ? `<div style="font-size: 0.73rem; color: var(--text-muted); margin-top: 0.15rem; display: flex; align-items: center; gap: 0.25rem;"><i class="fa-solid fa-user-tie" style="font-size: 0.65rem; color: var(--color-primary);"></i> Coord: ${escapeHtml(coordName)}</div>`
+                    : `<div style="font-size: 0.73rem; color: var(--text-muted); margin-top: 0.15rem; opacity: 0.6;">Sem Coordenador</div>`;
+
+                return `
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.45rem 0.65rem; border-radius: 6px; border: 1px solid rgba(255,255,255,0.03); background: rgba(255,255,255,0.01);">
+                        <div style="display: flex; flex-direction: column;">
+                            <span style="font-size: 0.85rem; font-weight: 500; color: var(--text-primary);">${escapeHtml(team)}</span>
+                            ${coordHtml}
+                        </div>
+                        <div style="display: flex; gap: 0.35rem; align-items: center;">
+                            <button class="btn-edit-team-item" data-permissao="OPERADOR,ADMIN" data-team="${escapeHtml(team)}" style="background: transparent; border: none; color: var(--text-secondary); cursor: pointer; font-size: 0.8rem; padding: 0.2rem;" title="Editar Equipe">
+                                <i class="fa-solid fa-pen-to-square"></i>
+                            </button>
+                            <button class="btn-delete-team-item" data-permissao="ADMIN" data-team="${escapeHtml(team)}" style="background: transparent; border: none; color: var(--color-danger); cursor: pointer; font-size: 0.8rem; padding: 0.2rem;" title="Excluir Equipe">
+                                <i class="fa-solid fa-trash-can"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
             
+            teamsList.querySelectorAll('.btn-edit-team-item').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    if (!verificarPermissao('OPERADOR')) { alert('Acesso negado: Perfil OPERADOR necessário.'); return; }
+                    const team = btn.getAttribute('data-team');
+                    openNewTeamModal(team);
+                });
+            });
+
             teamsList.querySelectorAll('.btn-delete-team-item').forEach(btn => {
                 btn.addEventListener('click', (e) => {
                     e.stopPropagation();
-                    if (!verificarPermissao('ADMIN')) { alert('Acesso negado: Perfil ADMIN necessÃ¡rio.'); return; }
+                    if (!verificarPermissao('ADMIN')) { alert('Acesso negado: Perfil ADMIN necessário.'); return; }
                     const team = btn.getAttribute('data-team');
-                    if (confirm(`Deseja ÃÃrealmente excluir a equipe "${team}"? Todos os responsÃ¡veis e atividades desta equipe ficarão "Sem Equipe".`)) {
+                    if (confirm(`Deseja realmente excluir a equipe "${team}"? Todos os responsáveis e atividades desta equipe ficarão "Sem Equipe".`)) {
                         state.teams = state.teams.filter(t => t !== team);
                         state.processes.forEach(p => {
                             if (p.area === team) p.area = '';
