@@ -3436,15 +3436,9 @@ function applyStateMigrations() {
         };
     }
     if (!state.areaAllocations) state.areaAllocations = {};
-    if (!state.processes) state.processes = [];
-
-    // Re-establish missing base processes for Backoffice and EficiÃªncia Operacional
-    EXAMPLE_PROCESSES.forEach(ep => {
-        const exists = state.processes.some(p => p.name === ep.name);
-        if (!exists) {
-            state.processes.push(JSON.parse(JSON.stringify(ep)));
-        }
-    });
+    if (!state.processes) {
+        state.processes = JSON.parse(JSON.stringify(EXAMPLE_PROCESSES));
+    }
 
     state.processes.forEach(p => {
         const match = EXAMPLE_PROCESSES.find(ep => ep.name === p.name);
