@@ -654,7 +654,7 @@ async function saveStateToSupabase() {
         const { error } = await client
             .from('board_state')
             .upsert({
-                id: 'default',
+                id: 'hml_default',
                 data: state,
                 updated_by: myUserId || null,
                 updated_at: new Date().toISOString()
@@ -698,7 +698,7 @@ async function forceResetGlobalState() {
         const { error } = await client
             .from('board_state')
             .upsert({
-                id: 'default',
+                id: 'hml_default',
                 data: state,
                 updated_by: user ? user.id : null,
                 updated_at: new Date().toISOString()
@@ -724,7 +724,7 @@ async function loadStateFromSupabase() {
         const { data, error } = await client
             .from('board_state')
             .select('data, updated_at')
-            .eq('id', 'default')
+            .eq('id', 'hml_default')
             .maybeSingle();
 
         if (error) {

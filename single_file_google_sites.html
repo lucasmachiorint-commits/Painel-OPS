@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Capacity & FTE - EficiÃªncia Operacional</title>
+    <title>Capacity & FTE - Eficiência Operacional</title>
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -1329,7 +1329,7 @@ body.light-theme .select-review-area option, body.light-theme .select-review-sta
     color: var(--color-success) !important;
     background: rgba(16, 185, 129, 0.08) !important;
 }
-.select-review-status[data-status="ComeÃ§ar"] {
+.select-review-status[data-status="Começar"] {
     border-color: var(--color-primary) !important;
     color: var(--color-primary) !important;
     background: rgba(235, 92, 39, 0.08) !important;
@@ -1651,18 +1651,18 @@ body.light-theme .select-review-area option, body.light-theme .select-review-sta
     border-color: var(--color-primary);
 }
 
-/* RestriÃ§Ã£o por perfil: Ocultar elementos exclusivos de ADMIN */
+/* Restrição por perfil: Ocultar elementos exclusivos de ADMIN */
 body.perfil-consulta .admin-only,
 body.perfil-operador .admin-only {
     display: none !important;
 }
 
-/* RestriÃ§Ã£o por perfil: Ocultar elementos exclusivos de OPERADOR/ADMIN para CONSULTA */
+/* Restrição por perfil: Ocultar elementos exclusivos de OPERADOR/ADMIN para CONSULTA */
 body.perfil-consulta .consulta-hidden {
     display: none !important;
 }
 
-/* RestriÃ§Ã£o por perfil: Bloquear interaÃ§Ã£o com todos os campos de formulÃ¡rio no perfil CONSULTA */
+/* Restrição por perfil: Bloquear interação com todos os campos de formulário no perfil CONSULTA */
 body.perfil-consulta input:not(#auth-email):not(#auth-password),
 body.perfil-consulta select:not(#select-user-profile),
 body.perfil-consulta textarea {
@@ -1676,7 +1676,10 @@ body.perfil-consulta textarea {
 </style>
 </head>
 <body class="dark-theme">
-    <div class="app-container">
+    <div id="hml-banner-fixed" style="position: fixed; top: 0; left: 0; right: 0; width: 100%; height: 32px; background: #f59e0b; color: #090d16; font-size: 11px; font-weight: 900; letter-spacing: 0.8px; text-transform: uppercase; display: flex; align-items: center; justify-content: center; gap: 8px; z-index: 999999; box-shadow: 0 4px 14px rgba(245,158,11,0.35); border-bottom: 2px solid #d97706;">
+        <i class="fa-solid fa-vial-circle-check text-slate-950 text-xs"></i> 🧪 AMBIENTE DE HOMOLOGAÇÃO (HML) — DADOS E FUNÇÕES EM TESTE
+    </div>
+    <div class="app-container" style="margin-top: 32px;">
         <!-- LEFT SIDEBAR -->
         <nav class="sidebar">
             <div class="sidebar-brand">
@@ -1713,17 +1716,17 @@ body.perfil-consulta textarea {
                     <i class="fa-solid fa-scale-balanced"></i>
                     <span>Balanceamento</span>
                 </li>
-                <li class="menu-item" data-view="review" title="RevisÃ£o de Atividades" style="display: none;">
+                <li class="menu-item" data-view="review" title="Revisão de Atividades" style="display: none;">
                     <i class="fa-solid fa-clipboard-check"></i>
-                    <span>RevisÃ£o</span>
+                    <span>Revisão</span>
                 </li>
-                <li class="menu-item" data-view="automations" title="Quadro de AutomaÃ§Ãµes (RPA)">
+                <li class="menu-item" data-view="automations" title="Quadro de Automações (RPA)">
                     <i class="fa-solid fa-robot"></i>
-                    <span>AutomaÃ§Ãµes</span>
+                    <span>Automações</span>
                 </li>
-                <li class="menu-item" data-view="history" title="HistÃ³rico de Volumes">
+                <li class="menu-item" data-view="history" title="Histórico de Volumes">
                     <i class="fa-solid fa-chart-line"></i>
-                    <span>HistÃ³rico</span>
+                    <span>Histórico</span>
                 </li>
                 <li class="menu-item" data-view="access-control" data-permissao="ADMIN" title="Controle de Acesso">
                     <i class="fa-solid fa-shield-halved"></i>
@@ -1740,11 +1743,11 @@ body.perfil-consulta textarea {
                     <h2 class="app-title" id="app-view-title">Cadastro</h2>
                 </div>
                 <div class="header-actions">
-                    <div id="realtime-status-badge" style="display: flex; align-items: center; gap: 0.4rem; padding: 0.4rem 0.8rem; border-radius: 20px; font-size: 0.8rem; background: rgba(255,255,255,0.05); color: var(--text-muted);" title="Status da sincronizaÃ§Ã£o em tempo real (Supabase)">
+                    <div id="realtime-status-badge" style="display: flex; align-items: center; gap: 0.4rem; padding: 0.4rem 0.8rem; border-radius: 20px; font-size: 0.8rem; background: rgba(255,255,255,0.05); color: var(--text-muted);" title="Status da sincronização em tempo real (Supabase)">
                         <span class="status-dot" style="width: 8px; height: 8px; border-radius: 50%; background: #eab308; display: inline-block;"></span>
                         <span class="status-text">Conectando...</span>
                     </div>
-                    <button id="btn-reset-global-state" class="btn btn-secondary" data-permissao="ADMIN" title="Publicar sua visÃ£o atual como a base oficial para todos os usuÃ¡rios" onclick="forceResetGlobalState()">
+                    <button id="btn-reset-global-state" class="btn btn-secondary" data-permissao="ADMIN" title="Publicar sua visão atual como a base oficial para todos os usuários" onclick="forceResetGlobalState()">
                         <i class="fa-solid fa-cloud-arrow-up"></i> Publicar para Todos
                     </button>
                     <button id="btn-export-csv" class="btn btn-primary-outline" title="Exportar CSV (Excel)">
@@ -1760,13 +1763,13 @@ body.perfil-consulta textarea {
                 <!-- VIEW 0: CADASTROS -->
                 <div id="view-cadastros" class="tab-view" style="display: block;">
                     <div class="grid-2-col" style="grid-template-columns: 300px 1fr; gap: 1.5rem;">
-                        <!-- SIDEBAR: EQUIPES & RESPONSÃVEIS -->
+                        <!-- SIDEBAR: EQUIPES & RESPONSÁVEIS -->
                         <aside style="display: flex; flex-direction: column; gap: 1.5rem;">
                             <!-- PANELS FOR TEAMS (EQUIPES) -->
                             <section class="panel glass-panel">
                                 <div style="display: flex; justify-content: space-between; align-items: center; width: 100%; border-bottom: 1px solid var(--border-color); padding-bottom: 0.75rem; margin-bottom: 1.25rem;">
                                     <h2 class="panel-title" style="margin-bottom: 0; border-bottom: none; padding-bottom: 0; font-size: 1.1rem;">
-                                        <i class="fa-solid fa-users"></i> Equipes (Ãreas)
+                                        <i class="fa-solid fa-users"></i> Equipes (Áreas)
                                     </h2>
                                     <div style="display: flex; gap: 0.5rem; align-items: center;">
                                         <button id="btn-view-organogram" class="btn btn-secondary" style="padding: 0.3rem 0.6rem; font-size: 0.75rem; opacity: 0.5; cursor: not-allowed; background: rgba(235, 92, 39, 0.05); border: 1px solid #eb5c27; color: #eb5c27;" title="Em breve" disabled>
@@ -1782,23 +1785,23 @@ body.perfil-consulta textarea {
                                 </div>
                             </section>
 
-                            <!-- PANELS FOR RESPONSÃVEIS -->
+                            <!-- PANELS FOR RESPONSÍVEIS -->
                             <section class="panel glass-panel">
                                 <div style="display: flex; justify-content: space-between; align-items: center; width: 100%; border-bottom: 1px solid var(--border-color); padding-bottom: 0.75rem; margin-bottom: 1.25rem;">
                                     <h2 class="panel-title" style="margin-bottom: 0; border-bottom: none; padding-bottom: 0; font-size: 1.1rem;">
-                                        <i class="fa-solid fa-user-tie"></i> ResponsÃ¡veis
+                                        <i class="fa-solid fa-user-tie"></i> Responsáveis
                                     </h2>
-                                    <button id="btn-global-params" data-permissao="OPERADOR,ADMIN" class="btn btn-secondary" style="padding: 0.3rem 0.6rem; font-size: 0.75rem; background: rgba(235, 92, 39, 0.08); border: 1px solid #eb5c27; color: #eb5c27;" title="Configurar ParÃ¢metros PadrÃ£o de Capacidade">
-                                        <i class="fa-solid fa-sliders"></i> PadrÃ£o Global
+                                    <button id="btn-global-params" data-permissao="OPERADOR,ADMIN" class="btn btn-secondary" style="padding: 0.3rem 0.6rem; font-size: 0.75rem; background: rgba(235, 92, 39, 0.08); border: 1px solid #eb5c27; color: #eb5c27;" title="Configurar Parâmetros Padrão de Capacidade">
+                                        <i class="fa-solid fa-sliders"></i> Padrão Global
                                     </button>
                                 </div>
                                 <div style="display: flex; flex-direction: column; gap: 0.5rem; margin-bottom: 1rem;">
-                                    <input type="text" id="input-new-responsible" name="field_resp_no_pass_manager" autocomplete="off" readonly onfocus="this.removeAttribute('readonly');" data-permissao="OPERADOR,ADMIN" placeholder="Novo ResponsÃ¡vel" style="width: 100%; padding: 0.4rem 0.8rem; border-radius: 6px; border: 1px solid var(--border-color); background: rgba(255,255,255,0.05); color: var(--text-primary);">
+                                    <input type="text" id="input-new-responsible" name="field_resp_no_pass_manager" autocomplete="off" readonly onfocus="this.removeAttribute('readonly');" data-permissao="OPERADOR,ADMIN" placeholder="Novo Responsável" style="width: 100%; padding: 0.4rem 0.8rem; border-radius: 6px; border: 1px solid var(--border-color); background: rgba(255,255,255,0.05); color: var(--text-primary);">
                                     <div style="display: flex; gap: 0.5rem;">
                                         <select id="select-new-responsible-team" data-permissao="OPERADOR,ADMIN" style="flex: 1; padding: 0.4rem 0.8rem; border-radius: 6px; border: 1px solid var(--border-color); background: rgba(255,255,255,0.05); color: var(--text-primary); cursor: pointer;">
                                             <!-- Populated dynamically -->
                                         </select>
-                                         <button id="btn-add-responsible" data-permissao="OPERADOR,ADMIN" class="btn btn-primary" style="padding: 0.4rem 1rem; white-space: nowrap;" title="Adicionar ResponsÃ¡vel">
+                                         <button id="btn-add-responsible" data-permissao="OPERADOR,ADMIN" class="btn btn-primary" style="padding: 0.4rem 1rem; white-space: nowrap;" title="Adicionar Responsável">
                                              Adicionar
                                          </button>
                                     </div>
@@ -1835,10 +1838,10 @@ body.perfil-consulta textarea {
                                         <tr>
                                             <th class="col-excluir-admin" style="width: 4%; text-align: center;"><input type="checkbox" id="cadastros-select-all" data-permissao="ADMIN"></th>
                                             <th style="width: 28%;">Nome da Atividade / Demanda</th>
-                                            <th style="width: 18%;">Equipe / Ãrea ResponsÃ¡vel</th>
-                                            <th style="width: 18%;">ResponsÃ¡vel</th>
+                                            <th style="width: 18%;">Equipe / Área Responsável</th>
+                                            <th style="width: 18%;">Responsável</th>
                                             <th style="width: 15%;">Produto</th>
-                                            <th style="width: 12%; text-align: center;">AutomaÃ§Ã£o (RPA)</th>
+                                            <th style="width: 12%; text-align: center;">Automação (RPA)</th>
                                             <th class="col-excluir-admin" style="width: 5%; text-align: center;">Excluir</th>
                                         </tr>
                                     </thead>
@@ -1865,7 +1868,7 @@ body.perfil-consulta textarea {
                                     <div class="widget-info">
                                         <h3>FTEs Requeridos</h3>
                                         <p class="widget-value" id="widget-fte-required">0.00</p>
-                                        <span class="widget-sub" id="widget-fte-required-sub">Recursos necessÃ¡rios</span>
+                                        <span class="widget-sub" id="widget-fte-required-sub">Recursos necessários</span>
                                     </div>
                                 </div>
 
@@ -1913,17 +1916,17 @@ body.perfil-consulta textarea {
                                         <div class="filter-group">
                                             <i class="fa-solid fa-filter"></i>
                                             <select id="filter-area">
-                                                <option value="all">Todas as Ãreas</option>
+                                                <option value="all">Todas as Áreas</option>
                                                 <option value="Backoffice">Backoffice</option>
-                                                <option value="GovernanÃ§a">GovernanÃ§a</option>
+                                                <option value="Governança">Governança</option>
                                                 <option value="Seguros/N2">Seguros/N2</option>
-                                                <option value="EficiÃªncia Operacional">EficiÃªncia Operacional</option>
+                                                <option value="Eficiência Operacional">Eficiência Operacional</option>
                                             </select>
                                         </div>
                                         <div class="filter-group">
                                             <i class="fa-solid fa-user-tag"></i>
                                             <select id="filter-responsavel">
-                                                <option value="all">Todos os ResponsÃ¡veis</option>
+                                                <option value="all">Todos os Responsáveis</option>
                                             </select>
                                         </div>
                                     </div>
@@ -1934,12 +1937,12 @@ body.perfil-consulta textarea {
                                         <thead>
                                             <tr>
                                                 <th style="width: 25%;">Processo / Atividade</th>
-                                                <th style="width: 15%;">Ãrea ResponsÃ¡vel</th>
-                                                <th style="width: 15%;">ResponsÃ¡vel</th>
-                                                <th class="consulta-hidden" style="width: 12%;">Volume / Qtd. MÃªs</th>
+                                                <th style="width: 15%;">Área Responsável</th>
+                                                <th style="width: 15%;">Responsável</th>
+                                                <th class="consulta-hidden" style="width: 12%;">Volume / Qtd. Mês</th>
                                                 <th class="consulta-hidden" style="width: 10%;">Tempo (Minutos)</th>
-                                                <th class="consulta-hidden" style="width: 13%;">Freq. ExecuÃ§Ã£o MÃªs</th>
-                                                <th class="admin-only" style="width: 10%;">Horas / MÃªs</th>
+                                                <th class="consulta-hidden" style="width: 13%;">Freq. Execução Mês</th>
+                                                <th class="admin-only" style="width: 10%;">Horas / Mês</th>
                                                 <th class="admin-only" style="width: 8%;">FTE (%)</th>
                                             </tr>
                                         </thead>
@@ -1974,7 +1977,7 @@ body.perfil-consulta textarea {
                                 <div class="empty-state-container" id="empty-state" style="display: none;">
                                     <i class="fa-solid fa-folder-open empty-icon"></i>
                                     <h3>Nenhum processo cadastrado</h3>
-                                    <p>Adicione um processo manualmente ou carregue o modelo de exemplo para comeÃ§ar.</p>
+                                    <p>Adicione um processo manualmente ou carregue o modelo de exemplo para começar.</p>
                                     <button id="btn-empty-load-example" data-permissao="OPERADOR,ADMIN" class="btn btn-secondary">
                                         <i class="fa-solid fa-wand-magic-sparkles"></i> Carregar Exemplo
                                     </button>
@@ -1984,13 +1987,13 @@ body.perfil-consulta textarea {
                             <!-- VISUALIZATION DASHBOARD -->
                             <section class="charts-grid">
                                 <div class="panel glass-panel chart-container admin-only">
-                                    <h3 class="panel-title" id="chart-pie-title"><i class="fa-solid fa-chart-pie"></i> DistribuiÃ§Ã£o de FTE por Processo</h3>
+                                    <h3 class="panel-title" id="chart-pie-title"><i class="fa-solid fa-chart-pie"></i> Distribuição de FTE por Processo</h3>
                                     <div class="canvas-wrapper">
                                         <canvas id="chart-pie"></canvas>
                                     </div>
                                 </div>
                                 <div class="panel glass-panel chart-container admin-only">
-                                    <h3 class="panel-title"><i class="fa-solid fa-chart-bar"></i> BalanÃ§o de Capacidade (FTE)</h3>
+                                    <h3 class="panel-title"><i class="fa-solid fa-chart-bar"></i> Balanço de Capacidade (FTE)</h3>
                                     <div class="canvas-wrapper">
                                         <canvas id="chart-bar"></canvas>
                                     </div>
@@ -2022,7 +2025,7 @@ body.perfil-consulta textarea {
                             <div class="widget-info">
                                 <h3>FTEs Requeridos Backlog</h3>
                                 <p class="widget-value" id="widget-backlog-fte">0.00</p>
-                                <span class="widget-sub" id="widget-backlog-fte-sub">Recursos necessÃ¡rios</span>
+                                <span class="widget-sub" id="widget-backlog-fte-sub">Recursos necessários</span>
                             </div>
                         </div>
 
@@ -2030,7 +2033,7 @@ body.perfil-consulta textarea {
                     </section>
                     <section class="panel glass-panel consulta-hidden" style="margin-bottom: 1.5rem; padding: 1.25rem;">
                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.5rem;">
-                            <h3 class="panel-title" style="margin-bottom: 0;"><i class="fa-solid fa-users-gear"></i> Recursos por Ãrea</h3>
+                            <h3 class="panel-title" style="margin-bottom: 0;"><i class="fa-solid fa-users-gear"></i> Recursos por Área</h3>
                             <p style="font-size: 0.8rem; color: var(--text-secondary); margin: 0; line-height: 1.3;">
                                 Insira a quantidade de colaboradores alocados para cada equipe. Clique em um processo na tabela para focar e editar a respectiva equipe.
                             </p>
@@ -2056,17 +2059,17 @@ body.perfil-consulta textarea {
                                 <div class="filter-group">
                                     <i class="fa-solid fa-filter"></i>
                                     <select id="filter-area-balancing">
-                                        <option value="all">Todas as Ãreas</option>
+                                        <option value="all">Todas as Áreas</option>
                                         <option value="Backoffice">Backoffice</option>
-                                        <option value="GovernanÃ§a">GovernanÃ§a</option>
+                                        <option value="Governança">Governança</option>
                                         <option value="Seguros/N2">Seguros/N2</option>
-                                        <option value="EficiÃªncia Operacional">EficiÃªncia Operacional</option>
+                                        <option value="Eficiência Operacional">Eficiência Operacional</option>
                                     </select>
                                 </div>
                                 <div class="filter-group">
                                     <i class="fa-solid fa-user-tag"></i>
                                     <select id="filter-responsavel-balancing">
-                                        <option value="all">Todos os ResponsÃ¡veis</option>
+                                        <option value="all">Todos os Responsáveis</option>
                                     </select>
                                 </div>
                             </div>
@@ -2077,8 +2080,8 @@ body.perfil-consulta textarea {
                                 <thead>
                                     <tr>
                                         <th style="width: 30%;">Processo / Atividade</th>
-                                        <th style="width: 15%;">Ãrea ResponsÃ¡vel</th>
-                                        <th style="width: 15%;">ResponsÃ¡vel</th>
+                                        <th style="width: 15%;">Área Responsável</th>
+                                        <th style="width: 15%;">Responsável</th>
                                         <th style="width: 10%;">Tempo (Minutos)</th>
                                         <th style="width: 12%;">Volume do Backlog</th>
                                         <th class="admin-only" style="width: 10%;">Horas Requeridas</th>
@@ -2114,12 +2117,12 @@ body.perfil-consulta textarea {
                         <div class="empty-state-container" id="balancing-empty-state" style="display: none;">
                             <i class="fa-solid fa-folder-open empty-icon"></i>
                             <h3>Nenhuma atividade cadastrada</h3>
-                            <p>Cadastre atividades no menu Dashboard para poder visualizÃ¡-las e simular backlogs aqui.</p>
+                            <p>Cadastre atividades no menu Dashboard para poder visualizá-las e simular backlogs aqui.</p>
                         </div>
                     </section>
                 </div>
 
-                <!-- VIEW 3: REVISÃƒO DE ATIVIDADES -->
+                <!-- VIEW 3: REVISÃO DE ATIVIDADES -->
                 <div id="view-review" class="tab-view" style="display: none;">
                     <!-- REVIEW SUMMARY WIDGETS -->
                     <section class="dashboard-widgets">
@@ -2130,7 +2133,7 @@ body.perfil-consulta textarea {
                             <div class="widget-info">
                                 <h3>Atividades a Manter</h3>
                                 <p class="widget-value" id="widget-review-manter">0</p>
-                                <span class="widget-sub">Manter a execuÃ§Ã£o</span>
+                                <span class="widget-sub">Manter a execução</span>
                             </div>
                         </div>
                         <div class="widget-card glass-panel count-card">
@@ -2140,7 +2143,7 @@ body.perfil-consulta textarea {
                             <div class="widget-info">
                                 <h3>Atividades a Parar</h3>
                                 <p class="widget-value" id="widget-review-parar">0</p>
-                                <span class="widget-sub">Encerrar execuÃ§Ã£o</span>
+                                <span class="widget-sub">Encerrar execução</span>
                             </div>
                         </div>
                         <div class="widget-card glass-panel count-card">
@@ -2148,7 +2151,7 @@ body.perfil-consulta textarea {
                                 <i class="fa-solid fa-circle-plus"></i>
                             </div>
                             <div class="widget-info">
-                                <h3>Atividades a ComeÃ§ar</h3>
+                                <h3>Atividades a Começar</h3>
                                 <p class="widget-value" id="widget-review-comecar">0</p>
                                 <span class="widget-sub">Novas iniciativas</span>
                             </div>
@@ -2159,20 +2162,20 @@ body.perfil-consulta textarea {
                     <section class="panel glass-panel table-panel">
                         <div class="panel-header-actions">
                             <h2 class="panel-title">
-                                <i class="fa-solid fa-clipboard-check"></i> RevisÃ£o de Atividades
+                                <i class="fa-solid fa-clipboard-check"></i> Revisão de Atividades
                             </h2>
                             <div class="header-table-controls">
                                 <div class="filter-group">
                                     <i class="fa-solid fa-filter"></i>
                                     <select id="filter-area-review">
-                                        <option value="all">Todas as Ãreas</option>
+                                        <option value="all">Todas as Áreas</option>
                                         <!-- Dynamically populated options -->
                                     </select>
                                 </div>
                                 <div class="filter-group">
                                     <i class="fa-solid fa-user-tag"></i>
                                     <select id="filter-responsavel-review">
-                                        <option value="all">Todos os ResponsÃ¡veis</option>
+                                        <option value="all">Todos os Responsáveis</option>
                                     </select>
                                 </div>
                             </div>
@@ -2183,11 +2186,11 @@ body.perfil-consulta textarea {
                                 <thead>
                                     <tr>
                                         <th style="width: 30%;">Processo / Atividade</th>
-                                        <th style="width: 20%;">Ãrea ResponsÃ¡vel (Equipe)</th>
-                                        <th style="width: 15%;">ResponsÃ¡vel</th>
-                                        <th style="width: 12%;">MÃ©trica Atual</th>
+                                        <th style="width: 20%;">Área Responsável (Equipe)</th>
+                                        <th style="width: 15%;">Responsável</th>
+                                        <th style="width: 12%;">Métrica Atual</th>
                                         <th class="admin-only" style="width: 8%;">FTE (%)</th>
-                                        <th style="width: 15%;">AÃ§Ã£o de RevisÃ£o (DecisÃ£o)</th>
+                                        <th style="width: 15%;">Ação de Revisão (Decisão)</th>
                                     </tr>
                                 </thead>
                                 <tbody id="review-table-body">
@@ -2199,12 +2202,12 @@ body.perfil-consulta textarea {
                         <div class="empty-state-container" id="review-empty-state" style="display: none;">
                             <i class="fa-solid fa-folder-open empty-icon"></i>
                             <h3>Nenhuma atividade cadastrada</h3>
-                            <p>Cadastre atividades no menu Dashboard para poder revisÃ¡-las aqui.</p>
+                            <p>Cadastre atividades no menu Dashboard para poder revisá-las aqui.</p>
                         </div>
                     </section>
                 </div>
 
-                <!-- AUTOMATIONS VIEW (QUADRO DE AUTOMAÃ‡Ã•ES & RPA) -->
+                <!-- AUTOMATIONS VIEW (QUADRO DE AUTOMAÇÕES & RPA) -->
                 <div id="view-automations" class="tab-view" style="display: none;">
                     <!-- TOP AUTOMATIONS KPI CARDS -->
                     <section class="dashboard-widgets" style="grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));">
@@ -2213,7 +2216,7 @@ body.perfil-consulta textarea {
                                 <i class="fa-solid fa-robot"></i>
                             </div>
                             <div class="widget-info">
-                                <h3>Total de AutomaÃ§Ãµes (RPA)</h3>
+                                <h3>Total de Automações (RPA)</h3>
                                 <p class="widget-value" id="rpa-view-total-count">0</p>
                                 <span class="widget-sub" id="rpa-view-total-count-sub">0.0% das atividades</span>
                             </div>
@@ -2235,24 +2238,24 @@ body.perfil-consulta textarea {
                                 <i class="fa-solid fa-hourglass-half"></i>
                             </div>
                             <div class="widget-info">
-                                <h3>Horas Economizadas / MÃªs</h3>
+                                <h3>Horas Economizadas / Mês</h3>
                                 <p class="widget-value" id="rpa-view-total-hours">0.0h</p>
-                                <span class="widget-sub">em execuÃ§Ã£o automÃ¡tica</span>
+                                <span class="widget-sub">em execução automática</span>
                             </div>
                         </div>
                     </section>
 
-                    <!-- MAIN QUADRO DE AUTOMAÃ‡Ã•ES PANEL -->
+                    <!-- MAIN QUADRO DE AUTOMAÇÕES PANEL -->
                     <section class="panel glass-panel table-panel">
                         <div class="panel-header-actions">
                             <h2 class="panel-title">
-                                <i class="fa-solid fa-robot"></i> Quadro de AutomaÃ§Ãµes (RPA)
+                                <i class="fa-solid fa-robot"></i> Quadro de Automações (RPA)
                             </h2>
                             <div class="header-table-controls">
                                 <div class="filter-group">
                                     <i class="fa-solid fa-filter"></i>
                                     <select id="filter-area-rpa">
-                                        <option value="all">Todas as Ãreas</option>
+                                        <option value="all">Todas as Áreas</option>
                                     </select>
                                 </div>
                             </div>
@@ -2263,8 +2266,8 @@ body.perfil-consulta textarea {
                                 <thead>
                                     <tr>
                                         <th style="width: 32%;">Processo / Atividade Automatizada</th>
-                                        <th style="width: 18%;">Equipe / Ãrea</th>
-                                        <th style="width: 18%;">ResponsÃ¡vel</th>
+                                        <th style="width: 18%;">Equipe / Área</th>
+                                        <th style="width: 18%;">Responsável</th>
                                         <th style="width: 15%;">Produto</th>
                                         <th class="admin-only" style="width: 17%;">Capacity (FTE / %)</th>
                                     </tr>
@@ -2277,9 +2280,9 @@ body.perfil-consulta textarea {
 
                         <div class="empty-state-container" id="rpa-empty-state" style="display: none; padding: 3rem 1.5rem; text-align: center;">
                             <i class="fa-solid fa-robot empty-icon" style="font-size: 3rem; color: #a78bfa; margin-bottom: 1rem; opacity: 0.8;"></i>
-                            <h3 style="color: var(--text-primary); font-size: 1.2rem; margin-bottom: 0.5rem;">Nenhuma atividade configurada como RPA / AutomaÃ§Ã£o</h3>
+                            <h3 style="color: var(--text-primary); font-size: 1.2rem; margin-bottom: 0.5rem;">Nenhuma atividade configurada como RPA / Automação</h3>
                             <p style="color: var(--text-muted); font-size: 0.9rem; max-width: 500px; margin: 0 auto;">
-                                Para adicionar uma atividade ao quadro de AutomaÃ§Ãµes, marque a opÃ§Ã£o <strong>ðŸ¤– RPA</strong> no menu <strong>Cadastro</strong> ou inclua <strong>RPA / RobÃ´</strong> no nome da atividade.
+                                Para adicionar uma atividade ao quadro de Automações, marque a opção <strong>🤖 RPA</strong> no menu <strong>Cadastro</strong> ou inclua <strong>RPA / Robô</strong> no nome da atividade.
                             </p>
                         </div>
                     </section>
@@ -2293,7 +2296,7 @@ body.perfil-consulta textarea {
                             <div>
                                 <h3 class="panel-title" style="margin-bottom: 0.5rem;"><i class="fa-solid fa-cloud-arrow-up"></i> Salvar Registro de Demandas</h3>
                                 <p style="font-size: 0.85rem; color: var(--text-secondary); margin: 0;">
-                                    Salve o volume atual de todas as atividades para gerar o histÃ³rico de demanda ao longo dos meses.
+                                    Salve o volume atual de todas as atividades para gerar o histórico de demanda ao longo dos meses.
                                 </p>
                             </div>
                             <div style="display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
@@ -2302,7 +2305,7 @@ body.perfil-consulta textarea {
                                     <input type="month" id="history-month-input" style="background: transparent; border: none; color: var(--text-primary); outline: none; font-size: 0.9rem; font-family: inherit;">
                                 </div>
                                 <button id="btn-save-history" data-permissao="OPERADOR,ADMIN" class="btn btn-primary">
-                                    <i class="fa-solid fa-floppy-disk"></i> Salvar Registro do MÃªs
+                                    <i class="fa-solid fa-floppy-disk"></i> Salvar Registro do Mês
                                 </button>
                             </div>
                         </div>
@@ -2313,7 +2316,7 @@ body.perfil-consulta textarea {
                         <section class="panel glass-panel">
                             <div class="panel-header-actions" style="margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
                                 <h2 class="panel-title" style="margin-bottom: 0;">
-                                    <i class="fa-solid fa-chart-area"></i> EvoluÃ§Ã£o de Volume de Demandas
+                                    <i class="fa-solid fa-chart-area"></i> Evolução de Volume de Demandas
                                 </h2>
                                 <div class="header-table-controls" style="gap: 0.75rem; flex-wrap: wrap;">
                                     <!-- Chart Filters -->
@@ -2321,8 +2324,8 @@ body.perfil-consulta textarea {
                                         <i class="fa-solid fa-users-viewfinder"></i>
                                         <select id="filter-history-type">
                                             <option value="atividade">Por Atividade</option>
-                                            <option value="area">Por Ãrea</option>
-                                            <option value="responsavel">Por ResponsÃ¡vel</option>
+                                            <option value="area">Por Área</option>
+                                            <option value="responsavel">Por Responsável</option>
                                         </select>
                                     </div>
                                     <div class="filter-group">
@@ -2359,8 +2362,8 @@ body.perfil-consulta textarea {
                                 <i class="fa-solid fa-users"></i>
                             </div>
                             <div class="widget-info">
-                                <h3>Total de UsuÃ¡rios</h3>
-                                <p class="widget-value" id="widget-access-total">â€“</p>
+                                <h3>Total de Usuários</h3>
+                                <p class="widget-value" id="widget-access-total">–</p>
                                 <span class="widget-sub">Contas cadastradas</span>
                             </div>
                         </div>
@@ -2370,7 +2373,7 @@ body.perfil-consulta textarea {
                             </div>
                             <div class="widget-info">
                                 <h3>Admins</h3>
-                                <p class="widget-value" id="widget-access-admin">â€“</p>
+                                <p class="widget-value" id="widget-access-admin">–</p>
                                 <span class="widget-sub">Acesso total</span>
                             </div>
                         </div>
@@ -2380,8 +2383,8 @@ body.perfil-consulta textarea {
                             </div>
                             <div class="widget-info">
                                 <h3>Operadores</h3>
-                                <p class="widget-value" id="widget-access-operador">â€“</p>
-                                <span class="widget-sub">CriaÃ§Ã£o e ediÃ§Ã£o</span>
+                                <p class="widget-value" id="widget-access-operador">–</p>
+                                <span class="widget-sub">Criação e edição</span>
                             </div>
                         </div>
                         <div class="widget-card glass-panel count-card">
@@ -2390,17 +2393,17 @@ body.perfil-consulta textarea {
                             </div>
                             <div class="widget-info">
                                 <h3>Consulta</h3>
-                                <p class="widget-value" id="widget-access-consulta">â€“</p>
+                                <p class="widget-value" id="widget-access-consulta">–</p>
                                 <span class="widget-sub">Somente leitura</span>
                             </div>
                         </div>
                     </section>
 
-                    <!-- PAINEL DA TABELA DE USUÃRIOS -->
+                    <!-- PAINEL DA TABELA DE USUÁRIOS -->
                     <section class="panel glass-panel table-panel">
                         <div class="panel-header-actions" style="margin-bottom: 1.5rem;">
                             <h2 class="panel-title" style="margin-bottom: 0;">
-                                <i class="fa-solid fa-shield-halved"></i> GestÃ£o de Perfis de Acesso
+                                <i class="fa-solid fa-shield-halved"></i> Gestão de Perfis de Acesso
                             </h2>
                             <div class="header-table-controls">
                                 <button id="btn-refresh-access" class="btn btn-secondary" onclick="renderAccessControlView()" title="Atualizar lista">
@@ -2411,12 +2414,12 @@ body.perfil-consulta textarea {
 
                         <div id="access-control-empty" style="display: none; text-align: center; padding: 3rem; color: var(--text-muted);">
                             <i class="fa-solid fa-circle-info" style="font-size: 2rem; margin-bottom: 1rem; display: block; opacity: 0.4;"></i>
-                            <p style="font-size: 0.9rem;">Nenhum usuÃ¡rio encontrado. Verifique se a tabela <code>profiles</code> foi criada no Supabase.</p>
+                            <p style="font-size: 0.9rem;">Nenhum usuário encontrado. Verifique se a tabela <code>profiles</code> foi criada no Supabase.</p>
                         </div>
 
                         <div id="access-control-loading" style="text-align: center; padding: 3rem; color: var(--text-muted);">
                             <i class="fa-solid fa-spinner fa-spin" style="font-size: 2rem; margin-bottom: 1rem; display: block;"></i>
-                            <p style="font-size: 0.9rem;">Carregando usuÃ¡rios...</p>
+                            <p style="font-size: 0.9rem;">Carregando usuários...</p>
                         </div>
 
                         <div class="table-responsive" id="access-control-table-wrapper" style="display: none;">
@@ -2437,8 +2440,8 @@ body.perfil-consulta textarea {
 
                         <!-- Info block with SQL setup instructions -->
                         <div id="access-control-setup-info" style="display: none; margin-top: 1.5rem; background: rgba(99,102,241,0.08); border: 1px solid rgba(99,102,241,0.25); border-radius: 8px; padding: 1.25rem;">
-                            <h4 style="color: #6366f1; margin-bottom: 0.75rem; font-size: 0.95rem;"><i class="fa-solid fa-circle-info"></i> ConfiguraÃ§Ã£o NecessÃ¡ria</h4>
-                            <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.75rem;">Para listar e gerenciar usuÃ¡rios, execute o SQL abaixo no <strong>SQL Editor</strong> do seu projeto Supabase:</p>
+                            <h4 style="color: #6366f1; margin-bottom: 0.75rem; font-size: 0.95rem;"><i class="fa-solid fa-circle-info"></i> Configuração Necessária</h4>
+                            <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.75rem;">Para listar e gerenciar usuários, execute o SQL abaixo no <strong>SQL Editor</strong> do seu projeto Supabase:</p>
                             <pre id="access-control-sql-block" style="background: rgba(0,0,0,0.3); border-radius: 6px; padding: 1rem; font-size: 0.75rem; color: #a5f3fc; overflow-x: auto; white-space: pre-wrap; line-height: 1.5;"></pre>
                             <button class="btn btn-secondary" style="margin-top: 0.75rem; font-size: 0.8rem;" onclick="navigator.clipboard.writeText(document.getElementById('access-control-sql-block').textContent).then(() => alert('SQL copiado!'))">
                                 <i class="fa-solid fa-copy"></i> Copiar SQL
@@ -2455,7 +2458,7 @@ body.perfil-consulta textarea {
     <div id="modal-parameters" class="modal-overlay" style="display: none;">
         <div class="modal-content glass-panel" style="max-width: 450px;">
             <div class="modal-header">
-                <h3 id="modal-param-title"><i class="fa-solid fa-sliders"></i> ParÃ¢metros de Capacidade</h3>
+                <h3 id="modal-param-title"><i class="fa-solid fa-sliders"></i> Parâmetros de Capacidade</h3>
                 <button class="modal-close" id="btn-close-modal-param">&times;</button>
             </div>
             <div class="modal-body" style="display: flex; flex-direction: column; gap: 1.25rem; padding: 1rem 0 1.5rem 0;">
@@ -2471,20 +2474,20 @@ body.perfil-consulta textarea {
                     <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.2rem; display: none;" id="modal-lbl-horas-dia-pattern"></div>
                 </div>
 
-                <!-- Input: AbsenteÃ­smo / Shrinkage -->
+                <!-- Input: Absenteísmo / Shrinkage -->
                 <div class="control-group">
                     <div class="control-label">
-                        <span>AbsenteÃ­smo / Shrinkage</span>
+                        <span>Absenteísmo / Shrinkage</span>
                         <span class="value-display" id="modal-val-absenteismo">20%</span>
                     </div>
                     <input type="range" id="modal-input-absenteismo" min="0" max="50" step="1" value="20">
                     <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.2rem; display: none;" id="modal-lbl-abs-pattern"></div>
                 </div>
 
-                <!-- Input: Dias Ãšteis no MÃªs -->
+                <!-- Input: Dias Úteis no Mês -->
                 <div class="control-group">
                     <div class="control-label">
-                        <span>Dias Ãšteis no MÃªs</span>
+                        <span>Dias Úteis no Mês</span>
                         <span class="value-display" id="modal-val-dias-uteis">21d</span>
                     </div>
                     <input type="range" id="modal-input-dias-uteis" min="15" max="27" step="1" value="21">
@@ -2498,14 +2501,14 @@ body.perfil-consulta textarea {
                         <span id="modal-calc-real-dia" style="font-size: 1.1rem; font-weight: 700; color: var(--text-primary);">6.4h</span>
                     </div>
                     <div class="admin-only" style="flex: 1; display: flex; flex-direction: column; gap: 0.2rem;">
-                        <span style="font-size: 0.75rem; color: var(--text-secondary);">Capacidade MÃªs (1 FTE):</span>
+                        <span style="font-size: 0.75rem; color: var(--text-secondary);">Capacidade Mês (1 FTE):</span>
                         <span id="modal-calc-mes" style="font-size: 1.1rem; font-weight: 700; color: var(--color-primary);">134.4h</span>
                     </div>
                 </div>
             </div>
             <div class="modal-footer" style="display: flex; justify-content: flex-end; gap: 0.75rem; border-top: 1px solid var(--border-color); padding-top: 1rem;">
                 <button id="btn-modal-param-clear" data-permissao="OPERADOR,ADMIN" class="btn btn-secondary" style="display: none; background: rgba(244, 63, 94, 0.08); border: 1px solid #f43f5e; color: #f43f5e;">
-                    Usar PadrÃ£o
+                    Usar Padrão
                 </button>
                 <button id="btn-modal-param-save" data-permissao="OPERADOR,ADMIN" class="btn btn-primary">
                     Confirmar
@@ -2529,23 +2532,23 @@ body.perfil-consulta textarea {
                     <input type="text" id="modal-input-new-team" placeholder="Ex: Backoffice" style="width: 100%; padding: 0.55rem 0.85rem; border-radius: 8px; border: 1px solid var(--border-color); background: rgba(255,255,255,0.05); color: var(--text-primary); font-size: 0.95rem;">
                 </div>
                 <div style="display: flex; flex-direction: column; gap: 0.35rem;">
-                    <label style="font-size: 0.8rem; font-weight: 600; color: var(--text-secondary);">Coordenador(a) / ResponsÃ¡vel</label>
+                    <label style="font-size: 0.8rem; font-weight: 600; color: var(--text-secondary);">Coordenador(a) / Responsável</label>
                     <select id="modal-select-team-coordenador" style="width: 100%; padding: 0.55rem 0.85rem; border-radius: 8px; border: 1px solid var(--border-color); background: rgba(255,255,255,0.05); color: var(--text-primary); font-size: 0.95rem; cursor: pointer;">
                         <option value="">Sem Coordenador</option>
                     </select>
                 </div>
                 <div style="display: flex; flex-direction: column; gap: 0.35rem;">
-                    <label style="font-size: 0.8rem; font-weight: 600; color: var(--text-secondary);">GerÃªncia <span style="color: var(--color-danger);">*</span></label>
+                    <label style="font-size: 0.8rem; font-weight: 600; color: var(--text-secondary);">Gerência <span style="color: var(--color-danger);">*</span></label>
                     <select id="modal-select-team-gerencia" style="width: 100%; padding: 0.55rem 0.85rem; border-radius: 8px; border: 1px solid var(--border-color); background: rgba(255,255,255,0.05); color: var(--text-primary); font-size: 0.95rem; cursor: pointer;">
                         <option value="Suporte Operacional">Suporte Operacional</option>
-                        <option value="ConciliaÃ§Ã£o e ParÃ¢metros">ConciliaÃ§Ã£o e ParÃ¢metros</option>
+                        <option value="Conciliação e Parâmetros">Conciliação e Parâmetros</option>
                         <option value="Atendimento">Atendimento</option>
                     </select>
                 </div>
                 <div style="display: flex; flex-direction: column; gap: 0.35rem;">
                     <label style="font-size: 0.8rem; font-weight: 600; color: var(--text-secondary);">Diretoria <span style="color: var(--color-danger);">*</span></label>
                     <select id="modal-select-team-diretoria" style="width: 100%; padding: 0.55rem 0.85rem; border-radius: 8px; border: 1px solid var(--border-color); background: rgba(255,255,255,0.05); color: var(--text-primary); font-size: 0.95rem; cursor: pointer;">
-                        <option value="OperaÃ§Ãµes">OperaÃ§Ãµes</option>
+                        <option value="Operações">Operações</option>
                     </select>
                 </div>
                 <div id="modal-new-team-error" style="display: none; color: var(--color-danger); font-size: 0.8rem; padding: 0.5rem 0.75rem; background: rgba(244,63,94,0.08); border-radius: 6px; border: 1px solid rgba(244,63,94,0.3);"></div>
@@ -2587,7 +2590,7 @@ body.perfil-consulta textarea {
         <div id="header-user-chip" style="display: flex; align-items: center; gap: 0.6rem; padding: 0.3rem 0.75rem 0.3rem 0.5rem; border-radius: 999px; background: var(--bg-glass); border: 1px solid var(--border-color); box-shadow: var(--shadow-premium); cursor: default; user-select: none; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);">
             <i class="fa-solid fa-circle-user" style="font-size: 1.4rem; color: var(--color-primary);"></i>
             <div style="display: flex; flex-direction: column; line-height: 1.2;">
-                <span id="userName" style="font-size: 0.82rem; font-weight: 600; color: var(--text-primary); max-width: 130px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">UsuÃ¡rio</span>
+                <span id="userName" style="font-size: 0.82rem; font-weight: 600; color: var(--text-primary); max-width: 130px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">Usuário</span>
                 <span id="userRole" class="user-role-badge role-consulta" style="font-size: 0.68rem; padding: 0.05rem 0.4rem; margin-top: 0.1rem; width: fit-content;">CONSULTA</span>
             </div>
             <button id="btn-logout" onclick="handleLogout()" title="Sair do sistema" style="background: transparent; border: 1px solid var(--border-color); color: var(--text-secondary); border-radius: 6px; padding: 0.3rem 0.55rem; cursor: pointer; font-size: 0.78rem; display: flex; align-items: center; gap: 0.3rem; transition: all 0.2s; white-space: nowrap;" onmouseover="this.style.background='rgba(244,63,94,0.12)';this.style.color='#f43f5e';this.style.borderColor='rgba(244,63,94,0.3)'" onmouseout="this.style.background='transparent';this.style.color='var(--text-secondary)';this.style.borderColor='var(--border-color)'">
@@ -2612,7 +2615,7 @@ body.perfil-consulta textarea {
         <div class="modal-container" style="max-width: 400px; padding: 2rem;">
             <div style="text-align: center; margin-bottom: 2rem;">
                 <h2 style="font-size: 1.5rem; margin-bottom: 0.5rem; color: var(--text-primary);">EmanaPay</h2>
-                <p style="color: var(--text-secondary); font-size: 0.9rem;">Controle de EficiÃªncia Operacional</p>
+                <p style="color: var(--text-secondary); font-size: 0.9rem;">Controle de Eficiência Operacional</p>
             </div>
             
             <div id="auth-error-msg" style="display: none; background: rgba(244, 63, 94, 0.1); border: 1px solid rgba(244, 63, 94, 0.3); color: #f43f5e; padding: 0.75rem; border-radius: 6px; font-size: 0.85rem; margin-bottom: 1rem; text-align: center;"></div>
@@ -2661,13 +2664,13 @@ let currentUser = {
     perfil: 'CONSULTA'  // 'ADMIN' | 'OPERADOR' | 'CONSULTA'
 };
 
-// Hierarquia de permissÃƒÂµes: CONSULTA < OPERADOR < ADMIN
+// Hierarquia de permissÃµes: CONSULTA < OPERADOR < ADMIN
 function verificarPermissao(perfilMinimo) {
     const hierarquia = { 'CONSULTA': 0, 'OPERADOR': 1, 'ADMIN': 2 };
     return (hierarquia[currentUser.perfil] || 0) >= (hierarquia[perfilMinimo] || 0);
 }
 
-// Varre o DOM e oculta/exibe elementos conforme o perfil do usuÃƒrio
+// Varre o DOM e oculta/exibe elementos conforme o perfil do usuÃrio
 function aplicarPerfilDeAcesso() {
     const perfil = currentUser.perfil;
 
@@ -2684,7 +2687,7 @@ function aplicarPerfilDeAcesso() {
     const selectProfile = document.getElementById('select-user-profile');
     if (selectProfile) selectProfile.value = perfil;
 
-    // Atualiza classe de perfil no body para controle de restriÃ§Ã£o CSS (.admin-only)
+    // Atualiza classe de perfil no body para controle de restrição CSS (.admin-only)
     if (document.body) {
         document.body.classList.remove('perfil-admin', 'perfil-operador', 'perfil-consulta');
         document.body.classList.add('perfil-' + perfil.toLowerCase());
@@ -2708,14 +2711,14 @@ function aplicarPerfilDeAcesso() {
         el.style.display = isAdmin ? '' : 'none';
     });
 
-    // Controla inputs editÃ¡veis para perfil CONSULTA
+    // Controla inputs editáveis para perfil CONSULTA
     const isConsulta = perfil === 'CONSULTA';
     document.querySelectorAll('.input-volume, .input-minutes, .input-qtd, .input-backlog-volume, .input-area-allocation, .select-review-status, .input-activity-name-cell, .select-activity-team-cell, .select-activity-resp-cell, .input-activity-product-cell, .select-activity-add-resp, .cadastros-row-checkbox, .cb-activity-rpa, .access-perfil-select, #history-month-input, #modal-input-horas-dia, #modal-input-absenteismo, #modal-input-dias-uteis, #modal-input-new-team, #modal-select-team-gerencia, #modal-select-team-diretoria').forEach(el => {
         el.disabled = isConsulta;
         el.style.opacity = isConsulta ? '0.5' : '1';
         el.style.pointerEvents = isConsulta ? 'none' : 'auto';
     });
-    // Controla botÃµes de aÃ§Ã£o e engrenagens na barra lateral e tabelas
+    // Controla botões de ação e engrenagens na barra lateral e tabelas
     document.querySelectorAll('.remove-resp-btn, .btn-config-resp-item').forEach(el => {
         el.style.pointerEvents = isConsulta ? 'none' : 'auto';
         el.style.display = isConsulta ? 'none' : 'inline-block';
@@ -2742,29 +2745,29 @@ let barChartInstance = null;
 // DEFAULT EXAMPLE DATA WITH AREAS
 const EXAMPLE_PROCESSES = [
     // Backoffice
-    { id: 'ex-1', name: 'Cancelamento DY - SolicitaÃ§Ã£o CB (Fila Projeto)', area: 'Backoffice', volume: '', minutos: 0, qtdExecucao: '', backlogVolume: '', allocatedResource: '' },
-    { id: 'ex-2', name: 'ProrrogaÃ§Ã£o', area: 'Backoffice', volume: '', minutos: 0, qtdExecucao: '', backlogVolume: '', allocatedResource: '' },
-    { id: 'ex-3', name: 'Baixa de Parcela (RobÃ´ Baixas) - Demandas BKO + Baixa em lote + Baixa manual', area: 'Backoffice', volume: '', minutos: 0, qtdExecucao: '', backlogVolume: '', allocatedResource: '' },
+    { id: 'ex-1', name: 'Cancelamento DY - Solicitação CB (Fila Projeto)', area: 'Backoffice', volume: '', minutos: 0, qtdExecucao: '', backlogVolume: '', allocatedResource: '' },
+    { id: 'ex-2', name: 'Prorrogação', area: 'Backoffice', volume: '', minutos: 0, qtdExecucao: '', backlogVolume: '', allocatedResource: '' },
+    { id: 'ex-3', name: 'Baixa de Parcela (Robô Baixas) - Demandas BKO + Baixa em lote + Baixa manual', area: 'Backoffice', volume: '', minutos: 0, qtdExecucao: '', backlogVolume: '', allocatedResource: '' },
     { id: 'ex-4', name: 'Improcedente DY', area: 'Backoffice', volume: '', minutos: 0, qtdExecucao: '', backlogVolume: '', allocatedResource: '' },
-    { id: 'ex-5', name: 'DevoluÃ§Ã£o de pagamento em duplicidade', area: 'Backoffice', volume: '', minutos: 0, qtdExecucao: '', backlogVolume: '', allocatedResource: '' },
-    { id: 'ex-6', name: 'Reembolso (RobÃ´ Reembolsos) Montagem Arquivo + Upload Zord + Monitoria/Retorno', area: 'Backoffice', volume: '', minutos: 0, qtdExecucao: '', backlogVolume: '', allocatedResource: '' },
+    { id: 'ex-5', name: 'Devolução de pagamento em duplicidade', area: 'Backoffice', volume: '', minutos: 0, qtdExecucao: '', backlogVolume: '', allocatedResource: '' },
+    { id: 'ex-6', name: 'Reembolso (Robô Reembolsos) Montagem Arquivo + Upload Zord + Monitoria/Retorno', area: 'Backoffice', volume: '', minutos: 0, qtdExecucao: '', backlogVolume: '', allocatedResource: '' },
     { id: 'ex-7', name: 'Cancelamento CAPTA + Cancelamento Jira', area: 'Backoffice', volume: '', minutos: 0, qtdExecucao: '', backlogVolume: '', allocatedResource: '' },
     { id: 'ex-8', name: 'Cancelamento SAP + Cancelamento Jira', area: 'Backoffice', volume: '', minutos: 0, qtdExecucao: '', backlogVolume: '', allocatedResource: '' },
-    { id: 'ex-9', name: 'DÃ©bitos Pag Emana Pay', area: 'Backoffice', volume: '', minutos: 0, qtdExecucao: '', backlogVolume: '', allocatedResource: '' },
-    { id: 'ex-10', name: 'Cancelamento DY - SolicitaÃ§Ã£o CB (Fila N3) + Cancelamento Jira', area: 'Backoffice', volume: '', minutos: 0, qtdExecucao: '', backlogVolume: '', allocatedResource: '' },
-    { id: 'ex-11', name: 'Pagamento nÃ£o processado', area: 'Backoffice', volume: '', minutos: 0, qtdExecucao: '', backlogVolume: '', allocatedResource: '' },
+    { id: 'ex-9', name: 'Débitos Pag Emana Pay', area: 'Backoffice', volume: '', minutos: 0, qtdExecucao: '', backlogVolume: '', allocatedResource: '' },
+    { id: 'ex-10', name: 'Cancelamento DY - Solicitação CB (Fila N3) + Cancelamento Jira', area: 'Backoffice', volume: '', minutos: 0, qtdExecucao: '', backlogVolume: '', allocatedResource: '' },
+    { id: 'ex-11', name: 'Pagamento não processado', area: 'Backoffice', volume: '', minutos: 0, qtdExecucao: '', backlogVolume: '', allocatedResource: '' },
     { id: 'ex-12', name: 'Parcela invertida', area: 'Backoffice', volume: '', minutos: 0, qtdExecucao: '', backlogVolume: '', allocatedResource: '' },
-    { id: 'ex-13', name: 'Cancelamento Parcial/AmortizaÃ§Ã£o', area: 'Backoffice', volume: '', minutos: 0, qtdExecucao: '', backlogVolume: '', allocatedResource: '' },
-    { id: 'ex-14', name: 'AmortizaÃ§Ã£o Nota de credito', area: 'Backoffice', volume: '', minutos: 0, qtdExecucao: '', backlogVolume: '', allocatedResource: '' },
-    { id: 'ex-15', name: 'Recompra (AmortizaÃ§Ã£o e Recompra Proativa)', area: 'Backoffice', volume: '', minutos: 0, qtdExecucao: '', backlogVolume: '', allocatedResource: '' },
-    { id: 'ex-16', name: 'DÃºvidas - Pagamento, CobranÃ§a e Espelhamento', area: 'Backoffice', volume: '', minutos: 0, qtdExecucao: '', backlogVolume: '', allocatedResource: '' },
+    { id: 'ex-13', name: 'Cancelamento Parcial/Amortização', area: 'Backoffice', volume: '', minutos: 0, qtdExecucao: '', backlogVolume: '', allocatedResource: '' },
+    { id: 'ex-14', name: 'Amortização Nota de credito', area: 'Backoffice', volume: '', minutos: 0, qtdExecucao: '', backlogVolume: '', allocatedResource: '' },
+    { id: 'ex-15', name: 'Recompra (Amortização e Recompra Proativa)', area: 'Backoffice', volume: '', minutos: 0, qtdExecucao: '', backlogVolume: '', allocatedResource: '' },
+    { id: 'ex-16', name: 'Dúvidas - Pagamento, Cobrança e Espelhamento', area: 'Backoffice', volume: '', minutos: 0, qtdExecucao: '', backlogVolume: '', allocatedResource: '' },
 
-    // EficiÃªncia Operacional
-    { id: 'ex-17', name: 'Mapeamento e Melhoria de Fluxos Operacionais', area: 'EficiÃªncia Operacional', volume: '', minutos: 0, qtdExecucao: '', backlogVolume: '', allocatedResource: '' },
-    { id: 'ex-18', name: 'Desenvolvimento e ManutenÃ§Ã£o de AutomaÃ§Ãµes RPA', area: 'EficiÃªncia Operacional', volume: '', minutos: 0, qtdExecucao: '', backlogVolume: '', allocatedResource: '', isRpa: true },
-    { id: 'ex-19', name: 'Monitoria de Qualidade e Auditoria de Processos', area: 'EficiÃªncia Operacional', volume: '', minutos: 0, qtdExecucao: '', backlogVolume: '', allocatedResource: '' },
-    { id: 'ex-20', name: 'AnÃ¡lise de Indicadores e Performance Operacional', area: 'EficiÃªncia Operacional', volume: '', minutos: 0, qtdExecucao: '', backlogVolume: '', allocatedResource: '' },
-    { id: 'ex-21', name: 'Suporte TÃ©cnico N2/N3 e GestÃ£o de Incidentes', area: 'EficiÃªncia Operacional', volume: '', minutos: 0, qtdExecucao: '', backlogVolume: '', allocatedResource: '' }
+    // Eficiência Operacional
+    { id: 'ex-17', name: 'Mapeamento e Melhoria de Fluxos Operacionais', area: 'Eficiência Operacional', volume: '', minutos: 0, qtdExecucao: '', backlogVolume: '', allocatedResource: '' },
+    { id: 'ex-18', name: 'Desenvolvimento e Manutenção de Automações RPA', area: 'Eficiência Operacional', volume: '', minutos: 0, qtdExecucao: '', backlogVolume: '', allocatedResource: '', isRpa: true },
+    { id: 'ex-19', name: 'Monitoria de Qualidade e Auditoria de Processos', area: 'Eficiência Operacional', volume: '', minutos: 0, qtdExecucao: '', backlogVolume: '', allocatedResource: '' },
+    { id: 'ex-20', name: 'Análise de Indicadores e Performance Operacional', area: 'Eficiência Operacional', volume: '', minutos: 0, qtdExecucao: '', backlogVolume: '', allocatedResource: '' },
+    { id: 'ex-21', name: 'Suporte Técnico N2/N3 e Gestão de Incidentes', area: 'Eficiência Operacional', volume: '', minutos: 0, qtdExecucao: '', backlogVolume: '', allocatedResource: '' }
 ];
 
 function getSupabase() {
@@ -2786,13 +2789,13 @@ function formatAuthError(msg) {
         return "E-mail ou senha incorretos.";
     }
     if (lower.includes("email not confirmed")) {
-        return "E-mail ainda nÃ£o foi confirmado no Supabase. Verifique sua caixa de entrada.";
+        return "E-mail ainda não foi confirmado no Supabase. Verifique sua caixa de entrada.";
     }
     if (lower.includes("too many requests") || lower.includes("rate limit")) {
         return "Muitas tentativas de acesso. Por favor, aguarde alguns instantes.";
     }
     if (lower.includes("user not found")) {
-        return "UsuÃ¡rio nÃ£o cadastrado.";
+        return "Usuário não cadastrado.";
     }
     return msg;
 }
@@ -2815,7 +2818,7 @@ async function handleLogin() {
     
     const client = getSupabase();
     if (!client) {
-        showAuthError("NÃ£o foi possÃ­vel conectar ao Supabase. Verifique sua conexÃ£o com a internet.");
+        showAuthError("Não foi possível conectar ao Supabase. Verifique sua conexão com a internet.");
         return;
     }
 
@@ -2833,22 +2836,22 @@ async function handleLogin() {
         } else {
             const user = (data && data.session && data.session.user) ? data.session.user : (data ? data.user : null);
             if (user) {
-                // ForÃ§ar ocultaÃ§Ã£o do overlay de login e exibiÃ§Ã£o do painel principal
+                // Forçar ocultação do overlay de login e exibição do painel principal
                 const overlay = document.getElementById('auth-overlay');
                 if (overlay) overlay.style.setProperty('display', 'none', 'important');
                 
                 try {
                     await setupUserSession(user);
                 } catch (sessionErr) {
-                    alert('[DIAGNÃ“STICO] Erro em setupUserSession: ' + (sessionErr.message || sessionErr));
-                    console.error('Erro em setupUserSession apÃ³s login:', sessionErr);
+                    alert('[DIAGNÓSTICO] Erro em setupUserSession: ' + (sessionErr.message || sessionErr));
+                    console.error('Erro em setupUserSession após login:', sessionErr);
                 }
             } else {
                 showAuthError("E-mail ou senha incorretos.");
             }
         }
     } catch (err) {
-        alert('[DIAGNÃ“STICO] Erro fatal no handleLogin: ' + (err.message || err));
+        alert('[DIAGNÓSTICO] Erro fatal no handleLogin: ' + (err.message || err));
         showAuthError(formatAuthError(err ? err.message : ''));
     } finally {
         if (btnLogin) {
@@ -2881,7 +2884,7 @@ async function handleSignup() {
     
     const client = getSupabase();
     if (!client) {
-        showAuthError("NÃ£o foi possÃ­vel conectar ao Supabase. Verifique sua conexÃ£o com a internet.");
+        showAuthError("Não foi possível conectar ao Supabase. Verifique sua conexão com a internet.");
         return;
     }
 
@@ -2909,7 +2912,7 @@ async function handleSignup() {
                 hideAuthOverlay();
                 await setupUserSession(user);
             } else if (data && data.user) {
-                showAuthInfo("Conta criada com sucesso! Se a confirmaÃ§Ã£o de e-mail estiver ativa no seu Supabase, ative sua conta pelo link enviado.");
+                showAuthInfo("Conta criada com sucesso! Se a confirmação de e-mail estiver ativa no seu Supabase, ative sua conta pelo link enviado.");
             } else {
                 showAuthInfo("Cadastro realizado com sucesso.");
             }
@@ -2998,7 +3001,7 @@ async function setupUserSession(user) {
         return;
     }
     
-    // ForÃ§ar ocultaÃ§Ã£o do overlay de login
+    // Forçar ocultação do overlay de login
     const overlay = document.getElementById('auth-overlay');
     if (overlay) overlay.style.setProperty('display', 'none', 'important');
 
@@ -3007,9 +3010,9 @@ async function setupUserSession(user) {
         
         const userMetadata = user.user_metadata || {};
         currentUser.email = user.email || '';
-        currentUser.nome  = userMetadata.nome || (user.email ? user.email.split('@')[0] : 'UsuÃ¡rio');
+        currentUser.nome  = userMetadata.nome || (user.email ? user.email.split('@')[0] : 'Usuário');
         
-        // Definir perfil padrÃ£o CONSULTA antes de qualquer tentativa
+        // Definir perfil padrão CONSULTA antes de qualquer tentativa
         currentUser.perfil = 'CONSULTA';
         
         const client = getSupabase();
@@ -3051,7 +3054,7 @@ async function setupUserSession(user) {
 
         refreshAllViews();
     } catch (err) {
-        alert('[DIAGNÃ“STICO] Erro em setupUserSession: ' + (err.message || err));
+        alert('[DIAGNÓSTICO] Erro em setupUserSession: ' + (err.message || err));
         console.error('Erro em setupUserSession:', err);
     }
 }
@@ -3095,7 +3098,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 showAuthOverlay();
             }
         } catch (sessionErr) {
-            console.error('Erro ao recuperar sessÃ£o existente do Supabase:', sessionErr);
+            console.error('Erro ao recuperar sessão existente do Supabase:', sessionErr);
             try {
                 const projName = SUPABASE_URL.split('//')[1]?.split('.')[0];
                 if (projName) {
@@ -3114,7 +3117,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 }
             });
         } catch (authListenerErr) {
-            console.error('Erro ao registrar listener de mudanÃ§as de autenticaÃ§Ã£o:', authListenerErr);
+            console.error('Erro ao registrar listener de mudanças de autenticação:', authListenerErr);
         }
     } else {
         showAuthOverlay();
@@ -3172,7 +3175,7 @@ function updateRealtimeStatusUI(status, customMessage) {
     if (status === 'SUBSCRIBED') {
         if (dot) dot.style.background = '#10b981'; // Green
         if (text) text.textContent = 'Sincronizado';
-        badge.title = 'Realtime ativo: Qualquer alteraÃ§Ã£o serÃ¡ sincronizada com todos os usuÃ¡rios.';
+        badge.title = 'Realtime ativo: Qualquer alteração será sincronizada com todos os usuários.';
     } else if (status === 'CONNECTING') {
         if (dot) dot.style.background = '#eab308'; // Yellow
         if (text) text.textContent = 'Conectando...';
@@ -3180,7 +3183,7 @@ function updateRealtimeStatusUI(status, customMessage) {
     } else if (status === 'ERROR' || status === 'CLOSED' || status === 'CHANNEL_ERROR') {
         if (dot) dot.style.background = '#ef4444'; // Red
         if (text) text.textContent = customMessage || 'Offline (Local)';
-        badge.title = 'Sem sincronizaÃ§Ã£o remota em tempo real. Verifique se a tabela board_state existe no Supabase.';
+        badge.title = 'Sem sincronização remota em tempo real. Verifique se a tabela board_state existe no Supabase.';
     }
 }
 
@@ -3242,17 +3245,17 @@ function subscribeRealtime() {
                 const now = Date.now();
                 if (now - _lastRealtimeToastTime > 6000) {
                     _lastRealtimeToastTime = now;
-                    showToast('âš¡ O painel foi atualizado em tempo real por outro usuÃ¡rio!', 'info', 4000);
+                    showToast('⚡ O painel foi atualizado em tempo real por outro usuário!', 'info', 4000);
                 }
             }
         })
         .subscribe((status, err) => {
-            console.log('[Realtime] Status da inscriÃ§Ã£o:', status, err || '');
+            console.log('[Realtime] Status da inscrição:', status, err || '');
             if (status === 'SUBSCRIBED') {
                 updateRealtimeStatusUI('SUBSCRIBED');
             } else if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
                 updateRealtimeStatusUI('ERROR', 'Erro Realtime');
-                console.warn('[Realtime Error] Certifique-se de que a publicaÃ§Ã£o Realtime estÃ¡ ativa no Supabase (ALTER PUBLICATION supabase_realtime ADD TABLE board_state).');
+                console.warn('[Realtime Error] Certifique-se de que a publicação Realtime está ativa no Supabase (ALTER PUBLICATION supabase_realtime ADD TABLE board_state).');
             } else if (status === 'CLOSED') {
                 updateRealtimeStatusUI('ERROR', 'Desconectado');
             }
@@ -3291,7 +3294,7 @@ async function saveStateToSupabase() {
         const { error } = await client
             .from('board_state')
             .upsert({
-                id: 'default',
+                id: 'hml_default',
                 data: state,
                 updated_by: myUserId || null,
                 updated_at: new Date().toISOString()
@@ -3300,9 +3303,9 @@ async function saveStateToSupabase() {
         if (error) {
             console.error('[Supabase Save Error]', error);
             if (error.code === '42P01' || error.message?.includes('board_state')) {
-                showToast('Erro Supabase: Tabela "board_state" nÃ£o encontrada. Execute o SQL de configuraÃ§Ã£o no Supabase.', 'error', 10000);
+                showToast('Erro Supabase: Tabela "board_state" não encontrada. Execute o SQL de configuração no Supabase.', 'error', 10000);
             } else if (error.code === '42501' || error.message?.includes('row-level security')) {
-                showToast('Erro de permissÃ£o RLS no Supabase. Habilite polÃ­ticas de SELECT/INSERT/UPDATE na tabela board_state.', 'error', 10000);
+                showToast('Erro de permissão RLS no Supabase. Habilite políticas de SELECT/INSERT/UPDATE na tabela board_state.', 'error', 10000);
             } else {
                 showToast(`Erro ao salvar no Supabase: ${error.message}`, 'error', 5000);
             }
@@ -3312,18 +3315,18 @@ async function saveStateToSupabase() {
         }
     } catch (err) {
         console.error('[Supabase Save Exception]', err);
-        showToast('Falha na conexÃ£o ao salvar no Supabase.', 'warning');
-        updateRealtimeStatusUI('ERROR', 'Erro ConexÃ£o');
+        showToast('Falha na conexão ao salvar no Supabase.', 'warning');
+        updateRealtimeStatusUI('ERROR', 'Erro Conexão');
     }
 }
 
 async function forceResetGlobalState() {
     if (!verificarPermissao('ADMIN')) {
-        alert('Acesso negado: Perfil ADMIN necessÃƒÂ¡rio para publicar a base global.');
+        alert('Acesso negado: Perfil ADMIN necessÃ¡rio para publicar a base global.');
         return;
     }
 
-    if (!confirm('Deseja ÃƒÃƒrealmente definir e publicar a sua visÃ£o atual como a base oficial para TODOS os usuÃ¡rios? Isso sincronizarÃ¡ a tela de todos imediatamente.')) {
+    if (!confirm('Deseja ÃÃrealmente definir e publicar a sua visão atual como a base oficial para TODOS os usuários? Isso sincronizará a tela de todos imediatamente.')) {
         return;
     }
 
@@ -3335,7 +3338,7 @@ async function forceResetGlobalState() {
         const { error } = await client
             .from('board_state')
             .upsert({
-                id: 'default',
+                id: 'hml_default',
                 data: state,
                 updated_by: user ? user.id : null,
                 updated_at: new Date().toISOString()
@@ -3344,12 +3347,12 @@ async function forceResetGlobalState() {
         if (error) {
             showToast(`Erro ao publicar base no Supabase: ${error.message}`, 'error', 8000);
         } else {
-            showToast('âœ… Sua visÃ£o atual foi publicada com sucesso como a base global para todos!', 'success', 6000);
+            showToast('✅ Sua visão atual foi publicada com sucesso como a base global para todos!', 'success', 6000);
             updateRealtimeStatusUI('SUBSCRIBED');
         }
     } catch (err) {
         console.error('[Supabase Force Reset Error]', err);
-        showToast('Erro de conexÃ£o ao publicar a base.', 'error');
+        showToast('Erro de conexão ao publicar a base.', 'error');
     }
 }
 
@@ -3361,13 +3364,13 @@ async function loadStateFromSupabase() {
         const { data, error } = await client
             .from('board_state')
             .select('data, updated_at')
-            .eq('id', 'default')
+            .eq('id', 'hml_default')
             .maybeSingle();
 
         if (error) {
             console.error('[Supabase Load Error]', error);
             if (error.code === '42P01' || error.message?.includes('board_state')) {
-                showToast('Aviso: Tabela "board_state" nÃ£o foi criada no Supabase ainda.', 'warning', 8000);
+                showToast('Aviso: Tabela "board_state" não foi criada no Supabase ainda.', 'warning', 8000);
             } else {
                 showToast(`Aviso ao carregar do Supabase: ${error.message}`, 'warning', 5000);
             }
@@ -3397,10 +3400,10 @@ function isRpaActivity(proc) {
 
 function isRpaResponsavel(name) {
     const s = (name || '').toLowerCase();
-    return s.includes('rpa') || s.includes('robÃ´') || s.includes('robo') || s.includes('bot') || s.includes('automaÃ§Ã£o') || s.includes('automacao');
+    return s.includes('rpa') || s.includes('robô') || s.includes('robo') || s.includes('bot') || s.includes('automação') || s.includes('automacao');
 }
 
-// MULTI-RESPONSÃVEL HELPER FUNCTIONS
+// MULTI-RESPONSÁVEL HELPER FUNCTIONS
 function getProcessResponsaveis(proc) {
     if (!proc) return [];
     if (Array.isArray(proc.responsaveis) && proc.responsaveis.length > 0) {
@@ -3421,7 +3424,7 @@ function setProcessResponsaveis(proc, respsArray) {
 function matchesRespFilter(proc, filterVal) {
     if (!filterVal || filterVal === 'all') return true;
     const resps = getProcessResponsaveis(proc);
-    if (resps.length === 0) return filterVal === 'Sem ResponsÃ¡vel';
+    if (resps.length === 0) return filterVal === 'Sem Responsável';
     return resps.includes(filterVal);
 }
 
@@ -3456,23 +3459,23 @@ function applyStateMigrations() {
     if (state.history === undefined) state.history = [];
     if (state.teams === undefined) {
         if (state.customAreas && state.customAreas.length > 0) {
-            state.teams = ['Backoffice', 'GovernanÃ§a', 'Seguros/N2', 'EficiÃªncia Operacional', ...state.customAreas];
+            state.teams = ['Backoffice', 'Governança', 'Seguros/N2', 'Eficiência Operacional', ...state.customAreas];
         } else {
-            state.teams = ['Backoffice', 'GovernanÃ§a', 'Seguros/N2', 'EficiÃªncia Operacional'];
+            state.teams = ['Backoffice', 'Governança', 'Seguros/N2', 'Eficiência Operacional'];
         }
     }
     if (!state.teamHierarchy) state.teamHierarchy = {};
     
     const defaultRelations = {
-        'Backoffice': { gerencia: 'ConciliaÃ§Ã£o', diretoria: 'OperaÃ§Ãµes' },
-        'GovernanÃ§a': { gerencia: 'Suporte Operacional', diretoria: 'OperaÃ§Ãµes' },
-        'Seguros/N2': { gerencia: 'Atendimento', diretoria: 'OperaÃ§Ãµes' },
-        'EficiÃªncia Operacional': { gerencia: 'Suporte Operacional', diretoria: 'OperaÃ§Ãµes' }
+        'Backoffice': { gerencia: 'Conciliação', diretoria: 'Operações' },
+        'Governança': { gerencia: 'Suporte Operacional', diretoria: 'Operações' },
+        'Seguros/N2': { gerencia: 'Atendimento', diretoria: 'Operações' },
+        'Eficiência Operacional': { gerencia: 'Suporte Operacional', diretoria: 'Operações' }
     };
     
     state.teams.forEach(team => {
         if (!state.teamHierarchy[team]) {
-            state.teamHierarchy[team] = defaultRelations[team] || { gerencia: 'Suporte Operacional', diretoria: 'OperaÃ§Ãµes', coordenador: '' };
+            state.teamHierarchy[team] = defaultRelations[team] || { gerencia: 'Suporte Operacional', diretoria: 'Operações', coordenador: '' };
         }
         if (state.teamHierarchy[team].coordenador === undefined) {
             state.teamHierarchy[team].coordenador = '';
@@ -3520,7 +3523,7 @@ function loadState() {
                 saveState();
             }
         } catch (e) {
-            console.error("Erro ao carregar dados do LocalStorage. Utilizando padrÃµes.", e);
+            console.error("Erro ao carregar dados do LocalStorage. Utilizando padrões.", e);
             useDefaults = true;
         }
     } else {
@@ -3531,7 +3534,7 @@ function loadState() {
         state.processes = JSON.parse(JSON.stringify(EXAMPLE_PROCESSES));
         state.customAreas = [];
         state.areaAllocations = {};
-        state.teams = ['Backoffice', 'GovernanÃ§a', 'Seguros/N2', 'EficiÃªncia Operacional'];
+        state.teams = ['Backoffice', 'Governança', 'Seguros/N2', 'Eficiência Operacional'];
         const uniqueResps = [...new Set(state.processes.map(p => p.responsavel || '').filter(r => r.trim() !== ''))].sort();
         state.responsaveis = uniqueResps.map(r => {
             const procWithResp = state.processes.find(p => p.responsavel === r);
@@ -3625,12 +3628,12 @@ function openNewTeamModal(teamToEdit = null) {
     if (teamToEdit) {
         if (modal) modal.dataset.editTeam = teamToEdit;
         if (titleEl) titleEl.innerHTML = `<i class="fa-solid fa-pen-to-square"></i> Editar Equipe`;
-        if (btnLabelEl) btnLabelEl.textContent = 'Salvar AlteraÃ§Ãµes';
+        if (btnLabelEl) btnLabelEl.textContent = 'Salvar Alterações';
         if (nameInput) nameInput.value = teamToEdit;
 
         const info = (state.teamHierarchy && state.teamHierarchy[teamToEdit]) || {};
         if (gerenciaSelect) gerenciaSelect.value = info.gerencia || 'Suporte Operacional';
-        if (diretoriaSelect) diretoriaSelect.value = info.diretoria || 'OperaÃ§Ãµes';
+        if (diretoriaSelect) diretoriaSelect.value = info.diretoria || 'Operações';
         populateTeamCoordenadorSelect(info.coordenador || '');
     } else {
         if (modal) delete modal.dataset.editTeam;
@@ -3638,7 +3641,7 @@ function openNewTeamModal(teamToEdit = null) {
         if (btnLabelEl) btnLabelEl.textContent = 'Cadastrar Equipe';
         if (nameInput) nameInput.value = '';
         if (gerenciaSelect) gerenciaSelect.value = 'Suporte Operacional';
-        if (diretoriaSelect) diretoriaSelect.value = 'OperaÃ§Ãµes';
+        if (diretoriaSelect) diretoriaSelect.value = 'Operações';
         populateTeamCoordenadorSelect('');
     }
 
@@ -3655,7 +3658,7 @@ function closeNewTeamModal() {
 }
 
 function saveNewTeamFromModal() {
-    if (!verificarPermissao('OPERADOR')) { alert('Acesso negado: Perfil OPERADOR necessÃ¡rio.'); return; }
+    if (!verificarPermissao('OPERADOR')) { alert('Acesso negado: Perfil OPERADOR necessário.'); return; }
     const modal = document.getElementById('modal-new-team');
     const nameInput = document.getElementById('modal-input-new-team');
     const gerenciaSelect = document.getElementById('modal-select-team-gerencia');
@@ -3675,13 +3678,13 @@ function saveNewTeamFromModal() {
 
     const existingTeams = (state.teams || []).filter(t => isEdit ? t.toLowerCase() !== editTeamOriginalName.toLowerCase() : true);
     if (existingTeams.map(t => t.toLowerCase()).includes(teamName.toLowerCase())) {
-        if (errorDiv) { errorDiv.textContent = 'Esta equipe jÃ¡ estÃ¡ cadastrada.'; errorDiv.style.display = 'block'; }
+        if (errorDiv) { errorDiv.textContent = 'Esta equipe já está cadastrada.'; errorDiv.style.display = 'block'; }
         if (nameInput) nameInput.focus();
         return;
     }
 
     const gerencia = gerenciaSelect ? gerenciaSelect.value : 'Suporte Operacional';
-    const diretoria = diretoriaSelect ? diretoriaSelect.value : 'OperaÃ§Ãµes';
+    const diretoria = diretoriaSelect ? diretoriaSelect.value : 'Operações';
     const coordenador = coordenadorSelect ? coordenadorSelect.value : '';
 
     if (!state.teamHierarchy) state.teamHierarchy = {};
@@ -3749,13 +3752,13 @@ function setupEventListeners() {
                 headerTitle.textContent = 'Balanceamento de Backlog';
                 renderBalancingTable();
             } else if (view === 'review') {
-                headerTitle.textContent = 'RevisÃ£o de Atividades';
+                headerTitle.textContent = 'Revisão de Atividades';
                 renderReviewTable();
             } else if (view === 'automations') {
-                headerTitle.textContent = 'Quadro de AutomaÃ§Ãµes (RPA)';
+                headerTitle.textContent = 'Quadro de Automações (RPA)';
                 renderAutomationsView();
             } else if (view === 'history') {
-                headerTitle.textContent = 'HistÃ³rico de Volumes';
+                headerTitle.textContent = 'Histórico de Volumes';
                 initHistoryView();
             } else if (view === 'access-control') {
                 headerTitle.textContent = 'Controle de Acesso';
@@ -3792,12 +3795,12 @@ function setupEventListeners() {
     const btnBulkDeleteSelected = document.getElementById('btn-cadastros-delete-selected');
     if (btnBulkDeleteSelected) {
         btnBulkDeleteSelected.addEventListener('click', () => {
-            if (!verificarPermissao('ADMIN')) { alert('Acesso negado: Perfil ADMIN necessÃƒÂ¡rio.'); return; }
+            if (!verificarPermissao('ADMIN')) { alert('Acesso negado: Perfil ADMIN necessÃ¡rio.'); return; }
             const checkedBoxes = document.querySelectorAll('.cadastros-row-checkbox:checked');
             const idsToDelete = [...checkedBoxes].map(cb => cb.dataset.id);
             if (idsToDelete.length === 0) return;
             
-            if (confirm(`Deseja ÃƒÃƒrealmente excluir as ${idsToDelete.length} atividades selecionadas?`)) {
+            if (confirm(`Deseja ÃÃrealmente excluir as ${idsToDelete.length} atividades selecionadas?`)) {
                 state.processes = state.processes.filter(p => !idsToDelete.includes(p.id));
                 saveState();
                 
@@ -3832,7 +3835,7 @@ function setupEventListeners() {
         });
     }
 
-    // AÃƒÃƒrea & Owner filter triggers
+    // AÃÃrea & Owner filter triggers
     const filterAreaEl = document.getElementById('filter-area');
     if (filterAreaEl) {
         filterAreaEl.addEventListener('change', () => {
@@ -3892,12 +3895,12 @@ function setupEventListeners() {
 
     // Cadastros - Add Responsible button
     const handleAddResponsible = () => {
-        if (!verificarPermissao('OPERADOR')) { alert('Acesso negado: Perfil OPERADOR necessÃƒÂ¡rio.'); return; }
+        if (!verificarPermissao('OPERADOR')) { alert('Acesso negado: Perfil OPERADOR necessÃ¡rio.'); return; }
         const respInput = document.getElementById('input-new-responsible');
         if (!respInput) return;
         const respName = respInput.value.trim();
         if (!respName) {
-            alert("Por favor, digite o nome do responsÃƒÂ¡vel.");
+            alert("Por favor, digite o nome do responsÃ¡vel.");
             return;
         }
         
@@ -3913,7 +3916,7 @@ function setupEventListeners() {
         
         const currentNames = state.responsaveis.map(r => (r && r.name ? r.name : String(r)).toLowerCase());
         if (currentNames.includes(respName.toLowerCase())) {
-            alert("Este responsÃƒÂ¡vel jÃƒ estÃƒ cadastrado.");
+            alert("Este responsÃ¡vel jÃ estÃ cadastrado.");
             return;
         }
         
@@ -3977,7 +3980,7 @@ function setupEventListeners() {
 
     // Backlog Action Buttons
     safeAddListener('btn-import-active-volumes', 'click', () => {
-        if (!verificarPermissao('OPERADOR')) { alert('Acesso negado: Perfil OPERADOR necessÃ¡rio.'); return; }
+        if (!verificarPermissao('OPERADOR')) { alert('Acesso negado: Perfil OPERADOR necessário.'); return; }
         state.processes.forEach(proc => {
             const hasVolume = proc.volume !== null && proc.volume !== '';
             proc.backlogVolume = hasVolume ? proc.volume : (proc.qtdExecucao !== null && proc.qtdExecucao !== '' ? proc.qtdExecucao : '');
@@ -3987,7 +3990,7 @@ function setupEventListeners() {
     });
 
     safeAddListener('btn-clear-backlog-volumes', 'click', () => {
-        if (!verificarPermissao('ADMIN')) { alert('Acesso negado: Perfil ADMIN necessÃƒÂ¡rio.'); return; }
+        if (!verificarPermissao('ADMIN')) { alert('Acesso negado: Perfil ADMIN necessÃ¡rio.'); return; }
         state.processes.forEach(proc => {
             proc.backlogVolume = '';
         });
@@ -4089,7 +4092,7 @@ function renderTable() {
                 <span class="badge-area" style="font-size: 0.85rem; padding: 0.25rem 0.5rem; border-radius: 4px; background: rgba(235, 92, 39, 0.08); color: var(--color-primary); border: 1px solid rgba(235, 92, 39, 0.15);">${escapeHtml(proc.area || 'Sem Equipe')}</span>
             </td>
             <td>
-                <span style="font-size: 0.9rem; color: var(--text-secondary);">${escapeHtml(proc.responsavel || 'Sem ResponsÃ¡vel')}</span>
+                <span style="font-size: 0.9rem; color: var(--text-secondary);">${escapeHtml(proc.responsavel || 'Sem Responsável')}</span>
             </td>
             <td class="consulta-hidden">
                 <input type="number" class="input-volume" value="${proc.volume}" placeholder="---" min="0">
@@ -4214,7 +4217,7 @@ function renderBalancingTable() {
                 </span>
             </td>
             <td>
-                <span style="font-size: 0.9rem; color: var(--text-secondary);">${escapeHtml(proc.responsavel || 'Sem ResponsÃ¡vel')}</span>
+                <span style="font-size: 0.9rem; color: var(--text-secondary);">${escapeHtml(proc.responsavel || 'Sem Responsável')}</span>
             </td>
             <td>${minutes.toFixed(0)} min</td>
             <td>
@@ -4236,7 +4239,7 @@ function renderBalancingTable() {
             }
         }
         
-        // Click event to highlight corresponding area card on the right (ignore for ResponsÃƒvel and Backlog inputs)
+        // Click event to highlight corresponding area card on the right (ignore for ResponsÃvel and Backlog inputs)
         tr.addEventListener('click', (e) => {
             const td = e.target.closest('td');
             if (!td) return;
@@ -4373,7 +4376,7 @@ function updateCalculations() {
         if (pctCell) pctCell.textContent = ftePct.toFixed(2) + '%';
     });
 
-    // Reutiliza filterValue e respFilter jÃ¡ declarados no topo da funÃ§Ã£o (sem re-declarar com const)
+    // Reutiliza filterValue e respFilter já declarados no topo da função (sem re-declarar com const)
     const currentFilterValue = document.getElementById('filter-area') ? document.getElementById('filter-area').value : 'all';
     const currentRespFilter = document.getElementById('filter-responsavel') ? document.getElementById('filter-responsavel').value : 'all';
     const isFiltered = (currentFilterValue !== 'all' || currentRespFilter !== 'all');
@@ -4466,7 +4469,7 @@ function updateCalculations() {
     const elFteReqSub = document.getElementById('widget-fte-required-sub');
     if (elFteReq) {
         if (pendingTimeCount > 0) {
-            elFteReq.innerHTML = `<span style="font-size: 1.15rem; color: #f59e0b; font-weight: 700;">Em construÃ§Ã£o</span>`;
+            elFteReq.innerHTML = `<span style="font-size: 1.15rem; color: #f59e0b; font-weight: 700;">Em construção</span>`;
             if (elFteReqSub) {
                 elFteReqSub.textContent = `${pendingTimeCount} atividade(s) sem tempo`;
                 elFteReqSub.style.color = '#f59e0b';
@@ -4474,7 +4477,7 @@ function updateCalculations() {
         } else {
             elFteReq.textContent = targetFteDecAccum.toFixed(2);
             if (elFteReqSub) {
-                elFteReqSub.textContent = 'Recursos necessÃ¡rios';
+                elFteReqSub.textContent = 'Recursos necessários';
                 elFteReqSub.style.color = '';
             }
         }
@@ -4500,7 +4503,7 @@ function updateCalculations() {
     // Update placeholders for responsible overrides inputs in-place to avoid re-rendering layout
     const horasInputs = document.querySelectorAll('.override-horas');
     horasInputs.forEach(inp => {
-        inp.placeholder = `${horasDia.toFixed(1)} (PadrÃƒÂ£o)`;
+        inp.placeholder = `${horasDia.toFixed(1)} (PadrÃ£o)`;
     });
     const absInputs = document.querySelectorAll('.override-absenteismo');
     absInputs.forEach(inp => {
@@ -4549,7 +4552,7 @@ function updateBalancingCalculations() {
         let totalHoursRow = 0;
         if (!isStopped) {
             if (isTempoFrequencia) {
-                // Tempo x FrequÃƒÂªncia: distributed evenly across working days
+                // Tempo x FrequÃªncia: distributed evenly across working days
                 const qtdExec = parseFloat(proc.qtdExecucao) || 0;
                 totalHoursRow = (qtdExec * minutes) / 60 / respParams.diasUteis;
             } else {
@@ -4637,7 +4640,7 @@ function updateBalancingCalculations() {
     const elBacklogFteSub = document.getElementById('widget-backlog-fte-sub');
     if (elBacklogFte) {
         if (pendingTimeCountBalancing > 0) {
-            elBacklogFte.innerHTML = `<span style="font-size: 1.15rem; color: #f59e0b; font-weight: 700;">Em construÃ§Ã£o</span>`;
+            elBacklogFte.innerHTML = `<span style="font-size: 1.15rem; color: #f59e0b; font-weight: 700;">Em construção</span>`;
             if (elBacklogFteSub) {
                 elBacklogFteSub.textContent = `${pendingTimeCountBalancing} atividade(s) sem tempo`;
                 elBacklogFteSub.style.color = '#f59e0b';
@@ -4645,7 +4648,7 @@ function updateBalancingCalculations() {
         } else {
             elBacklogFte.textContent = totalFteDecAccum.toFixed(2);
             if (elBacklogFteSub) {
-                elBacklogFteSub.textContent = 'Recursos necessÃ¡rios';
+                elBacklogFteSub.textContent = 'Recursos necessários';
                 elBacklogFteSub.style.color = '';
             }
         }
@@ -4653,7 +4656,7 @@ function updateBalancingCalculations() {
 
 
 
-    // Update AÃƒÃƒrea Allocations Side Panel
+    // Update AÃÃrea Allocations Side Panel
     renderAreaAllocations();
 }
 
@@ -4661,7 +4664,7 @@ function renderAreaAllocations() {
     const listContainer = document.getElementById('area-allocations-list');
     if (!listContainer) return;
     
-    const areas = ['Backoffice', 'GovernanÃ§a', 'Seguros/N2', 'EficiÃªncia Operacional', ...state.customAreas];
+    const areas = ['Backoffice', 'Governança', 'Seguros/N2', 'Eficiência Operacional', ...state.customAreas];
     
     const horasDia = state.params.horasDia;
     const absenteismo = state.params.absenteismo / 100;
@@ -4766,7 +4769,7 @@ function renderAreaAllocations() {
 
 // NEW PROCESS MANAGEMENT
 function addNewProcess() {
-    if (!verificarPermissao('OPERADOR')) { alert('Acesso negado: Perfil OPERADOR necessÃ¡rio.'); return; }
+    if (!verificarPermissao('OPERADOR')) { alert('Acesso negado: Perfil OPERADOR necessário.'); return; }
     const newId = 'proc-' + Date.now();
     const defaultArea = state.teams.length > 0 ? state.teams[0] : '';
     
@@ -4796,18 +4799,18 @@ function addNewProcess() {
 }
 
 function deleteProcess(id) {
-    if (!verificarPermissao('ADMIN')) { alert('Acesso negado: Perfil ADMIN necessÃ¡rio.'); return; }
+    if (!verificarPermissao('ADMIN')) { alert('Acesso negado: Perfil ADMIN necessário.'); return; }
     state.processes = state.processes.filter(p => p.id !== id);
     renderTable();
     renderBalancingTable();
 }
 
 function duplicateProcess(proc) {
-    if (!verificarPermissao('OPERADOR')) { alert('Acesso negado: Perfil OPERADOR necessÃ¡rio.'); return; }
+    if (!verificarPermissao('OPERADOR')) { alert('Acesso negado: Perfil OPERADOR necessário.'); return; }
     const newId = 'proc-' + Date.now() + '-' + Math.floor(Math.random() * 100);
     state.processes.push({
         id: newId,
-        name: `${proc.name} (CÃ³pia)`,
+        name: `${proc.name} (Cópia)`,
         area: proc.area,
         responsavel: proc.responsavel || '',
         produto: proc.produto || '',
@@ -4824,7 +4827,7 @@ function duplicateProcess(proc) {
 }
 
 function loadExampleData() {
-    if (!verificarPermissao('ADMIN')) { alert('Acesso negado: Perfil ADMIN necessÃƒÂ¡rio.'); return; }
+    if (!verificarPermissao('ADMIN')) { alert('Acesso negado: Perfil ADMIN necessÃ¡rio.'); return; }
     state.processes = JSON.parse(JSON.stringify(EXAMPLE_PROCESSES));
     state.params = {
         horasDia: 8.0,
@@ -4833,12 +4836,12 @@ function loadExampleData() {
         teamSize: 5.0
     };
     state.customAreas = [];
-    state.teams = ['Backoffice', 'GovernanÃ§a', 'Seguros/N2', 'EficiÃªncia Operacional'];
+    state.teams = ['Backoffice', 'Governança', 'Seguros/N2', 'Eficiência Operacional'];
     state.teamHierarchy = {
-        'Backoffice': { gerencia: 'ConciliaÃ§Ã£o', diretoria: 'OperaÃ§Ãµes' },
-        'GovernanÃ§a': { gerencia: 'Suporte Operacional', diretoria: 'OperaÃ§Ãµes' },
-        'Seguros/N2': { gerencia: 'Atendimento', diretoria: 'OperaÃ§Ãµes' },
-        'EficiÃªncia Operacional': { gerencia: 'Suporte Operacional', diretoria: 'OperaÃ§Ãµes' }
+        'Backoffice': { gerencia: 'Conciliação', diretoria: 'Operações' },
+        'Governança': { gerencia: 'Suporte Operacional', diretoria: 'Operações' },
+        'Seguros/N2': { gerencia: 'Atendimento', diretoria: 'Operações' },
+        'Eficiência Operacional': { gerencia: 'Suporte Operacional', diretoria: 'Operações' }
     };
     
     const uniqueResps = [...new Set(state.processes.map(p => p.responsavel || '').filter(r => r.trim() !== ''))].sort();
@@ -4870,7 +4873,7 @@ function loadExampleData() {
 }
 
 function resetSimulator() {
-    if (!verificarPermissao('ADMIN')) { alert('Acesso negado: Perfil ADMIN necessÃƒÂ¡rio.'); return; }
+    if (!verificarPermissao('ADMIN')) { alert('Acesso negado: Perfil ADMIN necessÃ¡rio.'); return; }
     state.processes = [];
     document.getElementById('filter-area').value = 'all';
     document.getElementById('filter-area-balancing').value = 'all';
@@ -4885,7 +4888,7 @@ function resetSimulator() {
     renderBalancingTable();
 }
 
-// CHART RENDER ENGINE (Grouped by AÃƒÃƒrea or Process based on filter selection)
+// CHART RENDER ENGINE (Grouped by AÃÃrea or Process based on filter selection)
 function renderCharts(totalFteRequired) {
     const isDark = document.body.classList.contains('dark-theme');
     
@@ -4895,7 +4898,7 @@ function renderCharts(totalFteRequired) {
     const primaryColor = style.getPropertyValue('--color-primary').trim();
     const successColor = style.getPropertyValue('--color-success').trim();
 
-    // 1. Doughnut Chart (Aggregated by AÃƒÃƒrea or by Process)
+    // 1. Doughnut Chart (Aggregated by AÃÃrea or by Process)
     const pieCanvas = document.getElementById('chart-pie');
     if (!pieCanvas) return;
 
@@ -4942,13 +4945,13 @@ function renderCharts(totalFteRequired) {
         pieLabels = Object.keys(areaMap).filter(k => areaMap[k] > 0);
         pieData = pieLabels.map(k => parseFloat(areaMap[k].toFixed(2)));
         if (chartTitleElement) {
-            chartTitleElement.innerHTML = '<i class="fa-solid fa-chart-pie"></i> DistribuiÃ§Ã£o de FTE por Ãrea';
+            chartTitleElement.innerHTML = '<i class="fa-solid fa-chart-pie"></i> Distribuição de FTE por Área';
         }
     } else {
         pieLabels = Object.keys(processMap).filter(k => processMap[k] > 0);
         pieData = pieLabels.map(k => parseFloat(processMap[k].toFixed(2)));
         if (chartTitleElement) {
-            chartTitleElement.innerHTML = `<i class="fa-solid fa-chart-pie"></i> DistribuiÃ§Ã£o de FTE em ${filterValue}`;
+            chartTitleElement.innerHTML = `<i class="fa-solid fa-chart-pie"></i> Distribuição de FTE em ${filterValue}`;
         }
     }
 
@@ -4965,7 +4968,7 @@ function renderCharts(totalFteRequired) {
         pieChartInstance = new Chart(pieCanvas, {
             type: 'doughnut',
             data: {
-                labels: ['Nenhuma Ãrea com dados'],
+                labels: ['Nenhuma Área com dados'],
                 datasets: [{
                     data: [1],
                     backgroundColor: [isDark ? '#081e13' : '#cbd5e1'],
@@ -5100,7 +5103,7 @@ function updateChartsTheme() {
 // EXPORT TO CSV (Excel Compatible - Exports active tab content)
 function exportToCSV() {
     if (state.processes.length === 0) {
-        alert("NÃ£o hÃ¡ dados para exportar.");
+        alert("Não há dados para exportar.");
         return;
     }
 
@@ -5116,11 +5119,11 @@ function exportToCSV() {
 
     csvContent += "PARAMETROS GLOBAIS\n";
     csvContent += `Horas Trabalho / Dia;${state.params.horasDia}\n`;
-    csvContent += `AbsenteÃ­smo (%);${state.params.absenteismo}%\n`;
-    csvContent += `Dias Ãšteis;${state.params.diasUteis}\n`;
+    csvContent += `Absenteísmo (%);${state.params.absenteismo}%\n`;
+    csvContent += `Dias Úteis;${state.params.diasUteis}\n`;
     csvContent += `Horas Trabalho Real / Dia;${horasRealDia.toFixed(2)}\n`;
-    csvContent += `Horas Trabalho MÃªs (1 FTE);${horasTrabalhoMes.toFixed(2)}\n`;
-    csvContent += `Tamanho da Equipe (DisponÃ­vel);${state.params.teamSize}\n\n`;
+    csvContent += `Horas Trabalho Mês (1 FTE);${horasTrabalhoMes.toFixed(2)}\n`;
+    csvContent += `Tamanho da Equipe (Disponível);${state.params.teamSize}\n\n`;
 
     if (activeTab === 'dashboard' || activeTab === 'cadastros') {
         csvContent += "RELATORIO DE PROCESSOS E ATIVIDADES\n";
@@ -5158,7 +5161,7 @@ function exportToCSV() {
 
             const name = `"${(proc.name || '').replace(/"/g, '""')}"`;
             const area = `"${(proc.area || 'Sem Equipe').replace(/"/g, '""')}"`;
-            const resp = `"${(proc.responsavel || 'Sem ResponsÃ¡vel').replace(/"/g, '""')}"`;
+            const resp = `"${(proc.responsavel || 'Sem Responsável').replace(/"/g, '""')}"`;
             const vol = proc.volume !== null && proc.volume !== '' ? proc.volume : '""';
             const mins = proc.minutos !== null && proc.minutos !== '' ? proc.minutos : 0;
             const qtd = proc.qtdExecucao !== null && proc.qtdExecucao !== '' ? proc.qtdExecucao : '""';
@@ -5213,7 +5216,7 @@ function exportToCSV() {
         csvContent += "BALANCEAMENTO DE CAPACIDADE POR EQUIPE / AREA\n";
         csvContent += "AREA / EQUIPE;FTE REQUERIDO DIARIO;RECURSO ALOCADO (FTE);STATUS CAPACIDADE\n";
 
-        const areasList = ['Backoffice', 'GovernanÃ§a', 'Seguros/N2', 'EficiÃªncia Operacional', ...state.customAreas];
+        const areasList = ['Backoffice', 'Governança', 'Seguros/N2', 'Eficiência Operacional', ...state.customAreas];
         let sumRequiredFte = 0;
         let sumAllocatedFte = 0;
 
@@ -5292,7 +5295,7 @@ function renderAreaFilterOptions() {
     const currentValueBalancing = filterSelectBalancing.value;
     const currentValueReview = filterSelectReview.value;
     
-    const optionsHtml = '<option value="all">Todas as Ãreas</option>' +
+    const optionsHtml = '<option value="all">Todas as Áreas</option>' +
         (state.teams || []).map(area =>
             `<option value="${escapeHtml(area)}">${escapeHtml(area)}</option>`
         ).join('');
@@ -5361,7 +5364,7 @@ function renderReviewTable() {
         const status = p.reviewStatus || 'Manter';
         if (status === 'Manter') countManter++;
         else if (status === 'Parar') countParar++;
-        else if (status === 'ComeÃ§ar') countComecar++;
+        else if (status === 'Começar') countComecar++;
     });
 
     document.getElementById('widget-review-manter').textContent = countManter;
@@ -5389,7 +5392,7 @@ function renderReviewTable() {
         }
 
         // Review Action select box
-        const statusOptions = ['Manter', 'Parar', 'ComeÃ§ar'];
+        const statusOptions = ['Manter', 'Parar', 'Começar'];
         const statusOptionsHtml = statusOptions.map(opt =>
             `<option value="${opt}" ${proc.reviewStatus === opt ? 'selected' : ''}>${opt}</option>`
         ).join('');
@@ -5412,7 +5415,7 @@ function renderReviewTable() {
                 <span class="badge-area" style="font-size: 0.85rem; padding: 0.25rem 0.5rem; border-radius: 4px; background: rgba(235, 92, 39, 0.08); color: var(--color-primary); border: 1px solid rgba(235, 92, 39, 0.15);">${escapeHtml(proc.area || 'Sem Equipe')}</span>
             </td>
             <td>
-                <span style="font-size: 0.9rem; color: var(--text-secondary);">${escapeHtml(proc.responsavel || 'Sem ResponsÃ¡vel')}</span>
+                <span style="font-size: 0.9rem; color: var(--text-secondary);">${escapeHtml(proc.responsavel || 'Sem Responsável')}</span>
             </td>
             <td style="color: var(--text-secondary); font-size: 0.85rem;">${metricDesc}</td>
             <td class="admin-only" style="font-weight: 700; color: ${proc.reviewStatus === 'Parar' ? 'var(--text-muted)' : 'var(--text-primary)'};">${proc.reviewStatus === 'Parar' ? '0.00%' : ftePct.toFixed(2) + '%'}</td>
@@ -5447,7 +5450,7 @@ function renderResponsavelFilterOptions() {
     const uniqueResponsaveis = state.responsaveis || [];
     const names = uniqueResponsaveis.map(r => r.name);
     
-    const optionsHtml = '<option value="all">Todos os ResponsÃ¡veis</option>' +
+    const optionsHtml = '<option value="all">Todos os Responsáveis</option>' +
         names.map(name =>
             `<option value="${escapeHtml(name)}">${escapeHtml(name)}</option>`
         ).join('');
@@ -5477,7 +5480,7 @@ function renderResponsavelFilterOptions() {
 
 // IMPORT PROCESSES FROM EXCEL/CSV SPREADSHEET (SHEETJS)
 function importExcelFile(file) {
-    if (!verificarPermissao('OPERADOR')) { alert('Acesso negado: Perfil OPERADOR necessÃ¡rio.'); return; }
+    if (!verificarPermissao('OPERADOR')) { alert('Acesso negado: Perfil OPERADOR necessário.'); return; }
     const reader = new FileReader();
     reader.onload = function(e) {
         try {
@@ -5497,13 +5500,13 @@ function importExcelFile(file) {
                 
                 const headers = rows[0].map(h => String(h || '').trim().toLowerCase());
                 
-                let activityIdx = headers.findIndex(h => h.includes('atividade') || h.includes('nome') || h.includes('processo') || h.includes('demanda') || h.includes('descriÃ§Ã£o') || h.includes('descricao'));
-                let teamIdx = headers.findIndex(h => h.includes('equipe') || h.includes('Ã¡rea') || h.includes('area') || h.includes('grupo') || h.includes('setor') || h.includes('time'));
-                let respIdx = headers.findIndex(h => h.includes('responsÃ¡vel') || h.includes('responsavel') || h.includes('dono') || h.includes('colaborador') || h.includes('owner') || h.includes('analista'));
-                let productIdx = headers.findIndex(h => h.includes('produto') || h.includes('produtos') || h.includes('product') || h.includes('products') || h.includes('prod') || h.includes('serviÃ§o') || h.includes('servico') || h.includes('item'));
-                let volIdx = headers.findIndex(h => h.includes('volume') || h.includes('qtd. mÃªs') || h.includes('qtd. mes') || h.includes('quantidade') || h.includes('vol'));
-                let minIdx = headers.findIndex(h => h.includes('tempo') || h.includes('minuto') || h.includes('minutos') || h.includes('duraÃ§Ã£o') || h.includes('duracao'));
-                let freqIdx = headers.findIndex(h => h.includes('freq') || h.includes('execuÃ§Ã£o') || h.includes('execucao'));
+                let activityIdx = headers.findIndex(h => h.includes('atividade') || h.includes('nome') || h.includes('processo') || h.includes('demanda') || h.includes('descrição') || h.includes('descricao'));
+                let teamIdx = headers.findIndex(h => h.includes('equipe') || h.includes('área') || h.includes('area') || h.includes('grupo') || h.includes('setor') || h.includes('time'));
+                let respIdx = headers.findIndex(h => h.includes('responsável') || h.includes('responsavel') || h.includes('dono') || h.includes('colaborador') || h.includes('owner') || h.includes('analista'));
+                let productIdx = headers.findIndex(h => h.includes('produto') || h.includes('produtos') || h.includes('product') || h.includes('products') || h.includes('prod') || h.includes('serviço') || h.includes('servico') || h.includes('item'));
+                let volIdx = headers.findIndex(h => h.includes('volume') || h.includes('qtd. mês') || h.includes('qtd. mes') || h.includes('quantidade') || h.includes('vol'));
+                let minIdx = headers.findIndex(h => h.includes('tempo') || h.includes('minuto') || h.includes('minutos') || h.includes('duração') || h.includes('duracao'));
+                let freqIdx = headers.findIndex(h => h.includes('freq') || h.includes('execução') || h.includes('execucao'));
                 
                 // Track claimed column indices to avoid positional fallback collisions
                 const claimed = new Set([activityIdx, teamIdx, respIdx, productIdx, volIdx, minIdx, freqIdx].filter(i => i !== -1));
@@ -5597,11 +5600,11 @@ function importExcelFile(file) {
                 
                 alert(`Sucesso! ${importCount} novas atividades foram adicionadas.`);
             } else {
-                alert("Nenhuma atividade encontrada na planilha. Verifique se as colunas estÃ£o no formato correto.");
+                alert("Nenhuma atividade encontrada na planilha. Verifique se as colunas estão no formato correto.");
             }
         } catch (err) {
             console.error(err);
-            alert("Erro ao ler o arquivo Excel. Certifique-se de que Ã© um arquivo .xlsx, .xls ou .csv vÃ¡lido.");
+            alert("Erro ao ler o arquivo Excel. Certifique-se de que é um arquivo .xlsx, .xls ou .csv válido.");
         }
     };
     reader.readAsArrayBuffer(file);
@@ -5632,10 +5635,10 @@ function initHistoryView() {
 }
 
 function saveHistorySnapshot() {
-    if (!verificarPermissao('OPERADOR')) { alert('Acesso negado: Perfil OPERADOR necessÃ¡rio.'); return; }
+    if (!verificarPermissao('OPERADOR')) { alert('Acesso negado: Perfil OPERADOR necessário.'); return; }
     const monthInput = document.getElementById('history-month-input');
     if (!monthInput || !monthInput.value) {
-        alert("Selecione um mÃªs vÃ¡lido.");
+        alert("Selecione um mês válido.");
         return;
     }
     
@@ -5643,13 +5646,13 @@ function saveHistorySnapshot() {
     
     // Check if current processes are empty
     if (state.processes.length === 0) {
-        alert("NÃ£o hÃ¡ atividades cadastradas no Dashboard para salvar.");
+        alert("Não há atividades cadastradas no Dashboard para salvar.");
         return;
     }
     
     const existingIndex = state.history.findIndex(h => h.month === selectedMonth);
     if (existingIndex !== -1) {
-        if (!confirm(`JÃ¡ existe um registro de volume para ${formatMonth(selectedMonth)}. Deseja sobrescrevÃª-lo com os dados atuais do Dashboard?`)) {
+        if (!confirm(`Já existe um registro de volume para ${formatMonth(selectedMonth)}. Deseja sobrescrevê-lo com os dados atuais do Dashboard?`)) {
             return;
         }
     }
@@ -5657,7 +5660,7 @@ function saveHistorySnapshot() {
     const snapshotData = state.processes.map(p => ({
         name: p.name,
         area: p.area,
-        responsavel: p.responsavel || 'Sem ResponsÃ¡vel',
+        responsavel: p.responsavel || 'Sem Responsável',
         volume: p.volume !== null && p.volume !== '' ? parseFloat(p.volume) : 0
     }));
     
@@ -5704,7 +5707,7 @@ function renderSnapshotsList() {
             <div class="glass-panel" style="display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 1rem; border-radius: 8px; border: 1px solid rgba(255,255,255,0.05); background: rgba(255,255,255,0.01);">
                 <div>
                     <h4 style="margin: 0; font-size: 0.95rem; font-weight: 600; color: var(--text-primary);">${formatMonth(h.month)}</h4>
-                    <span style="font-size: 0.8rem; color: var(--text-secondary);">${h.data.length} atividades Ã¢â‚¬ Vol: ${totalVolume.toFixed(0)}</span>
+                    <span style="font-size: 0.8rem; color: var(--text-secondary);">${h.data.length} atividades â€ Vol: ${totalVolume.toFixed(0)}</span>
                 </div>
                 <button class="btn-row-action btn-delete-snapshot" data-permissao="ADMIN" data-month="${h.month}" title="Excluir Registro" style="color: var(--color-danger); background: transparent; border: none; cursor: pointer; font-size: 0.9rem; padding: 0.2rem;">
                     <i class="fa-solid fa-trash-can"></i>
@@ -5718,7 +5721,7 @@ function renderSnapshotsList() {
     // Add delete listeners
     container.querySelectorAll('.btn-delete-snapshot').forEach(btn => {
         btn.addEventListener('click', (e) => {
-            if (!verificarPermissao('ADMIN')) { alert('Acesso negado: Perfil ADMIN necessÃƒÂ¡rio.'); return; }
+            if (!verificarPermissao('ADMIN')) { alert('Acesso negado: Perfil ADMIN necessÃ¡rio.'); return; }
             const btnEl = e.currentTarget;
             const month = btnEl.dataset.month;
             if (confirm(`Tem certeza que deseja excluir o registro de ${formatMonth(month)}?`)) {
@@ -5749,7 +5752,7 @@ function populateHistoryItemOptions() {
     state.processes.forEach(p => {
         if (type === 'atividade') itemsSet.add(p.name);
         else if (type === 'area') itemsSet.add(p.area);
-        else if (type === 'responsavel') itemsSet.add(p.responsavel || 'Sem ResponsÃ¡vel');
+        else if (type === 'responsavel') itemsSet.add(p.responsavel || 'Sem Responsável');
     });
     
     const items = [...itemsSet].sort();
@@ -5757,7 +5760,7 @@ function populateHistoryItemOptions() {
     if (!selectItem) return;
     
     if (items.length === 0) {
-        selectItem.innerHTML = '<option value="">Nenhum item disponÃ­vel</option>';
+        selectItem.innerHTML = '<option value="">Nenhum item disponível</option>';
         return;
     }
     
@@ -5933,7 +5936,7 @@ function renderCadastrosView() {
             teamsList.querySelectorAll('.btn-edit-team-item').forEach(btn => {
                 btn.addEventListener('click', (e) => {
                     e.stopPropagation();
-                    if (!verificarPermissao('OPERADOR')) { alert('Acesso negado: Perfil OPERADOR necessÃ¡rio.'); return; }
+                    if (!verificarPermissao('OPERADOR')) { alert('Acesso negado: Perfil OPERADOR necessário.'); return; }
                     const team = btn.getAttribute('data-team');
                     openNewTeamModal(team);
                 });
@@ -5942,9 +5945,9 @@ function renderCadastrosView() {
             teamsList.querySelectorAll('.btn-delete-team-item').forEach(btn => {
                 btn.addEventListener('click', (e) => {
                     e.stopPropagation();
-                    if (!verificarPermissao('ADMIN')) { alert('Acesso negado: Perfil ADMIN necessÃ¡rio.'); return; }
+                    if (!verificarPermissao('ADMIN')) { alert('Acesso negado: Perfil ADMIN necessário.'); return; }
                     const team = btn.getAttribute('data-team');
-                    if (confirm(`Deseja realmente excluir a equipe "${team}"? Todos os responsÃ¡veis e atividades desta equipe ficarÃ£o "Sem Equipe".`)) {
+                    if (confirm(`Deseja realmente excluir a equipe "${team}"? Todos os responsáveis e atividades desta equipe ficarão "Sem Equipe".`)) {
                         state.teams = state.teams.filter(t => t !== team);
                         state.processes.forEach(p => {
                             if (p.area === team) p.area = '';
@@ -6001,7 +6004,7 @@ function renderCadastrosView() {
     // 2. Render Responsibles List (Accordion by Team)
     responsiblesList.innerHTML = '';
     if (!state.responsaveis || state.responsaveis.length === 0) {
-        responsiblesList.innerHTML = '<div style="color: var(--text-muted); font-size: 0.85rem; padding: 0.5rem;">Nenhum responsÃ¡vel cadastrado.</div>';
+        responsiblesList.innerHTML = '<div style="color: var(--text-muted); font-size: 0.85rem; padding: 0.5rem;">Nenhum responsável cadastrado.</div>';
     } else {
         const teamsToRender = [...(state.teams || []), 'Outros / Sem Equipe'];
         
@@ -6041,7 +6044,7 @@ function renderCadastrosView() {
                     <div style="display: flex; flex-direction: column;">
                         <span style="font-weight: 600; color: var(--text-primary);">${escapeHtml(resp.name)}</span>
                     </div>
-                    ${hasOverrides ? '<i class="fa-solid fa-user-gear" style="color: var(--color-primary); font-size: 0.75rem; margin-left: 0.25rem;" title="ParÃ¢metros customizados ativos"></i>' : ''}
+                    ${hasOverrides ? '<i class="fa-solid fa-user-gear" style="color: var(--color-primary); font-size: 0.75rem; margin-left: 0.25rem;" title="Parâmetros customizados ativos"></i>' : ''}
                 `;
                 
                 const btnGroup = document.createElement('div');
@@ -6051,14 +6054,14 @@ function renderCadastrosView() {
                 btnConfig.className = 'btn-config-resp-item';
                 btnConfig.setAttribute('data-permissao', 'OPERADOR,ADMIN');
                 btnConfig.style.cssText = 'background: transparent; border: none; color: var(--color-primary); cursor: pointer; font-size: 0.85rem; padding: 0.2rem; display: flex; align-items: center; justify-content: center;';
-                btnConfig.title = 'Configurar ParÃ¢metros de Capacidade';
+                btnConfig.title = 'Configurar Parâmetros de Capacidade';
                 btnConfig.innerHTML = '<i class="fa-solid fa-cog"></i>';
                 
                 const btnDelete = document.createElement('button');
                 btnDelete.className = 'btn-delete-resp-item';
                 btnDelete.setAttribute('data-permissao', 'ADMIN');
                 btnDelete.style.cssText = 'background: transparent; border: none; color: var(--color-danger); cursor: pointer; font-size: 0.85rem; padding: 0.2rem; display: flex; align-items: center; justify-content: center;';
-                btnDelete.title = 'Excluir ResponsÃ¡vel';
+                btnDelete.title = 'Excluir Responsável';
                 btnDelete.innerHTML = '<i class="fa-solid fa-trash-can"></i>';
                 
                 btnGroup.appendChild(btnConfig);
@@ -6074,8 +6077,8 @@ function renderCadastrosView() {
                 
                 btnDelete.addEventListener('click', (e) => {
                     e.stopPropagation();
-                    if (!verificarPermissao('ADMIN')) { alert('Acesso negado: Perfil ADMIN necessÃ¡rio.'); return; }
-                    if (confirm(`Tem certeza que deseja excluir o responsÃ¡vel "${resp.name}"? Todas as atividades sob sua responsabilidade ficarÃ£o sem responsÃ¡vel.`)) {
+                    if (!verificarPermissao('ADMIN')) { alert('Acesso negado: Perfil ADMIN necessário.'); return; }
+                    if (confirm(`Tem certeza que deseja excluir o responsável "${resp.name}"? Todas as atividades sob sua responsabilidade ficarão sem responsável.`)) {
                         state.responsaveis = state.responsaveis.filter(r => r.name !== resp.name);
                         state.processes.forEach(p => {
                             if (p.responsavel === resp.name) p.responsavel = '';
@@ -6179,7 +6182,7 @@ function renderCadastrosView() {
                 return !currentResps.includes(rName);
             });
 
-            const unassignedOptionsHtml = '<option value="">+ ResponsÃ¡vel</option>' +
+            const unassignedOptionsHtml = '<option value="">+ Responsável</option>' +
                 unassignedResps.map(resp => {
                     const rName = typeof resp === 'object' ? resp.name : resp;
                     return `<option value="${escapeHtml(rName)}">${escapeHtml(rName)}</option>`;
@@ -6214,7 +6217,7 @@ function renderCadastrosView() {
                 <td style="text-align: center;">
                     <label style="display: inline-flex; align-items: center; gap: 0.35rem; cursor: pointer; font-size: 0.8rem; user-select: none;">
                         <input type="checkbox" class="cb-activity-rpa" ${isRpa ? 'checked' : ''} ${isConsulta ? 'disabled' : ''}>
-                        <span class="label-rpa-text" style="${isRpa ? 'color: #a78bfa; font-weight: 600;' : 'color: var(--text-muted);'}">ðŸ¤– RPA</span>
+                        <span class="label-rpa-text" style="${isRpa ? 'color: #a78bfa; font-weight: 600;' : 'color: var(--text-muted);'}">🤖 RPA</span>
                     </label>
                 </td>
                 <td class="col-excluir-admin" style="text-align: center;">
@@ -6350,8 +6353,8 @@ function renderCadastrosView() {
             
             const deleteBtn = tr.querySelector('.btn-delete-activity-cell');
             deleteBtn.addEventListener('click', () => {
-                if (!verificarPermissao('ADMIN')) { alert('Acesso negado: Perfil ADMIN necessÃƒÂ¡rio.'); return; }
-                if (confirm(`Deseja ÃƒÃƒrealmente excluir a atividade "${proc.name}"?`)) {
+                if (!verificarPermissao('ADMIN')) { alert('Acesso negado: Perfil ADMIN necessÃ¡rio.'); return; }
+                if (confirm(`Deseja ÃÃrealmente excluir a atividade "${proc.name}"?`)) {
                     state.processes = state.processes.filter(p => p.id !== proc.id);
                     saveState();
                     renderCadastrosView();
@@ -6471,7 +6474,7 @@ function setupModalParametersListeners() {
     
     if (saveBtn) {
         saveBtn.addEventListener('click', () => {
-            if (!verificarPermissao('OPERADOR')) { alert('Acesso negado: Perfil OPERADOR necessÃ¡rio.'); return; }
+            if (!verificarPermissao('OPERADOR')) { alert('Acesso negado: Perfil OPERADOR necessário.'); return; }
             const respName = document.getElementById('modal-param-target-resp').value;
             const hDia = parseFloat(inputHoras.value);
             const abs = parseFloat(inputAbs.value);
@@ -6522,7 +6525,7 @@ function openCapacityModal(respName = '') {
     
     if (!respName) {
         // Global defaults mode
-        title.innerHTML = '<i class="fa-solid fa-sliders"></i> ParÃ¢metros PadrÃ£o de Capacidade';
+        title.innerHTML = '<i class="fa-solid fa-sliders"></i> Parâmetros Padrão de Capacidade';
         if (clearBtn) clearBtn.style.display = 'none';
         
         inputHoras.value = state.params.horasDia;
@@ -6545,15 +6548,15 @@ function openCapacityModal(respName = '') {
         }
         
         if (lblHoras) {
-            lblHoras.textContent = `PadrÃ£o Global: ${state.params.horasDia.toFixed(1)}h`;
+            lblHoras.textContent = `Padrão Global: ${state.params.horasDia.toFixed(1)}h`;
             lblHoras.style.display = 'block';
         }
         if (lblAbs) {
-            lblAbs.textContent = `PadrÃ£o Global: ${state.params.absenteismo}%`;
+            lblAbs.textContent = `Padrão Global: ${state.params.absenteismo}%`;
             lblAbs.style.display = 'block';
         }
         if (lblDias) {
-            lblDias.textContent = `PadrÃ£o Global: ${state.params.diasUteis}d`;
+            lblDias.textContent = `Padrão Global: ${state.params.diasUteis}d`;
             lblDias.style.display = 'block';
         }
     }
@@ -6582,7 +6585,7 @@ function openCapacityModal(respName = '') {
 }
 
 // ============================================================
-// ACCESS CONTROL VIEW - GESTÃƒO DE PERFIS DE USUÃRIO
+// ACCESS CONTROL VIEW - GESTÃO DE PERFIS DE USUÁRIO
 // ============================================================
 
 const SETUP_SQL = `-- Execute no SQL Editor do Supabase:
@@ -6597,7 +6600,7 @@ CREATE TABLE public.profiles (
 
 ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
 
-CREATE POLICY "Perfis visÃ­veis para autenticados"
+CREATE POLICY "Perfis visíveis para autenticados"
   ON public.profiles FOR SELECT
   USING (auth.role() = 'authenticated');
 
@@ -6612,7 +6615,7 @@ CREATE POLICY "Admins podem atualizar perfis"
   );
 
 CREATE OR REPLACE FUNCTION public.handle_new_user()
-RETURNS TRIGGER AS $$
+RETURNS TRIGGER AS $
 BEGIN
   INSERT INTO public.profiles (id, email, nome, perfil)
   VALUES (
@@ -6623,7 +6626,7 @@ BEGIN
   );
   RETURN NEW;
 END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
+$ LANGUAGE plpgsql SECURITY DEFINER;
 
 CREATE TRIGGER on_auth_user_created
   AFTER INSERT ON auth.users
@@ -6705,7 +6708,7 @@ async function renderAccessControlView() {
                     <div style="display: flex; align-items: center; gap: 0.5rem;">
                         <i class="fa-solid fa-circle-user" style="color: var(--color-primary); font-size: 1.1rem;"></i>
                         <span style="font-weight: 500;">${escapeHtml(profile.nome || '-')}</span>
-                        ${isCurrentUser ? '<span style="font-size:0.7rem; color: var(--color-primary); background: rgba(235,92,39,0.12); padding: 0.1rem 0.4rem; border-radius: 4px; margin-left: 0.25rem;">VocÃª</span>' : ''}
+                        ${isCurrentUser ? '<span style="font-size:0.7rem; color: var(--color-primary); background: rgba(235,92,39,0.12); padding: 0.1rem 0.4rem; border-radius: 4px; margin-left: 0.25rem;">Você</span>' : ''}
                     </div>
                 </td>
                 <td style="color: var(--text-secondary); font-size: 0.85rem;">${escapeHtml(profile.email || '-')}</td>
@@ -6733,7 +6736,7 @@ async function renderAccessControlView() {
 
 async function updateUserProfile(userId, newPerfil, selectEl) {
     if (!verificarPermissao('ADMIN')) {
-        alert('Acesso negado: Perfil ADMIN necessÃ¡rio.');
+        alert('Acesso negado: Perfil ADMIN necessário.');
         if (selectEl && selectEl.dataset.originalValue) selectEl.value = selectEl.dataset.originalValue;
         return;
     }
@@ -6773,7 +6776,7 @@ async function updateUserProfile(userId, newPerfil, selectEl) {
     }
 }
 
-// RENDER AUTOMATIONS VIEW (QUADRO DE AUTOMAÃ‡Ã•ES & RPA)
+// RENDER AUTOMATIONS VIEW (QUADRO DE AUTOMAÇÕES & RPA)
 function renderAutomationsView() {
     const tableBody = document.getElementById('rpa-table-body');
     const emptyState = document.getElementById('rpa-empty-state');
@@ -6786,7 +6789,7 @@ function renderAutomationsView() {
     const filterSelect = document.getElementById('filter-area-rpa');
     if (filterSelect) {
         const currentVal = filterSelect.value;
-        filterSelect.innerHTML = '<option value="all">Todas as Ãreas</option>';
+        filterSelect.innerHTML = '<option value="all">Todas as Áreas</option>';
         (state.teams || []).forEach(t => {
             const opt = document.createElement('option');
             opt.value = t;
@@ -6890,7 +6893,7 @@ function renderAutomationsView() {
                 <span class="badge-area" style="font-size: 0.85rem; padding: 0.25rem 0.5rem; border-radius: 4px; background: rgba(235, 92, 39, 0.08); color: var(--color-primary); border: 1px solid rgba(235, 92, 39, 0.15);">${escapeHtml(proc.area || 'Sem Equipe')}</span>
             </td>
             <td>
-                <span style="font-size: 0.9rem; color: var(--text-secondary);">${escapeHtml(proc.responsavel || 'Sem ResponsÃ¡vel')}</span>
+                <span style="font-size: 0.9rem; color: var(--text-secondary);">${escapeHtml(proc.responsavel || 'Sem Responsável')}</span>
             </td>
             <td>
                 <span style="font-size: 0.9rem; color: var(--text-primary);">${escapeHtml(proc.produto || '-')}</span>
@@ -6898,7 +6901,7 @@ function renderAutomationsView() {
             <td class="admin-only">
                 <div style="display: flex; flex-direction: column;">
                     <span style="font-weight: 700; color: #a78bfa;">${fteDec.toFixed(2)} FTE (${ftePct.toFixed(2)}%)</span>
-                    <span style="font-size: 0.75rem; color: var(--text-muted);">${totalHours.toFixed(1)}h/mÃªs</span>
+                    <span style="font-size: 0.75rem; color: var(--text-muted);">${totalHours.toFixed(1)}h/mês</span>
                 </div>
             </td>
         `;
