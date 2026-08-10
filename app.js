@@ -104,6 +104,7 @@ let barChartInstance = null;
 
 // DEFAULT EXAMPLE DATA WITH AREAS
 const EXAMPLE_PROCESSES = [
+    // Backoffice
     { id: 'ex-1', name: 'Cancelamento DY - Solicitação CB (Fila Projeto)', area: 'Backoffice', volume: '', minutos: 0, qtdExecucao: '', backlogVolume: '', allocatedResource: '' },
     { id: 'ex-2', name: 'Prorrogação', area: 'Backoffice', volume: '', minutos: 0, qtdExecucao: '', backlogVolume: '', allocatedResource: '' },
     { id: 'ex-3', name: 'Baixa de Parcela (Robô Baixas) - Demandas BKO + Baixa em lote + Baixa manual', area: 'Backoffice', volume: '', minutos: 0, qtdExecucao: '', backlogVolume: '', allocatedResource: '' },
@@ -119,7 +120,14 @@ const EXAMPLE_PROCESSES = [
     { id: 'ex-13', name: 'Cancelamento Parcial/Amortização', area: 'Backoffice', volume: '', minutos: 0, qtdExecucao: '', backlogVolume: '', allocatedResource: '' },
     { id: 'ex-14', name: 'Amortização Nota de credito', area: 'Backoffice', volume: '', minutos: 0, qtdExecucao: '', backlogVolume: '', allocatedResource: '' },
     { id: 'ex-15', name: 'Recompra (Amortização e Recompra Proativa)', area: 'Backoffice', volume: '', minutos: 0, qtdExecucao: '', backlogVolume: '', allocatedResource: '' },
-    { id: 'ex-16', name: 'Dúvidas - Pagamento, Cobrança e Espelhamento', area: 'Backoffice', volume: '', minutos: 0, qtdExecucao: '', backlogVolume: '', allocatedResource: '' }
+    { id: 'ex-16', name: 'Dúvidas - Pagamento, Cobrança e Espelhamento', area: 'Backoffice', volume: '', minutos: 0, qtdExecucao: '', backlogVolume: '', allocatedResource: '' },
+
+    // Eficiência Operacional
+    { id: 'ex-17', name: 'Mapeamento e Melhoria de Fluxos Operacionais', area: 'Eficiência Operacional', volume: '', minutos: 0, qtdExecucao: '', backlogVolume: '', allocatedResource: '' },
+    { id: 'ex-18', name: 'Desenvolvimento e Manutenção de Automações RPA', area: 'Eficiência Operacional', volume: '', minutos: 0, qtdExecucao: '', backlogVolume: '', allocatedResource: '', isRpa: true },
+    { id: 'ex-19', name: 'Monitoria de Qualidade e Auditoria de Processos', area: 'Eficiência Operacional', volume: '', minutos: 0, qtdExecucao: '', backlogVolume: '', allocatedResource: '' },
+    { id: 'ex-20', name: 'Análise de Indicadores e Performance Operacional', area: 'Eficiência Operacional', volume: '', minutos: 0, qtdExecucao: '', backlogVolume: '', allocatedResource: '' },
+    { id: 'ex-21', name: 'Suporte Técnico N2/N3 e Gestão de Incidentes', area: 'Eficiência Operacional', volume: '', minutos: 0, qtdExecucao: '', backlogVolume: '', allocatedResource: '' }
 ];
 
 function getSupabase() {
@@ -793,9 +801,17 @@ function applyStateMigrations() {
     if (!state.areaAllocations) state.areaAllocations = {};
     if (!state.processes) state.processes = [];
 
+    // Re-establish missing base processes for Backoffice and Eficiência Operacional
+    EXAMPLE_PROCESSES.forEach(ep => {
+        const exists = state.processes.some(p => p.name === ep.name);
+        if (!exists) {
+            state.processes.push(JSON.parse(JSON.stringify(ep)));
+        }
+    });
+
     state.processes.forEach(p => {
         const match = EXAMPLE_PROCESSES.find(ep => ep.name === p.name);
-        if (match) p.area = 'Backoffice';
+        if (match && (!p.area || p.area.trim() === '')) p.area = match.area;
         if (p.backlogVolume === undefined) p.backlogVolume = '';
         if (p.allocatedResource === undefined) p.allocatedResource = '';
         if (p.reviewStatus === undefined) p.reviewStatus = 'Manter';
