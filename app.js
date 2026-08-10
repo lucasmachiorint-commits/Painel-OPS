@@ -2137,6 +2137,9 @@ function addNewProcess() {
         allocatedResource: '',
         reviewStatus: 'Manter'
     });
+    if (typeof expandedCadastrosTableTeams !== 'undefined') {
+        expandedCadastrosTableTeams[defaultArea || 'Outros / Sem Equipe'] = true;
+    }
     saveState();
     
     renderCadastrosView();
@@ -2827,7 +2830,7 @@ function renderResponsavelFilterOptions() {
 
 // IMPORT PROCESSES FROM EXCEL/CSV SPREADSHEET (SHEETJS)
 function importExcelFile(file) {
-    if (!verificarPermissao('ADMIN')) { alert('Acesso negado: Perfil ADMIN necessÃ¡rio.'); return; }
+    if (!verificarPermissao('OPERADOR')) { alert('Acesso negado: Perfil OPERADOR necessário.'); return; }
     const reader = new FileReader();
     reader.onload = function(e) {
         try {
@@ -2837,7 +2840,7 @@ function importExcelFile(file) {
             let importCount = 0;
             const importedProcesses = [];
             const newTeams = new Set(state.teams);
-            const newResps = new Set((state.responsaveis || []).map(r => r.name));
+            const newResps = new Set((state.responsaveis || []).map(r => typeof r === 'object' ? r.name : r));
             
             workbook.SheetNames.forEach(sheetName => {
                 const sheet = workbook.Sheets[sheetName];
@@ -2917,16 +2920,14 @@ function importExcelFile(file) {
             });
             
             if (importedProcesses.length > 0) {
-                const mode = confirm(`Importação Concluída!\n\nForam encontradas ${importCount} atividades.\n\nDeseja SUBSTITUIR as atividades existentes no simulador pelas novas?\n\n(Clique em 'OK' para substituir ou 'Cancelar' para adicionar ao final)`);
-                
                 state.teams = [...newTeams];
                 const existingResps = state.responsaveis || [];
                 state.responsaveis = [...newResps].sort().map(name => {
-                    const existing = existingResps.find(r => r.name === name);
+                    const existing = existingResps.find(r => (typeof r === 'object' ? r.name : r) === name);
                     const importedAct = importedProcesses.find(ip => ip.responsavel === name);
                     const importedArea = importedAct ? importedAct.area : '';
                     
-                    if (existing) {
+                    if (existing && typeof existing === 'object') {
                         if (!existing.area) {
                             existing.area = importedArea;
                         }
@@ -2935,11 +2936,8 @@ function importExcelFile(file) {
                     return { name, area: importedArea, horasDia: null, absenteismo: null, diasUteis: null };
                 });
                 
-                if (mode) {
-                    state.processes = importedProcesses;
-                } else {
-                    state.processes = [...state.processes, ...importedProcesses];
-                }
+                // Always append imported processes (Strictly non-destructive import)
+                state.processes = [...state.processes, ...importedProcesses];
                 
                 saveState();
                 renderResponsavelFilterOptions();
@@ -2950,7 +2948,7 @@ function importExcelFile(file) {
                 renderBalancingTable();
                 renderReviewTable();
                 
-                alert(`Sucesso! ${importCount} atividades foram importadas e salvas.`);
+                alert(`Sucesso! ${importCount} novas atividades foram adicionadas.`);
             } else {
                 alert("Nenhuma atividade encontrada na planilha. Verifique se as colunas estão no formato correto.");
             }
@@ -3228,6 +3226,9 @@ function renderHistoryChart() {
 // CADASTROS VIEW SYSTEM
 // ----------------------------------------------------
 
+// State tracking for accordion expansion in Cadastros view
+const expandedCadastrosTableTeams = {};
+
 function renderCadastrosView() {
     const teamsList = document.getElementById('cadastros-teams-list');
     const responsiblesList = document.getElementById('cadastros-responsibles-list');
@@ -3331,18 +3332,22 @@ function renderCadastrosView() {
         }
     };
 
-    const toggleTableAccordion = (headerTr, className) => {
+    const toggleTableAccordion = (headerTr, className, forceState = null) => {
         const rows = tableBody.querySelectorAll('.' + className);
-        let currentlyHidden = true;
-        if(rows.length > 0) {
-            currentlyHidden = rows[0].style.display === 'none';
+        let nextExpanded = forceState;
+        if (nextExpanded === null || nextExpanded === undefined) {
+            let currentlyHidden = true;
+            if (rows.length > 0) {
+                currentlyHidden = rows[0].style.display === 'none';
+            }
+            nextExpanded = currentlyHidden;
         }
         rows.forEach(r => {
-            r.style.display = currentlyHidden ? 'table-row' : 'none';
+            r.style.display = nextExpanded ? 'table-row' : 'none';
         });
         const icon = headerTr.querySelector('i');
-        if(icon) {
-            icon.className = currentlyHidden ? 'fa-solid fa-chevron-down' : 'fa-solid fa-chevron-right';
+        if (icon) {
+            icon.className = nextExpanded ? 'fa-solid fa-chevron-down' : 'fa-solid fa-chevron-right';
         }
     };
 
@@ -3422,8 +3427,8 @@ function renderCadastrosView() {
                 
                 btnDelete.addEventListener('click', (e) => {
                     e.stopPropagation();
-                    if (!verificarPermissao('ADMIN')) { alert('Acesso negado: Perfil ADMIN necessÃ¡rio.'); return; }
-                    if (confirm(`Tem certeza que deseja excluir o responsÃ¡vel "${resp.name}"? Todas as atividades sob sua responsabilidade ficarão sem responsÃ¡vel.`)) {
+                    if (!verificarPermissao('ADMIN')) { alert('Acesso negado: Perfil ADMIN necessário.'); return; }
+                    if (confirm(`Tem certeza que deseja excluir o responsável "${resp.name}"? Todas as atividades sob sua responsabilidade ficarão sem responsável.`)) {
                         state.responsaveis = state.responsaveis.filter(r => r.name !== resp.name);
                         state.processes.forEach(p => {
                             if (p.responsavel === resp.name) p.responsavel = '';
@@ -3477,23 +3482,29 @@ function renderCadastrosView() {
         if (teamProcs.length === 0) return;
         
         const rowClass = 'team-activity-row-' + teamIndex;
+        // Default to expanded (true) if undefined so activities remain open unless explicitly collapsed by user
+        const isExpanded = expandedCadastrosTableTeams[team] !== false;
         
         // Header Row
         const headerTr = document.createElement('tr');
         headerTr.style.cssText = 'background: rgba(255,255,255,0.03); cursor: pointer; user-select: none;';
         headerTr.innerHTML = `
             <td colspan="7" style="padding: 0.8rem; font-weight: 600; color: var(--text-primary); border-top: 1px solid rgba(255,255,255,0.05); border-bottom: 1px solid rgba(255,255,255,0.05);">
-                <i class="fa-solid fa-chevron-right" style="width: 20px;"></i> ${escapeHtml(team)} <span style="background: rgba(255,255,255,0.1); color: var(--text-secondary); padding: 0.1rem 0.5rem; border-radius: 10px; font-size: 0.75rem; margin-left: 0.5rem;">${teamProcs.length} atividades</span>
+                <i class="${isExpanded ? 'fa-solid fa-chevron-down' : 'fa-solid fa-chevron-right'}" style="width: 20px;"></i> ${escapeHtml(team)} <span style="background: rgba(255,255,255,0.1); color: var(--text-secondary); padding: 0.1rem 0.5rem; border-radius: 10px; font-size: 0.75rem; margin-left: 0.5rem;">${teamProcs.length} atividades</span>
             </td>
         `;
-        headerTr.addEventListener('click', () => toggleTableAccordion(headerTr, rowClass));
+        headerTr.addEventListener('click', () => {
+            const currentVis = expandedCadastrosTableTeams[team] !== false;
+            expandedCadastrosTableTeams[team] = !currentVis;
+            toggleTableAccordion(headerTr, rowClass, expandedCadastrosTableTeams[team]);
+        });
         tableBody.appendChild(headerTr);
         
         // Activity Rows
         teamProcs.forEach(proc => {
             const tr = document.createElement('tr');
             tr.className = rowClass;
-            tr.style.display = 'none'; // Initially collapsed
+            tr.style.display = isExpanded ? 'table-row' : 'none';
             tr.dataset.id = proc.id;
             
             const teamOptions = '<option value="">-- Sem Equipe --</option>' +
