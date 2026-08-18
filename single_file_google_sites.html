@@ -1894,13 +1894,13 @@ body.light-theme input:-webkit-autofill:active {
                                 <table class="fte-table" id="cadastros-table">
                                     <thead>
                                         <tr>
-                                            <th class="col-excluir-admin" style="width: 4%; text-align: center;"><input type="checkbox" id="cadastros-select-all" data-permissao="ADMIN"></th>
+                                            <th class="col-select-admin" style="width: 4%; text-align: center;"><input type="checkbox" id="cadastros-select-all" data-permissao="ADMIN"></th>
                                             <th style="width: 28%;">Nome da Atividade / Demanda</th>
                                             <th style="width: 18%;">Equipe / Área Responsável</th>
                                             <th style="width: 18%;">Responsável</th>
                                             <th style="width: 15%;">Produto</th>
                                             <th style="width: 12%; text-align: center;">Automação (RPA)</th>
-                                            <th class="col-excluir-admin" style="width: 5%; text-align: center;">Excluir</th>
+                                            <th class="col-acao-excluir" style="width: 5%; text-align: center;">Ações</th>
                                         </tr>
                                     </thead>
                                     <tbody id="cadastros-table-body">
@@ -2832,14 +2832,17 @@ function aplicarPerfilDeAcesso() {
         }
     });
 
-    // Controla coluna Excluir na tabela de Cadastros (header + cells)
+    // Controla coluna de seleção em massa (apenas ADMIN)
     const isAdmin = perfil === 'ADMIN';
-    document.querySelectorAll('.col-excluir-admin').forEach(el => {
+    document.querySelectorAll('.col-select-admin').forEach(el => {
         el.style.display = isAdmin ? '' : 'none';
     });
 
-    // Controla inputs editáveis para perfil CONSULTA
+    // Controla coluna de ações/excluir (ADMIN e OPERADOR, oculto para CONSULTA)
     const isConsulta = perfil === 'CONSULTA';
+    document.querySelectorAll('.col-acao-excluir').forEach(el => {
+        el.style.display = isConsulta ? 'none' : '';
+    });
     document.querySelectorAll('.input-volume, .input-minutes, .input-qtd, .input-backlog-volume, .input-area-allocation, .select-review-status, .input-activity-name-cell, .select-activity-team-cell, .select-activity-resp-cell, .input-activity-product-cell, .select-activity-add-resp, .cadastros-row-checkbox, .cb-activity-rpa, .access-perfil-select, #history-month-input, #modal-input-horas-dia, #modal-input-absenteismo, #modal-input-dias-uteis, #modal-input-new-team, #modal-select-team-gerencia, #modal-select-team-diretoria').forEach(el => {
         el.disabled = isConsulta;
         el.style.opacity = isConsulta ? '0.5' : '1';
@@ -6480,7 +6483,7 @@ function renderCadastrosView() {
                 
                 const btnDelete = document.createElement('button');
                 btnDelete.className = 'btn-delete-resp-item';
-                btnDelete.setAttribute('data-permissao', 'ADMIN');
+                btnDelete.setAttribute('data-permissao', 'OPERADOR,ADMIN');
                 btnDelete.style.cssText = 'background: transparent; border: none; color: var(--color-danger); cursor: pointer; font-size: 0.85rem; padding: 0.2rem; display: flex; align-items: center; justify-content: center;';
                 btnDelete.title = 'Excluir Responsável';
                 btnDelete.innerHTML = '<i class="fa-solid fa-trash-can"></i>';
@@ -6501,9 +6504,10 @@ function renderCadastrosView() {
                 
                 btnDelete.addEventListener('click', (e) => {
                     e.stopPropagation();
-                    if (!verificarPermissao('ADMIN')) { alert('Acesso negado: Perfil ADMIN necessário.'); return; }
+                    if (!verificarPermissao('OPERADOR')) { alert('Acesso negado: Perfil OPERADOR ou ADMIN necessário.'); return; }
+                    if (!podeEditarArea(resp.area)) { alert(`Acesso negado: Você só pode excluir responsáveis da sua própria equipe (${currentUser.assignedTeam}).`); return; }
                     if (confirm(`Tem certeza que deseja excluir o responsável "${resp.name}"? Todas as atividades sob sua responsabilidade ficarão sem responsável.`)) {
-                        state.responsaveis = state.responsaveis.filter(r => r.name !== resp.name);
+                        state.responsaveis = state.responsaveis.filter(r => (typeof r === 'object' ? r.name : r) !== resp.name);
                         state.processes.forEach(p => {
                             if (p.responsavel === resp.name) p.responsavel = '';
                         });
@@ -6562,8 +6566,9 @@ function renderCadastrosView() {
         // Header Row
         const headerTr = document.createElement('tr');
         headerTr.style.cssText = 'background: rgba(255,255,255,0.03); cursor: pointer; user-select: none;';
+        const totalCols = currentUser.perfil === 'ADMIN' ? 7 : (currentUser.perfil === 'OPERADOR' ? 6 : 5);
         headerTr.innerHTML = `
-            <td colspan="7" style="padding: 0.8rem; font-weight: 600; color: var(--text-primary); border-top: 1px solid rgba(255,255,255,0.05); border-bottom: 1px solid rgba(255,255,255,0.05);">
+            <td colspan="${totalCols}" style="padding: 0.8rem; font-weight: 600; color: var(--text-primary); border-top: 1px solid rgba(255,255,255,0.05); border-bottom: 1px solid rgba(255,255,255,0.05);">
                 <i class="${isExpanded ? 'fa-solid fa-chevron-down' : 'fa-solid fa-chevron-right'}" style="width: 20px;"></i> ${escapeHtml(team)} <span style="background: rgba(255,255,255,0.1); color: var(--text-secondary); padding: 0.1rem 0.5rem; border-radius: 10px; font-size: 0.75rem; margin-left: 0.5rem;">${teamProcs.length} atividades</span>
             </td>
         `;
@@ -6619,7 +6624,7 @@ function renderCadastrosView() {
             const isRpa = isRpaActivity(proc);
             
             tr.innerHTML = `
-                <td style="text-align: center;">
+                <td class="col-select-admin" style="text-align: center; ${currentUser.perfil === 'ADMIN' ? '' : 'display: none;'}">
                     <input type="checkbox" class="cadastros-row-checkbox" data-id="${proc.id}" ${isRowDisabled ? 'disabled style="opacity: 0.3; pointer-events: none;"' : ''}>
                 </td>
                 <td>
@@ -6647,8 +6652,8 @@ function renderCadastrosView() {
                         <span class="label-rpa-text" style="${isRpa ? 'color: #a78bfa; font-weight: 600;' : 'color: var(--text-muted);'}">🤖 RPA</span>
                     </label>
                 </td>
-                <td class="col-excluir-admin" style="text-align: center;">
-                    ${canEditThisArea || currentUser.perfil === 'ADMIN' ? `
+                <td class="col-acao-excluir" style="text-align: center; ${isConsulta ? 'display: none;' : ''}">
+                    ${canEditThisArea ? `
                     <button class="btn-row-action btn-delete-activity-cell" style="background: transparent; border: none; color: var(--color-danger); cursor: pointer; font-size: 0.95rem; padding: 0.2rem;" title="Excluir Atividade">
                         <i class="fa-solid fa-trash-can"></i>
                     </button>` : ''}
@@ -6800,7 +6805,8 @@ function renderCadastrosView() {
             const deleteBtn = tr.querySelector('.btn-delete-activity-cell');
             if (deleteBtn) {
                 deleteBtn.addEventListener('click', () => {
-                    if (!verificarPermissao('ADMIN')) { alert('Acesso negado: Perfil ADMIN necessário.'); return; }
+                    if (!verificarPermissao('OPERADOR')) { alert('Acesso negado: Perfil OPERADOR ou ADMIN necessário.'); return; }
+                    if (!podeEditarArea(proc.area)) { alert(`Acesso negado: Você só pode excluir atividades da sua equipe (${currentUser.assignedTeam}).`); return; }
                     if (confirm(`Deseja realmente excluir a atividade "${proc.name}"?`)) {
                         state.processes = state.processes.filter(p => p.id !== proc.id);
                         saveState();
@@ -6808,6 +6814,7 @@ function renderCadastrosView() {
                         renderTable();
                         renderBalancingTable();
                         renderReviewTable();
+                        renderAutomationsView();
                     }
                 });
             }
