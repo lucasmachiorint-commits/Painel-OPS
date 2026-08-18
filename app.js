@@ -681,7 +681,7 @@ let _lastRealtimeToastTime = 0;
 
 function subscribeRealtime() {
     const client = getSupabase();
-    if (!client) return;
+    if (!client || !window._authUserId) return;
 
     try {
         client.removeAllChannels();
@@ -691,13 +691,14 @@ function subscribeRealtime() {
     updateRealtimeStatusUI('CONNECTING');
 
     realtimeChannel = client
-        .channel('board-changes')
+        .channel('board-changes-hml')
         .on('postgres_changes', {
             event: '*',
             schema: 'public',
-            table: 'board_state'
+            table: 'board_state',
+            filter: 'id=eq.hml_default'
         }, (payload) => {
-            console.log('[Realtime] Evento recebido via WebSocket:', payload.eventType, payload);
+            console.log('[Realtime HML] Evento recebido via WebSocket:', payload.eventType, payload);
             
             const payloadData = payload.new || payload.record;
             if (payloadData && payloadData.data) {
@@ -727,12 +728,12 @@ function subscribeRealtime() {
             }
         })
         .subscribe((status, err) => {
-            console.log('[Realtime] Status da inscrição:', status, err || '');
+            console.log('[Realtime HML] Status da inscrição:', status, err || '');
             if (status === 'SUBSCRIBED') {
                 updateRealtimeStatusUI('SUBSCRIBED');
             } else if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
                 updateRealtimeStatusUI('ERROR', 'Erro Realtime');
-                console.warn('[Realtime Error] Certifique-se de que a publicação Realtime está ativa no Supabase (ALTER PUBLICATION supabase_realtime ADD TABLE board_state).');
+                console.warn('[Realtime Info] Publicação Realtime em standby ou necessita de ativação no Supabase.');
             } else if (status === 'CLOSED') {
                 updateRealtimeStatusUI('ERROR', 'Desconectado');
             }
@@ -748,25 +749,18 @@ function unsubscribeRealtime() {
     }
     realtimeChannel = null;
     updateRealtimeStatusUI('CLOSED');
-    console.log('[Realtime] Canal desconectado.');
+    console.log('[Realtime HML] Canal desconectado.');
 }
 
 // SUPABASE BOARD STATE PERSISTENCE
 async function saveStateToSupabase() {
     const client = getSupabase();
-    if (!client) return;
+    if (!client || !window._authUserId) return;
 
     _lastSelfSaveTime = Date.now();
 
     try {
-        let myUserId = window._authUserId;
-        if (!myUserId) {
-            const { data: { user } } = await client.auth.getUser();
-            if (user) {
-                myUserId = user.id;
-                window._authUserId = user.id;
-            }
-        }
+        const myUserId = window._authUserId;
 
         const { error } = await client
             .from('board_state')
@@ -781,8 +775,8 @@ async function saveStateToSupabase() {
             console.error('[Supabase Save Error]', error);
             if (error.code === '42P01' || error.message?.includes('board_state')) {
                 showToast('Erro Supabase: Tabela "board_state" não encontrada. Execute o SQL de configuração no Supabase.', 'error', 10000);
-            } else if (error.code === '42501' || error.message?.includes('row-level security')) {
-                showToast('Erro de permissão RLS no Supabase. Habilite políticas de SELECT/INSERT/UPDATE na tabela board_state.', 'error', 10000);
+            } else if (error.code === '42501' || error.message?.includes('row-level security') || error.code === '401' || error.status === 401) {
+                console.warn('[Supabase Save Auth/RLS]', error.message);
             } else {
                 showToast(`Erro ao salvar no Supabase: ${error.message}`, 'error', 5000);
             }
@@ -1121,6 +1115,9 @@ let _saveDebounceTimer = null;
 function saveState() {
     localStorage.setItem('capacity_fte_hub_state', JSON.stringify(state));
     
+    // Somente persiste no Supabase se houver usuário autenticado
+    if (!window._authUserId) return;
+
     // Debounce to prevent flooding Supabase with calls on every keystroke
     if (_saveDebounceTimer) clearTimeout(_saveDebounceTimer);
     _saveDebounceTimer = setTimeout(() => {
