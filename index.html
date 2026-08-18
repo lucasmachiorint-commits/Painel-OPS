@@ -879,11 +879,16 @@
                     <label style="font-size: 0.8rem; font-weight: 600; color: var(--text-secondary);">Nome da Equipe <span style="color: var(--color-danger);">*</span></label>
                     <input type="text" id="modal-input-new-team" placeholder="Ex: Backoffice" style="width: 100%; padding: 0.55rem 0.85rem; border-radius: 8px; border: 1px solid var(--border-color); background: rgba(255,255,255,0.05); color: var(--text-primary); font-size: 0.95rem;">
                 </div>
-                <div style="display: flex; flex-direction: column; gap: 0.35rem;">
-                    <label style="font-size: 0.8rem; font-weight: 600; color: var(--text-secondary);">Coordenador(a) / Responsável</label>
-                    <select id="modal-select-team-coordenador" style="width: 100%; padding: 0.55rem 0.85rem; border-radius: 8px; border: 1px solid var(--border-color); background: rgba(255,255,255,0.05); color: var(--text-primary); font-size: 0.95rem; cursor: pointer;">
-                        <option value="">Sem Coordenador</option>
-                    </select>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
+                    <div style="display: flex; flex-direction: column; gap: 0.35rem;">
+                        <label style="font-size: 0.8rem; font-weight: 600; color: var(--text-secondary);">Coordenador(a)</label>
+                        <input type="text" id="modal-input-team-coordenador" placeholder="Nome do(a) Coordenador(a)" list="coordenadores-datalist" style="width: 100%; padding: 0.55rem 0.85rem; border-radius: 8px; border: 1px solid var(--border-color); background: rgba(255,255,255,0.05); color: var(--text-primary); font-size: 0.9rem;">
+                        <datalist id="coordenadores-datalist"></datalist>
+                    </div>
+                    <div style="display: flex; flex-direction: column; gap: 0.35rem;">
+                        <label style="font-size: 0.8rem; font-weight: 600; color: var(--text-secondary);">E-mail do(a) Coordenador(a)</label>
+                        <input type="email" id="modal-input-team-coordenador-email" placeholder="coordenador@empresa.com" style="width: 100%; padding: 0.55rem 0.85rem; border-radius: 8px; border: 1px solid var(--border-color); background: rgba(255,255,255,0.05); color: var(--text-primary); font-size: 0.9rem;">
+                    </div>
                 </div>
                 <div style="display: flex; flex-direction: column; gap: 0.35rem;">
                     <label style="font-size: 0.8rem; font-weight: 600; color: var(--text-secondary);">Gerência <span style="color: var(--color-danger);">*</span></label>

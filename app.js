@@ -43,25 +43,33 @@ function podeEditarArea(areaName) {
     return false;
 }
 
-// Atualiza a equipe atribuída ao currentUser a partir do e-mail cadastrado em state.responsaveis
+// Atualiza a equipe atribuída ao currentUser a partir do e-mail cadastrado em state.responsaveis ou state.teamHierarchy
 function refreshCurrentUserAssignedTeam() {
     if (!currentUser.email) {
         currentUser.assignedTeam = '';
         return;
     }
     const userEmail = currentUser.email.toLowerCase().trim();
+    const userNome = (currentUser.nome || '').toLowerCase().trim();
+
+    // 1. Procurar em state.responsaveis por e-mail
     const matchedResp = (state.responsaveis || []).find(r => r.email && r.email.toLowerCase().trim() === userEmail);
     if (matchedResp && matchedResp.area) {
         currentUser.assignedTeam = matchedResp.area;
-    } else {
-        // Fallback: verificar se é coordenador de alguma equipe na hierarquia
-        currentUser.assignedTeam = '';
-        const userNome = (currentUser.nome || '').toLowerCase().trim();
-        for (const [teamName, teamData] of Object.entries(state.teamHierarchy || {})) {
-            if (teamData && teamData.coordenador && teamData.coordenador.toLowerCase().trim() === userNome) {
-                currentUser.assignedTeam = teamName;
-                break;
-            }
+        return;
+    }
+
+    // 2. Procurar em state.teamHierarchy por coordenadorEmail ou coordenadorNome
+    currentUser.assignedTeam = '';
+    for (const [teamName, teamData] of Object.entries(state.teamHierarchy || {})) {
+        if (!teamData) continue;
+        if (teamData.coordenadorEmail && teamData.coordenadorEmail.toLowerCase().trim() === userEmail) {
+            currentUser.assignedTeam = teamName;
+            return;
+        }
+        if (teamData.coordenador && teamData.coordenador.toLowerCase().trim() === userNome) {
+            currentUser.assignedTeam = teamName;
+            return;
         }
     }
 }
@@ -888,10 +896,13 @@ function applyStateMigrations() {
     
     state.teams.forEach(team => {
         if (!state.teamHierarchy[team]) {
-            state.teamHierarchy[team] = defaultRelations[team] || { gerencia: 'Suporte Operacional', diretoria: 'Operações', coordenador: '' };
+            state.teamHierarchy[team] = defaultRelations[team] || { gerencia: 'Suporte Operacional', diretoria: 'Operações', coordenador: '', coordenadorEmail: '' };
         }
         if (state.teamHierarchy[team].coordenador === undefined) {
             state.teamHierarchy[team].coordenador = '';
+        }
+        if (state.teamHierarchy[team].coordenadorEmail === undefined) {
+            state.teamHierarchy[team].coordenadorEmail = '';
         }
     });
 
@@ -1023,18 +1034,35 @@ function getResponsibleParams(responsavelName) {
 // GLOBAL MODAL FUNCTIONS FOR NOVA EQUIPE
 // Defined globally so they work with onclick= attributes in HTML
 
-function populateTeamCoordenadorSelect(selectedValue = '') {
-    const select = document.getElementById('modal-select-team-coordenador');
-    if (!select) return;
-    const resps = (state.responsaveis || []).map(r => typeof r === 'object' ? r.name : r).filter(Boolean);
-    select.innerHTML = '<option value="">Sem Coordenador</option>' + resps.map(r => 
-        `<option value="${escapeHtml(r)}" ${r === selectedValue ? 'selected' : ''}>${escapeHtml(r)}</option>`
-    ).join('');
+function populateTeamCoordenadorDatalist() {
+    const datalist = document.getElementById('coordenadores-datalist');
+    if (!datalist) return;
+    const resps = (state.responsaveis || []).filter(r => r && (typeof r === 'object' ? r.name : r));
+    datalist.innerHTML = resps.map(r => {
+        const name = typeof r === 'object' ? r.name : r;
+        const email = typeof r === 'object' ? r.email : '';
+        return `<option value="${escapeHtml(name)}">${email ? `(${escapeHtml(email)})` : ''}</option>`;
+    }).join('');
+
+    const coordInput = document.getElementById('modal-input-team-coordenador');
+    const coordEmailInput = document.getElementById('modal-input-team-coordenador-email');
+    if (coordInput && coordEmailInput && !coordInput._boundAutofill) {
+        coordInput._boundAutofill = true;
+        coordInput.addEventListener('input', () => {
+            const typedName = coordInput.value.trim().toLowerCase();
+            const foundResp = (state.responsaveis || []).find(r => r && r.name && r.name.toLowerCase().trim() === typedName);
+            if (foundResp && foundResp.email && !coordEmailInput.value) {
+                coordEmailInput.value = foundResp.email;
+            }
+        });
+    }
 }
 
 function openNewTeamModal(teamToEdit = null) {
     const modal = document.getElementById('modal-new-team');
     const nameInput = document.getElementById('modal-input-new-team');
+    const coordInput = document.getElementById('modal-input-team-coordenador');
+    const coordEmailInput = document.getElementById('modal-input-team-coordenador-email');
     const gerenciaSelect = document.getElementById('modal-select-team-gerencia');
     const diretoriaSelect = document.getElementById('modal-select-team-diretoria');
     const titleEl = document.getElementById('modal-new-team-title');
@@ -1042,6 +1070,8 @@ function openNewTeamModal(teamToEdit = null) {
     const errorDiv = document.getElementById('modal-new-team-error');
 
     if (errorDiv) errorDiv.style.display = 'none';
+
+    populateTeamCoordenadorDatalist();
 
     if (teamToEdit) {
         if (modal) modal.dataset.editTeam = teamToEdit;
@@ -1052,15 +1082,23 @@ function openNewTeamModal(teamToEdit = null) {
         const info = (state.teamHierarchy && state.teamHierarchy[teamToEdit]) || {};
         if (gerenciaSelect) gerenciaSelect.value = info.gerencia || 'Suporte Operacional';
         if (diretoriaSelect) diretoriaSelect.value = info.diretoria || 'Operações';
-        populateTeamCoordenadorSelect(info.coordenador || '');
+        if (coordInput) coordInput.value = info.coordenador || '';
+        
+        let coordEmail = info.coordenadorEmail || '';
+        if (!coordEmail && info.coordenador) {
+            const resp = (state.responsaveis || []).find(r => r && r.name && r.name.toLowerCase().trim() === info.coordenador.toLowerCase().trim());
+            if (resp && resp.email) coordEmail = resp.email;
+        }
+        if (coordEmailInput) coordEmailInput.value = coordEmail;
     } else {
         if (modal) delete modal.dataset.editTeam;
         if (titleEl) titleEl.innerHTML = `<i class="fa-solid fa-users"></i> Nova Equipe`;
         if (btnLabelEl) btnLabelEl.textContent = 'Cadastrar Equipe';
         if (nameInput) nameInput.value = '';
+        if (coordInput) coordInput.value = '';
+        if (coordEmailInput) coordEmailInput.value = '';
         if (gerenciaSelect) gerenciaSelect.value = 'Suporte Operacional';
         if (diretoriaSelect) diretoriaSelect.value = 'Operações';
-        populateTeamCoordenadorSelect('');
     }
 
     if (modal) modal.style.display = 'flex';
@@ -1081,7 +1119,8 @@ function saveNewTeamFromModal() {
     const nameInput = document.getElementById('modal-input-new-team');
     const gerenciaSelect = document.getElementById('modal-select-team-gerencia');
     const diretoriaSelect = document.getElementById('modal-select-team-diretoria');
-    const coordenadorSelect = document.getElementById('modal-select-team-coordenador');
+    const coordInput = document.getElementById('modal-input-team-coordenador');
+    const coordEmailInput = document.getElementById('modal-input-team-coordenador-email');
     const errorDiv = document.getElementById('modal-new-team-error');
 
     const teamName = nameInput ? nameInput.value.trim() : '';
@@ -1103,7 +1142,8 @@ function saveNewTeamFromModal() {
 
     const gerencia = gerenciaSelect ? gerenciaSelect.value : 'Suporte Operacional';
     const diretoria = diretoriaSelect ? diretoriaSelect.value : 'Operações';
-    const coordenador = coordenadorSelect ? coordenadorSelect.value : '';
+    const coordenador = coordInput ? coordInput.value.trim() : '';
+    const coordenadorEmail = coordEmailInput ? coordEmailInput.value.trim() : '';
 
     if (!state.teamHierarchy) state.teamHierarchy = {};
 
@@ -1123,10 +1163,32 @@ function saveNewTeamFromModal() {
             });
         }
 
-        state.teamHierarchy[teamName] = { gerencia, diretoria, coordenador };
+        state.teamHierarchy[teamName] = { gerencia, diretoria, coordenador, coordenadorEmail };
     } else {
         state.teams.push(teamName);
-        state.teamHierarchy[teamName] = { gerencia, diretoria, coordenador };
+        state.teamHierarchy[teamName] = { gerencia, diretoria, coordenador, coordenadorEmail };
+    }
+
+    // Se informou coordenador, garantir que ele esteja cadastrado e vinculado em state.responsaveis
+    if (coordenador) {
+        if (!Array.isArray(state.responsaveis)) {
+            state.responsaveis = [];
+        }
+        const existingResp = state.responsaveis.find(r => r && r.name && r.name.toLowerCase().trim() === coordenador.toLowerCase().trim());
+        if (existingResp) {
+            existingResp.area = teamName;
+            if (coordenadorEmail) existingResp.email = coordenadorEmail;
+        } else {
+            state.responsaveis.push({
+                name: coordenador,
+                email: coordenadorEmail,
+                area: teamName,
+                horasDia: null,
+                absenteismo: null,
+                diasUteis: null
+            });
+            state.responsaveis.sort((a, b) => a.name.localeCompare(b.name));
+        }
     }
 
     saveState();
@@ -1134,8 +1196,11 @@ function saveNewTeamFromModal() {
         delete modal.dataset.editTeam;
         modal.style.display = 'none';
     }
+    refreshCurrentUserAssignedTeam();
+    aplicarPerfilDeAcesso();
     renderCadastrosView();
     renderAreaFilterOptions();
+    renderResponsavelFilterOptions();
     renderTable();
     renderBalancingTable();
     renderReviewTable();
@@ -3396,8 +3461,9 @@ function renderCadastrosView() {
             teamsList.innerHTML = state.teams.map(team => {
                 const hierarchy = (state.teamHierarchy && state.teamHierarchy[team]) || {};
                 const coordName = hierarchy.coordenador ? hierarchy.coordenador : '';
+                const coordEmail = hierarchy.coordenadorEmail ? hierarchy.coordenadorEmail : '';
                 const coordHtml = coordName 
-                    ? `<div style="font-size: 0.73rem; color: var(--text-muted); margin-top: 0.15rem; display: flex; align-items: center; gap: 0.25rem;"><i class="fa-solid fa-user-tie" style="font-size: 0.65rem; color: var(--color-primary);"></i> Coord: ${escapeHtml(coordName)}</div>`
+                    ? `<div style="font-size: 0.73rem; color: var(--text-muted); margin-top: 0.15rem; display: flex; align-items: center; gap: 0.25rem;"><i class="fa-solid fa-user-tie" style="font-size: 0.65rem; color: var(--color-primary);"></i> Coord: ${escapeHtml(coordName)}${coordEmail ? ` <span style="opacity: 0.75; font-size: 0.68rem;">(${escapeHtml(coordEmail)})</span>` : ''}</div>`
                     : `<div style="font-size: 0.73rem; color: var(--text-muted); margin-top: 0.15rem; opacity: 0.6;">Sem Coordenador</div>`;
 
                 return `
