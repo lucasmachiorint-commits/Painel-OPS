@@ -1,4 +1,4 @@
-﻿// ============================================================
+// ============================================================
 // SUPABASE AUTH CONFIGURATION
 // ============================================================
 // Substitua pelas credenciais do seu projeto no Supabase Dashboard
@@ -786,6 +786,20 @@ async function setupUserSession(user) {
 
 // INITIALIZATION
 document.addEventListener('DOMContentLoaded', async () => {
+    // Self-healing: limpar qualquer token ou cache corrompido do localStorage
+    try {
+        const rawKeys = Object.keys(localStorage);
+        for (const k of rawKeys) {
+            const v = localStorage.getItem(k);
+            if (v && typeof v === 'string') {
+                if (v.trim().startsWith(':') || v.includes('SyntaxError') || v === 'undefined') {
+                    console.warn('[SelfHealing] Removendo chave corrompida do localStorage:', k);
+                    localStorage.removeItem(k);
+                }
+            }
+        }
+    } catch (_) {}
+
     // Bind Auth buttons & Enter key FIRST to prevent silent failures if other init steps crash
     const btnLogin = document.getElementById('btn-auth-login');
     const btnSignup = document.getElementById('btn-auth-signup');
@@ -1990,8 +2004,6 @@ function renderTable() {
         return areaMatch && respMatch;
     });
     filteredProcesses.sort((a, b) => (a.name || '').localeCompare(b.name || '', 'pt-BR', { sensitivity: 'base' }));
-    filteredProcesses.sort((a, b) => (a.name || '').localeCompare(b.name || '', 'pt-BR', { sensitivity: 'base' }));
-    filteredProcesses.sort((a, b) => (a.name || '').localeCompare(b.name || '', 'pt-BR', { sensitivity: 'base' }));
 
     if (filteredProcesses.length === 0) {
         if (state.processes.length === 0) {
@@ -2108,8 +2120,6 @@ function renderBalancingTable() {
         const respMatch = matchesRespFilter(p, respFilter);
         return areaMatch && respMatch;
     });
-    filteredProcesses.sort((a, b) => (a.name || '').localeCompare(b.name || '', 'pt-BR', { sensitivity: 'base' }));
-    filteredProcesses.sort((a, b) => (a.name || '').localeCompare(b.name || '', 'pt-BR', { sensitivity: 'base' }));
     filteredProcesses.sort((a, b) => (a.name || '').localeCompare(b.name || '', 'pt-BR', { sensitivity: 'base' }));
 
     if (filteredProcesses.length === 0) {
@@ -3307,8 +3317,6 @@ function renderReviewTable() {
         const respMatch = matchesRespFilter(p, respFilter);
         return areaMatch && respMatch;
     });
-    filteredProcesses.sort((a, b) => (a.name || '').localeCompare(b.name || '', 'pt-BR', { sensitivity: 'base' }));
-    filteredProcesses.sort((a, b) => (a.name || '').localeCompare(b.name || '', 'pt-BR', { sensitivity: 'base' }));
     filteredProcesses.sort((a, b) => (a.name || '').localeCompare(b.name || '', 'pt-BR', { sensitivity: 'base' }));
 
     if (filteredProcesses.length === 0) {
