@@ -3904,6 +3904,66 @@ function renderHistoryChart() {
 // State tracking for accordion expansion in Cadastros view
 const expandedCadastrosTableTeams = {};
 
+function toggleCadastrosTeam(team, rowClass, headerElement) {
+    const headerTr = headerElement ? headerElement.closest('tr') : document.querySelector(`.cadastros-team-header-row[data-team="${team}"]`);
+    if (!headerTr) return;
+    
+    const icon = headerTr.querySelector('i');
+    const isCurrentlyOpen = icon ? icon.classList.contains('fa-chevron-down') : true;
+    const newOpen = !isCurrentlyOpen;
+    
+    expandedCadastrosTableTeams[team] = newOpen;
+    
+    if (icon) {
+        icon.className = newOpen ? 'fa-solid fa-chevron-down' : 'fa-solid fa-chevron-right';
+        icon.style.width = '20px';
+        icon.style.color = 'var(--color-primary)';
+    }
+    
+    const rows = document.querySelectorAll('.' + rowClass);
+    rows.forEach(r => {
+        r.style.display = newOpen ? 'table-row' : 'none';
+    });
+}
+
+function toggleAllCadastrosTeams() {
+    const headers = document.querySelectorAll('.cadastros-team-header-row');
+    if (headers.length === 0) return;
+    
+    const anyOpen = Array.from(headers).some(h => {
+        const icon = h.querySelector('i');
+        return icon && icon.classList.contains('fa-chevron-down');
+    });
+    
+    const targetState = !anyOpen;
+    
+    headers.forEach(h => {
+        const team = h.getAttribute('data-team');
+        const rowClass = h.getAttribute('data-row-class');
+        if (team) expandedCadastrosTableTeams[team] = targetState;
+        
+        const icon = h.querySelector('i');
+        if (icon) {
+            icon.className = targetState ? 'fa-solid fa-chevron-down' : 'fa-solid fa-chevron-right';
+            icon.style.width = '20px';
+            icon.style.color = 'var(--color-primary)';
+        }
+        
+        if (rowClass) {
+            document.querySelectorAll('.' + rowClass).forEach(r => {
+                r.style.display = targetState ? 'table-row' : 'none';
+            });
+        }
+    });
+    
+    const btnToggleAll = document.getElementById('btn-cadastros-toggle-all');
+    if (btnToggleAll) {
+        btnToggleAll.innerHTML = targetState
+            ? '<i class="fa-solid fa-chevron-up"></i> Recolher Todas'
+            : '<i class="fa-solid fa-chevron-down"></i> Expandir Todas';
+    }
+}
+
 function renderCadastrosView() {
     const teamsList = document.getElementById('cadastros-teams-list');
     const responsiblesList = document.getElementById('cadastros-responsibles-list');
@@ -4336,31 +4396,21 @@ function renderCadastrosView() {
             
             // Header Row
             const headerTr = document.createElement('tr');
+            headerTr.className = 'cadastros-team-header-row';
+            headerTr.setAttribute('data-team', team);
+            headerTr.setAttribute('data-row-class', rowClass);
             headerTr.style.cssText = 'background: rgba(255,255,255,0.03); cursor: pointer; user-select: none; transition: background 0.15s;';
             headerTr.onmouseover = () => { headerTr.style.background = 'rgba(255,255,255,0.06)'; };
             headerTr.onmouseout = () => { headerTr.style.background = 'rgba(255,255,255,0.03)'; };
             const totalCols = currentUser.perfil === 'ADMIN' ? 7 : (currentUser.perfil === 'OPERADOR' ? 6 : 5);
             headerTr.innerHTML = `
-                <td colspan="${totalCols}" style="padding: 0.8rem; font-weight: 600; color: var(--text-primary); border-top: 1px solid rgba(255,255,255,0.05); border-bottom: 1px solid rgba(255,255,255,0.05);">
-                    <i class="${isExpanded ? 'fa-solid fa-chevron-down' : 'fa-solid fa-chevron-right'}" style="width: 20px; color: var(--color-primary);"></i> ${escapeHtml(team)} <span style="background: rgba(255,255,255,0.1); color: var(--text-secondary); padding: 0.1rem 0.5rem; border-radius: 10px; font-size: 0.75rem; margin-left: 0.5rem;">${teamProcs.length} atividades</span>
+                <td colspan="${totalCols}" style="padding: 0.8rem; font-weight: 600; color: var(--text-primary); border-top: 1px solid rgba(255,255,255,0.05); border-bottom: 1px solid rgba(255,255,255,0.05); cursor: pointer;">
+                    <i class="${isExpanded ? 'fa-solid fa-chevron-down' : 'fa-solid fa-chevron-right'}" style="width: 20px; color: var(--color-primary); margin-right: 0.25rem;"></i> ${escapeHtml(team)} <span style="background: rgba(255,255,255,0.1); color: var(--text-secondary); padding: 0.1rem 0.5rem; border-radius: 10px; font-size: 0.75rem; margin-left: 0.5rem;">${teamProcs.length} atividades</span>
                 </td>
             `;
-            headerTr.addEventListener('click', () => {
-                const icon = headerTr.querySelector('i');
-                const isCurrentlyOpen = icon ? icon.classList.contains('fa-chevron-down') : false;
-                const newOpen = !isCurrentlyOpen;
-                expandedCadastrosTableTeams[team] = newOpen;
-                
-                if (icon) {
-                    icon.className = newOpen ? 'fa-solid fa-chevron-down' : 'fa-solid fa-chevron-right';
-                    icon.style.width = '20px';
-                    icon.style.color = 'var(--color-primary)';
-                }
-                
-                const rows = tableBody.querySelectorAll(`.${rowClass}`);
-                rows.forEach(r => {
-                    r.style.display = newOpen ? 'table-row' : 'none';
-                });
+            headerTr.addEventListener('click', (e) => {
+                e.stopPropagation();
+                toggleCadastrosTeam(team, rowClass, headerTr);
             });
             tableBody.appendChild(headerTr);
             
