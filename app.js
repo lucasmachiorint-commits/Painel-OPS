@@ -1391,8 +1391,10 @@ function setupEventListeners() {
         
         const teamSelect = document.getElementById('select-new-responsible-team');
         let selectedTeam = teamSelect ? teamSelect.value : '';
-        if (!selectedTeam && Array.isArray(state.teams) && state.teams.length > 0) {
-            selectedTeam = state.teams[0];
+        if (!selectedTeam) {
+            alert("Por favor, selecione a equipe.");
+            if (teamSelect) teamSelect.focus();
+            return;
         }
 
         // Se perfil for OPERADOR com equipe atribuída, só pode cadastrar para a sua equipe
@@ -3433,12 +3435,18 @@ function renderCadastrosView() {
     
     if (!teamsList || !responsiblesList || !tableBody || !activityCountBadge) return;
     
-    // Clear new responsible input and set readOnly to prevent Chrome Password Manager / Autofill
+    // Clear new responsible inputs and set readOnly to prevent browser autofill
     const inputNewResp = document.getElementById('input-new-responsible');
     if (inputNewResp) {
         inputNewResp.value = '';
         inputNewResp.readOnly = true;
         inputNewResp.onfocus = function() { this.readOnly = false; };
+    }
+    const inputNewRespEmail = document.getElementById('input-new-responsible-email');
+    if (inputNewRespEmail) {
+        inputNewRespEmail.value = '';
+        inputNewRespEmail.readOnly = true;
+        inputNewRespEmail.onfocus = function() { this.readOnly = false; };
     }
 
     // Populate new responsible team select options
@@ -3447,9 +3455,10 @@ function renderCadastrosView() {
         if (currentUser.perfil === 'OPERADOR' && currentUser.assignedTeam) {
             newRespTeamSelect.innerHTML = `<option value="${escapeHtml(currentUser.assignedTeam)}">${escapeHtml(currentUser.assignedTeam)}</option>`;
         } else {
-            newRespTeamSelect.innerHTML = (state.teams || []).map(team => `
+            const teamOptions = (state.teams || []).map(team => `
                 <option value="${escapeHtml(team)}">${escapeHtml(team)}</option>
             `).join('');
+            newRespTeamSelect.innerHTML = `<option value="" disabled selected>Selecione a equipe</option>` + teamOptions;
         }
     }
 
