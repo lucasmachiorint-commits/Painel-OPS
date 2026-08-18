@@ -1670,6 +1670,24 @@ body.perfil-consulta textarea {
     user-select: none !important;
 }
 
+/* Neutralizar estilo de autofill dos navegadores */
+input:-webkit-autofill,
+input:-webkit-autofill:hover, 
+input:-webkit-autofill:focus, 
+input:-webkit-autofill:active {
+    -webkit-box-shadow: 0 0 0 1000px rgba(30, 27, 24, 0.95) inset !important;
+    -webkit-text-fill-color: var(--text-primary) !important;
+    transition: background-color 5000s ease-in-out 0s;
+}
+
+body.light-theme input:-webkit-autofill,
+body.light-theme input:-webkit-autofill:hover, 
+body.light-theme input:-webkit-autofill:focus, 
+body.light-theme input:-webkit-autofill:active {
+    -webkit-box-shadow: 0 0 0 1000px #ffffff inset !important;
+    -webkit-text-fill-color: #1e1b18 !important;
+}
+
 
 
 
@@ -1796,8 +1814,8 @@ body.perfil-consulta textarea {
                                     </button>
                                 </div>
                                 <div style="display: flex; flex-direction: column; gap: 0.55rem; margin-bottom: 1.25rem;">
-                                    <input type="text" id="input-new-responsible" name="field_resp_no_pass_manager" autocomplete="new-password" readonly onfocus="this.removeAttribute('readonly');" data-permissao="OPERADOR,ADMIN" placeholder="Novo Responsável" style="width: 100%; padding: 0.55rem 0.85rem; border-radius: 8px; border: 1px solid var(--border-color); background: rgba(255,255,255,0.05); color: var(--text-primary); font-size: 0.88rem; outline: none; transition: all 0.2s;">
-                                    <input type="text" id="input-new-responsible-email" name="field_resp_email_no_autofill" autocomplete="new-password" readonly onfocus="this.removeAttribute('readonly');" data-permissao="OPERADOR,ADMIN" placeholder="Escreva o e-mail" style="width: 100%; padding: 0.55rem 0.85rem; border-radius: 8px; border: 1px solid var(--border-color); background: rgba(255,255,255,0.05); color: var(--text-primary); font-size: 0.88rem; outline: none; transition: all 0.2s;">
+                                    <input type="text" id="input-new-responsible" name="resp_name_input_field" autocomplete="off" data-lpignore="true" data-form-type="other" readonly onfocus="this.removeAttribute('readonly');" data-permissao="OPERADOR,ADMIN" placeholder="Novo Responsável" style="width: 100%; padding: 0.55rem 0.85rem; border-radius: 8px; border: 1px solid var(--border-color); background: rgba(255,255,255,0.05); color: var(--text-primary); font-size: 0.88rem; outline: none; transition: all 0.2s;">
+                                    <input type="text" id="input-new-responsible-email" name="resp_email_input_field" autocomplete="off" data-lpignore="true" data-form-type="other" inputmode="email" spellcheck="false" readonly onfocus="this.removeAttribute('readonly');" data-permissao="OPERADOR,ADMIN" placeholder="Escreva o e-mail" style="width: 100%; padding: 0.55rem 0.85rem; border-radius: 8px; border: 1px solid var(--border-color); background: rgba(255,255,255,0.05); color: var(--text-primary); font-size: 0.88rem; outline: none; transition: all 0.2s;">
                                     <div style="display: flex; gap: 0.5rem;">
                                         <select id="select-new-responsible-team" data-permissao="OPERADOR,ADMIN" style="flex: 1; padding: 0.55rem 0.85rem; border-radius: 8px; border: 1px solid var(--border-color); background: rgba(255,255,255,0.05); color: var(--text-primary); font-size: 0.88rem; cursor: pointer; outline: none; transition: all 0.2s;">
                                             <option value="" disabled selected>Selecione a equipe</option>
@@ -6093,15 +6111,31 @@ function renderCadastrosView() {
     // Clear new responsible inputs and set readOnly to prevent browser autofill
     const inputNewResp = document.getElementById('input-new-responsible');
     if (inputNewResp) {
-        inputNewResp.value = '';
+        if (!inputNewResp._hasUserTyping) {
+            inputNewResp.value = '';
+        }
         inputNewResp.readOnly = true;
         inputNewResp.onfocus = function() { this.readOnly = false; };
+        if (!inputNewResp._boundTypingTracker) {
+            inputNewResp._boundTypingTracker = true;
+            inputNewResp.addEventListener('input', () => {
+                inputNewResp._hasUserTyping = inputNewResp.value.trim().length > 0;
+            });
+        }
     }
     const inputNewRespEmail = document.getElementById('input-new-responsible-email');
     if (inputNewRespEmail) {
-        inputNewRespEmail.value = '';
+        if (!inputNewRespEmail._hasUserTyping) {
+            inputNewRespEmail.value = '';
+        }
         inputNewRespEmail.readOnly = true;
         inputNewRespEmail.onfocus = function() { this.readOnly = false; };
+        if (!inputNewRespEmail._boundTypingTracker) {
+            inputNewRespEmail._boundTypingTracker = true;
+            inputNewRespEmail.addEventListener('input', () => {
+                inputNewRespEmail._hasUserTyping = inputNewRespEmail.value.trim().length > 0;
+            });
+        }
     }
 
     // Populate new responsible team select options
@@ -6194,6 +6228,15 @@ function renderCadastrosView() {
         const icon = headerDiv.querySelector('i');
         if(icon) {
             icon.className = isHidden ? 'fa-solid fa-chevron-down' : 'fa-solid fa-chevron-right';
+        }
+        // Limpar qualquer autofill não digitado pelo usuário
+        const emailInput = document.getElementById('input-new-responsible-email');
+        if (emailInput && !emailInput._hasUserTyping) {
+            emailInput.value = '';
+        }
+        const respInput = document.getElementById('input-new-responsible');
+        if (respInput && !respInput._hasUserTyping) {
+            respInput.value = '';
         }
     };
 
