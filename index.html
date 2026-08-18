@@ -138,6 +138,7 @@
                                 </div>
                                 <div style="display: flex; flex-direction: column; gap: 0.5rem; margin-bottom: 1rem;">
                                     <input type="text" id="input-new-responsible" name="field_resp_no_pass_manager" autocomplete="off" readonly onfocus="this.removeAttribute('readonly');" data-permissao="OPERADOR,ADMIN" placeholder="Novo Responsável" style="width: 100%; padding: 0.4rem 0.8rem; border-radius: 6px; border: 1px solid var(--border-color); background: rgba(255,255,255,0.05); color: var(--text-primary);">
+                                    <input type="email" id="input-new-responsible-email" name="field_resp_email" autocomplete="off" data-permissao="OPERADOR,ADMIN" placeholder="E-mail (ex: usuario@empresa.com)" style="width: 100%; padding: 0.4rem 0.8rem; border-radius: 6px; border: 1px solid var(--border-color); background: rgba(255,255,255,0.05); color: var(--text-primary);">
                                     <div style="display: flex; gap: 0.5rem;">
                                         <select id="select-new-responsible-team" data-permissao="OPERADOR,ADMIN" style="flex: 1; padding: 0.4rem 0.8rem; border-radius: 6px; border: 1px solid var(--border-color); background: rgba(255,255,255,0.05); color: var(--text-primary); cursor: pointer;">
                                             <!-- Populated dynamically -->
@@ -805,6 +806,12 @@
             <div class="modal-body" style="display: flex; flex-direction: column; gap: 1.25rem; padding: 1rem 0 1.5rem 0;">
                 <input type="hidden" id="modal-param-target-resp" value="">
                 
+                <!-- Email do Responsável (Individual) -->
+                <div id="modal-resp-email-group" style="display: none; flex-direction: column; gap: 0.35rem;">
+                    <label style="font-size: 0.8rem; font-weight: 600; color: var(--text-secondary);">E-mail do Responsável</label>
+                    <input type="email" id="modal-input-resp-email" placeholder="usuario@empresa.com" style="width: 100%; padding: 0.55rem 0.85rem; border-radius: 8px; border: 1px solid var(--border-color); background: rgba(255,255,255,0.05); color: var(--text-primary); font-size: 0.9rem;">
+                </div>
+                
                 <!-- Input: Horas Trabalho / Dia -->
                 <div class="control-group admin-only">
                     <div class="control-label">
@@ -931,8 +938,11 @@
         <div id="header-user-chip" style="display: flex; align-items: center; gap: 0.6rem; padding: 0.3rem 0.75rem 0.3rem 0.5rem; border-radius: 999px; background: var(--bg-glass); border: 1px solid var(--border-color); box-shadow: var(--shadow-premium); cursor: default; user-select: none; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);">
             <i class="fa-solid fa-circle-user" style="font-size: 1.4rem; color: var(--color-primary);"></i>
             <div style="display: flex; flex-direction: column; line-height: 1.2;">
-                <span id="userName" style="font-size: 0.82rem; font-weight: 600; color: var(--text-primary); max-width: 130px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">Usuário</span>
-                <span id="userRole" class="user-role-badge role-consulta" style="font-size: 0.68rem; padding: 0.05rem 0.4rem; margin-top: 0.1rem; width: fit-content;">CONSULTA</span>
+                <span id="userName" style="font-size: 0.82rem; font-weight: 600; color: var(--text-primary); max-width: 140px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">Usuário</span>
+                <div style="display: flex; align-items: center; gap: 0.35rem; margin-top: 0.1rem; flex-wrap: wrap;">
+                    <span id="userRole" class="user-role-badge role-consulta" style="font-size: 0.68rem; padding: 0.05rem 0.4rem; width: fit-content;">CONSULTA</span>
+                    <span id="userTeamBadge" style="font-size: 0.68rem; padding: 0.05rem 0.4rem; border-radius: 4px; background: rgba(235,92,39,0.12); color: var(--color-primary); border: 1px solid rgba(235,92,39,0.25); display: none; font-weight: 500;"></span>
+                </div>
             </div>
             <button id="btn-logout" onclick="handleLogout()" title="Sair do sistema" style="background: transparent; border: 1px solid var(--border-color); color: var(--text-secondary); border-radius: 6px; padding: 0.3rem 0.55rem; cursor: pointer; font-size: 0.78rem; display: flex; align-items: center; gap: 0.3rem; transition: all 0.2s; white-space: nowrap;" onmouseover="this.style.background='rgba(244,63,94,0.12)';this.style.color='#f43f5e';this.style.borderColor='rgba(244,63,94,0.3)'" onmouseout="this.style.background='transparent';this.style.color='var(--text-secondary)';this.style.borderColor='var(--border-color)'">
                 <i class="fa-solid fa-arrow-right-from-bracket"></i> Sair
