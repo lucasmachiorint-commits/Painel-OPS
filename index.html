@@ -14,6 +14,7 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <!-- Supabase SDK -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+        <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>ðŸ“Š</text></svg>">
     <link rel="stylesheet" href="style.css">
 </head>
 <body class="dark-theme">
@@ -323,49 +324,7 @@
                                     </div>
                                 </div>
 
-                                                            <!-- CADASTROS FILTERS BAR (Demanda, Ãrea, ResponsÃ¡vel, Produto, RPA) -->
-                            <div class="cadastros-filters-bar" style="display: flex; flex-wrap: wrap; gap: 0.65rem; align-items: center; margin-bottom: 1.25rem; padding: 0.75rem 1rem; background: rgba(255,255,255,0.02); border: 1px solid var(--border-color); border-radius: 8px;">
-                                <!-- 1. Demanda / Atividade -->
-                                <div style="flex: 1.2; min-width: 180px; position: relative;">
-                                    <i class="fa-solid fa-magnifying-glass" style="position: absolute; left: 0.75rem; top: 50%; transform: translateY(-50%); color: var(--text-muted); font-size: 0.8rem;"></i>
-                                    <input type="text" id="cadastros-filter-search" name="cadastros_search_field_safe" autocomplete="off" data-lpignore="true" data-form-type="other" spellcheck="false" readonly onfocus="this.removeAttribute('readonly');" placeholder="Buscar Demanda / Atividade..." style="width: 100%; padding: 0.45rem 0.75rem 0.45rem 2.1rem; border-radius: 6px; border: 1px solid var(--border-color); background: rgba(255,255,255,0.05); color: var(--text-primary); font-size: 0.83rem; outline: none; transition: all 0.2s;">
-                                </div>
-
-                                <!-- 2. Ãrea / Equipe -->
-                                <div style="flex: 1; min-width: 150px;">
-                                    <select id="cadastros-filter-area" style="width: 100%; padding: 0.45rem 0.75rem; border-radius: 6px; border: 1px solid var(--border-color); background: rgba(255,255,255,0.05); color: var(--text-primary); font-size: 0.83rem; outline: none; cursor: pointer;">
-                                        <option value="">Todas as Ãreas</option>
-                                    </select>
-                                </div>
-
-                                <!-- 3. ResponsÃ¡vel -->
-                                <div style="flex: 1; min-width: 150px;">
-                                    <select id="cadastros-filter-resp" style="width: 100%; padding: 0.45rem 0.75rem; border-radius: 6px; border: 1px solid var(--border-color); background: rgba(255,255,255,0.05); color: var(--text-primary); font-size: 0.83rem; outline: none; cursor: pointer;">
-                                        <option value="">Todos os ResponsÃ¡veis</option>
-                                    </select>
-                                </div>
-
-                                <!-- 4. Produto -->
-                                <div style="flex: 0.9; min-width: 140px;">
-                                    <input type="text" id="cadastros-filter-product" name="cadastros_product_field_safe" autocomplete="off" data-lpignore="true" data-form-type="other" spellcheck="false" readonly onfocus="this.removeAttribute('readonly');" placeholder="Filtrar Produto..." style="width: 100%; padding: 0.45rem 0.75rem; border-radius: 6px; border: 1px solid var(--border-color); background: rgba(255,255,255,0.05); color: var(--text-primary); font-size: 0.83rem; outline: none;">
-                                </div>
-
-                                <!-- 5. RPA -->
-                                <div style="min-width: 135px;">
-                                    <select id="cadastros-filter-rpa" style="width: 100%; padding: 0.45rem 0.75rem; border-radius: 6px; border: 1px solid var(--border-color); background: rgba(255,255,255,0.05); color: var(--text-primary); font-size: 0.83rem; outline: none; cursor: pointer;">
-                                        <option value="">RPA: Todos</option>
-                                        <option value="sim">ðŸ¤– Somente RPA</option>
-                                        <option value="nao">Manual (Sem RPA)</option>
-                                    </select>
-                                </div>
-
-                                <!-- 6. Limpar -->
-                                <button id="btn-cadastros-clear-filters" class="btn btn-secondary" style="padding: 0.45rem 0.75rem; font-size: 0.8rem; white-space: nowrap;" title="Limpar Filtros">
-                                    <i class="fa-solid fa-xmark"></i> Limpar
-                                </button>
-                            </div>
-
-                            <div class="table-responsive">
+                                <div class="table-responsive">
                                     <table class="fte-table" id="fte-table">
                                         <thead>
                                             <tr>
@@ -508,49 +467,7 @@
                             </div>
                         </div>
 
-                                                    <!-- CADASTROS FILTERS BAR (Demanda, Ãrea, ResponsÃ¡vel, Produto, RPA) -->
-                            <div class="cadastros-filters-bar" style="display: flex; flex-wrap: wrap; gap: 0.65rem; align-items: center; margin-bottom: 1.25rem; padding: 0.75rem 1rem; background: rgba(255,255,255,0.02); border: 1px solid var(--border-color); border-radius: 8px;">
-                                <!-- 1. Demanda / Atividade -->
-                                <div style="flex: 1.2; min-width: 180px; position: relative;">
-                                    <i class="fa-solid fa-magnifying-glass" style="position: absolute; left: 0.75rem; top: 50%; transform: translateY(-50%); color: var(--text-muted); font-size: 0.8rem;"></i>
-                                    <input type="text" id="cadastros-filter-search" name="cadastros_search_field_safe" autocomplete="off" data-lpignore="true" data-form-type="other" spellcheck="false" readonly onfocus="this.removeAttribute('readonly');" placeholder="Buscar Demanda / Atividade..." style="width: 100%; padding: 0.45rem 0.75rem 0.45rem 2.1rem; border-radius: 6px; border: 1px solid var(--border-color); background: rgba(255,255,255,0.05); color: var(--text-primary); font-size: 0.83rem; outline: none; transition: all 0.2s;">
-                                </div>
-
-                                <!-- 2. Ãrea / Equipe -->
-                                <div style="flex: 1; min-width: 150px;">
-                                    <select id="cadastros-filter-area" style="width: 100%; padding: 0.45rem 0.75rem; border-radius: 6px; border: 1px solid var(--border-color); background: rgba(255,255,255,0.05); color: var(--text-primary); font-size: 0.83rem; outline: none; cursor: pointer;">
-                                        <option value="">Todas as Ãreas</option>
-                                    </select>
-                                </div>
-
-                                <!-- 3. ResponsÃ¡vel -->
-                                <div style="flex: 1; min-width: 150px;">
-                                    <select id="cadastros-filter-resp" style="width: 100%; padding: 0.45rem 0.75rem; border-radius: 6px; border: 1px solid var(--border-color); background: rgba(255,255,255,0.05); color: var(--text-primary); font-size: 0.83rem; outline: none; cursor: pointer;">
-                                        <option value="">Todos os ResponsÃ¡veis</option>
-                                    </select>
-                                </div>
-
-                                <!-- 4. Produto -->
-                                <div style="flex: 0.9; min-width: 140px;">
-                                    <input type="text" id="cadastros-filter-product" name="cadastros_product_field_safe" autocomplete="off" data-lpignore="true" data-form-type="other" spellcheck="false" readonly onfocus="this.removeAttribute('readonly');" placeholder="Filtrar Produto..." style="width: 100%; padding: 0.45rem 0.75rem; border-radius: 6px; border: 1px solid var(--border-color); background: rgba(255,255,255,0.05); color: var(--text-primary); font-size: 0.83rem; outline: none;">
-                                </div>
-
-                                <!-- 5. RPA -->
-                                <div style="min-width: 135px;">
-                                    <select id="cadastros-filter-rpa" style="width: 100%; padding: 0.45rem 0.75rem; border-radius: 6px; border: 1px solid var(--border-color); background: rgba(255,255,255,0.05); color: var(--text-primary); font-size: 0.83rem; outline: none; cursor: pointer;">
-                                        <option value="">RPA: Todos</option>
-                                        <option value="sim">ðŸ¤– Somente RPA</option>
-                                        <option value="nao">Manual (Sem RPA)</option>
-                                    </select>
-                                </div>
-
-                                <!-- 6. Limpar -->
-                                <button id="btn-cadastros-clear-filters" class="btn btn-secondary" style="padding: 0.45rem 0.75rem; font-size: 0.8rem; white-space: nowrap;" title="Limpar Filtros">
-                                    <i class="fa-solid fa-xmark"></i> Limpar
-                                </button>
-                            </div>
-
-                            <div class="table-responsive">
+                        <div class="table-responsive">
                             <table class="fte-table" id="balancing-table">
                                 <thead>
                                     <tr>
@@ -656,49 +573,7 @@
                             </div>
                         </div>
 
-                                                    <!-- CADASTROS FILTERS BAR (Demanda, Ãrea, ResponsÃ¡vel, Produto, RPA) -->
-                            <div class="cadastros-filters-bar" style="display: flex; flex-wrap: wrap; gap: 0.65rem; align-items: center; margin-bottom: 1.25rem; padding: 0.75rem 1rem; background: rgba(255,255,255,0.02); border: 1px solid var(--border-color); border-radius: 8px;">
-                                <!-- 1. Demanda / Atividade -->
-                                <div style="flex: 1.2; min-width: 180px; position: relative;">
-                                    <i class="fa-solid fa-magnifying-glass" style="position: absolute; left: 0.75rem; top: 50%; transform: translateY(-50%); color: var(--text-muted); font-size: 0.8rem;"></i>
-                                    <input type="text" id="cadastros-filter-search" name="cadastros_search_field_safe" autocomplete="off" data-lpignore="true" data-form-type="other" spellcheck="false" readonly onfocus="this.removeAttribute('readonly');" placeholder="Buscar Demanda / Atividade..." style="width: 100%; padding: 0.45rem 0.75rem 0.45rem 2.1rem; border-radius: 6px; border: 1px solid var(--border-color); background: rgba(255,255,255,0.05); color: var(--text-primary); font-size: 0.83rem; outline: none; transition: all 0.2s;">
-                                </div>
-
-                                <!-- 2. Ãrea / Equipe -->
-                                <div style="flex: 1; min-width: 150px;">
-                                    <select id="cadastros-filter-area" style="width: 100%; padding: 0.45rem 0.75rem; border-radius: 6px; border: 1px solid var(--border-color); background: rgba(255,255,255,0.05); color: var(--text-primary); font-size: 0.83rem; outline: none; cursor: pointer;">
-                                        <option value="">Todas as Ãreas</option>
-                                    </select>
-                                </div>
-
-                                <!-- 3. ResponsÃ¡vel -->
-                                <div style="flex: 1; min-width: 150px;">
-                                    <select id="cadastros-filter-resp" style="width: 100%; padding: 0.45rem 0.75rem; border-radius: 6px; border: 1px solid var(--border-color); background: rgba(255,255,255,0.05); color: var(--text-primary); font-size: 0.83rem; outline: none; cursor: pointer;">
-                                        <option value="">Todos os ResponsÃ¡veis</option>
-                                    </select>
-                                </div>
-
-                                <!-- 4. Produto -->
-                                <div style="flex: 0.9; min-width: 140px;">
-                                    <input type="text" id="cadastros-filter-product" name="cadastros_product_field_safe" autocomplete="off" data-lpignore="true" data-form-type="other" spellcheck="false" readonly onfocus="this.removeAttribute('readonly');" placeholder="Filtrar Produto..." style="width: 100%; padding: 0.45rem 0.75rem; border-radius: 6px; border: 1px solid var(--border-color); background: rgba(255,255,255,0.05); color: var(--text-primary); font-size: 0.83rem; outline: none;">
-                                </div>
-
-                                <!-- 5. RPA -->
-                                <div style="min-width: 135px;">
-                                    <select id="cadastros-filter-rpa" style="width: 100%; padding: 0.45rem 0.75rem; border-radius: 6px; border: 1px solid var(--border-color); background: rgba(255,255,255,0.05); color: var(--text-primary); font-size: 0.83rem; outline: none; cursor: pointer;">
-                                        <option value="">RPA: Todos</option>
-                                        <option value="sim">ðŸ¤– Somente RPA</option>
-                                        <option value="nao">Manual (Sem RPA)</option>
-                                    </select>
-                                </div>
-
-                                <!-- 6. Limpar -->
-                                <button id="btn-cadastros-clear-filters" class="btn btn-secondary" style="padding: 0.45rem 0.75rem; font-size: 0.8rem; white-space: nowrap;" title="Limpar Filtros">
-                                    <i class="fa-solid fa-xmark"></i> Limpar
-                                </button>
-                            </div>
-
-                            <div class="table-responsive">
+                        <div class="table-responsive">
                             <table class="fte-table" id="review-table">
                                 <thead>
                                     <tr>
@@ -778,49 +653,7 @@
                             </div>
                         </div>
 
-                                                    <!-- CADASTROS FILTERS BAR (Demanda, Ãrea, ResponsÃ¡vel, Produto, RPA) -->
-                            <div class="cadastros-filters-bar" style="display: flex; flex-wrap: wrap; gap: 0.65rem; align-items: center; margin-bottom: 1.25rem; padding: 0.75rem 1rem; background: rgba(255,255,255,0.02); border: 1px solid var(--border-color); border-radius: 8px;">
-                                <!-- 1. Demanda / Atividade -->
-                                <div style="flex: 1.2; min-width: 180px; position: relative;">
-                                    <i class="fa-solid fa-magnifying-glass" style="position: absolute; left: 0.75rem; top: 50%; transform: translateY(-50%); color: var(--text-muted); font-size: 0.8rem;"></i>
-                                    <input type="text" id="cadastros-filter-search" name="cadastros_search_field_safe" autocomplete="off" data-lpignore="true" data-form-type="other" spellcheck="false" readonly onfocus="this.removeAttribute('readonly');" placeholder="Buscar Demanda / Atividade..." style="width: 100%; padding: 0.45rem 0.75rem 0.45rem 2.1rem; border-radius: 6px; border: 1px solid var(--border-color); background: rgba(255,255,255,0.05); color: var(--text-primary); font-size: 0.83rem; outline: none; transition: all 0.2s;">
-                                </div>
-
-                                <!-- 2. Ãrea / Equipe -->
-                                <div style="flex: 1; min-width: 150px;">
-                                    <select id="cadastros-filter-area" style="width: 100%; padding: 0.45rem 0.75rem; border-radius: 6px; border: 1px solid var(--border-color); background: rgba(255,255,255,0.05); color: var(--text-primary); font-size: 0.83rem; outline: none; cursor: pointer;">
-                                        <option value="">Todas as Ãreas</option>
-                                    </select>
-                                </div>
-
-                                <!-- 3. ResponsÃ¡vel -->
-                                <div style="flex: 1; min-width: 150px;">
-                                    <select id="cadastros-filter-resp" style="width: 100%; padding: 0.45rem 0.75rem; border-radius: 6px; border: 1px solid var(--border-color); background: rgba(255,255,255,0.05); color: var(--text-primary); font-size: 0.83rem; outline: none; cursor: pointer;">
-                                        <option value="">Todos os ResponsÃ¡veis</option>
-                                    </select>
-                                </div>
-
-                                <!-- 4. Produto -->
-                                <div style="flex: 0.9; min-width: 140px;">
-                                    <input type="text" id="cadastros-filter-product" name="cadastros_product_field_safe" autocomplete="off" data-lpignore="true" data-form-type="other" spellcheck="false" readonly onfocus="this.removeAttribute('readonly');" placeholder="Filtrar Produto..." style="width: 100%; padding: 0.45rem 0.75rem; border-radius: 6px; border: 1px solid var(--border-color); background: rgba(255,255,255,0.05); color: var(--text-primary); font-size: 0.83rem; outline: none;">
-                                </div>
-
-                                <!-- 5. RPA -->
-                                <div style="min-width: 135px;">
-                                    <select id="cadastros-filter-rpa" style="width: 100%; padding: 0.45rem 0.75rem; border-radius: 6px; border: 1px solid var(--border-color); background: rgba(255,255,255,0.05); color: var(--text-primary); font-size: 0.83rem; outline: none; cursor: pointer;">
-                                        <option value="">RPA: Todos</option>
-                                        <option value="sim">ðŸ¤– Somente RPA</option>
-                                        <option value="nao">Manual (Sem RPA)</option>
-                                    </select>
-                                </div>
-
-                                <!-- 6. Limpar -->
-                                <button id="btn-cadastros-clear-filters" class="btn btn-secondary" style="padding: 0.45rem 0.75rem; font-size: 0.8rem; white-space: nowrap;" title="Limpar Filtros">
-                                    <i class="fa-solid fa-xmark"></i> Limpar
-                                </button>
-                            </div>
-
-                            <div class="table-responsive">
+                        <div class="table-responsive">
                             <table class="fte-table" id="rpa-table">
                                 <thead>
                                     <tr>
