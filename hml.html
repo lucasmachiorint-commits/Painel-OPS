@@ -1795,14 +1795,14 @@ body.perfil-consulta textarea {
                                         <i class="fa-solid fa-sliders"></i> Padrão Global
                                     </button>
                                 </div>
-                                <div style="display: flex; flex-direction: column; gap: 0.5rem; margin-bottom: 1rem;">
-                                    <input type="text" id="input-new-responsible" name="field_resp_no_pass_manager" autocomplete="off" readonly onfocus="this.removeAttribute('readonly');" data-permissao="OPERADOR,ADMIN" placeholder="Novo Responsável" style="width: 100%; padding: 0.4rem 0.8rem; border-radius: 6px; border: 1px solid var(--border-color); background: rgba(255,255,255,0.05); color: var(--text-primary);">
-                                    <input type="email" id="input-new-responsible-email" name="field_resp_email" autocomplete="off" data-permissao="OPERADOR,ADMIN" placeholder="E-mail (ex: usuario@empresa.com)" style="width: 100%; padding: 0.4rem 0.8rem; border-radius: 6px; border: 1px solid var(--border-color); background: rgba(255,255,255,0.05); color: var(--text-primary);">
+                                <div style="display: flex; flex-direction: column; gap: 0.55rem; margin-bottom: 1.25rem;">
+                                    <input type="text" id="input-new-responsible" name="field_resp_no_pass_manager" autocomplete="new-password" readonly onfocus="this.removeAttribute('readonly');" data-permissao="OPERADOR,ADMIN" placeholder="Novo Responsável" style="width: 100%; padding: 0.55rem 0.85rem; border-radius: 8px; border: 1px solid var(--border-color); background: rgba(255,255,255,0.05); color: var(--text-primary); font-size: 0.88rem; outline: none; transition: all 0.2s;">
+                                    <input type="text" id="input-new-responsible-email" name="field_resp_email_no_autofill" autocomplete="new-password" readonly onfocus="this.removeAttribute('readonly');" data-permissao="OPERADOR,ADMIN" placeholder="Escreva o e-mail" style="width: 100%; padding: 0.55rem 0.85rem; border-radius: 8px; border: 1px solid var(--border-color); background: rgba(255,255,255,0.05); color: var(--text-primary); font-size: 0.88rem; outline: none; transition: all 0.2s;">
                                     <div style="display: flex; gap: 0.5rem;">
-                                        <select id="select-new-responsible-team" data-permissao="OPERADOR,ADMIN" style="flex: 1; padding: 0.4rem 0.8rem; border-radius: 6px; border: 1px solid var(--border-color); background: rgba(255,255,255,0.05); color: var(--text-primary); cursor: pointer;">
-                                            <!-- Populated dynamically -->
+                                        <select id="select-new-responsible-team" data-permissao="OPERADOR,ADMIN" style="flex: 1; padding: 0.55rem 0.85rem; border-radius: 8px; border: 1px solid var(--border-color); background: rgba(255,255,255,0.05); color: var(--text-primary); font-size: 0.88rem; cursor: pointer; outline: none; transition: all 0.2s;">
+                                            <option value="" disabled selected>Selecione a equipe</option>
                                         </select>
-                                         <button id="btn-add-responsible" data-permissao="OPERADOR,ADMIN" class="btn btn-primary" style="padding: 0.4rem 1rem; white-space: nowrap;" title="Adicionar Responsável">
+                                         <button id="btn-add-responsible" data-permissao="OPERADOR,ADMIN" class="btn btn-primary" style="padding: 0.55rem 1.1rem; border-radius: 8px; font-weight: 500; font-size: 0.88rem; white-space: nowrap;" title="Adicionar Responsável">
                                              Adicionar
                                          </button>
                                     </div>
@@ -4046,8 +4046,10 @@ function setupEventListeners() {
         
         const teamSelect = document.getElementById('select-new-responsible-team');
         let selectedTeam = teamSelect ? teamSelect.value : '';
-        if (!selectedTeam && Array.isArray(state.teams) && state.teams.length > 0) {
-            selectedTeam = state.teams[0];
+        if (!selectedTeam) {
+            alert("Por favor, selecione a equipe.");
+            if (teamSelect) teamSelect.focus();
+            return;
         }
 
         // Se perfil for OPERADOR com equipe atribuída, só pode cadastrar para a sua equipe
@@ -6088,12 +6090,18 @@ function renderCadastrosView() {
     
     if (!teamsList || !responsiblesList || !tableBody || !activityCountBadge) return;
     
-    // Clear new responsible input and set readOnly to prevent Chrome Password Manager / Autofill
+    // Clear new responsible inputs and set readOnly to prevent browser autofill
     const inputNewResp = document.getElementById('input-new-responsible');
     if (inputNewResp) {
         inputNewResp.value = '';
         inputNewResp.readOnly = true;
         inputNewResp.onfocus = function() { this.readOnly = false; };
+    }
+    const inputNewRespEmail = document.getElementById('input-new-responsible-email');
+    if (inputNewRespEmail) {
+        inputNewRespEmail.value = '';
+        inputNewRespEmail.readOnly = true;
+        inputNewRespEmail.onfocus = function() { this.readOnly = false; };
     }
 
     // Populate new responsible team select options
@@ -6102,9 +6110,10 @@ function renderCadastrosView() {
         if (currentUser.perfil === 'OPERADOR' && currentUser.assignedTeam) {
             newRespTeamSelect.innerHTML = `<option value="${escapeHtml(currentUser.assignedTeam)}">${escapeHtml(currentUser.assignedTeam)}</option>`;
         } else {
-            newRespTeamSelect.innerHTML = (state.teams || []).map(team => `
+            const teamOptions = (state.teams || []).map(team => `
                 <option value="${escapeHtml(team)}">${escapeHtml(team)}</option>
             `).join('');
+            newRespTeamSelect.innerHTML = `<option value="" disabled selected>Selecione a equipe</option>` + teamOptions;
         }
     }
 
