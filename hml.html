@@ -213,6 +213,7 @@ body.light-theme .menu-item:hover {
 }
 
 .sidebar-footer {
+    margin-top: auto;
     padding-top: 1rem;
     border-top: 1px solid var(--border-color);
     width: 100%;
@@ -221,20 +222,17 @@ body.light-theme .menu-item:hover {
 }
 
 #theme-toggle {
-    position: fixed;
-    top: 1.5rem;
-    right: 1.5rem;
+    position: relative;
     width: 44px;
     height: 44px;
-    border-radius: 50%;
+    border-radius: 12px;
     background: var(--bg-glass);
     border: 1px solid var(--border-color);
-    box-shadow: var(--shadow-premium);
+    box-shadow: var(--shadow-sm);
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    z-index: 9999;
     color: var(--text-secondary);
     transition: all var(--transition-fast);
 }
@@ -242,7 +240,7 @@ body.light-theme .menu-item:hover {
 #theme-toggle:hover {
     background: var(--bg-glass-hover);
     border-color: var(--border-hover);
-    color: var(--text-primary);
+    color: var(--color-primary);
     transform: scale(1.08);
 }
 
@@ -255,7 +253,7 @@ body.light-theme #theme-toggle {
 body.light-theme #theme-toggle:hover {
     background: var(--bg-glass-hover);
     border-color: var(--border-hover);
-    color: var(--text-primary);
+    color: var(--color-primary);
 }
 
 #theme-toggle .icon-light {
@@ -1787,6 +1785,14 @@ body.light-theme input:-webkit-autofill:active {
                     <span>Acesso</span>
                 </li>
             </ul>
+
+            <!-- SIDEBAR FOOTER / ALTERAR TEMA -->
+            <div class="sidebar-footer" style="margin-top: auto; padding-top: 1rem; width: 100%; display: flex; justify-content: center;">
+                <button id="theme-toggle" class="btn-theme" title="Alternar Tema (Dark / Light)">
+                    <i class="fa-solid fa-sun icon-light"></i>
+                    <i class="fa-solid fa-moon icon-dark"></i>
+                </button>
+            </div>
         </nav>
 
         <!-- MAIN CONTENT AREA -->
@@ -2672,12 +2678,6 @@ body.light-theme input:-webkit-autofill:active {
                 <i class="fa-solid fa-arrow-right-from-bracket"></i> Sair
             </button>
         </div>
-
-        <!-- Floating Theme Toggle -->
-        <button id="theme-toggle" title="Alternar Tema" style="position: static; margin: 0; box-shadow: var(--shadow-premium);">
-            <i class="fa-solid fa-sun icon-light"></i>
-            <i class="fa-solid fa-moon icon-dark"></i>
-        </button>
     </div>
 
     <!-- Hidden Printable Area for Clean PDF -->
