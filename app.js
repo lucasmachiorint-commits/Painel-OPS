@@ -3438,15 +3438,31 @@ function renderCadastrosView() {
     // Clear new responsible inputs and set readOnly to prevent browser autofill
     const inputNewResp = document.getElementById('input-new-responsible');
     if (inputNewResp) {
-        inputNewResp.value = '';
+        if (!inputNewResp._hasUserTyping) {
+            inputNewResp.value = '';
+        }
         inputNewResp.readOnly = true;
         inputNewResp.onfocus = function() { this.readOnly = false; };
+        if (!inputNewResp._boundTypingTracker) {
+            inputNewResp._boundTypingTracker = true;
+            inputNewResp.addEventListener('input', () => {
+                inputNewResp._hasUserTyping = inputNewResp.value.trim().length > 0;
+            });
+        }
     }
     const inputNewRespEmail = document.getElementById('input-new-responsible-email');
     if (inputNewRespEmail) {
-        inputNewRespEmail.value = '';
+        if (!inputNewRespEmail._hasUserTyping) {
+            inputNewRespEmail.value = '';
+        }
         inputNewRespEmail.readOnly = true;
         inputNewRespEmail.onfocus = function() { this.readOnly = false; };
+        if (!inputNewRespEmail._boundTypingTracker) {
+            inputNewRespEmail._boundTypingTracker = true;
+            inputNewRespEmail.addEventListener('input', () => {
+                inputNewRespEmail._hasUserTyping = inputNewRespEmail.value.trim().length > 0;
+            });
+        }
     }
 
     // Populate new responsible team select options
@@ -3539,6 +3555,15 @@ function renderCadastrosView() {
         const icon = headerDiv.querySelector('i');
         if(icon) {
             icon.className = isHidden ? 'fa-solid fa-chevron-down' : 'fa-solid fa-chevron-right';
+        }
+        // Limpar qualquer autofill não digitado pelo usuário
+        const emailInput = document.getElementById('input-new-responsible-email');
+        if (emailInput && !emailInput._hasUserTyping) {
+            emailInput.value = '';
+        }
+        const respInput = document.getElementById('input-new-responsible');
+        if (respInput && !respInput._hasUserTyping) {
+            respInput.value = '';
         }
     };
 
