@@ -1,4 +1,4 @@
-﻿/* DESIGN SYSTEM & GLOBAL VARIABLES */
+/* DESIGN SYSTEM & GLOBAL VARIABLES */
 :root {
     /* Fonts */
     --font-main: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
@@ -265,7 +265,7 @@ body.light-theme #theme-toggle .icon-dark {
 }
 
 .content-area {
-    padding: 1.5rem;
+    padding: 1.5rem 1.5rem 6rem 1.5rem;
     flex: 1;
 }
 
