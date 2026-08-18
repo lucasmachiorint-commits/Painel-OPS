@@ -1,4 +1,4 @@
-// ============================================================
+﻿// ============================================================
 // SUPABASE AUTH CONFIGURATION
 // ============================================================
 // Substitua pelas credenciais do seu projeto no Supabase Dashboard
@@ -16,31 +16,86 @@ if (window.supabase) {
 }
 
 // ============================================================
-// RBAC - CONTROLE DE ACESSO BASEADO EM PERFIS
+// RBAC - CONTROLE DE ACESSO BASEADO EM PERFIS E EQUIPES
 // ============================================================
 let currentUser = {
     nome: 'Visitante',
     email: '',
-    perfil: 'CONSULTA'  // 'ADMIN' | 'OPERADOR' | 'CONSULTA'
+    perfil: 'CONSULTA',  // 'ADMIN' | 'OPERADOR' | 'CONSULTA'
+    assignedTeam: ''     // Equipe vinculada via e-mail (ex: 'Backoffice')
 };
 
-// Hierarquia de permissÃµes: CONSULTA < OPERADOR < ADMIN
+// Hierarquia de permissões: CONSULTA < OPERADOR < ADMIN
 function verificarPermissao(perfilMinimo) {
     const hierarquia = { 'CONSULTA': 0, 'OPERADOR': 1, 'ADMIN': 2 };
     return (hierarquia[currentUser.perfil] || 0) >= (hierarquia[perfilMinimo] || 0);
 }
 
-// Varre o DOM e oculta/exibe elementos conforme o perfil do usuÃrio
+// Verifica se o usuário atual tem permissão para editar uma área/equipe específica
+function podeEditarArea(areaName) {
+    if (currentUser.perfil === 'ADMIN') return true;
+    if (currentUser.perfil === 'CONSULTA') return false;
+    if (currentUser.perfil === 'OPERADOR') {
+        if (!currentUser.assignedTeam) return false; // Sem equipe atribuída = somente leitura
+        if (!areaName || areaName === 'Sem Equipe' || areaName === 'Outros') return false;
+        return currentUser.assignedTeam.toLowerCase().trim() === areaName.toLowerCase().trim();
+    }
+    return false;
+}
+
+// Atualiza a equipe atribuída ao currentUser a partir do e-mail cadastrado em state.responsaveis ou state.teamHierarchy
+function refreshCurrentUserAssignedTeam() {
+    if (!currentUser.email) {
+        currentUser.assignedTeam = '';
+        return;
+    }
+    const userEmail = currentUser.email.toLowerCase().trim();
+    const userNome = (currentUser.nome || '').toLowerCase().trim();
+
+    // 1. Procurar em state.responsaveis por e-mail
+    const matchedResp = (state.responsaveis || []).find(r => r.email && r.email.toLowerCase().trim() === userEmail);
+    if (matchedResp && matchedResp.area) {
+        currentUser.assignedTeam = matchedResp.area;
+        return;
+    }
+
+    // 2. Procurar em state.teamHierarchy por coordenadorEmail ou coordenadorNome
+    currentUser.assignedTeam = '';
+    for (const [teamName, teamData] of Object.entries(state.teamHierarchy || {})) {
+        if (!teamData) continue;
+        if (teamData.coordenadorEmail && teamData.coordenadorEmail.toLowerCase().trim() === userEmail) {
+            currentUser.assignedTeam = teamName;
+            return;
+        }
+        if (teamData.coordenador && teamData.coordenador.toLowerCase().trim() === userNome) {
+            currentUser.assignedTeam = teamName;
+            return;
+        }
+    }
+}
+
+// Varre o DOM e oculta/exibe elementos conforme o perfil do usuário
 function aplicarPerfilDeAcesso() {
+    refreshCurrentUserAssignedTeam();
     const perfil = currentUser.perfil;
 
-    // Atualiza barra visual na sidebar
+    // Atualiza barra visual na sidebar / header
     const userNameEl = document.getElementById('userName');
     const userRoleEl = document.getElementById('userRole');
+    const userTeamBadgeEl = document.getElementById('userTeamBadge');
     if (userNameEl) userNameEl.textContent = currentUser.nome;
     if (userRoleEl) {
         userRoleEl.textContent = perfil;
         userRoleEl.className = 'user-role-badge role-' + perfil.toLowerCase();
+    }
+    if (userTeamBadgeEl) {
+        if (perfil === 'OPERADOR' && currentUser.assignedTeam) {
+            userTeamBadgeEl.textContent = currentUser.assignedTeam;
+            userTeamBadgeEl.style.display = 'inline-block';
+            userTeamBadgeEl.title = `Equipe vinculada: ${currentUser.assignedTeam}`;
+        } else {
+            userTeamBadgeEl.style.display = 'none';
+        }
     }
 
     // Sincroniza o seletor de perfil
@@ -65,14 +120,17 @@ function aplicarPerfilDeAcesso() {
         }
     });
 
-    // Controla coluna Excluir na tabela de Cadastros (header + cells)
+    // Controla coluna de seleção em massa (apenas ADMIN)
     const isAdmin = perfil === 'ADMIN';
-    document.querySelectorAll('.col-excluir-admin').forEach(el => {
+    document.querySelectorAll('.col-select-admin').forEach(el => {
         el.style.display = isAdmin ? '' : 'none';
     });
 
-    // Controla inputs editáveis para perfil CONSULTA
+    // Controla coluna de ações/excluir (ADMIN e OPERADOR, oculto para CONSULTA)
     const isConsulta = perfil === 'CONSULTA';
+    document.querySelectorAll('.col-acao-excluir').forEach(el => {
+        el.style.display = isConsulta ? 'none' : '';
+    });
     document.querySelectorAll('.input-volume, .input-minutes, .input-qtd, .input-backlog-volume, .input-area-allocation, .select-review-status, .input-activity-name-cell, .select-activity-team-cell, .select-activity-resp-cell, .input-activity-product-cell, .select-activity-add-resp, .cadastros-row-checkbox, .cb-activity-rpa, .access-perfil-select, #history-month-input, #modal-input-horas-dia, #modal-input-absenteismo, #modal-input-dias-uteis, #modal-input-new-team, #modal-select-team-gerencia, #modal-select-team-diretoria').forEach(el => {
         el.disabled = isConsulta;
         el.style.opacity = isConsulta ? '0.5' : '1';
@@ -160,6 +218,41 @@ function formatAuthError(msg) {
     return msg;
 }
 
+// ----------------------------------------------------
+// CONTROLE DE INATIVIDADE (30 MINUTOS) E SESSÃO
+// ----------------------------------------------------
+const INACTIVITY_TIMEOUT_MS = 30 * 60 * 1000; // 30 minutos
+
+function recordUserActivity() {
+    if (window._authUserId) {
+        localStorage.setItem('painel_ops_last_activity', String(Date.now()));
+    }
+}
+
+let _lastActivityThrottled = 0;
+function handleUserInteraction() {
+    const now = Date.now();
+    if (now - _lastActivityThrottled > 5000) {
+        _lastActivityThrottled = now;
+        recordUserActivity();
+    }
+}
+
+// Ouvintes globais de atividade
+['mousedown', 'keydown', 'touchstart', 'scroll', 'click'].forEach(evt => {
+    window.addEventListener(evt, handleUserInteraction, { passive: true });
+});
+
+// Verificador periódico de inatividade
+setInterval(async () => {
+    if (!window._authUserId) return;
+    const lastActivity = parseInt(localStorage.getItem('painel_ops_last_activity') || '0', 10);
+    if (lastActivity > 0 && (Date.now() - lastActivity) > INACTIVITY_TIMEOUT_MS) {
+        console.log('[Auth] Sessão expirada por inatividade (30 minutos).');
+        await handleLogout(true);
+    }
+}, 15000);
+
 async function handleLogin() {
     hideAuthError();
     hideAuthInfo();
@@ -196,6 +289,7 @@ async function handleLogin() {
         } else {
             const user = (data && data.session && data.session.user) ? data.session.user : (data ? data.user : null);
             if (user) {
+                recordUserActivity();
                 // Forçar ocultação do overlay de login e exibição do painel principal
                 const overlay = document.getElementById('auth-overlay');
                 if (overlay) overlay.style.setProperty('display', 'none', 'important');
@@ -287,8 +381,9 @@ async function handleSignup() {
     }
 }
 
-async function handleLogout() {
+async function handleLogout(isAutoTimeout = false) {
     unsubscribeRealtime();
+    localStorage.removeItem('painel_ops_last_activity');
     const client = getSupabase();
     if (client) {
         try {
@@ -299,6 +394,9 @@ async function handleLogout() {
     }
     window._authUserId = null;
     showAuthOverlay();
+    if (isAutoTimeout) {
+        showAuthInfo('Sua sessão expirou após 30 minutos de inatividade. Por favor, faça login novamente.');
+    }
 }
 
 function showAuthError(msg) {
@@ -331,6 +429,224 @@ function hideAuthInfo() {
     }
 }
 
+// ----------------------------------------------------
+// GERENCIAMENTO DE MODO DE AUTENTICAÇÃO E SENHA
+// ----------------------------------------------------
+function setAuthViewMode(mode) {
+    hideAuthError();
+    hideAuthInfo();
+    
+    const loginBox = document.getElementById('auth-login-container');
+    const forgotBox = document.getElementById('auth-forgot-container');
+    const resetBox = document.getElementById('auth-reset-container');
+    const titleEl = document.getElementById('auth-main-title');
+    const subtitleEl = document.getElementById('auth-main-subtitle');
+
+    if (loginBox) loginBox.style.display = mode === 'login' ? 'flex' : 'none';
+    if (forgotBox) forgotBox.style.display = mode === 'forgot' ? 'flex' : 'none';
+    if (resetBox) resetBox.style.display = mode === 'reset' ? 'flex' : 'none';
+
+    if (mode === 'forgot') {
+        if (titleEl) titleEl.textContent = 'Recuperar Senha';
+        if (subtitleEl) subtitleEl.textContent = 'Enviaremos um link para seu e-mail';
+        const loginEmail = document.getElementById('auth-email');
+        const forgotEmail = document.getElementById('auth-forgot-email');
+        if (loginEmail && forgotEmail && loginEmail.value.trim()) {
+            forgotEmail.value = loginEmail.value.trim();
+        }
+        if (forgotEmail) setTimeout(() => forgotEmail.focus(), 150);
+    } else if (mode === 'reset') {
+        if (titleEl) titleEl.textContent = 'Nova Senha';
+        if (subtitleEl) subtitleEl.textContent = 'Defina sua nova senha de acesso';
+        const resetPass = document.getElementById('auth-reset-password');
+        if (resetPass) setTimeout(() => resetPass.focus(), 150);
+    } else {
+        if (titleEl) titleEl.textContent = 'EmanaPay';
+        if (subtitleEl) subtitleEl.textContent = 'Controle de Eficiência Operacional';
+    }
+}
+
+async function handleSendPasswordRecovery() {
+    hideAuthError();
+    hideAuthInfo();
+    
+    const emailEl = document.getElementById('auth-forgot-email');
+    const email = emailEl ? emailEl.value.trim() : '';
+    const btn = document.getElementById('btn-auth-send-recovery');
+    
+    if (!email) {
+        showAuthError('Por favor, informe seu e-mail cadastrado.');
+        return;
+    }
+    
+    const client = getSupabase();
+    if (!client) {
+        showAuthError('Erro: Supabase não conectado.');
+        return;
+    }
+    
+    const origText = btn ? btn.innerHTML : 'Enviar Link de Recuperação';
+    if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin" style="margin-right: 0.4rem;"></i> Enviando...';
+    }
+    
+    try {
+        const redirectUrl = window.location.href.split('#')[0];
+        const { error } = await client.auth.resetPasswordForEmail(email, {
+            redirectTo: redirectUrl
+        });
+        
+        if (error) {
+            showAuthError(formatAuthError(error.message));
+        } else {
+            showAuthInfo('Link de recuperação enviado com sucesso! Verifique sua caixa de entrada e pasta de spam.');
+            if (emailEl) emailEl.value = '';
+        }
+    } catch (err) {
+        showAuthError(formatAuthError(err ? err.message : ''));
+    } finally {
+        if (btn) {
+            btn.disabled = false;
+            btn.innerHTML = origText;
+        }
+    }
+}
+
+async function handleSaveResetPassword() {
+    hideAuthError();
+    hideAuthInfo();
+    
+    const passEl = document.getElementById('auth-reset-password');
+    const confirmEl = document.getElementById('auth-reset-confirm');
+    const pass = passEl ? passEl.value.trim() : '';
+    const confirm = confirmEl ? confirmEl.value.trim() : '';
+    const btn = document.getElementById('btn-auth-save-reset');
+    
+    if (!pass || !confirm) {
+        showAuthError('Por favor, preencha e confirme sua nova senha.');
+        return;
+    }
+    
+    if (pass.length < 6) {
+        showAuthError('A senha deve ter pelo menos 6 caracteres.');
+        return;
+    }
+    
+    if (pass !== confirm) {
+        showAuthError('As senhas digitadas não coincidem.');
+        return;
+    }
+    
+    const client = getSupabase();
+    if (!client) {
+        showAuthError('Erro: Supabase não conectado.');
+        return;
+    }
+    
+    const origText = btn ? btn.innerHTML : 'Salvar e Entrar no Painel';
+    if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin" style="margin-right: 0.4rem;"></i> Salvando...';
+    }
+    
+    try {
+        const { data, error } = await client.auth.updateUser({ password: pass });
+        
+        if (error) {
+            showAuthError(formatAuthError(error.message));
+        } else {
+            showToast('Nova senha salva com sucesso!', 'success', 5000);
+            if (window.history && window.history.replaceState) {
+                window.history.replaceState(null, null, window.location.pathname);
+            }
+            const user = (data && data.user) ? data.user : null;
+            if (user) {
+                await setupUserSession(user);
+            } else {
+                setAuthViewMode('login');
+                showAuthInfo('Senha atualizada com sucesso! Faça login com a nova senha.');
+            }
+        }
+    } catch (err) {
+        showAuthError(formatAuthError(err ? err.message : ''));
+    } finally {
+        if (btn) {
+            btn.disabled = false;
+            btn.innerHTML = origText;
+        }
+    }
+}
+
+// MODAL ALTERAR SENHA (USUÁRIO JÁ CONECTADO)
+function openChangePasswordModal() {
+    const modal = document.getElementById('modal-change-password');
+    const newPass = document.getElementById('input-modal-new-pass');
+    const confirmPass = document.getElementById('input-modal-confirm-pass');
+    if (newPass) newPass.value = '';
+    if (confirmPass) confirmPass.value = '';
+    if (modal) modal.style.display = 'flex';
+    if (newPass) setTimeout(() => newPass.focus(), 150);
+}
+
+function closeChangePasswordModal() {
+    const modal = document.getElementById('modal-change-password');
+    if (modal) modal.style.display = 'none';
+}
+
+async function handleSaveModalPassword() {
+    const newPassEl = document.getElementById('input-modal-new-pass');
+    const confirmPassEl = document.getElementById('input-modal-confirm-pass');
+    const newPass = newPassEl ? newPassEl.value.trim() : '';
+    const confirmPass = confirmPassEl ? confirmPassEl.value.trim() : '';
+    const btn = document.getElementById('btn-save-modal-pass');
+    
+    if (!newPass || !confirmPass) {
+        alert('Por favor, preencha os dois campos de senha.');
+        return;
+    }
+    
+    if (newPass.length < 6) {
+        alert('A senha deve ter pelo menos 6 caracteres.');
+        return;
+    }
+    
+    if (newPass !== confirmPass) {
+        alert('As senhas digitadas não coincidem.');
+        return;
+    }
+    
+    const client = getSupabase();
+    if (!client) {
+        alert('Erro: Supabase não conectado.');
+        return;
+    }
+    
+    const origText = btn ? btn.textContent : 'Salvar Nova Senha';
+    if (btn) {
+        btn.disabled = true;
+        btn.textContent = 'Salvando...';
+    }
+    
+    try {
+        const { error } = await client.auth.updateUser({ password: newPass });
+        if (error) {
+            alert('Erro ao atualizar senha: ' + error.message);
+        } else {
+            closeChangePasswordModal();
+            showToast('Senha atualizada com sucesso!', 'success', 5000);
+            alert('Sucesso! Sua nova senha foi cadastrada.');
+        }
+    } catch (err) {
+        alert('Erro ao atualizar senha: ' + (err.message || err));
+    } finally {
+        if (btn) {
+            btn.disabled = false;
+            btn.textContent = origText;
+        }
+    }
+}
+
 function showAuthOverlay() {
     const overlay = document.getElementById('auth-overlay');
     if (overlay) {
@@ -339,6 +655,7 @@ function showAuthOverlay() {
         overlay.style.setProperty('pointer-events', 'auto', 'important');
         overlay.style.setProperty('visibility', 'visible', 'important');
     }
+    setAuthViewMode('login');
     hideAuthError();
     hideAuthInfo();
     const emailEl = document.getElementById('auth-email');
@@ -367,6 +684,7 @@ async function setupUserSession(user) {
 
     try {
         window._authUserId = user.id;
+        recordUserActivity();
         
         const userMetadata = user.user_metadata || {};
         currentUser.email = user.email || '';
@@ -412,7 +730,9 @@ async function setupUserSession(user) {
             console.warn('Aviso ao iniciar Realtime:', e);
         }
 
+        refreshCurrentUserAssignedTeam();
         refreshAllViews();
+        aplicarPerfilDeAcesso();
     } catch (err) {
         alert('[DIAGNÓSTICO] Erro em setupUserSession: ' + (err.message || err));
         console.error('Erro em setupUserSession:', err);
@@ -428,7 +748,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     if (btnLogin) btnLogin.addEventListener('click', handleLogin);
     if (btnSignup) btnSignup.addEventListener('click', handleSignup);
-    if (btnLogout) btnLogout.addEventListener('click', handleLogout);
+    if (btnLogout) btnLogout.addEventListener('click', () => handleLogout(false));
 
     loadState();
     setupEventListeners();
@@ -446,16 +766,63 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     });
 
-    // Check existing Supabase session using getSupabase() helper
+    const forgotEmailEl = document.getElementById('auth-forgot-email');
+    if (forgotEmailEl) {
+        forgotEmailEl.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                handleSendPasswordRecovery();
+            }
+        });
+    }
+
+    const resetPassEl = document.getElementById('auth-reset-password');
+    const resetConfirmEl = document.getElementById('auth-reset-confirm');
+    [resetPassEl, resetConfirmEl].forEach(input => {
+        if (input) {
+            input.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    handleSaveResetPassword();
+                }
+            });
+        }
+    });
+
+    // Check existing Supabase session using getSupabase() helper with 30-min inactivity check
     const client = getSupabase();
     if (client) {
+        // Verificar se abriu através de link de recuperação de senha
+        const isRecoveryHash = window.location.hash && (window.location.hash.includes('type=recovery') || window.location.hash.includes('type=invite'));
+        
         try {
-            const { data } = await client.auth.getSession();
-            const session = data ? data.session : null;
-            if (session && session.user) {
-                await setupUserSession(session.user);
-            } else {
+            if (isRecoveryHash) {
+                console.log('[Auth] Link de recuperação de senha detectado via URL Hash.');
                 showAuthOverlay();
+                setAuthViewMode('reset');
+            } else {
+                const lastActivity = parseInt(localStorage.getItem('painel_ops_last_activity') || '0', 10);
+                const isInactive = lastActivity === 0 || (Date.now() - lastActivity) > INACTIVITY_TIMEOUT_MS;
+
+                if (isInactive) {
+                    console.log('[Auth Init] Sessão inexistente ou expirada (>30min de inatividade). Exibindo login.');
+                    try { await client.auth.signOut(); } catch (_) {}
+                    localStorage.removeItem('painel_ops_last_activity');
+                    window._authUserId = null;
+                    showAuthOverlay();
+                    if (lastActivity > 0) {
+                        showAuthInfo('Sua sessão expirou após 30 minutos de inatividade. Por favor, faça login.');
+                    }
+                } else {
+                    const { data } = await client.auth.getSession();
+                    const session = data ? data.session : null;
+                    if (session && session.user) {
+                        recordUserActivity();
+                        await setupUserSession(session.user);
+                    } else {
+                        showAuthOverlay();
+                    }
+                }
             }
         } catch (sessionErr) {
             console.error('Erro ao recuperar sessão existente do Supabase:', sessionErr);
@@ -470,8 +837,18 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         try {
             client.auth.onAuthStateChange(async (event, session) => {
-                if (event === 'SIGNED_IN' && session && session.user) {
-                    await setupUserSession(session.user);
+                if (event === 'PASSWORD_RECOVERY') {
+                    console.log('[Auth] Evento PASSWORD_RECOVERY recebido.');
+                    showAuthOverlay();
+                    setAuthViewMode('reset');
+                } else if (event === 'SIGNED_IN' && session && session.user) {
+                    if (window.location.hash && window.location.hash.includes('type=recovery')) {
+                        showAuthOverlay();
+                        setAuthViewMode('reset');
+                    } else {
+                        recordUserActivity();
+                        await setupUserSession(session.user);
+                    }
                 } else if (event === 'SIGNED_OUT' && window._authUserId) {
                     showAuthOverlay();
                 }
@@ -564,7 +941,7 @@ let _lastRealtimeToastTime = 0;
 
 function subscribeRealtime() {
     const client = getSupabase();
-    if (!client) return;
+    if (!client || !window._authUserId) return;
 
     try {
         client.removeAllChannels();
@@ -578,7 +955,8 @@ function subscribeRealtime() {
         .on('postgres_changes', {
             event: '*',
             schema: 'public',
-            table: 'board_state'
+            table: 'board_state',
+            filter: 'id=eq.default'
         }, (payload) => {
             console.log('[Realtime] Evento recebido via WebSocket:', payload.eventType, payload);
             
@@ -615,7 +993,7 @@ function subscribeRealtime() {
                 updateRealtimeStatusUI('SUBSCRIBED');
             } else if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
                 updateRealtimeStatusUI('ERROR', 'Erro Realtime');
-                console.warn('[Realtime Error] Certifique-se de que a publicação Realtime está ativa no Supabase (ALTER PUBLICATION supabase_realtime ADD TABLE board_state).');
+                console.warn('[Realtime Info] Publicação Realtime em standby ou necessita de ativação no Supabase.');
             } else if (status === 'CLOSED') {
                 updateRealtimeStatusUI('ERROR', 'Desconectado');
             }
@@ -637,19 +1015,12 @@ function unsubscribeRealtime() {
 // SUPABASE BOARD STATE PERSISTENCE
 async function saveStateToSupabase() {
     const client = getSupabase();
-    if (!client) return;
+    if (!client || !window._authUserId) return;
 
     _lastSelfSaveTime = Date.now();
 
     try {
-        let myUserId = window._authUserId;
-        if (!myUserId) {
-            const { data: { user } } = await client.auth.getUser();
-            if (user) {
-                myUserId = user.id;
-                window._authUserId = user.id;
-            }
-        }
+        const myUserId = window._authUserId;
 
         const { error } = await client
             .from('board_state')
@@ -664,8 +1035,8 @@ async function saveStateToSupabase() {
             console.error('[Supabase Save Error]', error);
             if (error.code === '42P01' || error.message?.includes('board_state')) {
                 showToast('Erro Supabase: Tabela "board_state" não encontrada. Execute o SQL de configuração no Supabase.', 'error', 10000);
-            } else if (error.code === '42501' || error.message?.includes('row-level security')) {
-                showToast('Erro de permissão RLS no Supabase. Habilite políticas de SELECT/INSERT/UPDATE na tabela board_state.', 'error', 10000);
+            } else if (error.code === '42501' || error.message?.includes('row-level security') || error.code === '401' || error.status === 401) {
+                console.warn('[Supabase Save Auth/RLS]', error.message);
             } else {
                 showToast(`Erro ao salvar no Supabase: ${error.message}`, 'error', 5000);
             }
@@ -753,6 +1124,72 @@ async function loadStateFromSupabase() {
     }
 }
 
+// IMPORTAR BASE DE DADOS COMPLETA DE PRODUÇÃO (PRD) PARA HOMOLOGAÇÃO (HML)
+async function importPrdDataToHml() {
+    if (!verificarPermissao('OPERADOR')) {
+        alert('Acesso negado: Perfil OPERADOR ou ADMIN necessário.');
+        return;
+    }
+    
+    const client = getSupabase();
+    if (!client) {
+        alert('Erro: Supabase não conectado.');
+        return;
+    }
+    
+    const confirmMsg = 'Deseja realmente importar todas as informações de PRODUÇÃO (PRD) para este ambiente de HOMOLOGAÇÃO (HML)?\n\n' +
+                       '⚠️ Todos os processos, responsáveis e equipes de HML serão substituídos pelo cenário atual de Produção para que você possa executar testes com dados reais.';
+    
+    if (!confirm(confirmMsg)) {
+        return;
+    }
+    
+    try {
+        showToast('Buscando dados atuais de Produção (PRD)...', 'info', 4000);
+        
+        const { data, error } = await client
+            .from('board_state')
+            .select('data')
+            .eq('id', 'default')
+            .maybeSingle();
+            
+        if (error) {
+            console.error('[Import PRD Error]', error);
+            alert('Erro ao buscar dados de Produção no Supabase: ' + error.message);
+            return;
+        }
+        
+        if (!data || !data.data) {
+            alert('Nenhum dado encontrado no banco de Produção (PRD).');
+            return;
+        }
+        
+        // Clona e migra estado de Produção
+        state = JSON.parse(JSON.stringify(data.data));
+        applyStateMigrations();
+        
+        // Salva diretamente em HML (id: 'default')
+        saveState();
+        
+        refreshCurrentUserAssignedTeam();
+        aplicarPerfilDeAcesso();
+        renderAreaFilterOptions();
+        renderResponsavelFilterOptions();
+        renderCadastrosView();
+        renderTable();
+        renderBalancingTable();
+        renderReviewTable();
+        renderAutomationsView();
+        
+        showToast('Cenário de Produção (PRD) importado com sucesso para HML!', 'success', 6000);
+        alert('Sucesso! O cenário de Produção (PRD) foi copiado integralmente para este ambiente de Homologação (HML).');
+        
+    } catch (err) {
+        console.error('[Import PRD Exception]', err);
+        alert('Erro inesperado ao importar dados de Produção: ' + err.message);
+    }
+}
+
 function isRpaActivity(proc) {
     if (!proc) return false;
     return proc.isRpa === true || proc.isRpa === 'true' || proc.isRpa === 1;
@@ -835,10 +1272,13 @@ function applyStateMigrations() {
     
     state.teams.forEach(team => {
         if (!state.teamHierarchy[team]) {
-            state.teamHierarchy[team] = defaultRelations[team] || { gerencia: 'Suporte Operacional', diretoria: 'Operações', coordenador: '' };
+            state.teamHierarchy[team] = defaultRelations[team] || { gerencia: 'Suporte Operacional', diretoria: 'Operações', coordenador: '', coordenadorEmail: '' };
         }
         if (state.teamHierarchy[team].coordenador === undefined) {
             state.teamHierarchy[team].coordenador = '';
+        }
+        if (state.teamHierarchy[team].coordenadorEmail === undefined) {
+            state.teamHierarchy[team].coordenadorEmail = '';
         }
     });
 
@@ -857,9 +1297,14 @@ function applyStateMigrations() {
         });
     } else if (Array.isArray(state.responsaveis)) {
         state.responsaveis.forEach(r => {
-            if (r && typeof r === 'object' && r.area === undefined) {
-                const procWithResp = state.processes.find(p => p.responsavel === r.name);
-                r.area = procWithResp ? procWithResp.area : '';
+            if (r && typeof r === 'object') {
+                if (r.area === undefined) {
+                    const procWithResp = state.processes.find(p => p.responsavel === r.name);
+                    r.area = procWithResp ? procWithResp.area : '';
+                }
+                if (r.email === undefined) {
+                    r.email = '';
+                }
             }
         });
     } else {
@@ -930,6 +1375,9 @@ let _saveDebounceTimer = null;
 function saveState() {
     localStorage.setItem('capacity_fte_hub_state', JSON.stringify(state));
     
+    // Somente persiste no Supabase se houver usuário autenticado
+    if (!window._authUserId) return;
+
     // Debounce to prevent flooding Supabase with calls on every keystroke
     if (_saveDebounceTimer) clearTimeout(_saveDebounceTimer);
     _saveDebounceTimer = setTimeout(() => {
@@ -965,18 +1413,35 @@ function getResponsibleParams(responsavelName) {
 // GLOBAL MODAL FUNCTIONS FOR NOVA EQUIPE
 // Defined globally so they work with onclick= attributes in HTML
 
-function populateTeamCoordenadorSelect(selectedValue = '') {
-    const select = document.getElementById('modal-select-team-coordenador');
-    if (!select) return;
-    const resps = (state.responsaveis || []).map(r => typeof r === 'object' ? r.name : r).filter(Boolean);
-    select.innerHTML = '<option value="">Sem Coordenador</option>' + resps.map(r => 
-        `<option value="${escapeHtml(r)}" ${r === selectedValue ? 'selected' : ''}>${escapeHtml(r)}</option>`
-    ).join('');
+function populateTeamCoordenadorDatalist() {
+    const datalist = document.getElementById('coordenadores-datalist');
+    if (!datalist) return;
+    const resps = (state.responsaveis || []).filter(r => r && (typeof r === 'object' ? r.name : r));
+    datalist.innerHTML = resps.map(r => {
+        const name = typeof r === 'object' ? r.name : r;
+        const email = typeof r === 'object' ? r.email : '';
+        return `<option value="${escapeHtml(name)}">${email ? `(${escapeHtml(email)})` : ''}</option>`;
+    }).join('');
+
+    const coordInput = document.getElementById('modal-input-team-coordenador');
+    const coordEmailInput = document.getElementById('modal-input-team-coordenador-email');
+    if (coordInput && coordEmailInput && !coordInput._boundAutofill) {
+        coordInput._boundAutofill = true;
+        coordInput.addEventListener('input', () => {
+            const typedName = coordInput.value.trim().toLowerCase();
+            const foundResp = (state.responsaveis || []).find(r => r && r.name && r.name.toLowerCase().trim() === typedName);
+            if (foundResp && foundResp.email && !coordEmailInput.value) {
+                coordEmailInput.value = foundResp.email;
+            }
+        });
+    }
 }
 
 function openNewTeamModal(teamToEdit = null) {
     const modal = document.getElementById('modal-new-team');
     const nameInput = document.getElementById('modal-input-new-team');
+    const coordInput = document.getElementById('modal-input-team-coordenador');
+    const coordEmailInput = document.getElementById('modal-input-team-coordenador-email');
     const gerenciaSelect = document.getElementById('modal-select-team-gerencia');
     const diretoriaSelect = document.getElementById('modal-select-team-diretoria');
     const titleEl = document.getElementById('modal-new-team-title');
@@ -984,6 +1449,8 @@ function openNewTeamModal(teamToEdit = null) {
     const errorDiv = document.getElementById('modal-new-team-error');
 
     if (errorDiv) errorDiv.style.display = 'none';
+
+    populateTeamCoordenadorDatalist();
 
     if (teamToEdit) {
         if (modal) modal.dataset.editTeam = teamToEdit;
@@ -994,15 +1461,23 @@ function openNewTeamModal(teamToEdit = null) {
         const info = (state.teamHierarchy && state.teamHierarchy[teamToEdit]) || {};
         if (gerenciaSelect) gerenciaSelect.value = info.gerencia || 'Suporte Operacional';
         if (diretoriaSelect) diretoriaSelect.value = info.diretoria || 'Operações';
-        populateTeamCoordenadorSelect(info.coordenador || '');
+        if (coordInput) coordInput.value = info.coordenador || '';
+        
+        let coordEmail = info.coordenadorEmail || '';
+        if (!coordEmail && info.coordenador) {
+            const resp = (state.responsaveis || []).find(r => r && r.name && r.name.toLowerCase().trim() === info.coordenador.toLowerCase().trim());
+            if (resp && resp.email) coordEmail = resp.email;
+        }
+        if (coordEmailInput) coordEmailInput.value = coordEmail;
     } else {
         if (modal) delete modal.dataset.editTeam;
         if (titleEl) titleEl.innerHTML = `<i class="fa-solid fa-users"></i> Nova Equipe`;
         if (btnLabelEl) btnLabelEl.textContent = 'Cadastrar Equipe';
         if (nameInput) nameInput.value = '';
+        if (coordInput) coordInput.value = '';
+        if (coordEmailInput) coordEmailInput.value = '';
         if (gerenciaSelect) gerenciaSelect.value = 'Suporte Operacional';
         if (diretoriaSelect) diretoriaSelect.value = 'Operações';
-        populateTeamCoordenadorSelect('');
     }
 
     if (modal) modal.style.display = 'flex';
@@ -1023,7 +1498,8 @@ function saveNewTeamFromModal() {
     const nameInput = document.getElementById('modal-input-new-team');
     const gerenciaSelect = document.getElementById('modal-select-team-gerencia');
     const diretoriaSelect = document.getElementById('modal-select-team-diretoria');
-    const coordenadorSelect = document.getElementById('modal-select-team-coordenador');
+    const coordInput = document.getElementById('modal-input-team-coordenador');
+    const coordEmailInput = document.getElementById('modal-input-team-coordenador-email');
     const errorDiv = document.getElementById('modal-new-team-error');
 
     const teamName = nameInput ? nameInput.value.trim() : '';
@@ -1045,7 +1521,8 @@ function saveNewTeamFromModal() {
 
     const gerencia = gerenciaSelect ? gerenciaSelect.value : 'Suporte Operacional';
     const diretoria = diretoriaSelect ? diretoriaSelect.value : 'Operações';
-    const coordenador = coordenadorSelect ? coordenadorSelect.value : '';
+    const coordenador = coordInput ? coordInput.value.trim() : '';
+    const coordenadorEmail = coordEmailInput ? coordEmailInput.value.trim() : '';
 
     if (!state.teamHierarchy) state.teamHierarchy = {};
 
@@ -1065,10 +1542,32 @@ function saveNewTeamFromModal() {
             });
         }
 
-        state.teamHierarchy[teamName] = { gerencia, diretoria, coordenador };
+        state.teamHierarchy[teamName] = { gerencia, diretoria, coordenador, coordenadorEmail };
     } else {
         state.teams.push(teamName);
-        state.teamHierarchy[teamName] = { gerencia, diretoria, coordenador };
+        state.teamHierarchy[teamName] = { gerencia, diretoria, coordenador, coordenadorEmail };
+    }
+
+    // Se informou coordenador, garantir que ele esteja cadastrado e vinculado em state.responsaveis
+    if (coordenador) {
+        if (!Array.isArray(state.responsaveis)) {
+            state.responsaveis = [];
+        }
+        const existingResp = state.responsaveis.find(r => r && r.name && r.name.toLowerCase().trim() === coordenador.toLowerCase().trim());
+        if (existingResp) {
+            existingResp.area = teamName;
+            if (coordenadorEmail) existingResp.email = coordenadorEmail;
+        } else {
+            state.responsaveis.push({
+                name: coordenador,
+                email: coordenadorEmail,
+                area: teamName,
+                horasDia: null,
+                absenteismo: null,
+                diasUteis: null
+            });
+            state.responsaveis.sort((a, b) => a.name.localeCompare(b.name));
+        }
     }
 
     saveState();
@@ -1076,8 +1575,11 @@ function saveNewTeamFromModal() {
         delete modal.dataset.editTeam;
         modal.style.display = 'none';
     }
+    refreshCurrentUserAssignedTeam();
+    aplicarPerfilDeAcesso();
     renderCadastrosView();
     renderAreaFilterOptions();
+    renderResponsavelFilterOptions();
     renderTable();
     renderBalancingTable();
     renderReviewTable();
@@ -1255,19 +1757,34 @@ function setupEventListeners() {
 
     // Cadastros - Add Responsible button
     const handleAddResponsible = () => {
-        if (!verificarPermissao('OPERADOR')) { alert('Acesso negado: Perfil OPERADOR necessÃ¡rio.'); return; }
+        if (!verificarPermissao('OPERADOR')) { alert('Acesso negado: Perfil OPERADOR necessário.'); return; }
         const respInput = document.getElementById('input-new-responsible');
+        const emailInput = document.getElementById('input-new-responsible-email');
         if (!respInput) return;
         const respName = respInput.value.trim();
+        const respEmail = emailInput ? emailInput.value.trim() : '';
         if (!respName) {
-            alert("Por favor, digite o nome do responsÃ¡vel.");
+            alert("Por favor, digite o nome do responsável.");
             return;
         }
         
         const teamSelect = document.getElementById('select-new-responsible-team');
         let selectedTeam = teamSelect ? teamSelect.value : '';
-        if (!selectedTeam && Array.isArray(state.teams) && state.teams.length > 0) {
-            selectedTeam = state.teams[0];
+        if (!selectedTeam) {
+            alert("Por favor, selecione a equipe.");
+            if (teamSelect) teamSelect.focus();
+            return;
+        }
+
+        // Se perfil for OPERADOR com equipe atribuída, só pode cadastrar para a sua equipe
+        if (currentUser.perfil === 'OPERADOR' && currentUser.assignedTeam) {
+            if (selectedTeam.toLowerCase().trim() !== currentUser.assignedTeam.toLowerCase().trim()) {
+                alert(`Operadores só podem cadastrar responsáveis na sua própria equipe (${currentUser.assignedTeam}).`);
+                return;
+            }
+        } else if (currentUser.perfil === 'OPERADOR' && !currentUser.assignedTeam) {
+            alert("Seu usuário não possui uma equipe vinculada para cadastrar novos responsáveis.");
+            return;
         }
         
         if (!Array.isArray(state.responsaveis)) {
@@ -1276,12 +1793,21 @@ function setupEventListeners() {
         
         const currentNames = state.responsaveis.map(r => (r && r.name ? r.name : String(r)).toLowerCase());
         if (currentNames.includes(respName.toLowerCase())) {
-            alert("Este responsÃ¡vel jÃ estÃ cadastrado.");
+            alert("Este responsável já está cadastrado.");
             return;
+        }
+
+        if (respEmail) {
+            const currentEmails = state.responsaveis.map(r => (r && r.email ? r.email : '').toLowerCase()).filter(Boolean);
+            if (currentEmails.includes(respEmail.toLowerCase())) {
+                alert("Este e-mail já está cadastrado para outro responsável.");
+                return;
+            }
         }
         
         state.responsaveis.push({
             name: respName,
+            email: respEmail,
             area: selectedTeam || '',
             horasDia: null,
             absenteismo: null,
@@ -1291,6 +1817,9 @@ function setupEventListeners() {
         
         saveState();
         respInput.value = '';
+        if (emailInput) emailInput.value = '';
+        refreshCurrentUserAssignedTeam();
+        aplicarPerfilDeAcesso();
         renderCadastrosView();
         renderResponsavelFilterOptions();
         renderTable();
@@ -1342,8 +1871,10 @@ function setupEventListeners() {
     safeAddListener('btn-import-active-volumes', 'click', () => {
         if (!verificarPermissao('OPERADOR')) { alert('Acesso negado: Perfil OPERADOR necessário.'); return; }
         state.processes.forEach(proc => {
-            const hasVolume = proc.volume !== null && proc.volume !== '';
-            proc.backlogVolume = hasVolume ? proc.volume : (proc.qtdExecucao !== null && proc.qtdExecucao !== '' ? proc.qtdExecucao : '');
+            if (podeEditarArea(proc.area)) {
+                const hasVolume = proc.volume !== null && proc.volume !== '';
+                proc.backlogVolume = hasVolume ? proc.volume : (proc.qtdExecucao !== null && proc.qtdExecucao !== '' ? proc.qtdExecucao : '');
+            }
         });
         saveState();
         renderBalancingTable();
@@ -1436,6 +1967,10 @@ function renderTable() {
         if (proc.reviewStatus === 'Parar') {
             tr.className = 'row-review-stopped';
         }
+
+        const canEditThisArea = podeEditarArea(proc.area);
+        const isConsulta = currentUser.perfil === 'CONSULTA';
+        const isRowDisabled = isConsulta || !canEditThisArea;
         
         tr.innerHTML = `
             <td>
@@ -1455,13 +1990,13 @@ function renderTable() {
                 <span style="font-size: 0.9rem; color: var(--text-secondary);">${escapeHtml(proc.responsavel || 'Sem Responsável')}</span>
             </td>
             <td class="consulta-hidden">
-                <input type="number" class="input-volume" value="${proc.volume}" placeholder="---" min="0">
+                <input type="number" class="input-volume" value="${proc.volume}" placeholder="---" min="0" ${isRowDisabled ? 'disabled style="opacity: 0.6; pointer-events: none;"' : ''}>
             </td>
             <td class="consulta-hidden">
-                <input type="number" class="input-minutes" value="${proc.minutos}" placeholder="0" min="0">
+                <input type="number" class="input-minutes" value="${proc.minutos}" placeholder="0" min="0" ${isRowDisabled ? 'disabled style="opacity: 0.6; pointer-events: none;"' : ''}>
             </td>
             <td class="consulta-hidden">
-                <input type="number" class="input-qtd" value="${proc.qtdExecucao}" placeholder="---" min="0">
+                <input type="number" class="input-qtd" value="${proc.qtdExecucao}" placeholder="---" min="0" ${isRowDisabled ? 'disabled style="opacity: 0.6; pointer-events: none;"' : ''}>
             </td>
             <td class="cell-hours admin-only">0.0h</td>
             <td class="cell-highlight-pct neon-text-secondary admin-only">0.00%</td>
@@ -1471,31 +2006,36 @@ function renderTable() {
         const minutesInput = tr.querySelector('.input-minutes');
         const qtdInput = tr.querySelector('.input-qtd');
 
-        volumeInput.addEventListener('input', (e) => {
-            const val = e.target.value;
-            proc.volume = val !== '' ? parseFloat(val) : '';
-            if (val !== '') {
-                proc.qtdExecucao = '';
-                qtdInput.value = '';
-            }
-            updateCalculations();
-        });
+        if (!isRowDisabled) {
+            volumeInput.addEventListener('input', (e) => {
+                if (!podeEditarArea(proc.area)) return;
+                const val = e.target.value;
+                proc.volume = val !== '' ? parseFloat(val) : '';
+                if (val !== '') {
+                    proc.qtdExecucao = '';
+                    qtdInput.value = '';
+                }
+                updateCalculations();
+            });
 
-        minutesInput.addEventListener('input', (e) => {
-            const val = e.target.value;
-            proc.minutos = val !== '' ? parseFloat(val) : '';
-            updateCalculations();
-        });
+            minutesInput.addEventListener('input', (e) => {
+                if (!podeEditarArea(proc.area)) return;
+                const val = e.target.value;
+                proc.minutos = val !== '' ? parseFloat(val) : '';
+                updateCalculations();
+            });
 
-        qtdInput.addEventListener('input', (e) => {
-            const val = e.target.value;
-            proc.qtdExecucao = val !== '' ? parseFloat(val) : '';
-            if (val !== '') {
-                proc.volume = '';
-                volumeInput.value = '';
-            }
-            updateCalculations();
-        });
+            qtdInput.addEventListener('input', (e) => {
+                if (!podeEditarArea(proc.area)) return;
+                const val = e.target.value;
+                proc.qtdExecucao = val !== '' ? parseFloat(val) : '';
+                if (val !== '') {
+                    proc.volume = '';
+                    volumeInput.value = '';
+                }
+                updateCalculations();
+            });
+        }
 
         tableBody.appendChild(tr);
     });
@@ -1547,12 +2087,17 @@ function renderBalancingTable() {
         
         const isTempoFrequencia = proc.qtdExecucao !== null && proc.qtdExecucao !== '' && parseFloat(proc.qtdExecucao) > 0;
         const minutes = proc.minutos || 0;
+        const canEditThisArea = podeEditarArea(proc.area);
         
         let volumeFieldHtml = '';
         if (proc.reviewStatus === 'Parar') {
             volumeFieldHtml = `<input type="text" class="input-backlog-volume" value="Parado (Sem FTE)" disabled style="opacity: 0.6; cursor: not-allowed; text-align: center; background: rgba(255, 255, 255, 0.02);">`;
         } else if (isTempoFrequencia) {
             volumeFieldHtml = `<input type="text" class="input-backlog-volume" value="Rotina (Fixa)" disabled style="opacity: 0.6; cursor: not-allowed; text-align: center; background: rgba(255, 255, 255, 0.02);">`;
+        } else if (!canEditThisArea) {
+            const hasBacklog = proc.backlogVolume !== undefined && proc.backlogVolume !== '';
+            const backlogVolVal = hasBacklog ? parseFloat(proc.backlogVolume) : '';
+            volumeFieldHtml = `<input type="number" class="input-backlog-volume" value="${backlogVolVal}" placeholder="---" disabled style="opacity: 0.6; cursor: not-allowed; text-align: center; pointer-events: none;">`;
         } else {
             const hasBacklog = proc.backlogVolume !== undefined && proc.backlogVolume !== '';
             const backlogVolVal = hasBacklog ? parseFloat(proc.backlogVolume) : '';
@@ -1587,10 +2132,11 @@ function renderBalancingTable() {
             <td class="cell-backlog-fte neon-text-secondary admin-only">0.00%</td>
         `;
         
-        if (!isTempoFrequencia && proc.reviewStatus !== 'Parar') {
+        if (!isTempoFrequencia && proc.reviewStatus !== 'Parar' && canEditThisArea) {
             const backlogInput = tr.querySelector('.input-backlog-volume');
             if (backlogInput) {
                 backlogInput.addEventListener('input', (e) => {
+                    if (!podeEditarArea(proc.area)) return;
                     const val = e.target.value;
                     proc.backlogVolume = val !== '' ? parseFloat(val) : '';
                     saveState();
@@ -2131,7 +2677,10 @@ function renderAreaAllocations() {
 function addNewProcess() {
     if (!verificarPermissao('OPERADOR')) { alert('Acesso negado: Perfil OPERADOR necessário.'); return; }
     const newId = 'proc-' + Date.now();
-    const defaultArea = state.teams.length > 0 ? state.teams[0] : '';
+    let defaultArea = state.teams.length > 0 ? state.teams[0] : '';
+    if (currentUser.perfil === 'OPERADOR' && currentUser.assignedTeam) {
+        defaultArea = currentUser.assignedTeam;
+    }
     
     state.processes.push({
         id: newId,
@@ -2167,6 +2716,10 @@ function deleteProcess(id) {
 
 function duplicateProcess(proc) {
     if (!verificarPermissao('OPERADOR')) { alert('Acesso negado: Perfil OPERADOR necessário.'); return; }
+    if (!podeEditarArea(proc.area)) {
+        alert('Acesso negado: você só pode duplicar atividades da sua própria equipe.');
+        return;
+    }
     const newId = 'proc-' + Date.now() + '-' + Math.floor(Math.random() * 100);
     state.processes.push({
         id: newId,
@@ -2752,11 +3305,14 @@ function renderReviewTable() {
         }
 
         // Review Action select box
+        const canEditThisArea = podeEditarArea(proc.area);
+        const isConsulta = currentUser.perfil === 'CONSULTA';
+        const isSelectDisabled = isConsulta || !canEditThisArea;
         const statusOptions = ['Manter', 'Parar', 'Começar'];
         const statusOptionsHtml = statusOptions.map(opt =>
             `<option value="${opt}" ${proc.reviewStatus === opt ? 'selected' : ''}>${opt}</option>`
         ).join('');
-        const statusSelectHtml = `<select class="select-review-status" data-id="${proc.id}" data-status="${proc.reviewStatus || 'Manter'}">${statusOptionsHtml}</select>`;
+        const statusSelectHtml = `<select class="select-review-status" data-id="${proc.id}" data-status="${proc.reviewStatus || 'Manter'}" ${isSelectDisabled ? 'disabled style="opacity: 0.6; pointer-events: none;"' : ''}>${statusOptionsHtml}</select>`;
 
         const tr = document.createElement('tr');
         if (proc.reviewStatus === 'Parar') {
@@ -2783,13 +3339,16 @@ function renderReviewTable() {
         `;
 
         const statusSelect = tr.querySelector('.select-review-status');
-        statusSelect.addEventListener('change', (e) => {
-            const newStatus = e.target.value;
-            proc.reviewStatus = newStatus;
-            saveState();
-            // Re-render and recalculate everything
-            renderReviewTable();
-        });
+        if (!isSelectDisabled) {
+            statusSelect.addEventListener('change', (e) => {
+                if (!podeEditarArea(proc.area)) return;
+                const newStatus = e.target.value;
+                proc.reviewStatus = newStatus;
+                saveState();
+                // Re-render and recalculate everything
+                renderReviewTable();
+            });
+        }
 
         tableBody.appendChild(tr);
     });
@@ -2905,8 +3464,13 @@ function importExcelFile(file) {
                         if (isNaN(freqVal)) freqVal = '';
                     }
                     
-                    if (teamName && !newTeams.has(teamName)) {
-                        newTeams.add(teamName);
+                    let targetArea = teamName || (state.teams.length > 0 ? state.teams[0] : '');
+                    if (currentUser.perfil === 'OPERADOR' && currentUser.assignedTeam) {
+                        targetArea = currentUser.assignedTeam;
+                    }
+                    
+                    if (targetArea && !newTeams.has(targetArea)) {
+                        newTeams.add(targetArea);
                     }
                     if (respName && !newResps.has(respName)) {
                         newResps.add(respName);
@@ -2915,7 +3479,7 @@ function importExcelFile(file) {
                     importedProcesses.push({
                         id: 'proc-' + Date.now() + '-' + Math.floor(Math.random() * 1000) + '-' + importCount,
                         name: activityName,
-                        area: teamName || (state.teams.length > 0 ? state.teams[0] : ''),
+                        area: targetArea,
                         responsavel: respName,
                         produto: productName,
                         volume: volumeVal,
@@ -2941,9 +3505,12 @@ function importExcelFile(file) {
                         if (!existing.area) {
                             existing.area = importedArea;
                         }
+                        if (existing.email === undefined) {
+                            existing.email = '';
+                        }
                         return existing;
                     }
-                    return { name, area: importedArea, horasDia: null, absenteismo: null, diasUteis: null };
+                    return { name, email: '', area: importedArea, horasDia: null, absenteismo: null, diasUteis: null };
                 });
                 
                 // Always append imported processes (Strictly non-destructive import)
@@ -3247,20 +3814,47 @@ function renderCadastrosView() {
     
     if (!teamsList || !responsiblesList || !tableBody || !activityCountBadge) return;
     
-    // Clear new responsible input and set readOnly to prevent Chrome Password Manager / Autofill
+    // Clear new responsible inputs and set readOnly to prevent browser autofill
     const inputNewResp = document.getElementById('input-new-responsible');
     if (inputNewResp) {
-        inputNewResp.value = '';
+        if (!inputNewResp._hasUserTyping) {
+            inputNewResp.value = '';
+        }
         inputNewResp.readOnly = true;
         inputNewResp.onfocus = function() { this.readOnly = false; };
+        if (!inputNewResp._boundTypingTracker) {
+            inputNewResp._boundTypingTracker = true;
+            inputNewResp.addEventListener('input', () => {
+                inputNewResp._hasUserTyping = inputNewResp.value.trim().length > 0;
+            });
+        }
+    }
+    const inputNewRespEmail = document.getElementById('input-new-responsible-email');
+    if (inputNewRespEmail) {
+        if (!inputNewRespEmail._hasUserTyping) {
+            inputNewRespEmail.value = '';
+        }
+        inputNewRespEmail.readOnly = true;
+        inputNewRespEmail.onfocus = function() { this.readOnly = false; };
+        if (!inputNewRespEmail._boundTypingTracker) {
+            inputNewRespEmail._boundTypingTracker = true;
+            inputNewRespEmail.addEventListener('input', () => {
+                inputNewRespEmail._hasUserTyping = inputNewRespEmail.value.trim().length > 0;
+            });
+        }
     }
 
     // Populate new responsible team select options
     const newRespTeamSelect = document.getElementById('select-new-responsible-team');
     if (newRespTeamSelect) {
-        newRespTeamSelect.innerHTML = (state.teams || []).map(team => `
-            <option value="${escapeHtml(team)}">${escapeHtml(team)}</option>
-        `).join('');
+        if (currentUser.perfil === 'OPERADOR' && currentUser.assignedTeam) {
+            newRespTeamSelect.innerHTML = `<option value="${escapeHtml(currentUser.assignedTeam)}">${escapeHtml(currentUser.assignedTeam)}</option>`;
+        } else {
+            const teamOptions = (state.teams || []).map(team => `
+                <option value="${escapeHtml(team)}">${escapeHtml(team)}</option>
+            `).join('');
+            newRespTeamSelect.innerHTML = `<option value="" disabled selected>Selecione a equipe</option>` + teamOptions;
+        }
     }
 
     // 1. Render Teams List
@@ -3271,8 +3865,9 @@ function renderCadastrosView() {
             teamsList.innerHTML = state.teams.map(team => {
                 const hierarchy = (state.teamHierarchy && state.teamHierarchy[team]) || {};
                 const coordName = hierarchy.coordenador ? hierarchy.coordenador : '';
+                const coordEmail = hierarchy.coordenadorEmail ? hierarchy.coordenadorEmail : '';
                 const coordHtml = coordName 
-                    ? `<div style="font-size: 0.73rem; color: var(--text-muted); margin-top: 0.15rem; display: flex; align-items: center; gap: 0.25rem;"><i class="fa-solid fa-user-tie" style="font-size: 0.65rem; color: var(--color-primary);"></i> Coord: ${escapeHtml(coordName)}</div>`
+                    ? `<div style="font-size: 0.73rem; color: var(--text-muted); margin-top: 0.15rem; display: flex; align-items: center; gap: 0.25rem;"><i class="fa-solid fa-user-tie" style="font-size: 0.65rem; color: var(--color-primary);"></i> Coord: ${escapeHtml(coordName)}${coordEmail ? ` <span style="opacity: 0.75; font-size: 0.68rem;">(${escapeHtml(coordEmail)})</span>` : ''}</div>`
                     : `<div style="font-size: 0.73rem; color: var(--text-muted); margin-top: 0.15rem; opacity: 0.6;">Sem Coordenador</div>`;
 
                 return `
@@ -3340,6 +3935,15 @@ function renderCadastrosView() {
         if(icon) {
             icon.className = isHidden ? 'fa-solid fa-chevron-down' : 'fa-solid fa-chevron-right';
         }
+        // Limpar qualquer autofill não digitado pelo usuário
+        const emailInput = document.getElementById('input-new-responsible-email');
+        if (emailInput && !emailInput._hasUserTyping) {
+            emailInput.value = '';
+        }
+        const respInput = document.getElementById('input-new-responsible');
+        if (respInput && !respInput._hasUserTyping) {
+            respInput.value = '';
+        }
     };
 
     const toggleTableAccordion = (headerTr, className, forceState = null) => {
@@ -3399,10 +4003,12 @@ function renderCadastrosView() {
                 const nameSpan = document.createElement('span');
                 nameSpan.style.cssText = 'font-size: 0.85rem; font-weight: 500; color: var(--text-primary);';
                 
+                const canEditResp = podeEditarArea(resp.area);
                 const hasOverrides = resp.horasDia !== null || resp.absenteismo !== null || resp.diasUteis !== null;
                 nameSpan.innerHTML = `
                     <div style="display: flex; flex-direction: column;">
                         <span style="font-weight: 600; color: var(--text-primary);">${escapeHtml(resp.name)}</span>
+                        ${resp.email ? `<span style="font-size: 0.72rem; color: var(--text-muted); display: flex; align-items: center; gap: 0.25rem;"><i class="fa-regular fa-envelope" style="font-size: 0.65rem;"></i> ${escapeHtml(resp.email)}</span>` : ''}
                     </div>
                     ${hasOverrides ? '<i class="fa-solid fa-user-gear" style="color: var(--color-primary); font-size: 0.75rem; margin-left: 0.25rem;" title="Parâmetros customizados ativos"></i>' : ''}
                 `;
@@ -3416,13 +4022,19 @@ function renderCadastrosView() {
                 btnConfig.style.cssText = 'background: transparent; border: none; color: var(--color-primary); cursor: pointer; font-size: 0.85rem; padding: 0.2rem; display: flex; align-items: center; justify-content: center;';
                 btnConfig.title = 'Configurar Parâmetros de Capacidade';
                 btnConfig.innerHTML = '<i class="fa-solid fa-cog"></i>';
+                if (!canEditResp && currentUser.perfil !== 'ADMIN') {
+                    btnConfig.style.display = 'none';
+                }
                 
                 const btnDelete = document.createElement('button');
                 btnDelete.className = 'btn-delete-resp-item';
-                btnDelete.setAttribute('data-permissao', 'ADMIN');
+                btnDelete.setAttribute('data-permissao', 'OPERADOR,ADMIN');
                 btnDelete.style.cssText = 'background: transparent; border: none; color: var(--color-danger); cursor: pointer; font-size: 0.85rem; padding: 0.2rem; display: flex; align-items: center; justify-content: center;';
                 btnDelete.title = 'Excluir Responsável';
                 btnDelete.innerHTML = '<i class="fa-solid fa-trash-can"></i>';
+                if (!canEditResp && currentUser.perfil !== 'ADMIN') {
+                    btnDelete.style.display = 'none';
+                }
                 
                 btnGroup.appendChild(btnConfig);
                 btnGroup.appendChild(btnDelete);
@@ -3437,9 +4049,10 @@ function renderCadastrosView() {
                 
                 btnDelete.addEventListener('click', (e) => {
                     e.stopPropagation();
-                    if (!verificarPermissao('ADMIN')) { alert('Acesso negado: Perfil ADMIN necessário.'); return; }
+                    if (!verificarPermissao('OPERADOR')) { alert('Acesso negado: Perfil OPERADOR ou ADMIN necessário.'); return; }
+                    if (!podeEditarArea(resp.area)) { alert(`Acesso negado: Você só pode excluir responsáveis da sua própria equipe (${currentUser.assignedTeam}).`); return; }
                     if (confirm(`Tem certeza que deseja excluir o responsável "${resp.name}"? Todas as atividades sob sua responsabilidade ficarão sem responsável.`)) {
-                        state.responsaveis = state.responsaveis.filter(r => r.name !== resp.name);
+                        state.responsaveis = state.responsaveis.filter(r => (typeof r === 'object' ? r.name : r) !== resp.name);
                         state.processes.forEach(p => {
                             if (p.responsavel === resp.name) p.responsavel = '';
                         });
@@ -3498,8 +4111,9 @@ function renderCadastrosView() {
         // Header Row
         const headerTr = document.createElement('tr');
         headerTr.style.cssText = 'background: rgba(255,255,255,0.03); cursor: pointer; user-select: none;';
+        const totalCols = currentUser.perfil === 'ADMIN' ? 7 : (currentUser.perfil === 'OPERADOR' ? 6 : 5);
         headerTr.innerHTML = `
-            <td colspan="7" style="padding: 0.8rem; font-weight: 600; color: var(--text-primary); border-top: 1px solid rgba(255,255,255,0.05); border-bottom: 1px solid rgba(255,255,255,0.05);">
+            <td colspan="${totalCols}" style="padding: 0.8rem; font-weight: 600; color: var(--text-primary); border-top: 1px solid rgba(255,255,255,0.05); border-bottom: 1px solid rgba(255,255,255,0.05);">
                 <i class="${isExpanded ? 'fa-solid fa-chevron-down' : 'fa-solid fa-chevron-right'}" style="width: 20px;"></i> ${escapeHtml(team)} <span style="background: rgba(255,255,255,0.1); color: var(--text-secondary); padding: 0.1rem 0.5rem; border-radius: 10px; font-size: 0.75rem; margin-left: 0.5rem;">${teamProcs.length} atividades</span>
             </td>
         `;
@@ -3517,6 +4131,10 @@ function renderCadastrosView() {
             tr.style.display = isExpanded ? 'table-row' : 'none';
             tr.dataset.id = proc.id;
             
+            const canEditThisArea = podeEditarArea(proc.area);
+            const isConsulta = currentUser.perfil === 'CONSULTA';
+            const isRowDisabled = isConsulta || !canEditThisArea;
+            
             const teamOptions = '<option value="">-- Sem Equipe --</option>' +
                 state.teams.map(t => `
                     <option value="${escapeHtml(t)}" ${proc.area === t ? 'selected' : ''}>${escapeHtml(t)}</option>
@@ -3533,7 +4151,7 @@ function renderCadastrosView() {
             const assignedBadgesHtml = currentResps.map(rName => `
                 <span class="badge-resp-tag" style="font-size: 0.78rem; padding: 0.15rem 0.45rem; border-radius: 12px; background: rgba(99, 102, 241, 0.12); color: #818cf8; border: 1px solid rgba(99, 102, 241, 0.25); display: inline-flex; align-items: center; gap: 0.3rem;">
                     ${escapeHtml(rName)}
-                    <i class="fa-solid fa-xmark remove-resp-btn" data-resp="${escapeHtml(rName)}" style="cursor: pointer; opacity: 0.7; font-size: 0.7rem;" title="Remover ${escapeHtml(rName)}"></i>
+                    ${!isRowDisabled ? `<i class="fa-solid fa-xmark remove-resp-btn" data-resp="${escapeHtml(rName)}" style="cursor: pointer; opacity: 0.7; font-size: 0.7rem;" title="Remover ${escapeHtml(rName)}"></i>` : ''}
                 </span>
             `).join('');
 
@@ -3549,180 +4167,202 @@ function renderCadastrosView() {
                 }).join('');
                 
             const isRpa = isRpaActivity(proc);
-            const isConsulta = currentUser.perfil === 'CONSULTA';
             
             tr.innerHTML = `
-                <td style="text-align: center;">
-                    <input type="checkbox" class="cadastros-row-checkbox" data-id="${proc.id}" ${isConsulta ? 'disabled' : ''}>
+                <td class="col-select-admin" style="text-align: center; ${currentUser.perfil === 'ADMIN' ? '' : 'display: none;'}">
+                    <input type="checkbox" class="cadastros-row-checkbox" data-id="${proc.id}" ${isRowDisabled ? 'disabled style="opacity: 0.3; pointer-events: none;"' : ''}>
                 </td>
                 <td>
-                    <input type="text" class="input-activity-name-cell" value="${escapeHtml(proc.name)}" ${isConsulta ? 'readonly' : ''} style="width: 100%; border: none; background: transparent; color: var(--text-primary); outline: none; padding: 0.3rem 0.5rem; border-radius: 4px;">
+                    <input type="text" class="input-activity-name-cell" value="${escapeHtml(proc.name)}" ${isRowDisabled ? 'readonly style="width: 100%; border: none; background: transparent; color: var(--text-primary); outline: none; padding: 0.3rem 0.5rem; border-radius: 4px; opacity: 0.7; pointer-events: none;"' : 'style="width: 100%; border: none; background: transparent; color: var(--text-primary); outline: none; padding: 0.3rem 0.5rem; border-radius: 4px;"'}>
                 </td>
                 <td>
-                    <select class="select-activity-team-cell" ${isConsulta ? 'disabled' : ''} style="width: 100%; border: none; background: transparent; color: var(--text-primary); outline: none; padding: 0.3rem 0.5rem; border-radius: 4px; cursor: pointer;">
+                    <select class="select-activity-team-cell" ${isRowDisabled ? 'disabled style="width: 100%; border: none; background: transparent; color: var(--text-primary); outline: none; padding: 0.3rem 0.5rem; border-radius: 4px; opacity: 0.7; pointer-events: none;"' : 'style="width: 100%; border: none; background: transparent; color: var(--text-primary); outline: none; padding: 0.3rem 0.5rem; border-radius: 4px; cursor: pointer;"'}>
                         ${teamOptions}
                     </select>
                 </td>
                 <td>
                     <div class="cadastros-resp-container" style="display: flex; flex-wrap: wrap; gap: 0.3rem; align-items: center; padding: 0.2rem 0;">
                         ${assignedBadgesHtml}
-                        <select class="select-activity-add-resp" ${isConsulta ? 'disabled' : ''} style="border: 1px dashed var(--border-color); background: rgba(255,255,255,0.03); color: var(--text-secondary); outline: none; padding: 0.2rem 0.4rem; border-radius: 4px; font-size: 0.78rem; cursor: pointer;">
+                        <select class="select-activity-add-resp" ${isRowDisabled ? 'disabled style="display: none;"' : 'style="border: 1px dashed var(--border-color); background: rgba(255,255,255,0.03); color: var(--text-secondary); outline: none; padding: 0.2rem 0.4rem; border-radius: 4px; font-size: 0.78rem; cursor: pointer;"'}>
                             ${unassignedOptionsHtml}
                         </select>
                     </div>
                 </td>
                 <td>
-                    <input type="text" class="input-activity-product-cell" value="${escapeHtml(proc.produto || '')}" placeholder="Produto (Opcional)" ${isConsulta ? 'readonly' : ''} style="width: 100%; border: none; background: transparent; color: var(--text-primary); outline: none; padding: 0.3rem 0.5rem; border-radius: 4px;">
+                    <input type="text" class="input-activity-product-cell" value="${escapeHtml(proc.produto || '')}" placeholder="Produto (Opcional)" ${isRowDisabled ? 'readonly style="width: 100%; border: none; background: transparent; color: var(--text-primary); outline: none; padding: 0.3rem 0.5rem; border-radius: 4px; opacity: 0.7; pointer-events: none;"' : 'style="width: 100%; border: none; background: transparent; color: var(--text-primary); outline: none; padding: 0.3rem 0.5rem; border-radius: 4px;"'}>
                 </td>
                 <td style="text-align: center;">
-                    <label style="display: inline-flex; align-items: center; gap: 0.35rem; cursor: pointer; font-size: 0.8rem; user-select: none;">
-                        <input type="checkbox" class="cb-activity-rpa" ${isRpa ? 'checked' : ''} ${isConsulta ? 'disabled' : ''}>
+                    <label style="display: inline-flex; align-items: center; gap: 0.35rem; cursor: ${isRowDisabled ? 'default' : 'pointer'}; font-size: 0.8rem; user-select: none;">
+                        <input type="checkbox" class="cb-activity-rpa" ${isRpa ? 'checked' : ''} ${isRowDisabled ? 'disabled' : ''}>
                         <span class="label-rpa-text" style="${isRpa ? 'color: #a78bfa; font-weight: 600;' : 'color: var(--text-muted);'}">🤖 RPA</span>
                     </label>
                 </td>
-                <td class="col-excluir-admin" style="text-align: center;">
+                <td class="col-acao-excluir" style="text-align: center; ${isConsulta ? 'display: none;' : ''}">
+                    ${canEditThisArea ? `
                     <button class="btn-row-action btn-delete-activity-cell" style="background: transparent; border: none; color: var(--color-danger); cursor: pointer; font-size: 0.95rem; padding: 0.2rem;" title="Excluir Atividade">
                         <i class="fa-solid fa-trash-can"></i>
-                    </button>
+                    </button>` : ''}
                 </td>
             `;
             
             const rowCheckbox = tr.querySelector('.cadastros-row-checkbox');
-            rowCheckbox.addEventListener('change', () => {
-                if (!verificarPermissao('OPERADOR')) return;
-                updateBulkDeleteState();
-            });
-            
-            const rpaCheckbox = tr.querySelector('.cb-activity-rpa');
-            rpaCheckbox.addEventListener('change', (e) => {
-                if (!verificarPermissao('OPERADOR')) return;
-                proc.isRpa = e.target.checked;
-                saveState();
-                renderTable();
-                renderBalancingTable();
-                renderReviewTable();
-                renderAutomationsView();
-                
-                const labelText = tr.querySelector('.label-rpa-text');
-                if (labelText) {
-                    labelText.style.color = e.target.checked ? '#a78bfa' : 'var(--text-muted)';
-                    labelText.style.fontWeight = e.target.checked ? '600' : 'normal';
-                }
-            });
-            
-            const nameInput = tr.querySelector('.input-activity-name-cell');
-            nameInput.addEventListener('change', (e) => {
-                if (!verificarPermissao('OPERADOR')) return;
-                const val = e.target.value.trim();
-                if (val) {
-                    proc.name = val;
-                    saveState();
-                } else {
-                    e.target.value = proc.name;
-                }
-            });
-            nameInput.addEventListener('focus', () => {
-                if (isConsulta) return;
-                nameInput.style.background = 'rgba(255, 255, 255, 0.08)';
-                nameInput.style.border = '1px solid var(--border-color)';
-            });
-            nameInput.addEventListener('blur', () => {
-                nameInput.style.background = 'transparent';
-                nameInput.style.border = 'none';
-            });
-            
-            const teamSelect = tr.querySelector('.select-activity-team-cell');
-            teamSelect.addEventListener('change', (e) => {
-                if (!verificarPermissao('OPERADOR')) return;
-                const newTeam = e.target.value;
-                proc.area = newTeam;
-                setProcessResponsaveis(proc, []);
-                saveState();
-                
-                renderCadastrosView();
-                renderAreaFilterOptions();
-                renderResponsavelFilterOptions();
-                renderTable();
-                renderBalancingTable();
-                renderReviewTable();
-            });
-            teamSelect.addEventListener('focus', () => {
-                if (isConsulta) return;
-                teamSelect.style.background = 'rgba(255, 255, 255, 0.08)';
-                teamSelect.style.border = '1px solid var(--border-color)';
-            });
-            teamSelect.addEventListener('blur', () => {
-                teamSelect.style.background = 'transparent';
-                teamSelect.style.border = 'none';
-            });
-            
-            // Listeners for multi-responsible badges & add dropdown
-            tr.querySelectorAll('.remove-resp-btn').forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    e.stopPropagation();
+            if (rowCheckbox && !isRowDisabled) {
+                rowCheckbox.addEventListener('change', () => {
                     if (!verificarPermissao('OPERADOR')) return;
-                    const respToRemove = btn.dataset.resp;
-                    const updated = currentResps.filter(r => r !== respToRemove);
-                    setProcessResponsaveis(proc, updated);
-                    saveState();
-                    renderCadastrosView();
-                    renderResponsavelFilterOptions();
-                    renderTable();
-                    renderBalancingTable();
-                    renderReviewTable();
-                    renderAutomationsView();
-                });
-            });
-
-            const addRespSelect = tr.querySelector('.select-activity-add-resp');
-            if (addRespSelect) {
-                addRespSelect.addEventListener('change', (e) => {
-                    if (!verificarPermissao('OPERADOR')) return;
-                    const newResp = e.target.value;
-                    if (!newResp) return;
-                    const updated = [...currentResps, newResp];
-                    setProcessResponsaveis(proc, updated);
-                    if (isRpaResponsavel(newResp)) {
-                        proc.isRpa = true;
-                    }
-                    saveState();
-                    renderCadastrosView();
-                    renderResponsavelFilterOptions();
-                    renderTable();
-                    renderBalancingTable();
-                    renderReviewTable();
-                    renderAutomationsView();
+                    updateBulkDeleteState();
                 });
             }
             
-            const productInput = tr.querySelector('.input-activity-product-cell');
-            productInput.addEventListener('change', (e) => {
-                if (!verificarPermissao('OPERADOR')) return;
-                proc.produto = e.target.value.trim();
-                saveState();
-            });
-            productInput.addEventListener('focus', () => {
-                if (isConsulta) return;
-                productInput.style.background = 'rgba(255, 255, 255, 0.08)';
-                productInput.style.border = '1px solid var(--border-color)';
-            });
-            productInput.addEventListener('blur', () => {
-                productInput.style.background = 'transparent';
-                productInput.style.border = 'none';
-            });
-            
-            const deleteBtn = tr.querySelector('.btn-delete-activity-cell');
-            deleteBtn.addEventListener('click', () => {
-                if (!verificarPermissao('ADMIN')) { alert('Acesso negado: Perfil ADMIN necessÃ¡rio.'); return; }
-                if (confirm(`Deseja ÃÃrealmente excluir a atividade "${proc.name}"?`)) {
-                    state.processes = state.processes.filter(p => p.id !== proc.id);
+            const rpaCheckbox = tr.querySelector('.cb-activity-rpa');
+            if (rpaCheckbox && !isRowDisabled) {
+                rpaCheckbox.addEventListener('change', (e) => {
+                    if (!verificarPermissao('OPERADOR')) return;
+                    if (!podeEditarArea(proc.area)) return;
+                    proc.isRpa = e.target.checked;
                     saveState();
-                    renderCadastrosView();
                     renderTable();
                     renderBalancingTable();
                     renderReviewTable();
+                    renderAutomationsView();
+                    
+                    const labelText = tr.querySelector('.label-rpa-text');
+                    if (labelText) {
+                        labelText.style.color = e.target.checked ? '#a78bfa' : 'var(--text-muted)';
+                        labelText.style.fontWeight = e.target.checked ? '600' : 'normal';
+                    }
+                });
+            }
+            
+            const nameInput = tr.querySelector('.input-activity-name-cell');
+            if (nameInput && !isRowDisabled) {
+                nameInput.addEventListener('change', (e) => {
+                    if (!verificarPermissao('OPERADOR')) return;
+                    if (!podeEditarArea(proc.area)) return;
+                    const val = e.target.value.trim();
+                    if (val) {
+                        proc.name = val;
+                        saveState();
+                    } else {
+                        e.target.value = proc.name;
+                    }
+                });
+                nameInput.addEventListener('focus', () => {
+                    if (isRowDisabled) return;
+                    nameInput.style.background = 'rgba(255, 255, 255, 0.08)';
+                    nameInput.style.border = '1px solid var(--border-color)';
+                });
+                nameInput.addEventListener('blur', () => {
+                    nameInput.style.background = 'transparent';
+                    nameInput.style.border = 'none';
+                });
+            }
+            
+            const teamSelect = tr.querySelector('.select-activity-team-cell');
+            if (teamSelect && !isRowDisabled) {
+                teamSelect.addEventListener('change', (e) => {
+                    if (!verificarPermissao('OPERADOR')) return;
+                    if (!podeEditarArea(proc.area)) return;
+                    const newTeam = e.target.value;
+                    proc.area = newTeam;
+                    setProcessResponsaveis(proc, []);
+                    saveState();
+                    
+                    renderCadastrosView();
+                    renderAreaFilterOptions();
+                    renderResponsavelFilterOptions();
+                    renderTable();
+                    renderBalancingTable();
+                    renderReviewTable();
+                });
+                teamSelect.addEventListener('focus', () => {
+                    if (isRowDisabled) return;
+                    teamSelect.style.background = 'rgba(255, 255, 255, 0.08)';
+                    teamSelect.style.border = '1px solid var(--border-color)';
+                });
+                teamSelect.addEventListener('blur', () => {
+                    teamSelect.style.background = 'transparent';
+                    teamSelect.style.border = 'none';
+                });
+            }
+            
+            // Listeners for multi-responsible badges & add dropdown
+            if (!isRowDisabled) {
+                tr.querySelectorAll('.remove-resp-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        if (!verificarPermissao('OPERADOR')) return;
+                        if (!podeEditarArea(proc.area)) return;
+                        const respToRemove = btn.dataset.resp;
+                        const updated = currentResps.filter(r => r !== respToRemove);
+                        setProcessResponsaveis(proc, updated);
+                        saveState();
+                        renderCadastrosView();
+                        renderResponsavelFilterOptions();
+                        renderTable();
+                        renderBalancingTable();
+                        renderReviewTable();
+                        renderAutomationsView();
+                    });
+                });
+
+                const addRespSelect = tr.querySelector('.select-activity-add-resp');
+                if (addRespSelect) {
+                    addRespSelect.addEventListener('change', (e) => {
+                        if (!verificarPermissao('OPERADOR')) return;
+                        if (!podeEditarArea(proc.area)) return;
+                        const newResp = e.target.value;
+                        if (!newResp) return;
+                        const updated = [...currentResps, newResp];
+                        setProcessResponsaveis(proc, updated);
+                        if (isRpaResponsavel(newResp)) {
+                            proc.isRpa = true;
+                        }
+                        saveState();
+                        renderCadastrosView();
+                        renderResponsavelFilterOptions();
+                        renderTable();
+                        renderBalancingTable();
+                        renderReviewTable();
+                        renderAutomationsView();
+                    });
                 }
-            });
+                
+                const productInput = tr.querySelector('.input-activity-product-cell');
+                if (productInput) {
+                    productInput.addEventListener('change', (e) => {
+                        if (!verificarPermissao('OPERADOR')) return;
+                        if (!podeEditarArea(proc.area)) return;
+                        proc.produto = e.target.value.trim();
+                        saveState();
+                    });
+                    productInput.addEventListener('focus', () => {
+                        if (isRowDisabled) return;
+                        productInput.style.background = 'rgba(255, 255, 255, 0.08)';
+                        productInput.style.border = '1px solid var(--border-color)';
+                    });
+                    productInput.addEventListener('blur', () => {
+                        productInput.style.background = 'transparent';
+                        productInput.style.border = 'none';
+                    });
+                }
+            }
+            
+            const deleteBtn = tr.querySelector('.btn-delete-activity-cell');
+            if (deleteBtn) {
+                deleteBtn.addEventListener('click', () => {
+                    if (!verificarPermissao('OPERADOR')) { alert('Acesso negado: Perfil OPERADOR ou ADMIN necessário.'); return; }
+                    if (!podeEditarArea(proc.area)) { alert(`Acesso negado: Você só pode excluir atividades da sua equipe (${currentUser.assignedTeam}).`); return; }
+                    if (confirm(`Deseja realmente excluir a atividade "${proc.name}"?`)) {
+                        state.processes = state.processes.filter(p => p.id !== proc.id);
+                        saveState();
+                        renderCadastrosView();
+                        renderTable();
+                        renderBalancingTable();
+                        renderReviewTable();
+                        renderAutomationsView();
+                    }
+                });
+            }
             
             tableBody.appendChild(tr);
         });
@@ -3839,6 +4479,8 @@ function setupModalParametersListeners() {
             const hDia = parseFloat(inputHoras.value);
             const abs = parseFloat(inputAbs.value);
             const dUteis = parseInt(inputDias.value, 10);
+            const respEmailInput = document.getElementById('modal-input-resp-email');
+            const respEmail = respEmailInput ? respEmailInput.value.trim() : '';
             
             if (!respName) {
                 // Editing global defaults
@@ -3852,10 +4494,13 @@ function setupModalParametersListeners() {
                     resp.horasDia = hDia;
                     resp.absenteismo = abs;
                     resp.diasUteis = dUteis;
+                    resp.email = respEmail;
                 }
             }
             
             saveState();
+            refreshCurrentUserAssignedTeam();
+            aplicarPerfilDeAcesso();
             updateCalculations();
             updateBalancingCalculations();
             renderReviewTable();
@@ -3872,6 +4517,8 @@ function openCapacityModal(respName = '') {
     const title = document.getElementById('modal-param-title');
     const clearBtn = document.getElementById('btn-modal-param-clear');
     const targetInput = document.getElementById('modal-param-target-resp');
+    const emailGroup = document.getElementById('modal-resp-email-group');
+    const emailInput = document.getElementById('modal-input-resp-email');
     
     const inputHoras = document.getElementById('modal-input-horas-dia');
     const inputAbs = document.getElementById('modal-input-absenteismo');
@@ -3887,6 +4534,7 @@ function openCapacityModal(respName = '') {
         // Global defaults mode
         title.innerHTML = '<i class="fa-solid fa-sliders"></i> Parâmetros Padrão de Capacidade';
         if (clearBtn) clearBtn.style.display = 'none';
+        if (emailGroup) emailGroup.style.display = 'none';
         
         inputHoras.value = state.params.horasDia;
         inputAbs.value = state.params.absenteismo;
@@ -3899,12 +4547,16 @@ function openCapacityModal(respName = '') {
         // Responsible overrides mode
         title.innerHTML = `<i class="fa-solid fa-user-tie"></i> Capacidade - ${escapeHtml(respName)}`;
         if (clearBtn) clearBtn.style.display = 'inline-flex';
+        if (emailGroup) emailGroup.style.display = 'flex';
         
         const resp = state.responsaveis.find(r => r.name === respName);
         if (resp) {
+            if (emailInput) emailInput.value = resp.email || '';
             inputHoras.value = resp.horasDia !== null && resp.horasDia !== undefined ? resp.horasDia : state.params.horasDia;
             inputAbs.value = resp.absenteismo !== null && resp.absenteismo !== undefined ? resp.absenteismo : state.params.absenteismo;
             inputDias.value = resp.diasUteis !== null && resp.diasUteis !== undefined ? resp.diasUteis : state.params.diasUteis;
+        } else {
+            if (emailInput) emailInput.value = '';
         }
         
         if (lblHoras) {

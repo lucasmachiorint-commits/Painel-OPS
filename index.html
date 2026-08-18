@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
@@ -17,7 +17,8 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body class="dark-theme">
-    <div class="app-container">
+    
+    <div class="app-container" >
         <!-- LEFT SIDEBAR -->
         <nav class="sidebar">
             <div class="sidebar-brand">
@@ -71,6 +72,14 @@
                     <span>Acesso</span>
                 </li>
             </ul>
+
+            <!-- SIDEBAR FOOTER / ALTERAR TEMA -->
+            <div class="sidebar-footer" style="margin-top: auto; padding-top: 1rem; width: 100%; display: flex; justify-content: center;">
+                <button id="theme-toggle" class="btn-theme" title="Alternar Tema (Dark / Light)">
+                    <i class="fa-solid fa-sun icon-light"></i>
+                    <i class="fa-solid fa-moon icon-dark"></i>
+                </button>
+            </div>
         </nav>
 
         <!-- MAIN CONTENT AREA -->
@@ -133,13 +142,14 @@
                                         <i class="fa-solid fa-sliders"></i> Padrão Global
                                     </button>
                                 </div>
-                                <div style="display: flex; flex-direction: column; gap: 0.5rem; margin-bottom: 1rem;">
-                                    <input type="text" id="input-new-responsible" name="field_resp_no_pass_manager" autocomplete="off" readonly onfocus="this.removeAttribute('readonly');" data-permissao="OPERADOR,ADMIN" placeholder="Novo Responsável" style="width: 100%; padding: 0.4rem 0.8rem; border-radius: 6px; border: 1px solid var(--border-color); background: rgba(255,255,255,0.05); color: var(--text-primary);">
+                                <div style="display: flex; flex-direction: column; gap: 0.55rem; margin-bottom: 1.25rem;">
+                                    <input type="text" id="input-new-responsible" name="resp_name_input_field" autocomplete="off" data-lpignore="true" data-form-type="other" readonly onfocus="this.removeAttribute('readonly');" data-permissao="OPERADOR,ADMIN" placeholder="Novo Responsável" style="width: 100%; padding: 0.55rem 0.85rem; border-radius: 8px; border: 1px solid var(--border-color); background: rgba(255,255,255,0.05); color: var(--text-primary); font-size: 0.88rem; outline: none; transition: all 0.2s;">
+                                    <input type="text" id="input-new-responsible-email" name="resp_email_input_field" autocomplete="off" data-lpignore="true" data-form-type="other" inputmode="email" spellcheck="false" readonly onfocus="this.removeAttribute('readonly');" data-permissao="OPERADOR,ADMIN" placeholder="Escreva o e-mail" style="width: 100%; padding: 0.55rem 0.85rem; border-radius: 8px; border: 1px solid var(--border-color); background: rgba(255,255,255,0.05); color: var(--text-primary); font-size: 0.88rem; outline: none; transition: all 0.2s;">
                                     <div style="display: flex; gap: 0.5rem;">
-                                        <select id="select-new-responsible-team" data-permissao="OPERADOR,ADMIN" style="flex: 1; padding: 0.4rem 0.8rem; border-radius: 6px; border: 1px solid var(--border-color); background: rgba(255,255,255,0.05); color: var(--text-primary); cursor: pointer;">
-                                            <!-- Populated dynamically -->
+                                        <select id="select-new-responsible-team" data-permissao="OPERADOR,ADMIN" style="flex: 1; padding: 0.55rem 0.85rem; border-radius: 8px; border: 1px solid var(--border-color); background: rgba(255,255,255,0.05); color: var(--text-primary); font-size: 0.88rem; cursor: pointer; outline: none; transition: all 0.2s;">
+                                            <option value="" disabled selected>Selecione a equipe</option>
                                         </select>
-                                         <button id="btn-add-responsible" data-permissao="OPERADOR,ADMIN" class="btn btn-primary" style="padding: 0.4rem 1rem; white-space: nowrap;" title="Adicionar Responsável">
+                                         <button id="btn-add-responsible" data-permissao="OPERADOR,ADMIN" class="btn btn-primary" style="padding: 0.55rem 1.1rem; border-radius: 8px; font-weight: 500; font-size: 0.88rem; white-space: nowrap;" title="Adicionar Responsável">
                                              Adicionar
                                          </button>
                                     </div>
@@ -160,6 +170,7 @@
                                     <button id="btn-cadastros-delete-selected" data-permissao="ADMIN" class="btn btn-secondary" style="background: rgba(244, 63, 94, 0.08); border: 1px solid #f43f5e; color: #f43f5e; display: none;">
                                         <i class="fa-solid fa-trash-can"></i> Excluir Selecionados (<span id="cadastros-selected-count">0</span>)
                                     </button>
+                                    
                                     <input type="file" id="cadastros-import-excel-file" accept=".xlsx, .xls, .csv" style="display: none;">
                                     <button id="btn-cadastros-import-excel" data-permissao="OPERADOR,ADMIN" class="btn btn-secondary" style="background: rgba(16, 185, 129, 0.08); border: 1px solid #10b981; color: #10b981;">
                                         <i class="fa-solid fa-file-import"></i> Importar Atividades
@@ -174,13 +185,13 @@
                                 <table class="fte-table" id="cadastros-table">
                                     <thead>
                                         <tr>
-                                            <th class="col-excluir-admin" style="width: 4%; text-align: center;"><input type="checkbox" id="cadastros-select-all" data-permissao="ADMIN"></th>
+                                            <th class="col-select-admin" style="width: 4%; text-align: center;"><input type="checkbox" id="cadastros-select-all" data-permissao="ADMIN"></th>
                                             <th style="width: 28%;">Nome da Atividade / Demanda</th>
                                             <th style="width: 18%;">Equipe / Área Responsável</th>
                                             <th style="width: 18%;">Responsável</th>
                                             <th style="width: 15%;">Produto</th>
                                             <th style="width: 12%; text-align: center;">Automação (RPA)</th>
-                                            <th class="col-excluir-admin" style="width: 5%; text-align: center;">Excluir</th>
+                                            <th class="col-acao-excluir" style="width: 5%; text-align: center;">Ações</th>
                                         </tr>
                                     </thead>
                                     <tbody id="cadastros-table-body">
@@ -802,6 +813,12 @@
             <div class="modal-body" style="display: flex; flex-direction: column; gap: 1.25rem; padding: 1rem 0 1.5rem 0;">
                 <input type="hidden" id="modal-param-target-resp" value="">
                 
+                <!-- Email do Responsável (Individual) -->
+                <div id="modal-resp-email-group" style="display: none; flex-direction: column; gap: 0.35rem;">
+                    <label style="font-size: 0.8rem; font-weight: 600; color: var(--text-secondary);">E-mail do Responsável</label>
+                    <input type="email" id="modal-input-resp-email" placeholder="usuario@empresa.com" style="width: 100%; padding: 0.55rem 0.85rem; border-radius: 8px; border: 1px solid var(--border-color); background: rgba(255,255,255,0.05); color: var(--text-primary); font-size: 0.9rem;">
+                </div>
+                
                 <!-- Input: Horas Trabalho / Dia -->
                 <div class="control-group admin-only">
                     <div class="control-label">
@@ -869,11 +886,16 @@
                     <label style="font-size: 0.8rem; font-weight: 600; color: var(--text-secondary);">Nome da Equipe <span style="color: var(--color-danger);">*</span></label>
                     <input type="text" id="modal-input-new-team" placeholder="Ex: Backoffice" style="width: 100%; padding: 0.55rem 0.85rem; border-radius: 8px; border: 1px solid var(--border-color); background: rgba(255,255,255,0.05); color: var(--text-primary); font-size: 0.95rem;">
                 </div>
-                <div style="display: flex; flex-direction: column; gap: 0.35rem;">
-                    <label style="font-size: 0.8rem; font-weight: 600; color: var(--text-secondary);">Coordenador(a) / Responsável</label>
-                    <select id="modal-select-team-coordenador" style="width: 100%; padding: 0.55rem 0.85rem; border-radius: 8px; border: 1px solid var(--border-color); background: rgba(255,255,255,0.05); color: var(--text-primary); font-size: 0.95rem; cursor: pointer;">
-                        <option value="">Sem Coordenador</option>
-                    </select>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
+                    <div style="display: flex; flex-direction: column; gap: 0.35rem;">
+                        <label style="font-size: 0.8rem; font-weight: 600; color: var(--text-secondary);">Coordenador(a)</label>
+                        <input type="text" id="modal-input-team-coordenador" placeholder="Nome do(a) Coordenador(a)" list="coordenadores-datalist" style="width: 100%; padding: 0.55rem 0.85rem; border-radius: 8px; border: 1px solid var(--border-color); background: rgba(255,255,255,0.05); color: var(--text-primary); font-size: 0.9rem;">
+                        <datalist id="coordenadores-datalist"></datalist>
+                    </div>
+                    <div style="display: flex; flex-direction: column; gap: 0.35rem;">
+                        <label style="font-size: 0.8rem; font-weight: 600; color: var(--text-secondary);">E-mail do(a) Coordenador(a)</label>
+                        <input type="email" id="modal-input-team-coordenador-email" placeholder="coordenador@empresa.com" style="width: 100%; padding: 0.55rem 0.85rem; border-radius: 8px; border: 1px solid var(--border-color); background: rgba(255,255,255,0.05); color: var(--text-primary); font-size: 0.9rem;">
+                    </div>
                 </div>
                 <div style="display: flex; flex-direction: column; gap: 0.35rem;">
                     <label style="font-size: 0.8rem; font-weight: 600; color: var(--text-secondary);">Gerência <span style="color: var(--color-danger);">*</span></label>
@@ -928,19 +950,19 @@
         <div id="header-user-chip" style="display: flex; align-items: center; gap: 0.6rem; padding: 0.3rem 0.75rem 0.3rem 0.5rem; border-radius: 999px; background: var(--bg-glass); border: 1px solid var(--border-color); box-shadow: var(--shadow-premium); cursor: default; user-select: none; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);">
             <i class="fa-solid fa-circle-user" style="font-size: 1.4rem; color: var(--color-primary);"></i>
             <div style="display: flex; flex-direction: column; line-height: 1.2;">
-                <span id="userName" style="font-size: 0.82rem; font-weight: 600; color: var(--text-primary); max-width: 130px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">Usuário</span>
-                <span id="userRole" class="user-role-badge role-consulta" style="font-size: 0.68rem; padding: 0.05rem 0.4rem; margin-top: 0.1rem; width: fit-content;">CONSULTA</span>
+                <span id="userName" style="font-size: 0.82rem; font-weight: 600; color: var(--text-primary); max-width: 140px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">Usuário</span>
+                <div style="display: flex; align-items: center; gap: 0.35rem; margin-top: 0.1rem; flex-wrap: wrap;">
+                    <span id="userRole" class="user-role-badge role-consulta" style="font-size: 0.68rem; padding: 0.05rem 0.4rem; width: fit-content;">CONSULTA</span>
+                    <span id="userTeamBadge" style="font-size: 0.68rem; padding: 0.05rem 0.4rem; border-radius: 4px; background: rgba(235,92,39,0.12); color: var(--color-primary); border: 1px solid rgba(235,92,39,0.25); display: none; font-weight: 500;"></span>
+                </div>
             </div>
+            <button id="btn-open-change-pass" onclick="openChangePasswordModal()" title="Alterar minha senha" style="background: transparent; border: 1px solid var(--border-color); color: var(--text-secondary); border-radius: 6px; padding: 0.3rem 0.55rem; cursor: pointer; font-size: 0.78rem; display: flex; align-items: center; gap: 0.3rem; transition: all 0.2s;" onmouseover="this.style.borderColor='var(--color-primary)';this.style.color='var(--color-primary)'" onmouseout="this.style.borderColor='var(--border-color)';this.style.color='var(--text-secondary)'">
+                <i class="fa-solid fa-key"></i> Senha
+            </button>
             <button id="btn-logout" onclick="handleLogout()" title="Sair do sistema" style="background: transparent; border: 1px solid var(--border-color); color: var(--text-secondary); border-radius: 6px; padding: 0.3rem 0.55rem; cursor: pointer; font-size: 0.78rem; display: flex; align-items: center; gap: 0.3rem; transition: all 0.2s; white-space: nowrap;" onmouseover="this.style.background='rgba(244,63,94,0.12)';this.style.color='#f43f5e';this.style.borderColor='rgba(244,63,94,0.3)'" onmouseout="this.style.background='transparent';this.style.color='var(--text-secondary)';this.style.borderColor='var(--border-color)'">
                 <i class="fa-solid fa-arrow-right-from-bracket"></i> Sair
             </button>
         </div>
-
-        <!-- Floating Theme Toggle -->
-        <button id="theme-toggle" title="Alternar Tema" style="position: static; margin: 0; box-shadow: var(--shadow-premium);">
-            <i class="fa-solid fa-sun icon-light"></i>
-            <i class="fa-solid fa-moon icon-dark"></i>
-        </button>
     </div>
 
     <!-- Hidden Printable Area for Clean PDF -->
@@ -948,26 +970,81 @@
 
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     
+    <!-- MODAL ALTERAR SENHA (USUÁRIO LOGADO) -->
+    <div id="modal-change-password" class="modal-overlay" style="display: none;">
+        <div class="modal-container" style="max-width: 380px; padding: 1.8rem;">
+            <div class="modal-header" style="margin-bottom: 1.25rem;">
+                <h3 style="font-size: 1.1rem;"><i class="fa-solid fa-key" style="color: var(--color-primary);"></i> Alterar Senha</h3>
+                <button class="modal-close" onclick="closeChangePasswordModal()">&times;</button>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 1rem;">
+                <div>
+                    <label style="display: block; font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 0.3rem;">Nova Senha (mínimo 6 caracteres)</label>
+                    <input type="password" id="input-modal-new-pass" placeholder="Digite a nova senha" style="width: 100%; padding: 0.6rem 0.8rem; border-radius: 6px; border: 1px solid var(--border-color); background: rgba(255,255,255,0.05); color: var(--text-primary); outline: none;">
+                </div>
+                <div>
+                    <label style="display: block; font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 0.3rem;">Confirmar Nova Senha</label>
+                    <input type="password" id="input-modal-confirm-pass" placeholder="Confirme a nova senha" style="width: 100%; padding: 0.6rem 0.8rem; border-radius: 6px; border: 1px solid var(--border-color); background: rgba(255,255,255,0.05); color: var(--text-primary); outline: none;">
+                </div>
+                <div style="display: flex; justify-content: flex-end; gap: 0.5rem; margin-top: 0.5rem;">
+                    <button class="btn btn-secondary" onclick="closeChangePasswordModal()">Cancelar</button>
+                    <button id="btn-save-modal-pass" class="btn btn-primary" onclick="handleSaveModalPassword()">Salvar Nova Senha</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- AUTH OVERLAY -->
     <div id="auth-overlay" class="modal-overlay" style="display: flex; z-index: 9999;">
         <div class="modal-container" style="max-width: 400px; padding: 2rem;">
-            <div style="text-align: center; margin-bottom: 2rem;">
-                <h2 style="font-size: 1.5rem; margin-bottom: 0.5rem; color: var(--text-primary);">EmanaPay</h2>
-                <p style="color: var(--text-secondary); font-size: 0.9rem;">Controle de Eficiência Operacional</p>
+            <div style="text-align: center; margin-bottom: 1.5rem;">
+                <h2 id="auth-main-title" style="font-size: 1.5rem; margin-bottom: 0.3rem; color: var(--text-primary);">EmanaPay</h2>
+                <p id="auth-main-subtitle" style="color: var(--text-secondary); font-size: 0.9rem;">Controle de Eficiência Operacional</p>
             </div>
             
             <div id="auth-error-msg" style="display: none; background: rgba(244, 63, 94, 0.1); border: 1px solid rgba(244, 63, 94, 0.3); color: #f43f5e; padding: 0.75rem; border-radius: 6px; font-size: 0.85rem; margin-bottom: 1rem; text-align: center;"></div>
             <div id="auth-info-msg" style="display: none; background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3); color: #10b981; padding: 0.75rem; border-radius: 6px; font-size: 0.85rem; margin-bottom: 1rem; text-align: center;"></div>
             
-            <div style="display: flex; flex-direction: column; gap: 1rem;">
+            <!-- MODO 1: LOGIN / CRIAR CONTA -->
+            <div id="auth-login-container" style="display: flex; flex-direction: column; gap: 0.9rem;">
                 <input type="email" id="auth-email" placeholder="Seu e-mail" style="width: 100%; padding: 0.6rem 0.8rem; border-radius: 6px; border: 1px solid var(--border-color); background: rgba(255,255,255,0.05); color: var(--text-primary); outline: none;">
                 <input type="password" id="auth-password" placeholder="Sua senha" style="width: 100%; padding: 0.6rem 0.8rem; border-radius: 6px; border: 1px solid var(--border-color); background: rgba(255,255,255,0.05); color: var(--text-primary); outline: none;">
                 
-                <button id="btn-auth-login" class="btn btn-primary" style="width: 100%; justify-content: center; padding: 0.6rem; font-size: 0.9rem; margin-top: 0.5rem;">Entrar</button>
-                <div style="text-align: center; margin: 0.5rem 0;">
+                <div style="display: flex; justify-content: flex-end; margin-top: -0.3rem;">
+                    <a href="javascript:void(0)" onclick="setAuthViewMode('forgot')" style="font-size: 0.78rem; color: var(--color-primary); text-decoration: none; cursor: pointer;">Esqueci minha senha</a>
+                </div>
+
+                <button id="btn-auth-login" class="btn btn-primary" style="width: 100%; justify-content: center; padding: 0.6rem; font-size: 0.9rem; margin-top: 0.2rem;">Entrar</button>
+                <div style="text-align: center; margin: 0.3rem 0;">
                     <span style="color: var(--text-muted); font-size: 0.8rem;">ou</span>
                 </div>
                 <button id="btn-auth-signup" class="btn btn-secondary" style="width: 100%; justify-content: center; padding: 0.6rem; font-size: 0.9rem;">Criar nova conta</button>
+            </div>
+
+            <!-- MODO 2: ESQUECI MINHA SENHA -->
+            <div id="auth-forgot-container" style="display: none; flex-direction: column; gap: 0.9rem;">
+                <p style="font-size: 0.85rem; color: var(--text-secondary); line-height: 1.4; margin-bottom: 0.2rem;">
+                    Insira seu e-mail cadastrado para receber o link de recuperação e cadastro de nova senha:
+                </p>
+                <input type="email" id="auth-forgot-email" placeholder="Digite seu e-mail" style="width: 100%; padding: 0.6rem 0.8rem; border-radius: 6px; border: 1px solid var(--border-color); background: rgba(255,255,255,0.05); color: var(--text-primary); outline: none;">
+                <button id="btn-auth-send-recovery" class="btn btn-primary" onclick="handleSendPasswordRecovery()" style="width: 100%; justify-content: center; padding: 0.6rem; font-size: 0.9rem; margin-top: 0.3rem;">
+                    <i class="fa-solid fa-paper-plane" style="margin-right: 0.4rem;"></i> Enviar Link de Recuperação
+                </button>
+                <button class="btn btn-secondary" onclick="setAuthViewMode('login')" style="width: 100%; justify-content: center; padding: 0.55rem; font-size: 0.85rem;">
+                    <i class="fa-solid fa-arrow-left" style="margin-right: 0.4rem;"></i> Voltar ao Login
+                </button>
+            </div>
+
+            <!-- MODO 3: DEFINIR NOVA SENHA (APÓS CLIQUE NO LINK DO E-MAIL) -->
+            <div id="auth-reset-container" style="display: none; flex-direction: column; gap: 0.9rem;">
+                <p style="font-size: 0.85rem; color: var(--text-secondary); line-height: 1.4; margin-bottom: 0.2rem;">
+                    Digite sua nova senha de acesso:
+                </p>
+                <input type="password" id="auth-reset-password" placeholder="Nova senha (mínimo 6 caracteres)" style="width: 100%; padding: 0.6rem 0.8rem; border-radius: 6px; border: 1px solid var(--border-color); background: rgba(255,255,255,0.05); color: var(--text-primary); outline: none;">
+                <input type="password" id="auth-reset-confirm" placeholder="Confirme a nova senha" style="width: 100%; padding: 0.6rem 0.8rem; border-radius: 6px; border: 1px solid var(--border-color); background: rgba(255,255,255,0.05); color: var(--text-primary); outline: none;">
+                <button id="btn-auth-save-reset" class="btn btn-primary" onclick="handleSaveResetPassword()" style="width: 100%; justify-content: center; padding: 0.6rem; font-size: 0.9rem; margin-top: 0.3rem;">
+                    <i class="fa-solid fa-check" style="margin-right: 0.4rem;"></i> Salvar e Entrar no Painel
+                </button>
             </div>
         </div>
     </div>

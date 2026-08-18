@@ -196,6 +196,7 @@ body.light-theme .menu-item:hover {
 }
 
 .sidebar-footer {
+    margin-top: auto;
     padding-top: 1rem;
     border-top: 1px solid var(--border-color);
     width: 100%;
@@ -204,20 +205,17 @@ body.light-theme .menu-item:hover {
 }
 
 #theme-toggle {
-    position: fixed;
-    top: 1.5rem;
-    right: 1.5rem;
+    position: relative;
     width: 44px;
     height: 44px;
-    border-radius: 50%;
+    border-radius: 12px;
     background: var(--bg-glass);
     border: 1px solid var(--border-color);
-    box-shadow: var(--shadow-premium);
+    box-shadow: var(--shadow-sm);
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    z-index: 9999;
     color: var(--text-secondary);
     transition: all var(--transition-fast);
 }
@@ -225,7 +223,7 @@ body.light-theme .menu-item:hover {
 #theme-toggle:hover {
     background: var(--bg-glass-hover);
     border-color: var(--border-hover);
-    color: var(--text-primary);
+    color: var(--color-primary);
     transform: scale(1.08);
 }
 
@@ -238,7 +236,7 @@ body.light-theme #theme-toggle {
 body.light-theme #theme-toggle:hover {
     background: var(--bg-glass-hover);
     border-color: var(--border-hover);
-    color: var(--text-primary);
+    color: var(--color-primary);
 }
 
 #theme-toggle .icon-light {
@@ -916,16 +914,26 @@ body.light-theme .icon-dark {
     text-shadow: 0 0 10px rgba(16, 185, 129, 0.3);
 }
 
-/* PRINT CSS STYLE SHEET */
+/* PRINT CSS STYLE SHEET - PRESERVA TEMA ATIVO (DARK OU LIGHT) */
 @media print {
+    * {
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+        color-adjust: exact !important;
+    }
+
     html, body {
         height: auto !important;
         overflow: visible !important;
-        background: #ffffff !important;
-        color: #000000 !important;
+        background: var(--bg-body) !important;
+        color: var(--text-primary) !important;
     }
 
     body::before, body::after {
+        display: none !important;
+    }
+
+    #hml-banner-fixed {
         display: none !important;
     }
 
@@ -935,6 +943,7 @@ body.light-theme .icon-dark {
         overflow: visible !important;
         width: 100% !important;
         padding: 0 !important;
+        margin-top: 0 !important;
     }
 
     .sidebar {
@@ -956,34 +965,42 @@ body.light-theme .icon-dark {
         padding: 0 !important;
     }
 
-    .app-header, .sidebar-config, .header-actions, .btn, .btn-row-action, .row-actions-cell, .panel-header-actions button, .app-footer, #theme-toggle, #header-user-chip, #top-right-fixed-controls, .top-right-controls, #btn-logout {
+    .app-header, .sidebar-config, .header-actions, .btn, .btn-row-action, .row-actions-cell, .panel-header-actions button, .app-footer, #theme-toggle, #header-user-chip, #top-right-fixed-controls, .top-right-controls, #btn-logout, #auth-overlay {
         display: none !important;
     }
 
     .glass-panel {
-        background: none !important;
-        border: none !important;
+        background: var(--bg-card) !important;
+        border: 1px solid var(--border-color) !important;
         box-shadow: none !important;
-        padding: 0 !important;
+        padding: 1.25rem !important;
         margin-bottom: 1.5rem !important;
         backdrop-filter: none !important;
+        border-radius: 12px !important;
     }
 
     .fte-table {
-        border: 1px solid #cbd5e1 !important;
+        border: 1px solid var(--border-color) !important;
         width: 100% !important;
     }
 
-    .fte-table th, .fte-table td {
-        border-bottom: 1px solid #cbd5e1 !important;
-        color: #000000 !important;
+    .fte-table th {
+        background: var(--bg-card) !important;
+        border-bottom: 2px solid var(--border-color) !important;
+        color: var(--text-primary) !important;
         padding: 0.5rem !important;
     }
 
-    .fte-table input {
+    .fte-table td {
+        border-bottom: 1px solid var(--border-color) !important;
+        color: var(--text-primary) !important;
+        padding: 0.5rem !important;
+    }
+
+    .fte-table input, .fte-table select {
         border: none !important;
         background: transparent !important;
-        color: #000000 !important;
+        color: var(--text-primary) !important;
         padding: 0 !important;
     }
 
@@ -993,8 +1010,9 @@ body.light-theme .icon-dark {
     }
 
     .total-row {
-        background: #f1f5f9 !important;
-        border-top: 2px solid #000000 !important;
+        background: rgba(235, 92, 39, 0.08) !important;
+        border-top: 2px solid var(--color-primary) !important;
+        color: var(--text-primary) !important;
     }
 
     .charts-grid {
@@ -1003,9 +1021,16 @@ body.light-theme .icon-dark {
     }
 
     .chart-container {
-        border: 1px solid #cbd5e1 !important;
+        background: var(--bg-card) !important;
+        border: 1px solid var(--border-color) !important;
+        border-radius: 12px !important;
         padding: 1rem !important;
         margin-top: 1rem !important;
+    }
+
+    .stat-card {
+        background: var(--bg-card) !important;
+        border: 1px solid var(--border-color) !important;
     }
 }
 
@@ -1645,12 +1670,36 @@ body.perfil-consulta .consulta-hidden {
     display: none !important;
 }
 
-/* Restrição por perfil: Bloquear interação com todos os campos de formulário no perfil CONSULTA */
-body.perfil-consulta input:not(#auth-email):not(#auth-password),
-body.perfil-consulta select:not(#select-user-profile),
-body.perfil-consulta textarea {
-    pointer-events: none !important;
-    user-select: none !important;
+/* Garantir que todos os filtros, seletores de busca e navegação funcionem 100% para o perfil CONSULTA */
+.filter-group select,
+.filter-group input,
+.header-table-controls select,
+.header-table-controls input,
+.search-input,
+select[id^="filter-"],
+select[id^="select-review-filter-"],
+input[id^="search-"] {
+    pointer-events: auto !important;
+    user-select: auto !important;
+    cursor: pointer !important;
+}
+
+/* Neutralizar estilo de autofill dos navegadores */
+input:-webkit-autofill,
+input:-webkit-autofill:hover, 
+input:-webkit-autofill:focus, 
+input:-webkit-autofill:active {
+    -webkit-box-shadow: 0 0 0 1000px rgba(30, 27, 24, 0.95) inset !important;
+    -webkit-text-fill-color: var(--text-primary) !important;
+    transition: background-color 5000s ease-in-out 0s;
+}
+
+body.light-theme input:-webkit-autofill,
+body.light-theme input:-webkit-autofill:hover, 
+body.light-theme input:-webkit-autofill:focus, 
+body.light-theme input:-webkit-autofill:active {
+    -webkit-box-shadow: 0 0 0 1000px #ffffff inset !important;
+    -webkit-text-fill-color: #1e1b18 !important;
 }
 
 
