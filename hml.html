@@ -3005,6 +3005,7 @@ let pieChartInstance = null;
 let barChartInstance = null;
 
 // DEFAULT EXAMPLE DATA WITH AREAS
+const EXAMPLE_PROCESSES = [
     { id: 'bko-1', name: 'Site Operações - BKO', area: 'Backoffice', responsavel: 'Erika Kimie', responsaveis: ['Erika Kimie'], volume: 1, minutos: 150, qtdExecucao: 1, backlogVolume: '', allocatedResource: '', reviewStatus: 'Manter', isRpa: false },
     { id: 'bko-2', name: 'Atualização Backlog - Controle de filas', area: 'Backoffice', responsavel: 'Vitoria Silva - Skytel', responsaveis: ['Vitoria Silva - Skytel'], volume: 21, minutos: 25, qtdExecucao: 21, backlogVolume: '', allocatedResource: '', reviewStatus: 'Manter', isRpa: false },
     { id: 'bko-3', name: 'Atualização DO', area: 'Backoffice', responsavel: 'Erika Kimie', responsaveis: ['Erika Kimie'], volume: 1, minutos: 120, qtdExecucao: 1, backlogVolume: '', allocatedResource: '', reviewStatus: 'Manter', isRpa: false },
@@ -3074,8 +3075,8 @@ let barChartInstance = null;
     { id: 'bko-67', name: 'Cancelamento de pedidos - Thundera (erros capta)', area: 'Backoffice', responsavel: 'Valdirene Figueredo', responsaveis: ['Valdirene Figueredo', 'Flaviane - Skytel'], volume: 3, minutos: 20, qtdExecucao: 3, backlogVolume: '', allocatedResource: '', reviewStatus: 'Manter', isRpa: false },
     { id: 'bko-68', name: 'Cancelamento Capta', area: 'Backoffice', responsavel: '', responsaveis: [], volume: 21, minutos: 30, qtdExecucao: 21, backlogVolume: '', allocatedResource: '', reviewStatus: 'Manter', isRpa: false },
     { id: 'bko-69', name: 'Cancelamento SAP', area: 'Backoffice', responsavel: '', responsaveis: [], volume: 21, minutos: 30, qtdExecucao: 21, backlogVolume: '', allocatedResource: '', reviewStatus: 'Manter', isRpa: false },
-    { id: 'bko-70', name: 'Baixa de pagamentos não processados', area: 'Backoffice', responsavel: '', responsaveis: [], volume: '', minutos: 0, qtdExecucao: '', backlogVolume: '', allocatedResource: '', reviewStatus: 'Manter', isRpa: false },
-
+    { id: 'bko-70', name: 'Baixa de pagamentos não processados', area: 'Backoffice', responsavel: '', responsaveis: [], volume: '', minutos: 0, qtdExecucao: '', backlogVolume: '', allocatedResource: '', reviewStatus: 'Manter', isRpa: false }
+];
 
 function getSupabase() {
     if (!supabaseClient && window.supabase && typeof window.supabase.createClient === 'function') {
