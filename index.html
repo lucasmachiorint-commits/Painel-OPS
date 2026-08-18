@@ -181,6 +181,48 @@
                                 </div>
                             </div>
 
+                            <!-- CADASTROS FILTERS BAR (Demanda, Área, Responsável, Produto, RPA) -->
+                            <div class="cadastros-filters-bar" style="display: flex; flex-wrap: wrap; gap: 0.65rem; align-items: center; margin-bottom: 1.25rem; padding: 0.75rem 1rem; background: rgba(255,255,255,0.02); border: 1px solid var(--border-color); border-radius: 8px;">
+                                <!-- 1. Demanda / Atividade -->
+                                <div style="flex: 1.2; min-width: 180px; position: relative;">
+                                    <i class="fa-solid fa-magnifying-glass" style="position: absolute; left: 0.75rem; top: 50%; transform: translateY(-50%); color: var(--text-muted); font-size: 0.8rem;"></i>
+                                    <input type="text" id="cadastros-filter-search" placeholder="Buscar Demanda / Atividade..." style="width: 100%; padding: 0.45rem 0.75rem 0.45rem 2.1rem; border-radius: 6px; border: 1px solid var(--border-color); background: rgba(255,255,255,0.05); color: var(--text-primary); font-size: 0.83rem; outline: none; transition: all 0.2s;">
+                                </div>
+
+                                <!-- 2. Área / Equipe -->
+                                <div style="flex: 1; min-width: 150px;">
+                                    <select id="cadastros-filter-area" style="width: 100%; padding: 0.45rem 0.75rem; border-radius: 6px; border: 1px solid var(--border-color); background: rgba(255,255,255,0.05); color: var(--text-primary); font-size: 0.83rem; outline: none; cursor: pointer;">
+                                        <option value="">Todas as Áreas</option>
+                                    </select>
+                                </div>
+
+                                <!-- 3. Responsável -->
+                                <div style="flex: 1; min-width: 150px;">
+                                    <select id="cadastros-filter-resp" style="width: 100%; padding: 0.45rem 0.75rem; border-radius: 6px; border: 1px solid var(--border-color); background: rgba(255,255,255,0.05); color: var(--text-primary); font-size: 0.83rem; outline: none; cursor: pointer;">
+                                        <option value="">Todos os Responsáveis</option>
+                                    </select>
+                                </div>
+
+                                <!-- 4. Produto -->
+                                <div style="flex: 0.9; min-width: 140px;">
+                                    <input type="text" id="cadastros-filter-product" placeholder="Filtrar Produto..." style="width: 100%; padding: 0.45rem 0.75rem; border-radius: 6px; border: 1px solid var(--border-color); background: rgba(255,255,255,0.05); color: var(--text-primary); font-size: 0.83rem; outline: none;">
+                                </div>
+
+                                <!-- 5. RPA -->
+                                <div style="min-width: 135px;">
+                                    <select id="cadastros-filter-rpa" style="width: 100%; padding: 0.45rem 0.75rem; border-radius: 6px; border: 1px solid var(--border-color); background: rgba(255,255,255,0.05); color: var(--text-primary); font-size: 0.83rem; outline: none; cursor: pointer;">
+                                        <option value="">RPA: Todos</option>
+                                        <option value="sim">🤖 Somente RPA</option>
+                                        <option value="nao">Manual (Sem RPA)</option>
+                                    </select>
+                                </div>
+
+                                <!-- 6. Limpar -->
+                                <button id="btn-cadastros-clear-filters" class="btn btn-secondary" style="padding: 0.45rem 0.75rem; font-size: 0.8rem; white-space: nowrap;" title="Limpar Filtros">
+                                    <i class="fa-solid fa-xmark"></i> Limpar
+                                </button>
+                            </div>
+
                             <div class="table-responsive">
                                 <table class="fte-table" id="cadastros-table">
                                     <thead>

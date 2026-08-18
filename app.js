@@ -162,23 +162,77 @@ let barChartInstance = null;
 
 // DEFAULT EXAMPLE DATA WITH AREAS
 const EXAMPLE_PROCESSES = [
-    // Backoffice
-    { id: 'ex-1', name: 'Cancelamento DY - Solicitação CB (Fila Projeto)', area: 'Backoffice', volume: '', minutos: 0, qtdExecucao: '', backlogVolume: '', allocatedResource: '' },
-    { id: 'ex-2', name: 'Prorrogação', area: 'Backoffice', volume: '', minutos: 0, qtdExecucao: '', backlogVolume: '', allocatedResource: '' },
-    { id: 'ex-3', name: 'Baixa de Parcela (Robô Baixas) - Demandas BKO + Baixa em lote + Baixa manual', area: 'Backoffice', volume: '', minutos: 0, qtdExecucao: '', backlogVolume: '', allocatedResource: '' },
-    { id: 'ex-4', name: 'Improcedente DY', area: 'Backoffice', volume: '', minutos: 0, qtdExecucao: '', backlogVolume: '', allocatedResource: '' },
-    { id: 'ex-5', name: 'Devolução de pagamento em duplicidade', area: 'Backoffice', volume: '', minutos: 0, qtdExecucao: '', backlogVolume: '', allocatedResource: '' },
-    { id: 'ex-6', name: 'Reembolso (Robô Reembolsos) Montagem Arquivo + Upload Zord + Monitoria/Retorno', area: 'Backoffice', volume: '', minutos: 0, qtdExecucao: '', backlogVolume: '', allocatedResource: '' },
-    { id: 'ex-7', name: 'Cancelamento CAPTA + Cancelamento Jira', area: 'Backoffice', volume: '', minutos: 0, qtdExecucao: '', backlogVolume: '', allocatedResource: '' },
-    { id: 'ex-8', name: 'Cancelamento SAP + Cancelamento Jira', area: 'Backoffice', volume: '', minutos: 0, qtdExecucao: '', backlogVolume: '', allocatedResource: '' },
-    { id: 'ex-9', name: 'Débitos Pag Emana Pay', area: 'Backoffice', volume: '', minutos: 0, qtdExecucao: '', backlogVolume: '', allocatedResource: '' },
-    { id: 'ex-10', name: 'Cancelamento DY - Solicitação CB (Fila N3) + Cancelamento Jira', area: 'Backoffice', volume: '', minutos: 0, qtdExecucao: '', backlogVolume: '', allocatedResource: '' },
-    { id: 'ex-11', name: 'Pagamento não processado', area: 'Backoffice', volume: '', minutos: 0, qtdExecucao: '', backlogVolume: '', allocatedResource: '' },
-    { id: 'ex-12', name: 'Parcela invertida', area: 'Backoffice', volume: '', minutos: 0, qtdExecucao: '', backlogVolume: '', allocatedResource: '' },
-    { id: 'ex-13', name: 'Cancelamento Parcial/Amortização', area: 'Backoffice', volume: '', minutos: 0, qtdExecucao: '', backlogVolume: '', allocatedResource: '' },
-    { id: 'ex-14', name: 'Amortização Nota de credito', area: 'Backoffice', volume: '', minutos: 0, qtdExecucao: '', backlogVolume: '', allocatedResource: '' },
-    { id: 'ex-15', name: 'Recompra (Amortização e Recompra Proativa)', area: 'Backoffice', volume: '', minutos: 0, qtdExecucao: '', backlogVolume: '', allocatedResource: '' },
-    { id: 'ex-16', name: 'Dúvidas - Pagamento, Cobrança e Espelhamento', area: 'Backoffice', volume: '', minutos: 0, qtdExecucao: '', backlogVolume: '', allocatedResource: '' },
+    // Backoffice (70 Processos Oficiais)
+    { id: 'bko-1', name: 'Site Operações - BKO', area: 'Backoffice', responsavel: 'Erika Kimie', responsaveis: ['Erika Kimie'], volume: 1, minutos: 150, qtdExecucao: 1, backlogVolume: '', allocatedResource: '', reviewStatus: 'Manter', isRpa: false },
+    { id: 'bko-2', name: 'Atualização Backlog - Controle de filas', area: 'Backoffice', responsavel: 'Vitoria Silva - Skytel', responsaveis: ['Vitoria Silva - Skytel'], volume: 21, minutos: 25, qtdExecucao: 21, backlogVolume: '', allocatedResource: '', reviewStatus: 'Manter', isRpa: false },
+    { id: 'bko-3', name: 'Atualização DO', area: 'Backoffice', responsavel: 'Erika Kimie', responsaveis: ['Erika Kimie'], volume: 1, minutos: 120, qtdExecucao: 1, backlogVolume: '', allocatedResource: '', reviewStatus: 'Manter', isRpa: false },
+    { id: 'bko-4', name: 'Fechamento Contábil (Mensal)', area: 'Backoffice', responsavel: 'Erika Kimie', responsaveis: ['Erika Kimie'], volume: 1, minutos: 120, qtdExecucao: 1, backlogVolume: '', allocatedResource: '', reviewStatus: 'Manter', isRpa: false },
+    { id: 'bko-5', name: 'Sem conta - Reembolsos PEP', area: 'Backoffice', responsavel: 'Erika Kimie', responsaveis: ['Erika Kimie'], volume: 4, minutos: 60, qtdExecucao: 4, backlogVolume: '', allocatedResource: '', reviewStatus: 'Manter', isRpa: false },
+    { id: 'bko-6', name: 'Agenda semanal time Cosméticos', area: 'Backoffice', responsavel: 'Erika Kimie', responsaveis: ['Erika Kimie'], volume: 4, minutos: 60, qtdExecucao: 4, backlogVolume: '', allocatedResource: '', reviewStatus: 'Manter', isRpa: false },
+    { id: 'bko-7', name: 'Apoio atuação terceiros', area: 'Backoffice', responsavel: 'Erika Kimie', responsaveis: ['Erika Kimie'], volume: 21, minutos: 60, qtdExecucao: 21, backlogVolume: '', allocatedResource: '', reviewStatus: 'Manter', isRpa: false },
+    { id: 'bko-8', name: 'Priorização de Atendimentos', area: 'Backoffice', responsavel: 'Erika Kimie', responsaveis: ['Erika Kimie'], volume: 21, minutos: 20, qtdExecucao: 21, backlogVolume: '', allocatedResource: '', reviewStatus: 'Manter', isRpa: false },
+    { id: 'bko-9', name: 'Apoio a Projetos', area: 'Backoffice', responsavel: 'Erika Kimie', responsaveis: ['Erika Kimie'], volume: '', minutos: 0, qtdExecucao: '', backlogVolume: '', allocatedResource: '', reviewStatus: 'Manter', isRpa: false },
+    { id: 'bko-10', name: 'Manuais da Área', area: 'Backoffice', responsavel: 'Erika Kimie', responsaveis: ['Erika Kimie'], volume: 1, minutos: 150, qtdExecucao: 1, backlogVolume: '', allocatedResource: '', reviewStatus: 'Manter', isRpa: false },
+    { id: 'bko-11', name: 'Monitoria - RPA', area: 'Backoffice', responsavel: 'Erika Kimie', responsaveis: ['Erika Kimie'], volume: 21, minutos: 90, qtdExecucao: 21, backlogVolume: '', allocatedResource: '', reviewStatus: 'Manter', isRpa: true },
+    { id: 'bko-12', name: 'Reembolsos de Cancelamentos', area: 'Backoffice', responsavel: '', responsaveis: [], volume: 21, minutos: 20, qtdExecucao: 21, backlogVolume: '', allocatedResource: '', reviewStatus: 'Manter', isRpa: false },
+    { id: 'bko-13', name: 'Reembolsos de Amortização', area: 'Backoffice', responsavel: 'Erika Kimie', responsaveis: ['Erika Kimie'], volume: 2, minutos: 45, qtdExecucao: 2, backlogVolume: '', allocatedResource: '', reviewStatus: 'Manter', isRpa: false },
+    { id: 'bko-14', name: 'Repasse Matera (Demanda com Dados)', area: 'Backoffice', responsavel: 'Ana Eugenio', responsaveis: ['Ana Eugenio'], volume: 21, minutos: 30, qtdExecucao: 21, backlogVolume: '', allocatedResource: '', reviewStatus: 'Manter', isRpa: false },
+    { id: 'bko-15', name: 'Amortização Nota de Crédito - Cosméticos', area: 'Backoffice', responsavel: 'Ana Eugenio', responsaveis: ['Ana Eugenio'], volume: 8, minutos: 120, qtdExecucao: 8, backlogVolume: '', allocatedResource: '', reviewStatus: 'Manter', isRpa: false },
+    { id: 'bko-16', name: 'Análise de pagamento não processado - Demandas BKO', area: 'Backoffice', responsavel: '', responsaveis: [], volume: '', minutos: 0, qtdExecucao: '', backlogVolume: '', allocatedResource: '', reviewStatus: 'Manter', isRpa: false },
+    { id: 'bko-17', name: 'Reembolsos - Demandas BKO', area: 'Backoffice', responsavel: '', responsaveis: [], volume: '', minutos: 0, qtdExecucao: '', backlogVolume: '', allocatedResource: '', reviewStatus: 'Manter', isRpa: false },
+    { id: 'bko-18', name: 'Cancelamento em lote fila N3 – Pagamentos', area: 'Backoffice', responsavel: '', responsaveis: [], volume: '', minutos: 0, qtdExecucao: '', backlogVolume: '', allocatedResource: '', reviewStatus: 'Manter', isRpa: false },
+    { id: 'bko-19', name: 'Monitoria - RPA', area: 'Backoffice', responsavel: 'Ana Eugenio', responsaveis: ['Ana Eugenio'], volume: 21, minutos: 90, qtdExecucao: 21, backlogVolume: '', allocatedResource: '', reviewStatus: 'Manter', isRpa: true },
+    { id: 'bko-20', name: 'Homologação Pag Emana Pay', area: 'Backoffice', responsavel: 'Ana Eugenio', responsaveis: ['Ana Eugenio'], volume: '', minutos: 0, qtdExecucao: '', backlogVolume: '', allocatedResource: '', reviewStatus: 'Manter', isRpa: false },
+    { id: 'bko-21', name: 'Agenda semanal time Cosméticos', area: 'Backoffice', responsavel: 'Ana Eugenio', responsaveis: ['Ana Eugenio'], volume: 4, minutos: 60, qtdExecucao: 4, backlogVolume: '', allocatedResource: '', reviewStatus: 'Manter', isRpa: false },
+    { id: 'bko-22', name: 'Agenda Trabalho – BKO/Conciliação', area: 'Backoffice', responsavel: 'Ana Eugenio', responsaveis: ['Ana Eugenio'], volume: 4, minutos: 60, qtdExecucao: 4, backlogVolume: '', allocatedResource: '', reviewStatus: 'Manter', isRpa: false },
+    { id: 'bko-23', name: 'Apoio atuação terceiros', area: 'Backoffice', responsavel: 'Ana Eugenio', responsaveis: ['Ana Eugenio'], volume: 21, minutos: 60, qtdExecucao: 21, backlogVolume: '', allocatedResource: '', reviewStatus: 'Manter', isRpa: false },
+    { id: 'bko-24', name: 'Indicadores de Atendimentos BKO', area: 'Backoffice', responsavel: 'Ana Eugenio', responsaveis: ['Ana Eugenio'], volume: 21, minutos: 60, qtdExecucao: 21, backlogVolume: '', allocatedResource: '', reviewStatus: 'Manter', isRpa: false },
+    { id: 'bko-25', name: 'Reembolsos PEP - residual amortização', area: 'Backoffice', responsavel: 'Ana Eugenio', responsaveis: ['Ana Eugenio'], volume: 1, minutos: 40, qtdExecucao: 1, backlogVolume: '', allocatedResource: '', reviewStatus: 'Manter', isRpa: false },
+    { id: 'bko-26', name: 'Avaliação de solicitações de amortização via NC', area: 'Backoffice', responsavel: 'Ana Eugenio', responsaveis: ['Ana Eugenio'], volume: 1, minutos: 20, qtdExecucao: 1, backlogVolume: '', allocatedResource: '', reviewStatus: 'Manter', isRpa: false },
+    { id: 'bko-27', name: 'Novação (Função)', area: 'Backoffice', responsavel: 'Valdirene Figueredo', responsaveis: ['Valdirene Figueredo'], volume: 22, minutos: 10, qtdExecucao: 22, backlogVolume: '', allocatedResource: '', reviewStatus: 'Manter', isRpa: false },
+    { id: 'bko-28', name: 'Integração (Função)', area: 'Backoffice', responsavel: 'Valdirene Figueredo', responsaveis: ['Valdirene Figueredo'], volume: 22, minutos: 10, qtdExecucao: 22, backlogVolume: '', allocatedResource: '', reviewStatus: 'Manter', isRpa: false },
+    { id: 'bko-29', name: 'Prévia - Reembolsos', area: 'Backoffice', responsavel: 'Valdirene Figueredo', responsaveis: ['Valdirene Figueredo'], volume: 1, minutos: 90, qtdExecucao: 1, backlogVolume: '', allocatedResource: '', reviewStatus: 'Manter', isRpa: false },
+    { id: 'bko-30', name: 'Atendimento Cadastro Positivo', area: 'Backoffice', responsavel: 'Valdirene Figueredo', responsaveis: ['Valdirene Figueredo'], volume: 1, minutos: 40, qtdExecucao: 1, backlogVolume: '', allocatedResource: '', reviewStatus: 'Manter', isRpa: false },
+    { id: 'bko-31', name: 'Baixa de Contratos Espólio - Função', area: 'Backoffice', responsavel: 'Valdirene Figueredo', responsaveis: ['Valdirene Figueredo'], volume: 22, minutos: 20, qtdExecucao: 22, backlogVolume: '', allocatedResource: '', reviewStatus: 'Manter', isRpa: false },
+    { id: 'bko-32', name: 'Casos críticos (Apoio Jurídico)', area: 'Backoffice', responsavel: 'Valdirene Figueredo', responsaveis: ['Valdirene Figueredo'], volume: 15, minutos: 60, qtdExecucao: 15, backlogVolume: '', allocatedResource: '', reviewStatus: 'Manter', isRpa: false },
+    { id: 'bko-33', name: 'Ajuste financeiro', area: 'Backoffice', responsavel: 'Valdirene Figueredo', responsaveis: ['Valdirene Figueredo'], volume: 4, minutos: 20, qtdExecucao: 4, backlogVolume: '', allocatedResource: '', reviewStatus: 'Manter', isRpa: false },
+    { id: 'bko-34', name: 'Estorno / Reembolso', area: 'Backoffice', responsavel: 'Valdirene Figueredo', responsaveis: ['Valdirene Figueredo'], volume: 20, minutos: 10, qtdExecucao: 20, backlogVolume: '', allocatedResource: '', reviewStatus: 'Manter', isRpa: false },
+    { id: 'bko-35', name: 'Suporte Cartões', area: 'Backoffice', responsavel: 'Valdirene Figueredo', responsaveis: ['Valdirene Figueredo'], volume: 22, minutos: 30, qtdExecucao: 22, backlogVolume: '', allocatedResource: '', reviewStatus: 'Manter', isRpa: false },
+    { id: 'bko-36', name: 'Suporte Faturas', area: 'Backoffice', responsavel: 'Valdirene Figueredo', responsaveis: ['Valdirene Figueredo'], volume: 22, minutos: 30, qtdExecucao: 22, backlogVolume: '', allocatedResource: '', reviewStatus: 'Manter', isRpa: false },
+    { id: 'bko-37', name: 'Suporte filas / terceiros', area: 'Backoffice', responsavel: 'Valdirene Figueredo', responsaveis: ['Valdirene Figueredo'], volume: 60, minutos: 30, qtdExecucao: 60, backlogVolume: '', allocatedResource: '', reviewStatus: 'Manter', isRpa: false },
+    { id: 'bko-38', name: 'Filas de Pag Emana Pay Dynamics', area: 'Backoffice', responsavel: 'Time Skytel', responsaveis: ['Time Skytel'], volume: 70, minutos: 27, qtdExecucao: 70, backlogVolume: '', allocatedResource: '', reviewStatus: 'Manter', isRpa: false },
+    { id: 'bko-39', name: 'Filas do Mandala no Zendesk', area: 'Backoffice', responsavel: 'Flaviane - Skytel', responsaveis: ['Flaviane - Skytel'], volume: 6, minutos: 40, qtdExecucao: 6, backlogVolume: '', allocatedResource: '', reviewStatus: 'Manter', isRpa: false },
+    { id: 'bko-40', name: 'Filas de Banking no Zendesk', area: 'Backoffice', responsavel: 'Flaviane - Skytel', responsaveis: ['Flaviane - Skytel'], volume: 4, minutos: 20, qtdExecucao: 4, backlogVolume: '', allocatedResource: '', reviewStatus: 'Manter', isRpa: false },
+    { id: 'bko-41', name: 'Filas do Thundera no Zendesk e Dynamics', area: 'Backoffice', responsavel: 'Flaviane - Skytel', responsaveis: ['Flaviane - Skytel'], volume: 33, minutos: 30, qtdExecucao: 33, backlogVolume: '', allocatedResource: '', reviewStatus: 'Manter', isRpa: false },
+    { id: 'bko-42', name: 'Fila N3 - Logística (Cartões)', area: 'Backoffice', responsavel: 'Flávio - Skytel', responsaveis: ['Flávio - Skytel'], volume: 12, minutos: 10, qtdExecucao: 12, backlogVolume: '', allocatedResource: '', reviewStatus: 'Manter', isRpa: false },
+    { id: 'bko-43', name: 'Fila BKO Multibenefícios', area: 'Backoffice', responsavel: 'Flávio - Skytel', responsaveis: ['Flávio - Skytel'], volume: 14, minutos: 10, qtdExecucao: 14, backlogVolume: '', allocatedResource: '', reviewStatus: 'Manter', isRpa: false },
+    { id: 'bko-44', name: 'Tabulação de Atendimentos', area: 'Backoffice', responsavel: 'Time Skytel', responsaveis: ['Time Skytel'], volume: 21, minutos: 15, qtdExecucao: 21, backlogVolume: '', allocatedResource: '', reviewStatus: 'Manter', isRpa: false },
+    { id: 'bko-45', name: 'Extração de relatórios DY', area: 'Backoffice', responsavel: 'Vitoria Amorim - Skytel', responsaveis: ['Vitoria Amorim - Skytel'], volume: 21, minutos: 10, qtdExecucao: 21, backlogVolume: '', allocatedResource: '', reviewStatus: 'Manter', isRpa: false },
+    { id: 'bko-46', name: 'Reunião Backoffice', area: 'Backoffice', responsavel: 'Time Skytel', responsaveis: ['Time Skytel'], volume: 4, minutos: 60, qtdExecucao: 4, backlogVolume: '', allocatedResource: '', reviewStatus: 'Manter', isRpa: false },
+    { id: 'bko-47', name: 'Abertura de chamados', area: 'Backoffice', responsavel: 'Time Skytel', responsaveis: ['Time Skytel'], volume: 40, minutos: 10, qtdExecucao: 40, backlogVolume: '', allocatedResource: '', reviewStatus: 'Manter', isRpa: false },
+    { id: 'bko-48', name: 'Processo de reembolso', area: 'Backoffice', responsavel: 'Flaviane - Skytel', responsaveis: ['Flaviane - Skytel'], volume: 20, minutos: 15, qtdExecucao: 20, backlogVolume: '', allocatedResource: '', reviewStatus: 'Manter', isRpa: false },
+    { id: 'bko-49', name: 'De acordo ajustes', area: 'Backoffice', responsavel: 'Flaviane - Skytel', responsaveis: ['Flaviane - Skytel'], volume: 4, minutos: 20, qtdExecucao: 4, backlogVolume: '', allocatedResource: '', reviewStatus: 'Manter', isRpa: false },
+    { id: 'bko-50', name: 'Acionamentos das áreas', area: 'Backoffice', responsavel: 'Time Skytel', responsaveis: ['Time Skytel'], volume: 30, minutos: 15, qtdExecucao: 30, backlogVolume: '', allocatedResource: '', reviewStatus: 'Manter', isRpa: false },
+    { id: 'bko-51', name: 'Report de Produtividade', area: 'Backoffice', responsavel: 'Vitoria Silva - Skytel', responsaveis: ['Vitoria Silva - Skytel'], volume: 21, minutos: 25, qtdExecucao: 21, backlogVolume: '', allocatedResource: '', reviewStatus: 'Manter', isRpa: false },
+    { id: 'bko-52', name: 'Tabulação - Cancelamento CAPTA', area: 'Backoffice', responsavel: 'Vanessa - Skytel', responsaveis: ['Vanessa - Skytel'], volume: 21, minutos: 10, qtdExecucao: 21, backlogVolume: '', allocatedResource: '', reviewStatus: 'Manter', isRpa: false },
+    { id: 'bko-53', name: 'Tabulação - Cancelamento SAP', area: 'Backoffice', responsavel: 'Vanessa - Skytel', responsaveis: ['Vanessa - Skytel'], volume: 21, minutos: 10, qtdExecucao: 21, backlogVolume: '', allocatedResource: '', reviewStatus: 'Manter', isRpa: false },
+    { id: 'bko-54', name: 'Recompras Amortização Proativa', area: 'Backoffice', responsavel: 'Vitoria Amorim - Skytel', responsaveis: ['Vitoria Amorim - Skytel'], volume: 21, minutos: 10, qtdExecucao: 21, backlogVolume: '', allocatedResource: '', reviewStatus: 'Manter', isRpa: false },
+    { id: 'bko-55', name: 'Recompras Prorrogação Proativa', area: 'Backoffice', responsavel: 'Vitoria Amorim - Skytel', responsaveis: ['Vitoria Amorim - Skytel'], volume: 21, minutos: 10, qtdExecucao: 21, backlogVolume: '', allocatedResource: '', reviewStatus: 'Manter', isRpa: false },
+    { id: 'bko-56', name: 'Priorização de Atendimentos', area: 'Backoffice', responsavel: 'Vanessa - Skytel', responsaveis: ['Vanessa - Skytel'], volume: 30, minutos: 15, qtdExecucao: 30, backlogVolume: '', allocatedResource: '', reviewStatus: 'Manter', isRpa: false },
+    { id: 'bko-57', name: 'Planilha da Cosméticos - Reparação', area: 'Backoffice', responsavel: 'Vitoria Amorim - Skytel', responsaveis: ['Vitoria Amorim - Skytel'], volume: 321, minutos: 10, qtdExecucao: 321, backlogVolume: '', allocatedResource: '', reviewStatus: 'Manter', isRpa: false },
+    { id: 'bko-58', name: 'Abertura de Pré-Conta', area: 'Backoffice', responsavel: 'Flávio - Skytel', responsaveis: ['Flávio - Skytel'], volume: 126, minutos: 5, qtdExecucao: 126, backlogVolume: '', allocatedResource: '', reviewStatus: 'Manter', isRpa: false },
+    { id: 'bko-59', name: 'Abertura de Conta PJ', area: 'Backoffice', responsavel: 'Flávio - Skytel', responsaveis: ['Flávio - Skytel', 'Flaviane - Skytel'], volume: 5, minutos: 30, qtdExecucao: 5, backlogVolume: '', allocatedResource: '', reviewStatus: 'Manter', isRpa: false },
+    { id: 'bko-60', name: 'Processo de Tangíveis - Cartões', area: 'Backoffice', responsavel: 'Flávio - Skytel', responsaveis: ['Flávio - Skytel'], volume: 22, minutos: 20, qtdExecucao: 22, backlogVolume: '', allocatedResource: '', reviewStatus: 'Manter', isRpa: false },
+    { id: 'bko-61', name: 'Processo de Tangíveis - Faturas', area: 'Backoffice', responsavel: 'Flávio - Skytel', responsaveis: ['Flávio - Skytel'], volume: 6, minutos: 40, qtdExecucao: 6, backlogVolume: '', allocatedResource: '', reviewStatus: 'Manter', isRpa: false },
+    { id: 'bko-62', name: 'Atualização OnePage', area: 'Backoffice', responsavel: 'Flávio - Skytel', responsaveis: ['Flávio - Skytel'], volume: 1, minutos: 90, qtdExecucao: 1, backlogVolume: '', allocatedResource: '', reviewStatus: 'Manter', isRpa: false },
+    { id: 'bko-63', name: 'Gestão de acesso Portal Cloud (Forncedor faturas)', area: 'Backoffice', responsavel: 'Flávio - Skytel', responsaveis: ['Flávio - Skytel'], volume: 16, minutos: 5, qtdExecucao: 16, backlogVolume: '', allocatedResource: '', reviewStatus: 'Manter', isRpa: false },
+    { id: 'bko-64', name: 'Validação de Faturamento fornecedores', area: 'Backoffice', responsavel: 'Flávio - Skytel', responsaveis: ['Flávio - Skytel'], volume: 2, minutos: 40, qtdExecucao: 2, backlogVolume: '', allocatedResource: '', reviewStatus: 'Manter', isRpa: false },
+    { id: 'bko-65', name: 'Atualização de Controles', area: 'Backoffice', responsavel: 'Flávio - Skytel', responsaveis: ['Flávio - Skytel'], volume: 5, minutos: 40, qtdExecucao: 5, backlogVolume: '', allocatedResource: '', reviewStatus: 'Manter', isRpa: false },
+    { id: 'bko-66', name: 'Arquivo FOP', area: 'Backoffice', responsavel: 'Vitoria Amorim - Skytel', responsaveis: ['Vitoria Amorim - Skytel'], volume: 21, minutos: 20, qtdExecucao: 21, backlogVolume: '', allocatedResource: '', reviewStatus: 'Manter', isRpa: false },
+    { id: 'bko-67', name: 'Cancelamento de pedidos - Thundera (erros capta)', area: 'Backoffice', responsavel: 'Valdirene Figueredo', responsaveis: ['Valdirene Figueredo', 'Flaviane - Skytel'], volume: 3, minutos: 20, qtdExecucao: 3, backlogVolume: '', allocatedResource: '', reviewStatus: 'Manter', isRpa: false },
+    { id: 'bko-68', name: 'Cancelamento Capta', area: 'Backoffice', responsavel: '', responsaveis: [], volume: 21, minutos: 30, qtdExecucao: 21, backlogVolume: '', allocatedResource: '', reviewStatus: 'Manter', isRpa: false },
+    { id: 'bko-69', name: 'Cancelamento SAP', area: 'Backoffice', responsavel: '', responsaveis: [], volume: 21, minutos: 30, qtdExecucao: 21, backlogVolume: '', allocatedResource: '', reviewStatus: 'Manter', isRpa: false },
+    { id: 'bko-70', name: 'Baixa de pagamentos não processados', area: 'Backoffice', responsavel: '', responsaveis: [], volume: '', minutos: 0, qtdExecucao: '', backlogVolume: '', allocatedResource: '', reviewStatus: 'Manter', isRpa: false },
 
     // Eficiência Operacional
     { id: 'ex-17', name: 'Mapeamento e Melhoria de Fluxos Operacionais', area: 'Eficiência Operacional', volume: '', minutos: 0, qtdExecucao: '', backlogVolume: '', allocatedResource: '' },
@@ -1236,6 +1290,9 @@ function applyStateMigrations() {
         };
     }
     if (!state.areaAllocations) state.areaAllocations = {};
+    if (state.processes && Array.isArray(state.processes)) {
+        state.processes.sort((a, b) => (a.name || '').localeCompare(b.name || '', 'pt-BR', { sensitivity: 'base' }));
+    }
     if (!state.processes) {
         state.processes = JSON.parse(JSON.stringify(EXAMPLE_PROCESSES));
     }
@@ -3891,7 +3948,7 @@ function renderCadastrosView() {
             teamsList.querySelectorAll('.btn-edit-team-item').forEach(btn => {
                 btn.addEventListener('click', (e) => {
                     e.stopPropagation();
-                    if (!verificarPermissao('OPERADOR')) { alert('Acesso negado: Perfil OPERADOR necessário.'); return; }
+                    if (!verificarPermissao('OPERADOR')) { alert('Acesso negado: Perfil OPERADOR necessÃ¡rio.'); return; }
                     const team = btn.getAttribute('data-team');
                     openNewTeamModal(team);
                 });
@@ -3900,9 +3957,9 @@ function renderCadastrosView() {
             teamsList.querySelectorAll('.btn-delete-team-item').forEach(btn => {
                 btn.addEventListener('click', (e) => {
                     e.stopPropagation();
-                    if (!verificarPermissao('ADMIN')) { alert('Acesso negado: Perfil ADMIN necessário.'); return; }
+                    if (!verificarPermissao('ADMIN')) { alert('Acesso negado: Perfil ADMIN necessÃ¡rio.'); return; }
                     const team = btn.getAttribute('data-team');
-                    if (confirm(`Deseja realmente excluir a equipe "${team}"? Todos os responsáveis e atividades desta equipe ficarão "Sem Equipe".`)) {
+                    if (confirm(`Deseja realmente excluir a equipe "${team}"? Todos os responsÃ¡veis e atividades desta equipe ficarÃ£o "Sem Equipe".`)) {
                         state.teams = state.teams.filter(t => t !== team);
                         state.processes.forEach(p => {
                             if (p.area === team) p.area = '';
@@ -3935,7 +3992,7 @@ function renderCadastrosView() {
         if(icon) {
             icon.className = isHidden ? 'fa-solid fa-chevron-down' : 'fa-solid fa-chevron-right';
         }
-        // Limpar qualquer autofill não digitado pelo usuário
+        // Limpar qualquer autofill nÃ£o digitado pelo usuÃ¡rio
         const emailInput = document.getElementById('input-new-responsible-email');
         if (emailInput && !emailInput._hasUserTyping) {
             emailInput.value = '';
@@ -3946,43 +4003,25 @@ function renderCadastrosView() {
         }
     };
 
-    const toggleTableAccordion = (headerTr, className, forceState = null) => {
-        const rows = tableBody.querySelectorAll('.' + className);
-        let nextExpanded = forceState;
-        if (nextExpanded === null || nextExpanded === undefined) {
-            let currentlyHidden = true;
-            if (rows.length > 0) {
-                currentlyHidden = rows[0].style.display === 'none';
-            }
-            nextExpanded = currentlyHidden;
-        }
-        rows.forEach(r => {
-            r.style.display = nextExpanded ? 'table-row' : 'none';
-        });
-        const icon = headerTr.querySelector('i');
-        if (icon) {
-            icon.className = nextExpanded ? 'fa-solid fa-chevron-down' : 'fa-solid fa-chevron-right';
-        }
-    };
-
     // 2. Render Responsibles List (Accordion by Team)
     responsiblesList.innerHTML = '';
+    
     if (!state.responsaveis || state.responsaveis.length === 0) {
-        responsiblesList.innerHTML = '<div style="color: var(--text-muted); font-size: 0.85rem; padding: 0.5rem;">Nenhum responsável cadastrado.</div>';
+        responsiblesList.innerHTML = '<div style="color: var(--text-muted); font-size: 0.85rem; padding: 0.5rem;">Nenhum responsÃ¡vel cadastrado.</div>';
     } else {
-        const teamsToRender = [...(state.teams || []), 'Outros / Sem Equipe'];
+        const teamsToRender = [...(state.teams || []), 'Sem Equipe'];
         
         teamsToRender.forEach(team => {
-            let teamResps = [];
-            if (team === 'Outros / Sem Equipe') {
-                teamResps = state.responsaveis.filter(r => !r.area || !state.teams.includes(r.area));
-            } else {
-                teamResps = state.responsaveis.filter(r => r.area === team);
-            }
+            const teamResps = (state.responsaveis || []).filter(r => {
+                const rArea = typeof r === 'object' ? r.area : '';
+                if (team === 'Sem Equipe') {
+                    return !rArea || !state.teams.includes(rArea);
+                }
+                return rArea === team;
+            });
             
             if (teamResps.length === 0) return;
             
-            // Accordion Header
             const header = document.createElement('div');
             header.style.cssText = 'display: flex; align-items: center; gap: 0.5rem; cursor: pointer; padding: 0.5rem; background: rgba(255,255,255,0.05); border-radius: 4px; font-weight: 500; font-size: 0.85rem; user-select: none; border: 1px solid rgba(255,255,255,0.02); margin-top: 0.5rem;';
             header.innerHTML = `<i class="fa-solid fa-chevron-right" style="width: 15px; text-align: center;"></i> ${escapeHtml(team)} <span style="background: rgba(255,255,255,0.1); padding: 0.1rem 0.4rem; border-radius: 10px; font-size: 0.7rem; margin-left: auto;">${teamResps.length}</span>`;
@@ -4010,7 +4049,7 @@ function renderCadastrosView() {
                         <span style="font-weight: 600; color: var(--text-primary);">${escapeHtml(resp.name)}</span>
                         ${resp.email ? `<span style="font-size: 0.72rem; color: var(--text-muted); display: flex; align-items: center; gap: 0.25rem;"><i class="fa-regular fa-envelope" style="font-size: 0.65rem;"></i> ${escapeHtml(resp.email)}</span>` : ''}
                     </div>
-                    ${hasOverrides ? '<i class="fa-solid fa-user-gear" style="color: var(--color-primary); font-size: 0.75rem; margin-left: 0.25rem;" title="Parâmetros customizados ativos"></i>' : ''}
+                    ${hasOverrides ? '<i class="fa-solid fa-user-gear" style="color: var(--color-primary); font-size: 0.75rem; margin-left: 0.25rem;" title="ParÃ¢metros customizados ativos"></i>' : ''}
                 `;
                 
                 const btnGroup = document.createElement('div');
@@ -4020,7 +4059,7 @@ function renderCadastrosView() {
                 btnConfig.className = 'btn-config-resp-item';
                 btnConfig.setAttribute('data-permissao', 'OPERADOR,ADMIN');
                 btnConfig.style.cssText = 'background: transparent; border: none; color: var(--color-primary); cursor: pointer; font-size: 0.85rem; padding: 0.2rem; display: flex; align-items: center; justify-content: center;';
-                btnConfig.title = 'Configurar Parâmetros de Capacidade';
+                btnConfig.title = 'Configurar ParÃ¢metros de Capacidade';
                 btnConfig.innerHTML = '<i class="fa-solid fa-cog"></i>';
                 if (!canEditResp && currentUser.perfil !== 'ADMIN') {
                     btnConfig.style.display = 'none';
@@ -4030,7 +4069,7 @@ function renderCadastrosView() {
                 btnDelete.className = 'btn-delete-resp-item';
                 btnDelete.setAttribute('data-permissao', 'OPERADOR,ADMIN');
                 btnDelete.style.cssText = 'background: transparent; border: none; color: var(--color-danger); cursor: pointer; font-size: 0.85rem; padding: 0.2rem; display: flex; align-items: center; justify-content: center;';
-                btnDelete.title = 'Excluir Responsável';
+                btnDelete.title = 'Excluir ResponsÃ¡vel';
                 btnDelete.innerHTML = '<i class="fa-solid fa-trash-can"></i>';
                 if (!canEditResp && currentUser.perfil !== 'ADMIN') {
                     btnDelete.style.display = 'none';
@@ -4049,9 +4088,9 @@ function renderCadastrosView() {
                 
                 btnDelete.addEventListener('click', (e) => {
                     e.stopPropagation();
-                    if (!verificarPermissao('OPERADOR')) { alert('Acesso negado: Perfil OPERADOR ou ADMIN necessário.'); return; }
-                    if (!podeEditarArea(resp.area)) { alert(`Acesso negado: Você só pode excluir responsáveis da sua própria equipe (${currentUser.assignedTeam}).`); return; }
-                    if (confirm(`Tem certeza que deseja excluir o responsável "${resp.name}"? Todas as atividades sob sua responsabilidade ficarão sem responsável.`)) {
+                    if (!verificarPermissao('OPERADOR')) { alert('Acesso negado: Perfil OPERADOR ou ADMIN necessÃ¡rio.'); return; }
+                    if (!podeEditarArea(resp.area)) { alert(`Acesso negado: VocÃª sÃ³ pode excluir responsÃ¡veis da sua prÃ³pria equipe (${currentUser.assignedTeam}).`); return; }
+                    if (confirm(`Tem certeza que deseja excluir o responsÃ¡vel "${resp.name}"? Todas as atividades sob sua responsabilidade ficarÃ£o sem responsÃ¡vel.`)) {
                         state.responsaveis = state.responsaveis.filter(r => (typeof r === 'object' ? r.name : r) !== resp.name);
                         state.processes.forEach(p => {
                             if (p.responsavel === resp.name) p.responsavel = '';
@@ -4072,309 +4111,422 @@ function renderCadastrosView() {
             responsiblesList.appendChild(contentContainer);
         });
     }
-    
-    // 3. Render Activities Table (Accordion by Team)
-    tableBody.innerHTML = '';
-    activityCountBadge.textContent = state.processes.length;
-    
-    if (state.processes.length === 0) {
-        tableBody.innerHTML = `
-            <tr>
-                <td colspan="7" style="text-align: center; color: var(--text-muted); padding: 2rem;">
-                    Nenhuma atividade cadastrada. Clique em "Adicionar Atividade" para iniciar.
-                </td>
-            </tr>
-        `;
-        const btnBulkDelete = document.getElementById('btn-cadastros-delete-selected');
-        if (btnBulkDelete) btnBulkDelete.style.display = 'none';
-        const selectAllCb = document.getElementById('cadastros-select-all');
-        if (selectAllCb) selectAllCb.checked = false;
-        return;
+
+    // ----------------------------------------------------
+    // POPULAR E SINCRONIZAR BARRA DE FILTROS DE CADASTROS
+    // ----------------------------------------------------
+    const filterSearchEl = document.getElementById('cadastros-filter-search');
+    const filterAreaEl = document.getElementById('cadastros-filter-area');
+    const filterRespEl = document.getElementById('cadastros-filter-resp');
+    const filterProductEl = document.getElementById('cadastros-filter-product');
+    const filterRpaEl = document.getElementById('cadastros-filter-rpa');
+    const btnClearFilters = document.getElementById('btn-cadastros-clear-filters');
+
+    if (filterAreaEl) {
+        const curArea = filterAreaEl.value;
+        const areaOptions = ['<option value="">Todas as Ãreas</option>']
+            .concat((state.teams || []).map(t => `<option value="${escapeHtml(t)}" ${t === curArea ? 'selected' : ''}>${escapeHtml(t)}</option>`))
+            .concat([`<option value="Outros / Sem Equipe" ${curArea === 'Outros / Sem Equipe' ? 'selected' : ''}>Outros / Sem Equipe</option>`]);
+        filterAreaEl.innerHTML = areaOptions.join('');
     }
-    
-    const activityTeamsToRender = [...(state.teams || []), 'Outros / Sem Equipe'];
-    
-    activityTeamsToRender.forEach((team, teamIndex) => {
-        let teamProcs = [];
-        if (team === 'Outros / Sem Equipe') {
-            teamProcs = state.processes.filter(p => !p.area || !state.teams.includes(p.area));
-        } else {
-            teamProcs = state.processes.filter(p => p.area === team);
+
+    if (filterRespEl) {
+        const curResp = filterRespEl.value;
+        const allResps = (state.responsaveis || []).map(r => typeof r === 'object' ? r.name : r).filter(Boolean);
+        const uniqueResps = [...new Set(allResps)].sort();
+        const respOptions = ['<option value="">Todos os ResponsÃ¡veis</option>']
+            .concat(uniqueResps.map(r => `<option value="${escapeHtml(r)}" ${r === curResp ? 'selected' : ''}>${escapeHtml(r)}</option>`))
+            .concat([`<option value="__SEM_RESP__" ${curResp === '__SEM_RESP__' ? 'selected' : ''}>Sem ResponsÃ¡vel</option>`]);
+        filterRespEl.innerHTML = respOptions.join('');
+    }
+
+    // Attach real-time filter listeners once
+    if (filterSearchEl && !filterSearchEl._boundFilter) {
+        filterSearchEl._boundFilter = true;
+        filterSearchEl.addEventListener('input', () => renderCadastrosTable());
+    }
+    if (filterAreaEl && !filterAreaEl._boundFilter) {
+        filterAreaEl._boundFilter = true;
+        filterAreaEl.addEventListener('change', () => renderCadastrosTable());
+    }
+    if (filterRespEl && !filterRespEl._boundFilter) {
+        filterRespEl._boundFilter = true;
+        filterRespEl.addEventListener('change', () => renderCadastrosTable());
+    }
+    if (filterProductEl && !filterProductEl._boundFilter) {
+        filterProductEl._boundFilter = true;
+        filterProductEl.addEventListener('input', () => renderCadastrosTable());
+    }
+    if (filterRpaEl && !filterRpaEl._boundFilter) {
+        filterRpaEl._boundFilter = true;
+        filterRpaEl.addEventListener('change', () => renderCadastrosTable());
+    }
+    if (btnClearFilters && !btnClearFilters._boundFilter) {
+        btnClearFilters._boundFilter = true;
+        btnClearFilters.addEventListener('click', () => {
+            if (filterSearchEl) filterSearchEl.value = '';
+            if (filterAreaEl) filterAreaEl.value = '';
+            if (filterRespEl) filterRespEl.value = '';
+            if (filterProductEl) filterProductEl.value = '';
+            if (filterRpaEl) filterRpaEl.value = '';
+            renderCadastrosTable();
+        });
+    }
+
+    function renderCadastrosTable() {
+        const searchVal = filterSearchEl ? filterSearchEl.value.trim().toLowerCase() : '';
+        const areaVal = filterAreaEl ? filterAreaEl.value : '';
+        const respVal = filterRespEl ? filterRespEl.value : '';
+        const productVal = filterProductEl ? filterProductEl.value.trim().toLowerCase() : '';
+        const rpaVal = filterRpaEl ? filterRpaEl.value : '';
+        const isAnyFilterActive = !!(searchVal || areaVal || respVal || productVal || rpaVal);
+
+        const filteredProcesses = state.processes.filter(proc => {
+            // 1. Demanda / Atividade
+            if (searchVal && !(proc.name || '').toLowerCase().includes(searchVal)) return false;
+
+            // 2. Ãrea / Equipe
+            if (areaVal) {
+                if (areaVal === 'Outros / Sem Equipe') {
+                    if (proc.area && state.teams.includes(proc.area)) return false;
+                } else if (proc.area !== areaVal) {
+                    return false;
+                }
+            }
+
+            // 3. ResponsÃ¡vel
+            if (respVal) {
+                const resps = getProcessResponsaveis(proc);
+                if (respVal === '__SEM_RESP__') {
+                    if (resps.length > 0) return false;
+                } else {
+                    if (!resps.includes(respVal)) return false;
+                }
+            }
+
+            // 4. Produto
+            if (productVal) {
+                const prod = (proc.produto || '').toLowerCase();
+                if (!prod.includes(productVal)) return false;
+            }
+
+            // 5. RPA
+            if (rpaVal === 'sim') {
+                if (!isRpaActivity(proc)) return false;
+            } else if (rpaVal === 'nao') {
+                if (isRpaActivity(proc)) return false;
+            }
+
+            return true;
+        });
+
+        // Render Activities Table (Accordion by Team)
+        tableBody.innerHTML = '';
+        activityCountBadge.textContent = isAnyFilterActive
+            ? `${filteredProcesses.length} / ${state.processes.length}`
+            : `${state.processes.length}`;
+        
+        if (filteredProcesses.length === 0) {
+            const totalCols = currentUser.perfil === 'ADMIN' ? 7 : (currentUser.perfil === 'OPERADOR' ? 6 : 5);
+            tableBody.innerHTML = `
+                <tr>
+                    <td colspan="${totalCols}" style="text-align: center; color: var(--text-muted); padding: 2.5rem 1rem;">
+                        <div style="font-size: 1.1rem; margin-bottom: 0.4rem; color: var(--text-secondary);"><i class="fa-solid fa-filter-circle-xmark"></i> Nenhuma atividade encontrada</div>
+                        <span style="font-size: 0.85rem; opacity: 0.7;">Tente ajustar ou limpar os filtros aplicados acima.</span>
+                    </td>
+                </tr>
+            `;
+            const btnBulkDelete = document.getElementById('btn-cadastros-delete-selected');
+            if (btnBulkDelete) btnBulkDelete.style.display = 'none';
+            const selectAllCb = document.getElementById('cadastros-select-all');
+            if (selectAllCb) selectAllCb.checked = false;
+            return;
         }
         
-        if (teamProcs.length === 0) return;
+        const activityTeamsToRender = [...(state.teams || []), 'Outros / Sem Equipe'];
         
-        const rowClass = 'team-activity-row-' + teamIndex;
-        // Default to expanded (true) if undefined so activities remain open unless explicitly collapsed by user
-        const isExpanded = expandedCadastrosTableTeams[team] !== false;
-        
-        // Header Row
-        const headerTr = document.createElement('tr');
-        headerTr.style.cssText = 'background: rgba(255,255,255,0.03); cursor: pointer; user-select: none;';
-        const totalCols = currentUser.perfil === 'ADMIN' ? 7 : (currentUser.perfil === 'OPERADOR' ? 6 : 5);
-        headerTr.innerHTML = `
-            <td colspan="${totalCols}" style="padding: 0.8rem; font-weight: 600; color: var(--text-primary); border-top: 1px solid rgba(255,255,255,0.05); border-bottom: 1px solid rgba(255,255,255,0.05);">
-                <i class="${isExpanded ? 'fa-solid fa-chevron-down' : 'fa-solid fa-chevron-right'}" style="width: 20px;"></i> ${escapeHtml(team)} <span style="background: rgba(255,255,255,0.1); color: var(--text-secondary); padding: 0.1rem 0.5rem; border-radius: 10px; font-size: 0.75rem; margin-left: 0.5rem;">${teamProcs.length} atividades</span>
-            </td>
-        `;
-        headerTr.addEventListener('click', () => {
-            const currentVis = expandedCadastrosTableTeams[team] !== false;
-            expandedCadastrosTableTeams[team] = !currentVis;
-            toggleTableAccordion(headerTr, rowClass, expandedCadastrosTableTeams[team]);
-        });
-        tableBody.appendChild(headerTr);
-        
-        // Activity Rows
-        teamProcs.forEach(proc => {
-            const tr = document.createElement('tr');
-            tr.className = rowClass;
-            tr.style.display = isExpanded ? 'table-row' : 'none';
-            tr.dataset.id = proc.id;
+        activityTeamsToRender.forEach((team, teamIndex) => {
+            let teamProcs = [];
+            if (team === 'Outros / Sem Equipe') {
+                teamProcs = filteredProcesses.filter(p => !p.area || !state.teams.includes(p.area));
+            } else {
+                teamProcs = filteredProcesses.filter(p => p.area === team);
+            }
             
-            const canEditThisArea = podeEditarArea(proc.area);
-            const isConsulta = currentUser.perfil === 'CONSULTA';
-            const isRowDisabled = isConsulta || !canEditThisArea;
+            if (teamProcs.length === 0) return;
+            teamProcs.sort((a, b) => (a.name || '').localeCompare(b.name || '', 'pt-BR', { sensitivity: 'base' }));
             
-            const teamOptions = '<option value="">-- Sem Equipe --</option>' +
-                state.teams.map(t => `
-                    <option value="${escapeHtml(t)}" ${proc.area === t ? 'selected' : ''}>${escapeHtml(t)}</option>
-                `).join('');
-                
-            const currentResps = getProcessResponsaveis(proc);
-            const teamResps = (state.responsaveis || []).filter(resp => {
-                const rName = typeof resp === 'object' ? resp.name : resp;
-                const rArea = typeof resp === 'object' ? resp.area : '';
-                return !proc.area || !rArea || rArea === proc.area || currentResps.includes(rName);
-            });
-            const respsToDisplay = teamResps.length > 0 ? teamResps : (state.responsaveis || []);
+            const rowClass = 'team-activity-row-' + teamIndex;
+            // Se houver filtros ativos, expande automaticamente para exibir resultados
+            const isExpanded = isAnyFilterActive ? true : (expandedCadastrosTableTeams[team] !== false);
             
-            const assignedBadgesHtml = currentResps.map(rName => `
-                <span class="badge-resp-tag" style="font-size: 0.78rem; padding: 0.15rem 0.45rem; border-radius: 12px; background: rgba(99, 102, 241, 0.12); color: #818cf8; border: 1px solid rgba(99, 102, 241, 0.25); display: inline-flex; align-items: center; gap: 0.3rem;">
-                    ${escapeHtml(rName)}
-                    ${!isRowDisabled ? `<i class="fa-solid fa-xmark remove-resp-btn" data-resp="${escapeHtml(rName)}" style="cursor: pointer; opacity: 0.7; font-size: 0.7rem;" title="Remover ${escapeHtml(rName)}"></i>` : ''}
-                </span>
-            `).join('');
-
-            const unassignedResps = respsToDisplay.filter(resp => {
-                const rName = typeof resp === 'object' ? resp.name : resp;
-                return !currentResps.includes(rName);
-            });
-
-            const unassignedOptionsHtml = '<option value="">+ Responsável</option>' +
-                unassignedResps.map(resp => {
-                    const rName = typeof resp === 'object' ? resp.name : resp;
-                    return `<option value="${escapeHtml(rName)}">${escapeHtml(rName)}</option>`;
-                }).join('');
-                
-            const isRpa = isRpaActivity(proc);
-            
-            tr.innerHTML = `
-                <td class="col-select-admin" style="text-align: center; ${currentUser.perfil === 'ADMIN' ? '' : 'display: none;'}">
-                    <input type="checkbox" class="cadastros-row-checkbox" data-id="${proc.id}" ${isRowDisabled ? 'disabled style="opacity: 0.3; pointer-events: none;"' : ''}>
-                </td>
-                <td>
-                    <input type="text" class="input-activity-name-cell" value="${escapeHtml(proc.name)}" ${isRowDisabled ? 'readonly style="width: 100%; border: none; background: transparent; color: var(--text-primary); outline: none; padding: 0.3rem 0.5rem; border-radius: 4px; opacity: 0.7; pointer-events: none;"' : 'style="width: 100%; border: none; background: transparent; color: var(--text-primary); outline: none; padding: 0.3rem 0.5rem; border-radius: 4px;"'}>
-                </td>
-                <td>
-                    <select class="select-activity-team-cell" ${isRowDisabled ? 'disabled style="width: 100%; border: none; background: transparent; color: var(--text-primary); outline: none; padding: 0.3rem 0.5rem; border-radius: 4px; opacity: 0.7; pointer-events: none;"' : 'style="width: 100%; border: none; background: transparent; color: var(--text-primary); outline: none; padding: 0.3rem 0.5rem; border-radius: 4px; cursor: pointer;"'}>
-                        ${teamOptions}
-                    </select>
-                </td>
-                <td>
-                    <div class="cadastros-resp-container" style="display: flex; flex-wrap: wrap; gap: 0.3rem; align-items: center; padding: 0.2rem 0;">
-                        ${assignedBadgesHtml}
-                        <select class="select-activity-add-resp" ${isRowDisabled ? 'disabled style="display: none;"' : 'style="border: 1px dashed var(--border-color); background: rgba(255,255,255,0.03); color: var(--text-secondary); outline: none; padding: 0.2rem 0.4rem; border-radius: 4px; font-size: 0.78rem; cursor: pointer;"'}>
-                            ${unassignedOptionsHtml}
-                        </select>
-                    </div>
-                </td>
-                <td>
-                    <input type="text" class="input-activity-product-cell" value="${escapeHtml(proc.produto || '')}" placeholder="Produto (Opcional)" ${isRowDisabled ? 'readonly style="width: 100%; border: none; background: transparent; color: var(--text-primary); outline: none; padding: 0.3rem 0.5rem; border-radius: 4px; opacity: 0.7; pointer-events: none;"' : 'style="width: 100%; border: none; background: transparent; color: var(--text-primary); outline: none; padding: 0.3rem 0.5rem; border-radius: 4px;"'}>
-                </td>
-                <td style="text-align: center;">
-                    <label style="display: inline-flex; align-items: center; gap: 0.35rem; cursor: ${isRowDisabled ? 'default' : 'pointer'}; font-size: 0.8rem; user-select: none;">
-                        <input type="checkbox" class="cb-activity-rpa" ${isRpa ? 'checked' : ''} ${isRowDisabled ? 'disabled' : ''}>
-                        <span class="label-rpa-text" style="${isRpa ? 'color: #a78bfa; font-weight: 600;' : 'color: var(--text-muted);'}">🤖 RPA</span>
-                    </label>
-                </td>
-                <td class="col-acao-excluir" style="text-align: center; ${isConsulta ? 'display: none;' : ''}">
-                    ${canEditThisArea ? `
-                    <button class="btn-row-action btn-delete-activity-cell" style="background: transparent; border: none; color: var(--color-danger); cursor: pointer; font-size: 0.95rem; padding: 0.2rem;" title="Excluir Atividade">
-                        <i class="fa-solid fa-trash-can"></i>
-                    </button>` : ''}
+            // Header Row
+            const headerTr = document.createElement('tr');
+            headerTr.style.cssText = 'background: rgba(255,255,255,0.03); cursor: pointer; user-select: none;';
+            const totalCols = currentUser.perfil === 'ADMIN' ? 7 : (currentUser.perfil === 'OPERADOR' ? 6 : 5);
+            headerTr.innerHTML = `
+                <td colspan="${totalCols}" style="padding: 0.8rem; font-weight: 600; color: var(--text-primary); border-top: 1px solid rgba(255,255,255,0.05); border-bottom: 1px solid rgba(255,255,255,0.05);">
+                    <i class="${isExpanded ? 'fa-solid fa-chevron-down' : 'fa-solid fa-chevron-right'}" style="width: 20px;"></i> ${escapeHtml(team)} <span style="background: rgba(255,255,255,0.1); color: var(--text-secondary); padding: 0.1rem 0.5rem; border-radius: 10px; font-size: 0.75rem; margin-left: 0.5rem;">${teamProcs.length} atividades</span>
                 </td>
             `;
+            headerTr.addEventListener('click', () => {
+                const currentVis = expandedCadastrosTableTeams[team] !== false;
+                expandedCadastrosTableTeams[team] = !currentVis;
+                toggleTableAccordion(headerTr, rowClass, expandedCadastrosTableTeams[team]);
+            });
+            tableBody.appendChild(headerTr);
             
-            const rowCheckbox = tr.querySelector('.cadastros-row-checkbox');
-            if (rowCheckbox && !isRowDisabled) {
-                rowCheckbox.addEventListener('change', () => {
-                    if (!verificarPermissao('OPERADOR')) return;
-                    updateBulkDeleteState();
-                });
-            }
-            
-            const rpaCheckbox = tr.querySelector('.cb-activity-rpa');
-            if (rpaCheckbox && !isRowDisabled) {
-                rpaCheckbox.addEventListener('change', (e) => {
-                    if (!verificarPermissao('OPERADOR')) return;
-                    if (!podeEditarArea(proc.area)) return;
-                    proc.isRpa = e.target.checked;
-                    saveState();
-                    renderTable();
-                    renderBalancingTable();
-                    renderReviewTable();
-                    renderAutomationsView();
+            // Activity Rows
+            teamProcs.forEach(proc => {
+                const tr = document.createElement('tr');
+                tr.className = rowClass;
+                tr.style.display = isExpanded ? 'table-row' : 'none';
+                tr.dataset.id = proc.id;
+                
+                const canEditThisArea = podeEditarArea(proc.area);
+                const isConsulta = currentUser.perfil === 'CONSULTA';
+                const isRowDisabled = isConsulta || !canEditThisArea;
+                
+                const teamOptions = '<option value="">-- Sem Equipe --</option>' +
+                    state.teams.map(t => `
+                        <option value="${escapeHtml(t)}" ${proc.area === t ? 'selected' : ''}>${escapeHtml(t)}</option>
+                    `).join('');
                     
-                    const labelText = tr.querySelector('.label-rpa-text');
-                    if (labelText) {
-                        labelText.style.color = e.target.checked ? '#a78bfa' : 'var(--text-muted)';
-                        labelText.style.fontWeight = e.target.checked ? '600' : 'normal';
-                    }
+                const currentResps = getProcessResponsaveis(proc);
+                const teamResps = (state.responsaveis || []).filter(resp => {
+                    const rName = typeof resp === 'object' ? resp.name : resp;
+                    const rArea = typeof resp === 'object' ? resp.area : '';
+                    return !proc.area || !rArea || rArea === proc.area || currentResps.includes(rName);
                 });
-            }
-            
-            const nameInput = tr.querySelector('.input-activity-name-cell');
-            if (nameInput && !isRowDisabled) {
-                nameInput.addEventListener('change', (e) => {
-                    if (!verificarPermissao('OPERADOR')) return;
-                    if (!podeEditarArea(proc.area)) return;
-                    const val = e.target.value.trim();
-                    if (val) {
-                        proc.name = val;
-                        saveState();
-                    } else {
-                        e.target.value = proc.name;
-                    }
-                });
-                nameInput.addEventListener('focus', () => {
-                    if (isRowDisabled) return;
-                    nameInput.style.background = 'rgba(255, 255, 255, 0.08)';
-                    nameInput.style.border = '1px solid var(--border-color)';
-                });
-                nameInput.addEventListener('blur', () => {
-                    nameInput.style.background = 'transparent';
-                    nameInput.style.border = 'none';
-                });
-            }
-            
-            const teamSelect = tr.querySelector('.select-activity-team-cell');
-            if (teamSelect && !isRowDisabled) {
-                teamSelect.addEventListener('change', (e) => {
-                    if (!verificarPermissao('OPERADOR')) return;
-                    if (!podeEditarArea(proc.area)) return;
-                    const newTeam = e.target.value;
-                    proc.area = newTeam;
-                    setProcessResponsaveis(proc, []);
-                    saveState();
-                    
-                    renderCadastrosView();
-                    renderAreaFilterOptions();
-                    renderResponsavelFilterOptions();
-                    renderTable();
-                    renderBalancingTable();
-                    renderReviewTable();
-                });
-                teamSelect.addEventListener('focus', () => {
-                    if (isRowDisabled) return;
-                    teamSelect.style.background = 'rgba(255, 255, 255, 0.08)';
-                    teamSelect.style.border = '1px solid var(--border-color)';
-                });
-                teamSelect.addEventListener('blur', () => {
-                    teamSelect.style.background = 'transparent';
-                    teamSelect.style.border = 'none';
-                });
-            }
-            
-            // Listeners for multi-responsible badges & add dropdown
-            if (!isRowDisabled) {
-                tr.querySelectorAll('.remove-resp-btn').forEach(btn => {
-                    btn.addEventListener('click', (e) => {
-                        e.stopPropagation();
-                        if (!verificarPermissao('OPERADOR')) return;
-                        if (!podeEditarArea(proc.area)) return;
-                        const respToRemove = btn.dataset.resp;
-                        const updated = currentResps.filter(r => r !== respToRemove);
-                        setProcessResponsaveis(proc, updated);
-                        saveState();
-                        renderCadastrosView();
-                        renderResponsavelFilterOptions();
-                        renderTable();
-                        renderBalancingTable();
-                        renderReviewTable();
-                        renderAutomationsView();
-                    });
+                const respsToDisplay = teamResps.length > 0 ? teamResps : (state.responsaveis || []);
+                
+                const assignedBadgesHtml = currentResps.map(rName => `
+                    <span class="badge-resp-tag" style="font-size: 0.78rem; padding: 0.15rem 0.45rem; border-radius: 12px; background: rgba(99, 102, 241, 0.12); color: #818cf8; border: 1px solid rgba(99, 102, 241, 0.25); display: inline-flex; align-items: center; gap: 0.3rem;">
+                        ${escapeHtml(rName)}
+                        ${!isRowDisabled ? `<i class="fa-solid fa-xmark remove-resp-btn" data-resp="${escapeHtml(rName)}" style="cursor: pointer; opacity: 0.7; font-size: 0.7rem;" title="Remover ${escapeHtml(rName)}"></i>` : ''}
+                    </span>
+                `).join('');
+
+                const unassignedResps = respsToDisplay.filter(resp => {
+                    const rName = typeof resp === 'object' ? resp.name : resp;
+                    return !currentResps.includes(rName);
                 });
 
-                const addRespSelect = tr.querySelector('.select-activity-add-resp');
-                if (addRespSelect) {
-                    addRespSelect.addEventListener('change', (e) => {
+                const unassignedOptionsHtml = '<option value="">+ ResponsÃ¡vel</option>' +
+                    unassignedResps.map(resp => {
+                        const rName = typeof resp === 'object' ? resp.name : resp;
+                        return `<option value="${escapeHtml(rName)}">${escapeHtml(rName)}</option>`;
+                    }).join('');
+                    
+                const isRpa = isRpaActivity(proc);
+                
+                tr.innerHTML = `
+                    <td class="col-select-admin" style="text-align: center; ${currentUser.perfil === 'ADMIN' ? '' : 'display: none;'}">
+                        <input type="checkbox" class="cadastros-row-checkbox" data-id="${proc.id}" ${isRowDisabled ? 'disabled style="opacity: 0.3; pointer-events: none;"' : ''}>
+                    </td>
+                    <td>
+                        <input type="text" class="input-activity-name-cell" value="${escapeHtml(proc.name)}" ${isRowDisabled ? 'readonly style="width: 100%; border: none; background: transparent; color: var(--text-primary); outline: none; padding: 0.3rem 0.5rem; border-radius: 4px; opacity: 0.7; pointer-events: none;"' : 'style="width: 100%; border: none; background: transparent; color: var(--text-primary); outline: none; padding: 0.3rem 0.5rem; border-radius: 4px;"'}>
+                    </td>
+                    <td>
+                        <select class="select-activity-team-cell" ${isRowDisabled ? 'disabled style="width: 100%; border: none; background: transparent; color: var(--text-primary); outline: none; padding: 0.3rem 0.5rem; border-radius: 4px; opacity: 0.7; pointer-events: none;"' : 'style="width: 100%; border: none; background: transparent; color: var(--text-primary); outline: none; padding: 0.3rem 0.5rem; border-radius: 4px; cursor: pointer;"'}>
+                            ${teamOptions}
+                        </select>
+                    </td>
+                    <td>
+                        <div class="cadastros-resp-container" style="display: flex; flex-wrap: wrap; gap: 0.3rem; align-items: center; padding: 0.2rem 0;">
+                            ${assignedBadgesHtml}
+                            <select class="select-activity-add-resp" ${isRowDisabled ? 'disabled style="display: none;"' : 'style="border: 1px dashed var(--border-color); background: rgba(255,255,255,0.03); color: var(--text-secondary); outline: none; padding: 0.2rem 0.4rem; border-radius: 4px; font-size: 0.78rem; cursor: pointer;"'}>
+                                ${unassignedOptionsHtml}
+                            </select>
+                        </div>
+                    </td>
+                    <td>
+                        <input type="text" class="input-activity-product-cell" value="${escapeHtml(proc.produto || '')}" placeholder="Produto (Opcional)" ${isRowDisabled ? 'readonly style="width: 100%; border: none; background: transparent; color: var(--text-primary); outline: none; padding: 0.3rem 0.5rem; border-radius: 4px; opacity: 0.7; pointer-events: none;"' : 'style="width: 100%; border: none; background: transparent; color: var(--text-primary); outline: none; padding: 0.3rem 0.5rem; border-radius: 4px;"'}>
+                    </td>
+                    <td style="text-align: center;">
+                        <label style="display: inline-flex; align-items: center; gap: 0.35rem; cursor: ${isRowDisabled ? 'default' : 'pointer'}; font-size: 0.8rem; user-select: none;">
+                            <input type="checkbox" class="cb-activity-rpa" ${isRpa ? 'checked' : ''} ${isRowDisabled ? 'disabled' : ''}>
+                            <span class="label-rpa-text" style="${isRpa ? 'color: #a78bfa; font-weight: 600;' : 'color: var(--text-muted);'}">ðŸ¤– RPA</span>
+                        </label>
+                    </td>
+                    <td class="col-acao-excluir" style="text-align: center; ${isConsulta ? 'display: none;' : ''}">
+                        ${canEditThisArea ? `
+                        <button class="btn-row-action btn-delete-activity-cell" style="background: transparent; border: none; color: var(--color-danger); cursor: pointer; font-size: 0.95rem; padding: 0.2rem;" title="Excluir Atividade">
+                            <i class="fa-solid fa-trash-can"></i>
+                        </button>` : ''}
+                    </td>
+                `;
+                
+                const rowCheckbox = tr.querySelector('.cadastros-row-checkbox');
+                if (rowCheckbox && !isRowDisabled) {
+                    rowCheckbox.addEventListener('change', () => {
                         if (!verificarPermissao('OPERADOR')) return;
-                        if (!podeEditarArea(proc.area)) return;
-                        const newResp = e.target.value;
-                        if (!newResp) return;
-                        const updated = [...currentResps, newResp];
-                        setProcessResponsaveis(proc, updated);
-                        if (isRpaResponsavel(newResp)) {
-                            proc.isRpa = true;
-                        }
-                        saveState();
-                        renderCadastrosView();
-                        renderResponsavelFilterOptions();
-                        renderTable();
-                        renderBalancingTable();
-                        renderReviewTable();
-                        renderAutomationsView();
+                        updateBulkDeleteState();
                     });
                 }
                 
-                const productInput = tr.querySelector('.input-activity-product-cell');
-                if (productInput) {
-                    productInput.addEventListener('change', (e) => {
+                const rpaCheckbox = tr.querySelector('.cb-activity-rpa');
+                if (rpaCheckbox && !isRowDisabled) {
+                    rpaCheckbox.addEventListener('change', (e) => {
                         if (!verificarPermissao('OPERADOR')) return;
                         if (!podeEditarArea(proc.area)) return;
-                        proc.produto = e.target.value.trim();
+                        proc.isRpa = e.target.checked;
                         saveState();
-                    });
-                    productInput.addEventListener('focus', () => {
-                        if (isRowDisabled) return;
-                        productInput.style.background = 'rgba(255, 255, 255, 0.08)';
-                        productInput.style.border = '1px solid var(--border-color)';
-                    });
-                    productInput.addEventListener('blur', () => {
-                        productInput.style.background = 'transparent';
-                        productInput.style.border = 'none';
-                    });
-                }
-            }
-            
-            const deleteBtn = tr.querySelector('.btn-delete-activity-cell');
-            if (deleteBtn) {
-                deleteBtn.addEventListener('click', () => {
-                    if (!verificarPermissao('OPERADOR')) { alert('Acesso negado: Perfil OPERADOR ou ADMIN necessário.'); return; }
-                    if (!podeEditarArea(proc.area)) { alert(`Acesso negado: Você só pode excluir atividades da sua equipe (${currentUser.assignedTeam}).`); return; }
-                    if (confirm(`Deseja realmente excluir a atividade "${proc.name}"?`)) {
-                        state.processes = state.processes.filter(p => p.id !== proc.id);
-                        saveState();
-                        renderCadastrosView();
                         renderTable();
                         renderBalancingTable();
                         renderReviewTable();
                         renderAutomationsView();
+                        
+                        const labelText = tr.querySelector('.label-rpa-text');
+                        if (labelText) {
+                            labelText.style.color = e.target.checked ? '#a78bfa' : 'var(--text-muted)';
+                            labelText.style.fontWeight = e.target.checked ? '600' : 'normal';
+                        }
+                    });
+                }
+                
+                const nameInput = tr.querySelector('.input-activity-name-cell');
+                if (nameInput && !isRowDisabled) {
+                    nameInput.addEventListener('change', (e) => {
+                        if (!verificarPermissao('OPERADOR')) return;
+                        if (!podeEditarArea(proc.area)) return;
+                        const val = e.target.value.trim();
+                        if (val) {
+                            proc.name = val;
+                            saveState();
+                        } else {
+                            e.target.value = proc.name;
+                        }
+                    });
+                    nameInput.addEventListener('focus', () => {
+                        if (isRowDisabled) return;
+                        nameInput.style.background = 'rgba(255, 255, 255, 0.08)';
+                        nameInput.style.border = '1px solid var(--border-color)';
+                    });
+                    nameInput.addEventListener('blur', () => {
+                        nameInput.style.background = 'transparent';
+                        nameInput.style.border = 'none';
+                    });
+                }
+                
+                const teamSelect = tr.querySelector('.select-activity-team-cell');
+                if (teamSelect && !isRowDisabled) {
+                    teamSelect.addEventListener('change', (e) => {
+                        if (!verificarPermissao('OPERADOR')) return;
+                        if (!podeEditarArea(proc.area)) return;
+                        const newTeam = e.target.value;
+                        proc.area = newTeam;
+                        setProcessResponsaveis(proc, []);
+                        saveState();
+                        
+                        renderCadastrosView();
+                        renderAreaFilterOptions();
+                        renderResponsavelFilterOptions();
+                        renderTable();
+                        renderBalancingTable();
+                        renderReviewTable();
+                    });
+                    teamSelect.addEventListener('focus', () => {
+                        if (isRowDisabled) return;
+                        teamSelect.style.background = 'rgba(255, 255, 255, 0.08)';
+                        teamSelect.style.border = '1px solid var(--border-color)';
+                    });
+                    teamSelect.addEventListener('blur', () => {
+                        teamSelect.style.background = 'transparent';
+                        teamSelect.style.border = 'none';
+                    });
+                }
+                
+                // Listeners for multi-responsible badges & add dropdown
+                if (!isRowDisabled) {
+                    tr.querySelectorAll('.remove-resp-btn').forEach(btn => {
+                        btn.addEventListener('click', (e) => {
+                            e.stopPropagation();
+                            if (!verificarPermissao('OPERADOR')) return;
+                            if (!podeEditarArea(proc.area)) return;
+                            const respToRemove = btn.dataset.resp;
+                            const updated = currentResps.filter(r => r !== respToRemove);
+                            setProcessResponsaveis(proc, updated);
+                            saveState();
+                            renderCadastrosView();
+                            renderResponsavelFilterOptions();
+                            renderTable();
+                            renderBalancingTable();
+                            renderReviewTable();
+                            renderAutomationsView();
+                        });
+                    });
+
+                    const addRespSelect = tr.querySelector('.select-activity-add-resp');
+                    if (addRespSelect) {
+                        addRespSelect.addEventListener('change', (e) => {
+                            if (!verificarPermissao('OPERADOR')) return;
+                            if (!podeEditarArea(proc.area)) return;
+                            const newResp = e.target.value;
+                            if (!newResp) return;
+                            const updated = [...currentResps, newResp];
+                            setProcessResponsaveis(proc, updated);
+                            if (isRpaResponsavel(newResp)) {
+                                proc.isRpa = true;
+                            }
+                            saveState();
+                            renderCadastrosView();
+                            renderResponsavelFilterOptions();
+                            renderTable();
+                            renderBalancingTable();
+                            renderReviewTable();
+                            renderAutomationsView();
+                        });
                     }
-                });
-            }
-            
-            tableBody.appendChild(tr);
+                    
+                    const productInput = tr.querySelector('.input-activity-product-cell');
+                    if (productInput) {
+                        productInput.addEventListener('change', (e) => {
+                            if (!verificarPermissao('OPERADOR')) return;
+                            if (!podeEditarArea(proc.area)) return;
+                            proc.produto = e.target.value.trim();
+                            saveState();
+                        });
+                        productInput.addEventListener('focus', () => {
+                            if (isRowDisabled) return;
+                            productInput.style.background = 'rgba(255, 255, 255, 0.08)';
+                            productInput.style.border = '1px solid var(--border-color)';
+                        });
+                        productInput.addEventListener('blur', () => {
+                            productInput.style.background = 'transparent';
+                            productInput.style.border = 'none';
+                        });
+                    }
+                }
+                
+                const deleteBtn = tr.querySelector('.btn-delete-activity-cell');
+                if (deleteBtn) {
+                    deleteBtn.addEventListener('click', () => {
+                        if (!verificarPermissao('OPERADOR')) { alert('Acesso negado: Perfil OPERADOR ou ADMIN necessÃ¡rio.'); return; }
+                        if (!podeEditarArea(proc.area)) { alert(`Acesso negado: VocÃª sÃ³ pode excluir atividades da sua equipe (${currentUser.assignedTeam}).`); return; }
+                        if (confirm(`Deseja realmente excluir a atividade "${proc.name}"?`)) {
+                            state.processes = state.processes.filter(p => p.id !== proc.id);
+                            saveState();
+                            renderCadastrosView();
+                            renderTable();
+                            renderBalancingTable();
+                            renderReviewTable();
+                            renderAutomationsView();
+                        }
+                    });
+                }
+                
+                tableBody.appendChild(tr);
+            });
         });
-    });
-    
-    updateBulkDeleteState();
-    
-    // Re-apply permission logic after recreating DOM elements
-    aplicarPerfilDeAcesso();
+        
+        updateBulkDeleteState();
+        aplicarPerfilDeAcesso();
+    }
+
+    renderCadastrosTable();
 }
 
-// Update bulk delete button state helper
 function updateBulkDeleteState() {
     const tableBody = document.getElementById('cadastros-table-body');
     if (!tableBody) return;
@@ -4920,5 +5072,8 @@ function renderAutomationsView() {
         tableBody.appendChild(tr);
     });
 }
+
+
+
 
 
