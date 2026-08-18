@@ -17,8 +17,11 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body class="dark-theme">
-    <div id="hml-banner-fixed" style="position: fixed; top: 0; left: 0; right: 0; width: 100%; height: 32px; background: #f59e0b; color: #090d16; font-size: 11px; font-weight: 900; letter-spacing: 0.8px; text-transform: uppercase; display: flex; align-items: center; justify-content: center; gap: 8px; z-index: 999999; box-shadow: 0 4px 14px rgba(245,158,11,0.35); border-bottom: 2px solid #d97706;">
-        <i class="fa-solid fa-vial-circle-check text-slate-950 text-xs"></i> 🧪 AMBIENTE DE HOMOLOGAÇÃO (HML) — DADOS E FUNÇÕES EM TESTE
+    <div id="hml-banner-fixed" style="position: fixed; top: 0; left: 0; right: 0; width: 100%; height: 32px; background: #f59e0b; color: #090d16; font-size: 11px; font-weight: 900; letter-spacing: 0.8px; text-transform: uppercase; display: flex; align-items: center; justify-content: center; gap: 12px; z-index: 999999; box-shadow: 0 4px 14px rgba(245,158,11,0.35); border-bottom: 2px solid #d97706;">
+        <span><i class="fa-solid fa-vial-circle-check text-slate-950 text-xs"></i> 🧪 AMBIENTE DE HOMOLOGAÇÃO (HML) — DADOS E FUNÇÕES EM TESTE</span>
+        <button id="btn-hml-sync-prd" onclick="importPrdDataToHml()" data-permissao="OPERADOR,ADMIN" style="background: rgba(9, 13, 22, 0.85); color: #fff; border: 1px solid rgba(255,255,255,0.25); font-size: 10px; font-weight: 700; text-transform: none; letter-spacing: normal; padding: 2px 10px; border-radius: 6px; cursor: pointer; display: inline-flex; align-items: center; gap: 5px; transition: all 0.2s;" onmouseover="this.style.background='#000'" onmouseout="this.style.background='rgba(9, 13, 22, 0.85)'" title="Copiar todos os dados atuais de Produção para HML">
+            <i class="fa-solid fa-cloud-arrow-down" style="color: #f59e0b;"></i> Copiar Dados de PRD
+        </button>
     </div>
     <div class="app-container" style="margin-top: 32px;">
         <!-- LEFT SIDEBAR -->
@@ -163,6 +166,9 @@
                                 <div class="header-table-controls" style="gap: 0.75rem; flex-wrap: wrap;">
                                     <button id="btn-cadastros-delete-selected" data-permissao="ADMIN" class="btn btn-secondary" style="background: rgba(244, 63, 94, 0.08); border: 1px solid #f43f5e; color: #f43f5e; display: none;">
                                         <i class="fa-solid fa-trash-can"></i> Excluir Selecionados (<span id="cadastros-selected-count">0</span>)
+                                    </button>
+                                    <button id="btn-cadastros-sync-prd" onclick="importPrdDataToHml()" data-permissao="OPERADOR,ADMIN" class="btn btn-secondary hml-only" style="background: rgba(245, 158, 11, 0.1); border: 1px solid rgba(245, 158, 11, 0.4); color: #f59e0b;" title="Importar base de dados atual de Produção para HML">
+                                        <i class="fa-solid fa-cloud-arrow-down"></i> Copiar Dados de PRD
                                     </button>
                                     <input type="file" id="cadastros-import-excel-file" accept=".xlsx, .xls, .csv" style="display: none;">
                                     <button id="btn-cadastros-import-excel" data-permissao="OPERADOR,ADMIN" class="btn btn-secondary" style="background: rgba(16, 185, 129, 0.08); border: 1px solid #10b981; color: #10b981;">

@@ -810,6 +810,72 @@ async function loadStateFromSupabase() {
     }
 }
 
+// IMPORTAR BASE DE DADOS COMPLETA DE PRODUÇÃO (PRD) PARA HOMOLOGAÇÃO (HML)
+async function importPrdDataToHml() {
+    if (!verificarPermissao('OPERADOR')) {
+        alert('Acesso negado: Perfil OPERADOR ou ADMIN necessário.');
+        return;
+    }
+    
+    const client = getSupabase();
+    if (!client) {
+        alert('Erro: Supabase não conectado.');
+        return;
+    }
+    
+    const confirmMsg = 'Deseja realmente importar todas as informações de PRODUÇÃO (PRD) para este ambiente de HOMOLOGAÇÃO (HML)?\n\n' +
+                       '⚠️ Todos os processos, responsáveis e equipes de HML serão substituídos pelo cenário atual de Produção para que você possa executar testes com dados reais.';
+    
+    if (!confirm(confirmMsg)) {
+        return;
+    }
+    
+    try {
+        showToast('Buscando dados atuais de Produção (PRD)...', 'info', 4000);
+        
+        const { data, error } = await client
+            .from('board_state')
+            .select('data')
+            .eq('id', 'default')
+            .maybeSingle();
+            
+        if (error) {
+            console.error('[Import PRD Error]', error);
+            alert('Erro ao buscar dados de Produção no Supabase: ' + error.message);
+            return;
+        }
+        
+        if (!data || !data.data) {
+            alert('Nenhum dado encontrado no banco de Produção (PRD).');
+            return;
+        }
+        
+        // Clona e migra estado de Produção
+        state = JSON.parse(JSON.stringify(data.data));
+        applyStateMigrations();
+        
+        // Salva diretamente em HML (id: 'hml_default')
+        saveState();
+        
+        refreshCurrentUserAssignedTeam();
+        aplicarPerfilDeAcesso();
+        renderAreaFilterOptions();
+        renderResponsavelFilterOptions();
+        renderCadastrosView();
+        renderTable();
+        renderBalancingTable();
+        renderReviewTable();
+        renderAutomationsView();
+        
+        showToast('Cenário de Produção (PRD) importado com sucesso para HML!', 'success', 6000);
+        alert('Sucesso! O cenário de Produção (PRD) foi copiado integralmente para este ambiente de Homologação (HML).');
+        
+    } catch (err) {
+        console.error('[Import PRD Exception]', err);
+        alert('Erro inesperado ao importar dados de Produção: ' + err.message);
+    }
+}
+
 function isRpaActivity(proc) {
     if (!proc) return false;
     return proc.isRpa === true || proc.isRpa === 'true' || proc.isRpa === 1;
