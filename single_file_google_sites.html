@@ -6732,7 +6732,7 @@ function toggleCadastrosTeam(team, rowClass, headerElement) {
     if (icon) {
         icon.className = newOpen ? 'fa-solid fa-chevron-down' : 'fa-solid fa-chevron-right';
         icon.style.width = '20px';
-        icon.style.color = 'var(--color-primary)';
+        icon.style.color = 'var(--text-primary)';
     }
     
     const rows = document.querySelectorAll('.' + rowClass);
@@ -6761,7 +6761,7 @@ function toggleAllCadastrosTeams() {
         if (icon) {
             icon.className = targetState ? 'fa-solid fa-chevron-down' : 'fa-solid fa-chevron-right';
             icon.style.width = '20px';
-            icon.style.color = 'var(--color-primary)';
+            icon.style.color = 'var(--text-primary)';
         }
         
         if (rowClass) {
@@ -7220,7 +7220,7 @@ function renderCadastrosView() {
             const totalCols = currentUser.perfil === 'ADMIN' ? 7 : (currentUser.perfil === 'OPERADOR' ? 6 : 5);
             headerTr.innerHTML = `
                 <td colspan="${totalCols}" style="padding: 0.8rem; font-weight: 600; color: var(--text-primary); border-top: 1px solid rgba(255,255,255,0.05); border-bottom: 1px solid rgba(255,255,255,0.05); cursor: pointer;">
-                    <i class="${isExpanded ? 'fa-solid fa-chevron-down' : 'fa-solid fa-chevron-right'}" style="width: 20px; color: var(--color-primary); margin-right: 0.25rem;"></i> ${escapeHtml(team)} <span style="background: rgba(255,255,255,0.1); color: var(--text-secondary); padding: 0.1rem 0.5rem; border-radius: 10px; font-size: 0.75rem; margin-left: 0.5rem;">${teamProcs.length} atividades</span>
+                    <i class="${isExpanded ? 'fa-solid fa-chevron-down' : 'fa-solid fa-chevron-right'}" style="width: 20px; color: var(--text-primary); margin-right: 0.25rem;"></i> ${escapeHtml(team)} <span style="background: rgba(255,255,255,0.1); color: var(--text-secondary); padding: 0.1rem 0.5rem; border-radius: 10px; font-size: 0.75rem; margin-left: 0.5rem;">${teamProcs.length} atividades</span>
                 </td>
             `;
             headerTr.addEventListener('click', (e) => {
