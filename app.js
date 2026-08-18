@@ -1145,11 +1145,11 @@ async function saveStateToSupabase() {
 
 async function forceResetGlobalState() {
     if (!verificarPermissao('ADMIN')) {
-        alert('Acesso negado: Perfil ADMIN necessÃ¡rio para publicar a base global.');
+        alert('Acesso negado: Perfil ADMIN necessário para publicar a base global.');
         return;
     }
 
-    if (!confirm('Deseja ÃÃrealmente definir e publicar a sua visão atual como a base oficial para TODOS os usuários? Isso sincronizará a tela de todos imediatamente.')) {
+    if (!confirm('Deseja realmente definir e publicar a sua visão atual como a base oficial para TODOS os usuários? Isso sincronizará a tela de todos imediatamente.')) {
         return;
     }
 
@@ -1752,12 +1752,12 @@ function setupEventListeners() {
     const btnBulkDeleteSelected = document.getElementById('btn-cadastros-delete-selected');
     if (btnBulkDeleteSelected) {
         btnBulkDeleteSelected.addEventListener('click', () => {
-            if (!verificarPermissao('ADMIN')) { alert('Acesso negado: Perfil ADMIN necessÃ¡rio.'); return; }
+            if (!verificarPermissao('ADMIN')) { alert('Acesso negado: Perfil ADMIN necessário.'); return; }
             const checkedBoxes = document.querySelectorAll('.cadastros-row-checkbox:checked');
             const idsToDelete = [...checkedBoxes].map(cb => cb.dataset.id);
             if (idsToDelete.length === 0) return;
             
-            if (confirm(`Deseja ÃÃrealmente excluir as ${idsToDelete.length} atividades selecionadas?`)) {
+            if (confirm(`Deseja realmente excluir as ${idsToDelete.length} atividades selecionadas?`)) {
                 state.processes = state.processes.filter(p => !idsToDelete.includes(p.id));
                 saveState();
                 
@@ -1792,7 +1792,7 @@ function setupEventListeners() {
         });
     }
 
-    // AÃÃrea & Owner filter triggers
+    // Área & Owner filter triggers
     const filterAreaEl = document.getElementById('filter-area');
     if (filterAreaEl) {
         filterAreaEl.addEventListener('change', () => {
@@ -1976,7 +1976,7 @@ function setupEventListeners() {
     });
 
     safeAddListener('btn-clear-backlog-volumes', 'click', () => {
-        if (!verificarPermissao('ADMIN')) { alert('Acesso negado: Perfil ADMIN necessÃ¡rio.'); return; }
+        if (!verificarPermissao('ADMIN')) { alert('Acesso negado: Perfil ADMIN necessário.'); return; }
         state.processes.forEach(proc => {
             proc.backlogVolume = '';
         });
@@ -2242,7 +2242,7 @@ function renderBalancingTable() {
             }
         }
         
-        // Click event to highlight corresponding area card on the right (ignore for ResponsÃvel and Backlog inputs)
+        // Click event to highlight corresponding area card on the right (ignore for Responsável and Backlog inputs)
         tr.addEventListener('click', (e) => {
             const td = e.target.closest('td');
             if (!td) return;
@@ -2506,7 +2506,7 @@ function updateCalculations() {
     // Update placeholders for responsible overrides inputs in-place to avoid re-rendering layout
     const horasInputs = document.querySelectorAll('.override-horas');
     horasInputs.forEach(inp => {
-        inp.placeholder = `${horasDia.toFixed(1)} (PadrÃ£o)`;
+        inp.placeholder = `${horasDia.toFixed(1)} (Padrão)`;
     });
     const absInputs = document.querySelectorAll('.override-absenteismo');
     absInputs.forEach(inp => {
@@ -2555,7 +2555,7 @@ function updateBalancingCalculations() {
         let totalHoursRow = 0;
         if (!isStopped) {
             if (isTempoFrequencia) {
-                // Tempo x FrequÃªncia: distributed evenly across working days
+                // Tempo x Frequência: distributed evenly across working days
                 const qtdExec = parseFloat(proc.qtdExecucao) || 0;
                 totalHoursRow = (qtdExec * minutes) / 60 / respParams.diasUteis;
             } else {
@@ -2659,7 +2659,7 @@ function updateBalancingCalculations() {
 
 
 
-    // Update AÃÃrea Allocations Side Panel
+    // Update Área Allocations Side Panel
     renderAreaAllocations();
 }
 
@@ -2837,7 +2837,7 @@ function duplicateProcess(proc) {
 }
 
 function loadExampleData() {
-    if (!verificarPermissao('ADMIN')) { alert('Acesso negado: Perfil ADMIN necessÃ¡rio.'); return; }
+    if (!verificarPermissao('ADMIN')) { alert('Acesso negado: Perfil ADMIN necessário.'); return; }
     state.processes = JSON.parse(JSON.stringify(EXAMPLE_PROCESSES));
     state.params = {
         horasDia: 8.0,
@@ -2883,7 +2883,7 @@ function loadExampleData() {
 }
 
 function resetSimulator() {
-    if (!verificarPermissao('ADMIN')) { alert('Acesso negado: Perfil ADMIN necessÃ¡rio.'); return; }
+    if (!verificarPermissao('ADMIN')) { alert('Acesso negado: Perfil ADMIN necessário.'); return; }
     state.processes = [];
     document.getElementById('filter-area').value = 'all';
     document.getElementById('filter-area-balancing').value = 'all';
@@ -2898,7 +2898,7 @@ function resetSimulator() {
     renderBalancingTable();
 }
 
-// CHART RENDER ENGINE (Grouped by AÃÃrea or Process based on filter selection)
+// CHART RENDER ENGINE (Grouped by Área or Process based on filter selection)
 function renderCharts(totalFteRequired) {
     const isDark = document.body.classList.contains('dark-theme');
     
@@ -2908,7 +2908,7 @@ function renderCharts(totalFteRequired) {
     const primaryColor = style.getPropertyValue('--color-primary').trim();
     const successColor = style.getPropertyValue('--color-success').trim();
 
-    // 1. Doughnut Chart (Aggregated by AÃÃrea or by Process)
+    // 1. Doughnut Chart (Aggregated by Área or by Process)
     const pieCanvas = document.getElementById('chart-pie');
     if (!pieCanvas) return;
 
@@ -3732,7 +3732,7 @@ function renderSnapshotsList() {
             <div class="glass-panel" style="display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 1rem; border-radius: 8px; border: 1px solid rgba(255,255,255,0.05); background: rgba(255,255,255,0.01);">
                 <div>
                     <h4 style="margin: 0; font-size: 0.95rem; font-weight: 600; color: var(--text-primary);">${formatMonth(h.month)}</h4>
-                    <span style="font-size: 0.8rem; color: var(--text-secondary);">${h.data.length} atividades â€ Vol: ${totalVolume.toFixed(0)}</span>
+                    <span style="font-size: 0.8rem; color: var(--text-secondary);">${h.data.length} atividades • Vol: ${totalVolume.toFixed(0)}</span>
                 </div>
                 <button class="btn-row-action btn-delete-snapshot" data-permissao="ADMIN" data-month="${h.month}" title="Excluir Registro" style="color: var(--color-danger); background: transparent; border: none; cursor: pointer; font-size: 0.9rem; padding: 0.2rem;">
                     <i class="fa-solid fa-trash-can"></i>
@@ -3746,7 +3746,7 @@ function renderSnapshotsList() {
     // Add delete listeners
     container.querySelectorAll('.btn-delete-snapshot').forEach(btn => {
         btn.addEventListener('click', (e) => {
-            if (!verificarPermissao('ADMIN')) { alert('Acesso negado: Perfil ADMIN necessÃ¡rio.'); return; }
+            if (!verificarPermissao('ADMIN')) { alert('Acesso negado: Perfil ADMIN necessário.'); return; }
             const btnEl = e.currentTarget;
             const month = btnEl.dataset.month;
             if (confirm(`Tem certeza que deseja excluir o registro de ${formatMonth(month)}?`)) {
@@ -3989,7 +3989,7 @@ function renderCadastrosView() {
             teamsList.querySelectorAll('.btn-edit-team-item').forEach(btn => {
                 btn.addEventListener('click', (e) => {
                     e.stopPropagation();
-                    if (!verificarPermissao('OPERADOR')) { alert('Acesso negado: Perfil OPERADOR necessÃ¡rio.'); return; }
+                    if (!verificarPermissao('OPERADOR')) { alert('Acesso negado: Perfil OPERADOR necessário.'); return; }
                     const team = btn.getAttribute('data-team');
                     openNewTeamModal(team);
                 });
@@ -3998,9 +3998,9 @@ function renderCadastrosView() {
             teamsList.querySelectorAll('.btn-delete-team-item').forEach(btn => {
                 btn.addEventListener('click', (e) => {
                     e.stopPropagation();
-                    if (!verificarPermissao('ADMIN')) { alert('Acesso negado: Perfil ADMIN necessÃ¡rio.'); return; }
+                    if (!verificarPermissao('ADMIN')) { alert('Acesso negado: Perfil ADMIN necessário.'); return; }
                     const team = btn.getAttribute('data-team');
-                    if (confirm(`Deseja realmente excluir a equipe "${team}"? Todos os responsÃ¡veis e atividades desta equipe ficarÃ£o "Sem Equipe".`)) {
+                    if (confirm(`Deseja realmente excluir a equipe "${team}"? Todos os responsáveis e atividades desta equipe ficarão "Sem Equipe".`)) {
                         state.teams = state.teams.filter(t => t !== team);
                         state.processes.forEach(p => {
                             if (p.area === team) p.area = '';
@@ -4033,7 +4033,7 @@ function renderCadastrosView() {
         if(icon) {
             icon.className = isHidden ? 'fa-solid fa-chevron-down' : 'fa-solid fa-chevron-right';
         }
-        // Limpar qualquer autofill nÃ£o digitado pelo usuÃ¡rio
+        // Limpar qualquer autofill não digitado pelo usuário
         const emailInput = document.getElementById('input-new-responsible-email');
         if (emailInput && !emailInput._hasUserTyping) {
             emailInput.value = '';
@@ -4048,7 +4048,7 @@ function renderCadastrosView() {
     responsiblesList.innerHTML = '';
     
     if (!state.responsaveis || state.responsaveis.length === 0) {
-        responsiblesList.innerHTML = '<div style="color: var(--text-muted); font-size: 0.85rem; padding: 0.5rem;">Nenhum responsÃ¡vel cadastrado.</div>';
+        responsiblesList.innerHTML = '<div style="color: var(--text-muted); font-size: 0.85rem; padding: 0.5rem;">Nenhum responsável cadastrado.</div>';
     } else {
         const teamsToRender = [...(state.teams || []), 'Sem Equipe'];
         
@@ -4090,7 +4090,7 @@ function renderCadastrosView() {
                         <span style="font-weight: 600; color: var(--text-primary);">${escapeHtml(resp.name)}</span>
                         ${resp.email ? `<span style="font-size: 0.72rem; color: var(--text-muted); display: flex; align-items: center; gap: 0.25rem;"><i class="fa-regular fa-envelope" style="font-size: 0.65rem;"></i> ${escapeHtml(resp.email)}</span>` : ''}
                     </div>
-                    ${hasOverrides ? '<i class="fa-solid fa-user-gear" style="color: var(--color-primary); font-size: 0.75rem; margin-left: 0.25rem;" title="ParÃ¢metros customizados ativos"></i>' : ''}
+                    ${hasOverrides ? '<i class="fa-solid fa-user-gear" style="color: var(--color-primary); font-size: 0.75rem; margin-left: 0.25rem;" title="Parâmetros customizados ativos"></i>' : ''}
                 `;
                 
                 const btnGroup = document.createElement('div');
@@ -4100,7 +4100,7 @@ function renderCadastrosView() {
                 btnConfig.className = 'btn-config-resp-item';
                 btnConfig.setAttribute('data-permissao', 'OPERADOR,ADMIN');
                 btnConfig.style.cssText = 'background: transparent; border: none; color: var(--color-primary); cursor: pointer; font-size: 0.85rem; padding: 0.2rem; display: flex; align-items: center; justify-content: center;';
-                btnConfig.title = 'Configurar ParÃ¢metros de Capacidade';
+                btnConfig.title = 'Configurar Parâmetros de Capacidade';
                 btnConfig.innerHTML = '<i class="fa-solid fa-cog"></i>';
                 if (!canEditResp && currentUser.perfil !== 'ADMIN') {
                     btnConfig.style.display = 'none';
@@ -4110,7 +4110,7 @@ function renderCadastrosView() {
                 btnDelete.className = 'btn-delete-resp-item';
                 btnDelete.setAttribute('data-permissao', 'OPERADOR,ADMIN');
                 btnDelete.style.cssText = 'background: transparent; border: none; color: var(--color-danger); cursor: pointer; font-size: 0.85rem; padding: 0.2rem; display: flex; align-items: center; justify-content: center;';
-                btnDelete.title = 'Excluir ResponsÃ¡vel';
+                btnDelete.title = 'Excluir Responsável';
                 btnDelete.innerHTML = '<i class="fa-solid fa-trash-can"></i>';
                 if (!canEditResp && currentUser.perfil !== 'ADMIN') {
                     btnDelete.style.display = 'none';
@@ -4129,9 +4129,9 @@ function renderCadastrosView() {
                 
                 btnDelete.addEventListener('click', (e) => {
                     e.stopPropagation();
-                    if (!verificarPermissao('OPERADOR')) { alert('Acesso negado: Perfil OPERADOR ou ADMIN necessÃ¡rio.'); return; }
-                    if (!podeEditarArea(resp.area)) { alert(`Acesso negado: VocÃª sÃ³ pode excluir responsÃ¡veis da sua prÃ³pria equipe (${currentUser.assignedTeam}).`); return; }
-                    if (confirm(`Tem certeza que deseja excluir o responsÃ¡vel "${resp.name}"? Todas as atividades sob sua responsabilidade ficarÃ£o sem responsÃ¡vel.`)) {
+                    if (!verificarPermissao('OPERADOR')) { alert('Acesso negado: Perfil OPERADOR ou ADMIN necessário.'); return; }
+                    if (!podeEditarArea(resp.area)) { alert(`Acesso negado: Você só pode excluir responsáveis da sua própria equipe (${currentUser.assignedTeam}).`); return; }
+                    if (confirm(`Tem certeza que deseja excluir o responsável "${resp.name}"? Todas as atividades sob sua responsabilidade ficarão sem responsável.`)) {
                         state.responsaveis = state.responsaveis.filter(r => (typeof r === 'object' ? r.name : r) !== resp.name);
                         state.processes.forEach(p => {
                             if (p.responsavel === resp.name) p.responsavel = '';
@@ -4196,7 +4196,7 @@ function renderCadastrosView() {
 
     if (filterAreaEl) {
         const curArea = filterAreaEl.value;
-        const areaOptions = ['<option value="">Todas as Ãreas</option>']
+        const areaOptions = ['<option value="">Todas as Áreas</option>']
             .concat((state.teams || []).map(t => `<option value="${escapeHtml(t)}" ${t === curArea ? 'selected' : ''}>${escapeHtml(t)}</option>`))
             .concat([`<option value="Outros / Sem Equipe" ${curArea === 'Outros / Sem Equipe' ? 'selected' : ''}>Outros / Sem Equipe</option>`]);
         filterAreaEl.innerHTML = areaOptions.join('');
@@ -4206,9 +4206,9 @@ function renderCadastrosView() {
         const curResp = filterRespEl.value;
         const allResps = (state.responsaveis || []).map(r => typeof r === 'object' ? r.name : r).filter(Boolean);
         const uniqueResps = [...new Set(allResps)].sort();
-        const respOptions = ['<option value="">Todos os ResponsÃ¡veis</option>']
+        const respOptions = ['<option value="">Todos os Responsáveis</option>']
             .concat(uniqueResps.map(r => `<option value="${escapeHtml(r)}" ${r === curResp ? 'selected' : ''}>${escapeHtml(r)}</option>`))
-            .concat([`<option value="__SEM_RESP__" ${curResp === '__SEM_RESP__' ? 'selected' : ''}>Sem ResponsÃ¡vel</option>`]);
+            .concat([`<option value="__SEM_RESP__" ${curResp === '__SEM_RESP__' ? 'selected' : ''}>Sem Responsável</option>`]);
         filterRespEl.innerHTML = respOptions.join('');
     }
 
@@ -4255,7 +4255,7 @@ function renderCadastrosView() {
             // 1. Demanda / Atividade
             if (searchVal && !(proc.name || '').toLowerCase().includes(searchVal)) return false;
 
-            // 2. Ãrea / Equipe
+            // 2. Área / Equipe
             if (areaVal) {
                 if (areaVal === 'Outros / Sem Equipe') {
                     if (proc.area && state.teams.includes(proc.area)) return false;
@@ -4264,7 +4264,7 @@ function renderCadastrosView() {
                 }
             }
 
-            // 3. ResponsÃ¡vel
+            // 3. Responsável
             if (respVal) {
                 const resps = getProcessResponsaveis(proc);
                 if (respVal === '__SEM_RESP__') {
@@ -4325,7 +4325,7 @@ function renderCadastrosView() {
             
             if (teamProcs.length === 0) return;
             
-            // OrdenaÃ§Ã£o AlfabÃ©tica A-Z das Atividades da Equipe
+            // Ordenação Alfabética A-Z das Atividades da Equipe
             teamProcs.sort((a, b) => (a.name || '').localeCompare(b.name || '', 'pt-BR', { sensitivity: 'base' }));
             
             const rowClass = 'team-activity-row-' + teamIndex;
@@ -4384,7 +4384,7 @@ function renderCadastrosView() {
                     return !currentResps.includes(rName);
                 });
 
-                const unassignedOptionsHtml = '<option value="">+ ResponsÃ¡vel</option>' +
+                const unassignedOptionsHtml = '<option value="">+ Responsável</option>' +
                     unassignedResps.map(resp => {
                         const rName = typeof resp === 'object' ? resp.name : resp;
                         return `<option value="${escapeHtml(rName)}">${escapeHtml(rName)}</option>`;
@@ -4418,7 +4418,7 @@ function renderCadastrosView() {
                     <td style="text-align: center;">
                         <label style="display: inline-flex; align-items: center; gap: 0.35rem; cursor: ${isRowDisabled ? 'default' : 'pointer'}; font-size: 0.8rem; user-select: none;">
                             <input type="checkbox" class="cb-activity-rpa" ${isRpa ? 'checked' : ''} ${isRowDisabled ? 'disabled' : ''}>
-                            <span class="label-rpa-text" style="${isRpa ? 'color: #a78bfa; font-weight: 600;' : 'color: var(--text-muted);'}">ðŸ¤– RPA</span>
+                            <span class="label-rpa-text" style="${isRpa ? 'color: #a78bfa; font-weight: 600;' : 'color: var(--text-muted);'}">🤖 RPA</span>
                         </label>
                     </td>
                     <td class="col-acao-excluir" style="text-align: center; ${isConsulta ? 'display: none;' : ''}">
@@ -4574,8 +4574,8 @@ function renderCadastrosView() {
                 const deleteBtn = tr.querySelector('.btn-delete-activity-cell');
                 if (deleteBtn) {
                     deleteBtn.addEventListener('click', () => {
-                        if (!verificarPermissao('OPERADOR')) { alert('Acesso negado: Perfil OPERADOR ou ADMIN necessÃ¡rio.'); return; }
-                        if (!podeEditarArea(proc.area)) { alert(`Acesso negado: VocÃª sÃ³ pode excluir atividades da sua equipe (${currentUser.assignedTeam}).`); return; }
+                        if (!verificarPermissao('OPERADOR')) { alert('Acesso negado: Perfil OPERADOR ou ADMIN necessário.'); return; }
+                        if (!podeEditarArea(proc.area)) { alert(`Acesso negado: Você só pode excluir atividades da sua equipe (${currentUser.assignedTeam}).`); return; }
                         if (confirm(`Deseja realmente excluir a atividade "${proc.name}"?`)) {
                             state.processes = state.processes.filter(p => p.id !== proc.id);
                             saveState();
