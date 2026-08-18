@@ -1290,6 +1290,9 @@ function applyStateMigrations() {
         };
     }
     if (!state.areaAllocations) state.areaAllocations = {};
+    if (state.processes && Array.isArray(state.processes)) {
+        state.processes.sort((a, b) => (a.name || '').localeCompare(b.name || '', 'pt-BR', { sensitivity: 'base' }));
+    }
     if (!state.processes) {
         state.processes = JSON.parse(JSON.stringify(EXAMPLE_PROCESSES));
     }
@@ -4251,6 +4254,7 @@ function renderCadastrosView() {
             }
             
             if (teamProcs.length === 0) return;
+            teamProcs.sort((a, b) => (a.name || '').localeCompare(b.name || '', 'pt-BR', { sensitivity: 'base' }));
             
             const rowClass = 'team-activity-row-' + teamIndex;
             // Se houver filtros ativos, expande automaticamente para exibir resultados
@@ -5068,6 +5072,7 @@ function renderAutomationsView() {
         tableBody.appendChild(tr);
     });
 }
+
 
 
 
