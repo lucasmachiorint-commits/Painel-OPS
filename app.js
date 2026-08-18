@@ -161,8 +161,6 @@ let pieChartInstance = null;
 let barChartInstance = null;
 
 // DEFAULT EXAMPLE DATA WITH AREAS
-const EXAMPLE_PROCESSES = [
-    // Backoffice (70 Processos Oficiais)
     { id: 'bko-1', name: 'Site Operações - BKO', area: 'Backoffice', responsavel: 'Erika Kimie', responsaveis: ['Erika Kimie'], volume: 1, minutos: 150, qtdExecucao: 1, backlogVolume: '', allocatedResource: '', reviewStatus: 'Manter', isRpa: false },
     { id: 'bko-2', name: 'Atualização Backlog - Controle de filas', area: 'Backoffice', responsavel: 'Vitoria Silva - Skytel', responsaveis: ['Vitoria Silva - Skytel'], volume: 21, minutos: 25, qtdExecucao: 21, backlogVolume: '', allocatedResource: '', reviewStatus: 'Manter', isRpa: false },
     { id: 'bko-3', name: 'Atualização DO', area: 'Backoffice', responsavel: 'Erika Kimie', responsaveis: ['Erika Kimie'], volume: 1, minutos: 120, qtdExecucao: 1, backlogVolume: '', allocatedResource: '', reviewStatus: 'Manter', isRpa: false },
@@ -234,13 +232,6 @@ const EXAMPLE_PROCESSES = [
     { id: 'bko-69', name: 'Cancelamento SAP', area: 'Backoffice', responsavel: '', responsaveis: [], volume: 21, minutos: 30, qtdExecucao: 21, backlogVolume: '', allocatedResource: '', reviewStatus: 'Manter', isRpa: false },
     { id: 'bko-70', name: 'Baixa de pagamentos não processados', area: 'Backoffice', responsavel: '', responsaveis: [], volume: '', minutos: 0, qtdExecucao: '', backlogVolume: '', allocatedResource: '', reviewStatus: 'Manter', isRpa: false },
 
-    // Eficiência Operacional
-    { id: 'ex-17', name: 'Mapeamento e Melhoria de Fluxos Operacionais', area: 'Eficiência Operacional', volume: '', minutos: 0, qtdExecucao: '', backlogVolume: '', allocatedResource: '' },
-    { id: 'ex-18', name: 'Desenvolvimento e Manutenção de Automações RPA', area: 'Eficiência Operacional', volume: '', minutos: 0, qtdExecucao: '', backlogVolume: '', allocatedResource: '', isRpa: true },
-    { id: 'ex-19', name: 'Monitoria de Qualidade e Auditoria de Processos', area: 'Eficiência Operacional', volume: '', minutos: 0, qtdExecucao: '', backlogVolume: '', allocatedResource: '' },
-    { id: 'ex-20', name: 'Análise de Indicadores e Performance Operacional', area: 'Eficiência Operacional', volume: '', minutos: 0, qtdExecucao: '', backlogVolume: '', allocatedResource: '' },
-    { id: 'ex-21', name: 'Suporte Técnico N2/N3 e Gestão de Incidentes', area: 'Eficiência Operacional', volume: '', minutos: 0, qtdExecucao: '', backlogVolume: '', allocatedResource: '' }
-];
 
 function getSupabase() {
     if (!supabaseClient && window.supabase && typeof window.supabase.createClient === 'function') {
@@ -1998,6 +1989,9 @@ function renderTable() {
         const respMatch = matchesRespFilter(p, respFilter);
         return areaMatch && respMatch;
     });
+    filteredProcesses.sort((a, b) => (a.name || '').localeCompare(b.name || '', 'pt-BR', { sensitivity: 'base' }));
+    filteredProcesses.sort((a, b) => (a.name || '').localeCompare(b.name || '', 'pt-BR', { sensitivity: 'base' }));
+    filteredProcesses.sort((a, b) => (a.name || '').localeCompare(b.name || '', 'pt-BR', { sensitivity: 'base' }));
 
     if (filteredProcesses.length === 0) {
         if (state.processes.length === 0) {
@@ -2114,6 +2108,9 @@ function renderBalancingTable() {
         const respMatch = matchesRespFilter(p, respFilter);
         return areaMatch && respMatch;
     });
+    filteredProcesses.sort((a, b) => (a.name || '').localeCompare(b.name || '', 'pt-BR', { sensitivity: 'base' }));
+    filteredProcesses.sort((a, b) => (a.name || '').localeCompare(b.name || '', 'pt-BR', { sensitivity: 'base' }));
+    filteredProcesses.sort((a, b) => (a.name || '').localeCompare(b.name || '', 'pt-BR', { sensitivity: 'base' }));
 
     if (filteredProcesses.length === 0) {
         if (state.processes.length === 0) {
@@ -3310,6 +3307,9 @@ function renderReviewTable() {
         const respMatch = matchesRespFilter(p, respFilter);
         return areaMatch && respMatch;
     });
+    filteredProcesses.sort((a, b) => (a.name || '').localeCompare(b.name || '', 'pt-BR', { sensitivity: 'base' }));
+    filteredProcesses.sort((a, b) => (a.name || '').localeCompare(b.name || '', 'pt-BR', { sensitivity: 'base' }));
+    filteredProcesses.sort((a, b) => (a.name || '').localeCompare(b.name || '', 'pt-BR', { sensitivity: 'base' }));
 
     if (filteredProcesses.length === 0) {
         emptyState.style.display = 'block';
@@ -4122,6 +4122,37 @@ function renderCadastrosView() {
     const filterRpaEl = document.getElementById('cadastros-filter-rpa');
     const btnClearFilters = document.getElementById('btn-cadastros-clear-filters');
 
+    // Prevenir auto-preenchimento indevido do navegador nos campos de busca e produto
+    if (filterProductEl) {
+        if (!filterProductEl._hasUserTyping) {
+            filterProductEl.value = '';
+        }
+        filterProductEl.readOnly = true;
+        filterProductEl.onfocus = function() { this.readOnly = false; };
+        if (!filterProductEl._boundTypingTracker) {
+            filterProductEl._boundTypingTracker = true;
+            filterProductEl.addEventListener('input', () => {
+                filterProductEl._hasUserTyping = filterProductEl.value.trim().length > 0;
+                renderCadastrosTable();
+            });
+        }
+    }
+
+    if (filterSearchEl) {
+        if (!filterSearchEl._hasUserTyping) {
+            filterSearchEl.value = '';
+        }
+        filterSearchEl.readOnly = true;
+        filterSearchEl.onfocus = function() { this.readOnly = false; };
+        if (!filterSearchEl._boundTypingTracker) {
+            filterSearchEl._boundTypingTracker = true;
+            filterSearchEl.addEventListener('input', () => {
+                filterSearchEl._hasUserTyping = filterSearchEl.value.trim().length > 0;
+                renderCadastrosTable();
+            });
+        }
+    }
+
     if (filterAreaEl) {
         const curArea = filterAreaEl.value;
         const areaOptions = ['<option value="">Todas as Ãreas</option>']
@@ -4141,10 +4172,6 @@ function renderCadastrosView() {
     }
 
     // Attach real-time filter listeners once
-    if (filterSearchEl && !filterSearchEl._boundFilter) {
-        filterSearchEl._boundFilter = true;
-        filterSearchEl.addEventListener('input', () => renderCadastrosTable());
-    }
     if (filterAreaEl && !filterAreaEl._boundFilter) {
         filterAreaEl._boundFilter = true;
         filterAreaEl.addEventListener('change', () => renderCadastrosTable());
@@ -4153,10 +4180,6 @@ function renderCadastrosView() {
         filterRespEl._boundFilter = true;
         filterRespEl.addEventListener('change', () => renderCadastrosTable());
     }
-    if (filterProductEl && !filterProductEl._boundFilter) {
-        filterProductEl._boundFilter = true;
-        filterProductEl.addEventListener('input', () => renderCadastrosTable());
-    }
     if (filterRpaEl && !filterRpaEl._boundFilter) {
         filterRpaEl._boundFilter = true;
         filterRpaEl.addEventListener('change', () => renderCadastrosTable());
@@ -4164,10 +4187,16 @@ function renderCadastrosView() {
     if (btnClearFilters && !btnClearFilters._boundFilter) {
         btnClearFilters._boundFilter = true;
         btnClearFilters.addEventListener('click', () => {
-            if (filterSearchEl) filterSearchEl.value = '';
+            if (filterSearchEl) {
+                filterSearchEl._hasUserTyping = false;
+                filterSearchEl.value = '';
+            }
             if (filterAreaEl) filterAreaEl.value = '';
             if (filterRespEl) filterRespEl.value = '';
-            if (filterProductEl) filterProductEl.value = '';
+            if (filterProductEl) {
+                filterProductEl._hasUserTyping = false;
+                filterProductEl.value = '';
+            }
             if (filterRpaEl) filterRpaEl.value = '';
             renderCadastrosTable();
         });
@@ -4254,6 +4283,8 @@ function renderCadastrosView() {
             }
             
             if (teamProcs.length === 0) return;
+            
+            // OrdenaÃ§Ã£o AlfabÃ©tica A-Z das Atividades da Equipe
             teamProcs.sort((a, b) => (a.name || '').localeCompare(b.name || '', 'pt-BR', { sensitivity: 'base' }));
             
             const rowClass = 'team-activity-row-' + teamIndex;
@@ -4968,6 +4999,7 @@ function renderAutomationsView() {
         if (areaFilter !== 'all' && p.area !== areaFilter) return false;
         return true;
     });
+    rpaProcesses.sort((a, b) => (a.name || '').localeCompare(b.name || '', 'pt-BR', { sensitivity: 'base' }));
     
     let totalRpaCount = 0;
     let totalRpaHours = 0;
@@ -5072,7 +5104,3 @@ function renderAutomationsView() {
         tableBody.appendChild(tr);
     });
 }
-
-
-
-
