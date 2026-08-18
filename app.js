@@ -215,6 +215,41 @@ function formatAuthError(msg) {
     return msg;
 }
 
+// ----------------------------------------------------
+// CONTROLE DE INATIVIDADE (30 MINUTOS) E SESSÃO
+// ----------------------------------------------------
+const INACTIVITY_TIMEOUT_MS = 30 * 60 * 1000; // 30 minutos
+
+function recordUserActivity() {
+    if (window._authUserId) {
+        localStorage.setItem('painel_ops_last_activity', String(Date.now()));
+    }
+}
+
+let _lastActivityThrottled = 0;
+function handleUserInteraction() {
+    const now = Date.now();
+    if (now - _lastActivityThrottled > 5000) {
+        _lastActivityThrottled = now;
+        recordUserActivity();
+    }
+}
+
+// Ouvintes globais de atividade
+['mousedown', 'keydown', 'touchstart', 'scroll', 'click'].forEach(evt => {
+    window.addEventListener(evt, handleUserInteraction, { passive: true });
+});
+
+// Verificador periódico de inatividade
+setInterval(async () => {
+    if (!window._authUserId) return;
+    const lastActivity = parseInt(localStorage.getItem('painel_ops_last_activity') || '0', 10);
+    if (lastActivity > 0 && (Date.now() - lastActivity) > INACTIVITY_TIMEOUT_MS) {
+        console.log('[Auth] Sessão expirada por inatividade (30 minutos).');
+        await handleLogout(true);
+    }
+}, 15000);
+
 async function handleLogin() {
     hideAuthError();
     hideAuthInfo();
@@ -251,6 +286,7 @@ async function handleLogin() {
         } else {
             const user = (data && data.session && data.session.user) ? data.session.user : (data ? data.user : null);
             if (user) {
+                recordUserActivity();
                 // Forçar ocultação do overlay de login e exibição do painel principal
                 const overlay = document.getElementById('auth-overlay');
                 if (overlay) overlay.style.setProperty('display', 'none', 'important');
@@ -342,8 +378,9 @@ async function handleSignup() {
     }
 }
 
-async function handleLogout() {
+async function handleLogout(isAutoTimeout = false) {
     unsubscribeRealtime();
+    localStorage.removeItem('painel_ops_last_activity');
     const client = getSupabase();
     if (client) {
         try {
@@ -354,6 +391,9 @@ async function handleLogout() {
     }
     window._authUserId = null;
     showAuthOverlay();
+    if (isAutoTimeout) {
+        showAuthInfo('Sua sessão expirou após 30 minutos de inatividade. Por favor, faça login novamente.');
+    }
 }
 
 function showAuthError(msg) {
@@ -422,6 +462,7 @@ async function setupUserSession(user) {
 
     try {
         window._authUserId = user.id;
+        recordUserActivity();
         
         const userMetadata = user.user_metadata || {};
         currentUser.email = user.email || '';
@@ -485,7 +526,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     if (btnLogin) btnLogin.addEventListener('click', handleLogin);
     if (btnSignup) btnSignup.addEventListener('click', handleSignup);
-    if (btnLogout) btnLogout.addEventListener('click', handleLogout);
+    if (btnLogout) btnLogout.addEventListener('click', () => handleLogout(false));
 
     loadState();
     setupEventListeners();
@@ -503,16 +544,31 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     });
 
-    // Check existing Supabase session using getSupabase() helper
+    // Check existing Supabase session using getSupabase() helper with 30-min inactivity check
     const client = getSupabase();
     if (client) {
         try {
-            const { data } = await client.auth.getSession();
-            const session = data ? data.session : null;
-            if (session && session.user) {
-                await setupUserSession(session.user);
-            } else {
+            const lastActivity = parseInt(localStorage.getItem('painel_ops_last_activity') || '0', 10);
+            const isInactive = lastActivity === 0 || (Date.now() - lastActivity) > INACTIVITY_TIMEOUT_MS;
+
+            if (isInactive) {
+                console.log('[Auth Init] Sessão inexistente ou expirada (>30min de inatividade). Exibindo login.');
+                try { await client.auth.signOut(); } catch (_) {}
+                localStorage.removeItem('painel_ops_last_activity');
+                window._authUserId = null;
                 showAuthOverlay();
+                if (lastActivity > 0) {
+                    showAuthInfo('Sua sessão expirou após 30 minutos de inatividade. Por favor, faça login.');
+                }
+            } else {
+                const { data } = await client.auth.getSession();
+                const session = data ? data.session : null;
+                if (session && session.user) {
+                    recordUserActivity();
+                    await setupUserSession(session.user);
+                } else {
+                    showAuthOverlay();
+                }
             }
         } catch (sessionErr) {
             console.error('Erro ao recuperar sessão existente do Supabase:', sessionErr);
@@ -528,6 +584,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         try {
             client.auth.onAuthStateChange(async (event, session) => {
                 if (event === 'SIGNED_IN' && session && session.user) {
+                    recordUserActivity();
                     await setupUserSession(session.user);
                 } else if (event === 'SIGNED_OUT' && window._authUserId) {
                     showAuthOverlay();
