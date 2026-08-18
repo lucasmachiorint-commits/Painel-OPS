@@ -2811,6 +2811,28 @@ body.light-theme input:-webkit-autofill:active {
 
     <script>
 // ============================================================
+// SELF-HEALING STORAGE & CORRUPTED DATA PROTECTION
+// ============================================================
+(function() {
+    try {
+        const keys = Object.keys(localStorage);
+        for (const k of keys) {
+            if (k.startsWith('sb-') || k.includes('auth') || k.includes('token') || k === 'capacity_fte_hub_state') {
+                const val = localStorage.getItem(k);
+                if (val && typeof val === 'string') {
+                    try {
+                        JSON.parse(val);
+                    } catch (_) {
+                        console.warn('[SelfHealing] Removendo chave com JSON corrompido do localStorage:', k);
+                        localStorage.removeItem(k);
+                    }
+                }
+            }
+        }
+    } catch (_) {}
+})();
+
+// ============================================================
 // SUPABASE AUTH CONFIGURATION
 // ============================================================
 // Substitua pelas credenciais do seu projeto no Supabase Dashboard
