@@ -1672,12 +1672,18 @@ body.perfil-consulta .consulta-hidden {
     display: none !important;
 }
 
-/* Restrição por perfil: Bloquear interação com todos os campos de formulário no perfil CONSULTA */
-body.perfil-consulta input:not(#auth-email):not(#auth-password),
-body.perfil-consulta select:not(#select-user-profile),
-body.perfil-consulta textarea {
-    pointer-events: none !important;
-    user-select: none !important;
+/* Garantir que todos os filtros, seletores de busca e navegação funcionem 100% para o perfil CONSULTA */
+.filter-group select,
+.filter-group input,
+.header-table-controls select,
+.header-table-controls input,
+.search-input,
+select[id^="filter-"],
+select[id^="select-review-filter-"],
+input[id^="search-"] {
+    pointer-events: auto !important;
+    user-select: auto !important;
+    cursor: pointer !important;
 }
 
 /* Neutralizar estilo de autofill dos navegadores */
