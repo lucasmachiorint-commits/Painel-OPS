@@ -429,6 +429,224 @@ function hideAuthInfo() {
     }
 }
 
+// ----------------------------------------------------
+// GERENCIAMENTO DE MODO DE AUTENTICAÇÃO E SENHA
+// ----------------------------------------------------
+function setAuthViewMode(mode) {
+    hideAuthError();
+    hideAuthInfo();
+    
+    const loginBox = document.getElementById('auth-login-container');
+    const forgotBox = document.getElementById('auth-forgot-container');
+    const resetBox = document.getElementById('auth-reset-container');
+    const titleEl = document.getElementById('auth-main-title');
+    const subtitleEl = document.getElementById('auth-main-subtitle');
+
+    if (loginBox) loginBox.style.display = mode === 'login' ? 'flex' : 'none';
+    if (forgotBox) forgotBox.style.display = mode === 'forgot' ? 'flex' : 'none';
+    if (resetBox) resetBox.style.display = mode === 'reset' ? 'flex' : 'none';
+
+    if (mode === 'forgot') {
+        if (titleEl) titleEl.textContent = 'Recuperar Senha';
+        if (subtitleEl) subtitleEl.textContent = 'Enviaremos um link para seu e-mail';
+        const loginEmail = document.getElementById('auth-email');
+        const forgotEmail = document.getElementById('auth-forgot-email');
+        if (loginEmail && forgotEmail && loginEmail.value.trim()) {
+            forgotEmail.value = loginEmail.value.trim();
+        }
+        if (forgotEmail) setTimeout(() => forgotEmail.focus(), 150);
+    } else if (mode === 'reset') {
+        if (titleEl) titleEl.textContent = 'Nova Senha';
+        if (subtitleEl) subtitleEl.textContent = 'Defina sua nova senha de acesso';
+        const resetPass = document.getElementById('auth-reset-password');
+        if (resetPass) setTimeout(() => resetPass.focus(), 150);
+    } else {
+        if (titleEl) titleEl.textContent = 'EmanaPay';
+        if (subtitleEl) subtitleEl.textContent = 'Controle de Eficiência Operacional';
+    }
+}
+
+async function handleSendPasswordRecovery() {
+    hideAuthError();
+    hideAuthInfo();
+    
+    const emailEl = document.getElementById('auth-forgot-email');
+    const email = emailEl ? emailEl.value.trim() : '';
+    const btn = document.getElementById('btn-auth-send-recovery');
+    
+    if (!email) {
+        showAuthError('Por favor, informe seu e-mail cadastrado.');
+        return;
+    }
+    
+    const client = getSupabase();
+    if (!client) {
+        showAuthError('Erro: Supabase não conectado.');
+        return;
+    }
+    
+    const origText = btn ? btn.innerHTML : 'Enviar Link de Recuperação';
+    if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin" style="margin-right: 0.4rem;"></i> Enviando...';
+    }
+    
+    try {
+        const redirectUrl = window.location.href.split('#')[0];
+        const { error } = await client.auth.resetPasswordForEmail(email, {
+            redirectTo: redirectUrl
+        });
+        
+        if (error) {
+            showAuthError(formatAuthError(error.message));
+        } else {
+            showAuthInfo('Link de recuperação enviado com sucesso! Verifique sua caixa de entrada e pasta de spam.');
+            if (emailEl) emailEl.value = '';
+        }
+    } catch (err) {
+        showAuthError(formatAuthError(err ? err.message : ''));
+    } finally {
+        if (btn) {
+            btn.disabled = false;
+            btn.innerHTML = origText;
+        }
+    }
+}
+
+async function handleSaveResetPassword() {
+    hideAuthError();
+    hideAuthInfo();
+    
+    const passEl = document.getElementById('auth-reset-password');
+    const confirmEl = document.getElementById('auth-reset-confirm');
+    const pass = passEl ? passEl.value.trim() : '';
+    const confirm = confirmEl ? confirmEl.value.trim() : '';
+    const btn = document.getElementById('btn-auth-save-reset');
+    
+    if (!pass || !confirm) {
+        showAuthError('Por favor, preencha e confirme sua nova senha.');
+        return;
+    }
+    
+    if (pass.length < 6) {
+        showAuthError('A senha deve ter pelo menos 6 caracteres.');
+        return;
+    }
+    
+    if (pass !== confirm) {
+        showAuthError('As senhas digitadas não coincidem.');
+        return;
+    }
+    
+    const client = getSupabase();
+    if (!client) {
+        showAuthError('Erro: Supabase não conectado.');
+        return;
+    }
+    
+    const origText = btn ? btn.innerHTML : 'Salvar e Entrar no Painel';
+    if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin" style="margin-right: 0.4rem;"></i> Salvando...';
+    }
+    
+    try {
+        const { data, error } = await client.auth.updateUser({ password: pass });
+        
+        if (error) {
+            showAuthError(formatAuthError(error.message));
+        } else {
+            showToast('Nova senha salva com sucesso!', 'success', 5000);
+            if (window.history && window.history.replaceState) {
+                window.history.replaceState(null, null, window.location.pathname);
+            }
+            const user = (data && data.user) ? data.user : null;
+            if (user) {
+                await setupUserSession(user);
+            } else {
+                setAuthViewMode('login');
+                showAuthInfo('Senha atualizada com sucesso! Faça login com a nova senha.');
+            }
+        }
+    } catch (err) {
+        showAuthError(formatAuthError(err ? err.message : ''));
+    } finally {
+        if (btn) {
+            btn.disabled = false;
+            btn.innerHTML = origText;
+        }
+    }
+}
+
+// MODAL ALTERAR SENHA (USUÁRIO JÁ CONECTADO)
+function openChangePasswordModal() {
+    const modal = document.getElementById('modal-change-password');
+    const newPass = document.getElementById('input-modal-new-pass');
+    const confirmPass = document.getElementById('input-modal-confirm-pass');
+    if (newPass) newPass.value = '';
+    if (confirmPass) confirmPass.value = '';
+    if (modal) modal.style.display = 'flex';
+    if (newPass) setTimeout(() => newPass.focus(), 150);
+}
+
+function closeChangePasswordModal() {
+    const modal = document.getElementById('modal-change-password');
+    if (modal) modal.style.display = 'none';
+}
+
+async function handleSaveModalPassword() {
+    const newPassEl = document.getElementById('input-modal-new-pass');
+    const confirmPassEl = document.getElementById('input-modal-confirm-pass');
+    const newPass = newPassEl ? newPassEl.value.trim() : '';
+    const confirmPass = confirmPassEl ? confirmPassEl.value.trim() : '';
+    const btn = document.getElementById('btn-save-modal-pass');
+    
+    if (!newPass || !confirmPass) {
+        alert('Por favor, preencha os dois campos de senha.');
+        return;
+    }
+    
+    if (newPass.length < 6) {
+        alert('A senha deve ter pelo menos 6 caracteres.');
+        return;
+    }
+    
+    if (newPass !== confirmPass) {
+        alert('As senhas digitadas não coincidem.');
+        return;
+    }
+    
+    const client = getSupabase();
+    if (!client) {
+        alert('Erro: Supabase não conectado.');
+        return;
+    }
+    
+    const origText = btn ? btn.textContent : 'Salvar Nova Senha';
+    if (btn) {
+        btn.disabled = true;
+        btn.textContent = 'Salvando...';
+    }
+    
+    try {
+        const { error } = await client.auth.updateUser({ password: newPass });
+        if (error) {
+            alert('Erro ao atualizar senha: ' + error.message);
+        } else {
+            closeChangePasswordModal();
+            showToast('Senha atualizada com sucesso!', 'success', 5000);
+            alert('Sucesso! Sua nova senha foi cadastrada.');
+        }
+    } catch (err) {
+        alert('Erro ao atualizar senha: ' + (err.message || err));
+    } finally {
+        if (btn) {
+            btn.disabled = false;
+            btn.textContent = origText;
+        }
+    }
+}
+
 function showAuthOverlay() {
     const overlay = document.getElementById('auth-overlay');
     if (overlay) {
@@ -437,6 +655,7 @@ function showAuthOverlay() {
         overlay.style.setProperty('pointer-events', 'auto', 'important');
         overlay.style.setProperty('visibility', 'visible', 'important');
     }
+    setAuthViewMode('login');
     hideAuthError();
     hideAuthInfo();
     const emailEl = document.getElementById('auth-email');
@@ -547,30 +766,62 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     });
 
+    const forgotEmailEl = document.getElementById('auth-forgot-email');
+    if (forgotEmailEl) {
+        forgotEmailEl.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                handleSendPasswordRecovery();
+            }
+        });
+    }
+
+    const resetPassEl = document.getElementById('auth-reset-password');
+    const resetConfirmEl = document.getElementById('auth-reset-confirm');
+    [resetPassEl, resetConfirmEl].forEach(input => {
+        if (input) {
+            input.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    handleSaveResetPassword();
+                }
+            });
+        }
+    });
+
     // Check existing Supabase session using getSupabase() helper with 30-min inactivity check
     const client = getSupabase();
     if (client) {
+        // Verificar se abriu através de link de recuperação de senha
+        const isRecoveryHash = window.location.hash && (window.location.hash.includes('type=recovery') || window.location.hash.includes('type=invite'));
+        
         try {
-            const lastActivity = parseInt(localStorage.getItem('painel_ops_last_activity') || '0', 10);
-            const isInactive = lastActivity === 0 || (Date.now() - lastActivity) > INACTIVITY_TIMEOUT_MS;
-
-            if (isInactive) {
-                console.log('[Auth Init] Sessão inexistente ou expirada (>30min de inatividade). Exibindo login.');
-                try { await client.auth.signOut(); } catch (_) {}
-                localStorage.removeItem('painel_ops_last_activity');
-                window._authUserId = null;
+            if (isRecoveryHash) {
+                console.log('[Auth] Link de recuperação de senha detectado via URL Hash.');
                 showAuthOverlay();
-                if (lastActivity > 0) {
-                    showAuthInfo('Sua sessão expirou após 30 minutos de inatividade. Por favor, faça login.');
-                }
+                setAuthViewMode('reset');
             } else {
-                const { data } = await client.auth.getSession();
-                const session = data ? data.session : null;
-                if (session && session.user) {
-                    recordUserActivity();
-                    await setupUserSession(session.user);
-                } else {
+                const lastActivity = parseInt(localStorage.getItem('painel_ops_last_activity') || '0', 10);
+                const isInactive = lastActivity === 0 || (Date.now() - lastActivity) > INACTIVITY_TIMEOUT_MS;
+
+                if (isInactive) {
+                    console.log('[Auth Init] Sessão inexistente ou expirada (>30min de inatividade). Exibindo login.');
+                    try { await client.auth.signOut(); } catch (_) {}
+                    localStorage.removeItem('painel_ops_last_activity');
+                    window._authUserId = null;
                     showAuthOverlay();
+                    if (lastActivity > 0) {
+                        showAuthInfo('Sua sessão expirou após 30 minutos de inatividade. Por favor, faça login.');
+                    }
+                } else {
+                    const { data } = await client.auth.getSession();
+                    const session = data ? data.session : null;
+                    if (session && session.user) {
+                        recordUserActivity();
+                        await setupUserSession(session.user);
+                    } else {
+                        showAuthOverlay();
+                    }
                 }
             }
         } catch (sessionErr) {
@@ -586,9 +837,18 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         try {
             client.auth.onAuthStateChange(async (event, session) => {
-                if (event === 'SIGNED_IN' && session && session.user) {
-                    recordUserActivity();
-                    await setupUserSession(session.user);
+                if (event === 'PASSWORD_RECOVERY') {
+                    console.log('[Auth] Evento PASSWORD_RECOVERY recebido.');
+                    showAuthOverlay();
+                    setAuthViewMode('reset');
+                } else if (event === 'SIGNED_IN' && session && session.user) {
+                    if (window.location.hash && window.location.hash.includes('type=recovery')) {
+                        showAuthOverlay();
+                        setAuthViewMode('reset');
+                    } else {
+                        recordUserActivity();
+                        await setupUserSession(session.user);
+                    }
                 } else if (event === 'SIGNED_OUT' && window._authUserId) {
                     showAuthOverlay();
                 }
