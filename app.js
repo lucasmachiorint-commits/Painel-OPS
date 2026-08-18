@@ -3945,7 +3945,7 @@ function renderCadastrosView() {
             teamsList.querySelectorAll('.btn-edit-team-item').forEach(btn => {
                 btn.addEventListener('click', (e) => {
                     e.stopPropagation();
-                    if (!verificarPermissao('OPERADOR')) { alert('Acesso negado: Perfil OPERADOR necessário.'); return; }
+                    if (!verificarPermissao('OPERADOR')) { alert('Acesso negado: Perfil OPERADOR necessÃ¡rio.'); return; }
                     const team = btn.getAttribute('data-team');
                     openNewTeamModal(team);
                 });
@@ -3954,9 +3954,9 @@ function renderCadastrosView() {
             teamsList.querySelectorAll('.btn-delete-team-item').forEach(btn => {
                 btn.addEventListener('click', (e) => {
                     e.stopPropagation();
-                    if (!verificarPermissao('ADMIN')) { alert('Acesso negado: Perfil ADMIN necessário.'); return; }
+                    if (!verificarPermissao('ADMIN')) { alert('Acesso negado: Perfil ADMIN necessÃ¡rio.'); return; }
                     const team = btn.getAttribute('data-team');
-                    if (confirm(`Deseja realmente excluir a equipe "${team}"? Todos os responsáveis e atividades desta equipe ficarão "Sem Equipe".`)) {
+                    if (confirm(`Deseja realmente excluir a equipe "${team}"? Todos os responsÃ¡veis e atividades desta equipe ficarÃ£o "Sem Equipe".`)) {
                         state.teams = state.teams.filter(t => t !== team);
                         state.processes.forEach(p => {
                             if (p.area === team) p.area = '';
@@ -3989,7 +3989,7 @@ function renderCadastrosView() {
         if(icon) {
             icon.className = isHidden ? 'fa-solid fa-chevron-down' : 'fa-solid fa-chevron-right';
         }
-        // Limpar qualquer autofill não digitado pelo usuário
+        // Limpar qualquer autofill nÃ£o digitado pelo usuÃ¡rio
         const emailInput = document.getElementById('input-new-responsible-email');
         if (emailInput && !emailInput._hasUserTyping) {
             emailInput.value = '';
@@ -4000,43 +4000,25 @@ function renderCadastrosView() {
         }
     };
 
-    const toggleTableAccordion = (headerTr, className, forceState = null) => {
-        const rows = tableBody.querySelectorAll('.' + className);
-        let nextExpanded = forceState;
-        if (nextExpanded === null || nextExpanded === undefined) {
-            let currentlyHidden = true;
-            if (rows.length > 0) {
-                currentlyHidden = rows[0].style.display === 'none';
-            }
-            nextExpanded = currentlyHidden;
-        }
-        rows.forEach(r => {
-            r.style.display = nextExpanded ? 'table-row' : 'none';
-        });
-        const icon = headerTr.querySelector('i');
-        if (icon) {
-            icon.className = nextExpanded ? 'fa-solid fa-chevron-down' : 'fa-solid fa-chevron-right';
-        }
-    };
-
     // 2. Render Responsibles List (Accordion by Team)
     responsiblesList.innerHTML = '';
+    
     if (!state.responsaveis || state.responsaveis.length === 0) {
-        responsiblesList.innerHTML = '<div style="color: var(--text-muted); font-size: 0.85rem; padding: 0.5rem;">Nenhum responsável cadastrado.</div>';
+        responsiblesList.innerHTML = '<div style="color: var(--text-muted); font-size: 0.85rem; padding: 0.5rem;">Nenhum responsÃ¡vel cadastrado.</div>';
     } else {
-        const teamsToRender = [...(state.teams || []), 'Outros / Sem Equipe'];
+        const teamsToRender = [...(state.teams || []), 'Sem Equipe'];
         
         teamsToRender.forEach(team => {
-            let teamResps = [];
-            if (team === 'Outros / Sem Equipe') {
-                teamResps = state.responsaveis.filter(r => !r.area || !state.teams.includes(r.area));
-            } else {
-                teamResps = state.responsaveis.filter(r => r.area === team);
-            }
+            const teamResps = (state.responsaveis || []).filter(r => {
+                const rArea = typeof r === 'object' ? r.area : '';
+                if (team === 'Sem Equipe') {
+                    return !rArea || !state.teams.includes(rArea);
+                }
+                return rArea === team;
+            });
             
             if (teamResps.length === 0) return;
             
-            // Accordion Header
             const header = document.createElement('div');
             header.style.cssText = 'display: flex; align-items: center; gap: 0.5rem; cursor: pointer; padding: 0.5rem; background: rgba(255,255,255,0.05); border-radius: 4px; font-weight: 500; font-size: 0.85rem; user-select: none; border: 1px solid rgba(255,255,255,0.02); margin-top: 0.5rem;';
             header.innerHTML = `<i class="fa-solid fa-chevron-right" style="width: 15px; text-align: center;"></i> ${escapeHtml(team)} <span style="background: rgba(255,255,255,0.1); padding: 0.1rem 0.4rem; border-radius: 10px; font-size: 0.7rem; margin-left: auto;">${teamResps.length}</span>`;
@@ -4064,7 +4046,7 @@ function renderCadastrosView() {
                         <span style="font-weight: 600; color: var(--text-primary);">${escapeHtml(resp.name)}</span>
                         ${resp.email ? `<span style="font-size: 0.72rem; color: var(--text-muted); display: flex; align-items: center; gap: 0.25rem;"><i class="fa-regular fa-envelope" style="font-size: 0.65rem;"></i> ${escapeHtml(resp.email)}</span>` : ''}
                     </div>
-                    ${hasOverrides ? '<i class="fa-solid fa-user-gear" style="color: var(--color-primary); font-size: 0.75rem; margin-left: 0.25rem;" title="Parâmetros customizados ativos"></i>' : ''}
+                    ${hasOverrides ? '<i class="fa-solid fa-user-gear" style="color: var(--color-primary); font-size: 0.75rem; margin-left: 0.25rem;" title="ParÃ¢metros customizados ativos"></i>' : ''}
                 `;
                 
                 const btnGroup = document.createElement('div');
@@ -4074,7 +4056,7 @@ function renderCadastrosView() {
                 btnConfig.className = 'btn-config-resp-item';
                 btnConfig.setAttribute('data-permissao', 'OPERADOR,ADMIN');
                 btnConfig.style.cssText = 'background: transparent; border: none; color: var(--color-primary); cursor: pointer; font-size: 0.85rem; padding: 0.2rem; display: flex; align-items: center; justify-content: center;';
-                btnConfig.title = 'Configurar Parâmetros de Capacidade';
+                btnConfig.title = 'Configurar ParÃ¢metros de Capacidade';
                 btnConfig.innerHTML = '<i class="fa-solid fa-cog"></i>';
                 if (!canEditResp && currentUser.perfil !== 'ADMIN') {
                     btnConfig.style.display = 'none';
@@ -4084,7 +4066,7 @@ function renderCadastrosView() {
                 btnDelete.className = 'btn-delete-resp-item';
                 btnDelete.setAttribute('data-permissao', 'OPERADOR,ADMIN');
                 btnDelete.style.cssText = 'background: transparent; border: none; color: var(--color-danger); cursor: pointer; font-size: 0.85rem; padding: 0.2rem; display: flex; align-items: center; justify-content: center;';
-                btnDelete.title = 'Excluir Responsável';
+                btnDelete.title = 'Excluir ResponsÃ¡vel';
                 btnDelete.innerHTML = '<i class="fa-solid fa-trash-can"></i>';
                 if (!canEditResp && currentUser.perfil !== 'ADMIN') {
                     btnDelete.style.display = 'none';
@@ -4103,9 +4085,9 @@ function renderCadastrosView() {
                 
                 btnDelete.addEventListener('click', (e) => {
                     e.stopPropagation();
-                    if (!verificarPermissao('OPERADOR')) { alert('Acesso negado: Perfil OPERADOR ou ADMIN necessário.'); return; }
-                    if (!podeEditarArea(resp.area)) { alert(`Acesso negado: Você só pode excluir responsáveis da sua própria equipe (${currentUser.assignedTeam}).`); return; }
-                    if (confirm(`Tem certeza que deseja excluir o responsável "${resp.name}"? Todas as atividades sob sua responsabilidade ficarão sem responsável.`)) {
+                    if (!verificarPermissao('OPERADOR')) { alert('Acesso negado: Perfil OPERADOR ou ADMIN necessÃ¡rio.'); return; }
+                    if (!podeEditarArea(resp.area)) { alert(`Acesso negado: VocÃª sÃ³ pode excluir responsÃ¡veis da sua prÃ³pria equipe (${currentUser.assignedTeam}).`); return; }
+                    if (confirm(`Tem certeza que deseja excluir o responsÃ¡vel "${resp.name}"? Todas as atividades sob sua responsabilidade ficarÃ£o sem responsÃ¡vel.`)) {
                         state.responsaveis = state.responsaveis.filter(r => (typeof r === 'object' ? r.name : r) !== resp.name);
                         state.processes.forEach(p => {
                             if (p.responsavel === resp.name) p.responsavel = '';
@@ -4126,309 +4108,421 @@ function renderCadastrosView() {
             responsiblesList.appendChild(contentContainer);
         });
     }
-    
-    // 3. Render Activities Table (Accordion by Team)
-    tableBody.innerHTML = '';
-    activityCountBadge.textContent = state.processes.length;
-    
-    if (state.processes.length === 0) {
-        tableBody.innerHTML = `
-            <tr>
-                <td colspan="7" style="text-align: center; color: var(--text-muted); padding: 2rem;">
-                    Nenhuma atividade cadastrada. Clique em "Adicionar Atividade" para iniciar.
-                </td>
-            </tr>
-        `;
-        const btnBulkDelete = document.getElementById('btn-cadastros-delete-selected');
-        if (btnBulkDelete) btnBulkDelete.style.display = 'none';
-        const selectAllCb = document.getElementById('cadastros-select-all');
-        if (selectAllCb) selectAllCb.checked = false;
-        return;
+
+    // ----------------------------------------------------
+    // POPULAR E SINCRONIZAR BARRA DE FILTROS DE CADASTROS
+    // ----------------------------------------------------
+    const filterSearchEl = document.getElementById('cadastros-filter-search');
+    const filterAreaEl = document.getElementById('cadastros-filter-area');
+    const filterRespEl = document.getElementById('cadastros-filter-resp');
+    const filterProductEl = document.getElementById('cadastros-filter-product');
+    const filterRpaEl = document.getElementById('cadastros-filter-rpa');
+    const btnClearFilters = document.getElementById('btn-cadastros-clear-filters');
+
+    if (filterAreaEl) {
+        const curArea = filterAreaEl.value;
+        const areaOptions = ['<option value="">Todas as Ãreas</option>']
+            .concat((state.teams || []).map(t => `<option value="${escapeHtml(t)}" ${t === curArea ? 'selected' : ''}>${escapeHtml(t)}</option>`))
+            .concat([`<option value="Outros / Sem Equipe" ${curArea === 'Outros / Sem Equipe' ? 'selected' : ''}>Outros / Sem Equipe</option>`]);
+        filterAreaEl.innerHTML = areaOptions.join('');
     }
-    
-    const activityTeamsToRender = [...(state.teams || []), 'Outros / Sem Equipe'];
-    
-    activityTeamsToRender.forEach((team, teamIndex) => {
-        let teamProcs = [];
-        if (team === 'Outros / Sem Equipe') {
-            teamProcs = state.processes.filter(p => !p.area || !state.teams.includes(p.area));
-        } else {
-            teamProcs = state.processes.filter(p => p.area === team);
+
+    if (filterRespEl) {
+        const curResp = filterRespEl.value;
+        const allResps = (state.responsaveis || []).map(r => typeof r === 'object' ? r.name : r).filter(Boolean);
+        const uniqueResps = [...new Set(allResps)].sort();
+        const respOptions = ['<option value="">Todos os ResponsÃ¡veis</option>']
+            .concat(uniqueResps.map(r => `<option value="${escapeHtml(r)}" ${r === curResp ? 'selected' : ''}>${escapeHtml(r)}</option>`))
+            .concat([`<option value="__SEM_RESP__" ${curResp === '__SEM_RESP__' ? 'selected' : ''}>Sem ResponsÃ¡vel</option>`]);
+        filterRespEl.innerHTML = respOptions.join('');
+    }
+
+    // Attach real-time filter listeners once
+    if (filterSearchEl && !filterSearchEl._boundFilter) {
+        filterSearchEl._boundFilter = true;
+        filterSearchEl.addEventListener('input', () => renderCadastrosTable());
+    }
+    if (filterAreaEl && !filterAreaEl._boundFilter) {
+        filterAreaEl._boundFilter = true;
+        filterAreaEl.addEventListener('change', () => renderCadastrosTable());
+    }
+    if (filterRespEl && !filterRespEl._boundFilter) {
+        filterRespEl._boundFilter = true;
+        filterRespEl.addEventListener('change', () => renderCadastrosTable());
+    }
+    if (filterProductEl && !filterProductEl._boundFilter) {
+        filterProductEl._boundFilter = true;
+        filterProductEl.addEventListener('input', () => renderCadastrosTable());
+    }
+    if (filterRpaEl && !filterRpaEl._boundFilter) {
+        filterRpaEl._boundFilter = true;
+        filterRpaEl.addEventListener('change', () => renderCadastrosTable());
+    }
+    if (btnClearFilters && !btnClearFilters._boundFilter) {
+        btnClearFilters._boundFilter = true;
+        btnClearFilters.addEventListener('click', () => {
+            if (filterSearchEl) filterSearchEl.value = '';
+            if (filterAreaEl) filterAreaEl.value = '';
+            if (filterRespEl) filterRespEl.value = '';
+            if (filterProductEl) filterProductEl.value = '';
+            if (filterRpaEl) filterRpaEl.value = '';
+            renderCadastrosTable();
+        });
+    }
+
+    function renderCadastrosTable() {
+        const searchVal = filterSearchEl ? filterSearchEl.value.trim().toLowerCase() : '';
+        const areaVal = filterAreaEl ? filterAreaEl.value : '';
+        const respVal = filterRespEl ? filterRespEl.value : '';
+        const productVal = filterProductEl ? filterProductEl.value.trim().toLowerCase() : '';
+        const rpaVal = filterRpaEl ? filterRpaEl.value : '';
+        const isAnyFilterActive = !!(searchVal || areaVal || respVal || productVal || rpaVal);
+
+        const filteredProcesses = state.processes.filter(proc => {
+            // 1. Demanda / Atividade
+            if (searchVal && !(proc.name || '').toLowerCase().includes(searchVal)) return false;
+
+            // 2. Ãrea / Equipe
+            if (areaVal) {
+                if (areaVal === 'Outros / Sem Equipe') {
+                    if (proc.area && state.teams.includes(proc.area)) return false;
+                } else if (proc.area !== areaVal) {
+                    return false;
+                }
+            }
+
+            // 3. ResponsÃ¡vel
+            if (respVal) {
+                const resps = getProcessResponsaveis(proc);
+                if (respVal === '__SEM_RESP__') {
+                    if (resps.length > 0) return false;
+                } else {
+                    if (!resps.includes(respVal)) return false;
+                }
+            }
+
+            // 4. Produto
+            if (productVal) {
+                const prod = (proc.produto || '').toLowerCase();
+                if (!prod.includes(productVal)) return false;
+            }
+
+            // 5. RPA
+            if (rpaVal === 'sim') {
+                if (!isRpaActivity(proc)) return false;
+            } else if (rpaVal === 'nao') {
+                if (isRpaActivity(proc)) return false;
+            }
+
+            return true;
+        });
+
+        // Render Activities Table (Accordion by Team)
+        tableBody.innerHTML = '';
+        activityCountBadge.textContent = isAnyFilterActive
+            ? `${filteredProcesses.length} / ${state.processes.length}`
+            : `${state.processes.length}`;
+        
+        if (filteredProcesses.length === 0) {
+            const totalCols = currentUser.perfil === 'ADMIN' ? 7 : (currentUser.perfil === 'OPERADOR' ? 6 : 5);
+            tableBody.innerHTML = `
+                <tr>
+                    <td colspan="${totalCols}" style="text-align: center; color: var(--text-muted); padding: 2.5rem 1rem;">
+                        <div style="font-size: 1.1rem; margin-bottom: 0.4rem; color: var(--text-secondary);"><i class="fa-solid fa-filter-circle-xmark"></i> Nenhuma atividade encontrada</div>
+                        <span style="font-size: 0.85rem; opacity: 0.7;">Tente ajustar ou limpar os filtros aplicados acima.</span>
+                    </td>
+                </tr>
+            `;
+            const btnBulkDelete = document.getElementById('btn-cadastros-delete-selected');
+            if (btnBulkDelete) btnBulkDelete.style.display = 'none';
+            const selectAllCb = document.getElementById('cadastros-select-all');
+            if (selectAllCb) selectAllCb.checked = false;
+            return;
         }
         
-        if (teamProcs.length === 0) return;
+        const activityTeamsToRender = [...(state.teams || []), 'Outros / Sem Equipe'];
         
-        const rowClass = 'team-activity-row-' + teamIndex;
-        // Default to expanded (true) if undefined so activities remain open unless explicitly collapsed by user
-        const isExpanded = expandedCadastrosTableTeams[team] !== false;
-        
-        // Header Row
-        const headerTr = document.createElement('tr');
-        headerTr.style.cssText = 'background: rgba(255,255,255,0.03); cursor: pointer; user-select: none;';
-        const totalCols = currentUser.perfil === 'ADMIN' ? 7 : (currentUser.perfil === 'OPERADOR' ? 6 : 5);
-        headerTr.innerHTML = `
-            <td colspan="${totalCols}" style="padding: 0.8rem; font-weight: 600; color: var(--text-primary); border-top: 1px solid rgba(255,255,255,0.05); border-bottom: 1px solid rgba(255,255,255,0.05);">
-                <i class="${isExpanded ? 'fa-solid fa-chevron-down' : 'fa-solid fa-chevron-right'}" style="width: 20px;"></i> ${escapeHtml(team)} <span style="background: rgba(255,255,255,0.1); color: var(--text-secondary); padding: 0.1rem 0.5rem; border-radius: 10px; font-size: 0.75rem; margin-left: 0.5rem;">${teamProcs.length} atividades</span>
-            </td>
-        `;
-        headerTr.addEventListener('click', () => {
-            const currentVis = expandedCadastrosTableTeams[team] !== false;
-            expandedCadastrosTableTeams[team] = !currentVis;
-            toggleTableAccordion(headerTr, rowClass, expandedCadastrosTableTeams[team]);
-        });
-        tableBody.appendChild(headerTr);
-        
-        // Activity Rows
-        teamProcs.forEach(proc => {
-            const tr = document.createElement('tr');
-            tr.className = rowClass;
-            tr.style.display = isExpanded ? 'table-row' : 'none';
-            tr.dataset.id = proc.id;
+        activityTeamsToRender.forEach((team, teamIndex) => {
+            let teamProcs = [];
+            if (team === 'Outros / Sem Equipe') {
+                teamProcs = filteredProcesses.filter(p => !p.area || !state.teams.includes(p.area));
+            } else {
+                teamProcs = filteredProcesses.filter(p => p.area === team);
+            }
             
-            const canEditThisArea = podeEditarArea(proc.area);
-            const isConsulta = currentUser.perfil === 'CONSULTA';
-            const isRowDisabled = isConsulta || !canEditThisArea;
+            if (teamProcs.length === 0) return;
             
-            const teamOptions = '<option value="">-- Sem Equipe --</option>' +
-                state.teams.map(t => `
-                    <option value="${escapeHtml(t)}" ${proc.area === t ? 'selected' : ''}>${escapeHtml(t)}</option>
-                `).join('');
-                
-            const currentResps = getProcessResponsaveis(proc);
-            const teamResps = (state.responsaveis || []).filter(resp => {
-                const rName = typeof resp === 'object' ? resp.name : resp;
-                const rArea = typeof resp === 'object' ? resp.area : '';
-                return !proc.area || !rArea || rArea === proc.area || currentResps.includes(rName);
-            });
-            const respsToDisplay = teamResps.length > 0 ? teamResps : (state.responsaveis || []);
+            const rowClass = 'team-activity-row-' + teamIndex;
+            // Se houver filtros ativos, expande automaticamente para exibir resultados
+            const isExpanded = isAnyFilterActive ? true : (expandedCadastrosTableTeams[team] !== false);
             
-            const assignedBadgesHtml = currentResps.map(rName => `
-                <span class="badge-resp-tag" style="font-size: 0.78rem; padding: 0.15rem 0.45rem; border-radius: 12px; background: rgba(99, 102, 241, 0.12); color: #818cf8; border: 1px solid rgba(99, 102, 241, 0.25); display: inline-flex; align-items: center; gap: 0.3rem;">
-                    ${escapeHtml(rName)}
-                    ${!isRowDisabled ? `<i class="fa-solid fa-xmark remove-resp-btn" data-resp="${escapeHtml(rName)}" style="cursor: pointer; opacity: 0.7; font-size: 0.7rem;" title="Remover ${escapeHtml(rName)}"></i>` : ''}
-                </span>
-            `).join('');
-
-            const unassignedResps = respsToDisplay.filter(resp => {
-                const rName = typeof resp === 'object' ? resp.name : resp;
-                return !currentResps.includes(rName);
-            });
-
-            const unassignedOptionsHtml = '<option value="">+ Responsável</option>' +
-                unassignedResps.map(resp => {
-                    const rName = typeof resp === 'object' ? resp.name : resp;
-                    return `<option value="${escapeHtml(rName)}">${escapeHtml(rName)}</option>`;
-                }).join('');
-                
-            const isRpa = isRpaActivity(proc);
-            
-            tr.innerHTML = `
-                <td class="col-select-admin" style="text-align: center; ${currentUser.perfil === 'ADMIN' ? '' : 'display: none;'}">
-                    <input type="checkbox" class="cadastros-row-checkbox" data-id="${proc.id}" ${isRowDisabled ? 'disabled style="opacity: 0.3; pointer-events: none;"' : ''}>
-                </td>
-                <td>
-                    <input type="text" class="input-activity-name-cell" value="${escapeHtml(proc.name)}" ${isRowDisabled ? 'readonly style="width: 100%; border: none; background: transparent; color: var(--text-primary); outline: none; padding: 0.3rem 0.5rem; border-radius: 4px; opacity: 0.7; pointer-events: none;"' : 'style="width: 100%; border: none; background: transparent; color: var(--text-primary); outline: none; padding: 0.3rem 0.5rem; border-radius: 4px;"'}>
-                </td>
-                <td>
-                    <select class="select-activity-team-cell" ${isRowDisabled ? 'disabled style="width: 100%; border: none; background: transparent; color: var(--text-primary); outline: none; padding: 0.3rem 0.5rem; border-radius: 4px; opacity: 0.7; pointer-events: none;"' : 'style="width: 100%; border: none; background: transparent; color: var(--text-primary); outline: none; padding: 0.3rem 0.5rem; border-radius: 4px; cursor: pointer;"'}>
-                        ${teamOptions}
-                    </select>
-                </td>
-                <td>
-                    <div class="cadastros-resp-container" style="display: flex; flex-wrap: wrap; gap: 0.3rem; align-items: center; padding: 0.2rem 0;">
-                        ${assignedBadgesHtml}
-                        <select class="select-activity-add-resp" ${isRowDisabled ? 'disabled style="display: none;"' : 'style="border: 1px dashed var(--border-color); background: rgba(255,255,255,0.03); color: var(--text-secondary); outline: none; padding: 0.2rem 0.4rem; border-radius: 4px; font-size: 0.78rem; cursor: pointer;"'}>
-                            ${unassignedOptionsHtml}
-                        </select>
-                    </div>
-                </td>
-                <td>
-                    <input type="text" class="input-activity-product-cell" value="${escapeHtml(proc.produto || '')}" placeholder="Produto (Opcional)" ${isRowDisabled ? 'readonly style="width: 100%; border: none; background: transparent; color: var(--text-primary); outline: none; padding: 0.3rem 0.5rem; border-radius: 4px; opacity: 0.7; pointer-events: none;"' : 'style="width: 100%; border: none; background: transparent; color: var(--text-primary); outline: none; padding: 0.3rem 0.5rem; border-radius: 4px;"'}>
-                </td>
-                <td style="text-align: center;">
-                    <label style="display: inline-flex; align-items: center; gap: 0.35rem; cursor: ${isRowDisabled ? 'default' : 'pointer'}; font-size: 0.8rem; user-select: none;">
-                        <input type="checkbox" class="cb-activity-rpa" ${isRpa ? 'checked' : ''} ${isRowDisabled ? 'disabled' : ''}>
-                        <span class="label-rpa-text" style="${isRpa ? 'color: #a78bfa; font-weight: 600;' : 'color: var(--text-muted);'}">🤖 RPA</span>
-                    </label>
-                </td>
-                <td class="col-acao-excluir" style="text-align: center; ${isConsulta ? 'display: none;' : ''}">
-                    ${canEditThisArea ? `
-                    <button class="btn-row-action btn-delete-activity-cell" style="background: transparent; border: none; color: var(--color-danger); cursor: pointer; font-size: 0.95rem; padding: 0.2rem;" title="Excluir Atividade">
-                        <i class="fa-solid fa-trash-can"></i>
-                    </button>` : ''}
+            // Header Row
+            const headerTr = document.createElement('tr');
+            headerTr.style.cssText = 'background: rgba(255,255,255,0.03); cursor: pointer; user-select: none;';
+            const totalCols = currentUser.perfil === 'ADMIN' ? 7 : (currentUser.perfil === 'OPERADOR' ? 6 : 5);
+            headerTr.innerHTML = `
+                <td colspan="${totalCols}" style="padding: 0.8rem; font-weight: 600; color: var(--text-primary); border-top: 1px solid rgba(255,255,255,0.05); border-bottom: 1px solid rgba(255,255,255,0.05);">
+                    <i class="${isExpanded ? 'fa-solid fa-chevron-down' : 'fa-solid fa-chevron-right'}" style="width: 20px;"></i> ${escapeHtml(team)} <span style="background: rgba(255,255,255,0.1); color: var(--text-secondary); padding: 0.1rem 0.5rem; border-radius: 10px; font-size: 0.75rem; margin-left: 0.5rem;">${teamProcs.length} atividades</span>
                 </td>
             `;
+            headerTr.addEventListener('click', () => {
+                const currentVis = expandedCadastrosTableTeams[team] !== false;
+                expandedCadastrosTableTeams[team] = !currentVis;
+                toggleTableAccordion(headerTr, rowClass, expandedCadastrosTableTeams[team]);
+            });
+            tableBody.appendChild(headerTr);
             
-            const rowCheckbox = tr.querySelector('.cadastros-row-checkbox');
-            if (rowCheckbox && !isRowDisabled) {
-                rowCheckbox.addEventListener('change', () => {
-                    if (!verificarPermissao('OPERADOR')) return;
-                    updateBulkDeleteState();
-                });
-            }
-            
-            const rpaCheckbox = tr.querySelector('.cb-activity-rpa');
-            if (rpaCheckbox && !isRowDisabled) {
-                rpaCheckbox.addEventListener('change', (e) => {
-                    if (!verificarPermissao('OPERADOR')) return;
-                    if (!podeEditarArea(proc.area)) return;
-                    proc.isRpa = e.target.checked;
-                    saveState();
-                    renderTable();
-                    renderBalancingTable();
-                    renderReviewTable();
-                    renderAutomationsView();
+            // Activity Rows
+            teamProcs.forEach(proc => {
+                const tr = document.createElement('tr');
+                tr.className = rowClass;
+                tr.style.display = isExpanded ? 'table-row' : 'none';
+                tr.dataset.id = proc.id;
+                
+                const canEditThisArea = podeEditarArea(proc.area);
+                const isConsulta = currentUser.perfil === 'CONSULTA';
+                const isRowDisabled = isConsulta || !canEditThisArea;
+                
+                const teamOptions = '<option value="">-- Sem Equipe --</option>' +
+                    state.teams.map(t => `
+                        <option value="${escapeHtml(t)}" ${proc.area === t ? 'selected' : ''}>${escapeHtml(t)}</option>
+                    `).join('');
                     
-                    const labelText = tr.querySelector('.label-rpa-text');
-                    if (labelText) {
-                        labelText.style.color = e.target.checked ? '#a78bfa' : 'var(--text-muted)';
-                        labelText.style.fontWeight = e.target.checked ? '600' : 'normal';
-                    }
+                const currentResps = getProcessResponsaveis(proc);
+                const teamResps = (state.responsaveis || []).filter(resp => {
+                    const rName = typeof resp === 'object' ? resp.name : resp;
+                    const rArea = typeof resp === 'object' ? resp.area : '';
+                    return !proc.area || !rArea || rArea === proc.area || currentResps.includes(rName);
                 });
-            }
-            
-            const nameInput = tr.querySelector('.input-activity-name-cell');
-            if (nameInput && !isRowDisabled) {
-                nameInput.addEventListener('change', (e) => {
-                    if (!verificarPermissao('OPERADOR')) return;
-                    if (!podeEditarArea(proc.area)) return;
-                    const val = e.target.value.trim();
-                    if (val) {
-                        proc.name = val;
-                        saveState();
-                    } else {
-                        e.target.value = proc.name;
-                    }
-                });
-                nameInput.addEventListener('focus', () => {
-                    if (isRowDisabled) return;
-                    nameInput.style.background = 'rgba(255, 255, 255, 0.08)';
-                    nameInput.style.border = '1px solid var(--border-color)';
-                });
-                nameInput.addEventListener('blur', () => {
-                    nameInput.style.background = 'transparent';
-                    nameInput.style.border = 'none';
-                });
-            }
-            
-            const teamSelect = tr.querySelector('.select-activity-team-cell');
-            if (teamSelect && !isRowDisabled) {
-                teamSelect.addEventListener('change', (e) => {
-                    if (!verificarPermissao('OPERADOR')) return;
-                    if (!podeEditarArea(proc.area)) return;
-                    const newTeam = e.target.value;
-                    proc.area = newTeam;
-                    setProcessResponsaveis(proc, []);
-                    saveState();
-                    
-                    renderCadastrosView();
-                    renderAreaFilterOptions();
-                    renderResponsavelFilterOptions();
-                    renderTable();
-                    renderBalancingTable();
-                    renderReviewTable();
-                });
-                teamSelect.addEventListener('focus', () => {
-                    if (isRowDisabled) return;
-                    teamSelect.style.background = 'rgba(255, 255, 255, 0.08)';
-                    teamSelect.style.border = '1px solid var(--border-color)';
-                });
-                teamSelect.addEventListener('blur', () => {
-                    teamSelect.style.background = 'transparent';
-                    teamSelect.style.border = 'none';
-                });
-            }
-            
-            // Listeners for multi-responsible badges & add dropdown
-            if (!isRowDisabled) {
-                tr.querySelectorAll('.remove-resp-btn').forEach(btn => {
-                    btn.addEventListener('click', (e) => {
-                        e.stopPropagation();
-                        if (!verificarPermissao('OPERADOR')) return;
-                        if (!podeEditarArea(proc.area)) return;
-                        const respToRemove = btn.dataset.resp;
-                        const updated = currentResps.filter(r => r !== respToRemove);
-                        setProcessResponsaveis(proc, updated);
-                        saveState();
-                        renderCadastrosView();
-                        renderResponsavelFilterOptions();
-                        renderTable();
-                        renderBalancingTable();
-                        renderReviewTable();
-                        renderAutomationsView();
-                    });
+                const respsToDisplay = teamResps.length > 0 ? teamResps : (state.responsaveis || []);
+                
+                const assignedBadgesHtml = currentResps.map(rName => `
+                    <span class="badge-resp-tag" style="font-size: 0.78rem; padding: 0.15rem 0.45rem; border-radius: 12px; background: rgba(99, 102, 241, 0.12); color: #818cf8; border: 1px solid rgba(99, 102, 241, 0.25); display: inline-flex; align-items: center; gap: 0.3rem;">
+                        ${escapeHtml(rName)}
+                        ${!isRowDisabled ? `<i class="fa-solid fa-xmark remove-resp-btn" data-resp="${escapeHtml(rName)}" style="cursor: pointer; opacity: 0.7; font-size: 0.7rem;" title="Remover ${escapeHtml(rName)}"></i>` : ''}
+                    </span>
+                `).join('');
+
+                const unassignedResps = respsToDisplay.filter(resp => {
+                    const rName = typeof resp === 'object' ? resp.name : resp;
+                    return !currentResps.includes(rName);
                 });
 
-                const addRespSelect = tr.querySelector('.select-activity-add-resp');
-                if (addRespSelect) {
-                    addRespSelect.addEventListener('change', (e) => {
+                const unassignedOptionsHtml = '<option value="">+ ResponsÃ¡vel</option>' +
+                    unassignedResps.map(resp => {
+                        const rName = typeof resp === 'object' ? resp.name : resp;
+                        return `<option value="${escapeHtml(rName)}">${escapeHtml(rName)}</option>`;
+                    }).join('');
+                    
+                const isRpa = isRpaActivity(proc);
+                
+                tr.innerHTML = `
+                    <td class="col-select-admin" style="text-align: center; ${currentUser.perfil === 'ADMIN' ? '' : 'display: none;'}">
+                        <input type="checkbox" class="cadastros-row-checkbox" data-id="${proc.id}" ${isRowDisabled ? 'disabled style="opacity: 0.3; pointer-events: none;"' : ''}>
+                    </td>
+                    <td>
+                        <input type="text" class="input-activity-name-cell" value="${escapeHtml(proc.name)}" ${isRowDisabled ? 'readonly style="width: 100%; border: none; background: transparent; color: var(--text-primary); outline: none; padding: 0.3rem 0.5rem; border-radius: 4px; opacity: 0.7; pointer-events: none;"' : 'style="width: 100%; border: none; background: transparent; color: var(--text-primary); outline: none; padding: 0.3rem 0.5rem; border-radius: 4px;"'}>
+                    </td>
+                    <td>
+                        <select class="select-activity-team-cell" ${isRowDisabled ? 'disabled style="width: 100%; border: none; background: transparent; color: var(--text-primary); outline: none; padding: 0.3rem 0.5rem; border-radius: 4px; opacity: 0.7; pointer-events: none;"' : 'style="width: 100%; border: none; background: transparent; color: var(--text-primary); outline: none; padding: 0.3rem 0.5rem; border-radius: 4px; cursor: pointer;"'}>
+                            ${teamOptions}
+                        </select>
+                    </td>
+                    <td>
+                        <div class="cadastros-resp-container" style="display: flex; flex-wrap: wrap; gap: 0.3rem; align-items: center; padding: 0.2rem 0;">
+                            ${assignedBadgesHtml}
+                            <select class="select-activity-add-resp" ${isRowDisabled ? 'disabled style="display: none;"' : 'style="border: 1px dashed var(--border-color); background: rgba(255,255,255,0.03); color: var(--text-secondary); outline: none; padding: 0.2rem 0.4rem; border-radius: 4px; font-size: 0.78rem; cursor: pointer;"'}>
+                                ${unassignedOptionsHtml}
+                            </select>
+                        </div>
+                    </td>
+                    <td>
+                        <input type="text" class="input-activity-product-cell" value="${escapeHtml(proc.produto || '')}" placeholder="Produto (Opcional)" ${isRowDisabled ? 'readonly style="width: 100%; border: none; background: transparent; color: var(--text-primary); outline: none; padding: 0.3rem 0.5rem; border-radius: 4px; opacity: 0.7; pointer-events: none;"' : 'style="width: 100%; border: none; background: transparent; color: var(--text-primary); outline: none; padding: 0.3rem 0.5rem; border-radius: 4px;"'}>
+                    </td>
+                    <td style="text-align: center;">
+                        <label style="display: inline-flex; align-items: center; gap: 0.35rem; cursor: ${isRowDisabled ? 'default' : 'pointer'}; font-size: 0.8rem; user-select: none;">
+                            <input type="checkbox" class="cb-activity-rpa" ${isRpa ? 'checked' : ''} ${isRowDisabled ? 'disabled' : ''}>
+                            <span class="label-rpa-text" style="${isRpa ? 'color: #a78bfa; font-weight: 600;' : 'color: var(--text-muted);'}">ðŸ¤– RPA</span>
+                        </label>
+                    </td>
+                    <td class="col-acao-excluir" style="text-align: center; ${isConsulta ? 'display: none;' : ''}">
+                        ${canEditThisArea ? `
+                        <button class="btn-row-action btn-delete-activity-cell" style="background: transparent; border: none; color: var(--color-danger); cursor: pointer; font-size: 0.95rem; padding: 0.2rem;" title="Excluir Atividade">
+                            <i class="fa-solid fa-trash-can"></i>
+                        </button>` : ''}
+                    </td>
+                `;
+                
+                const rowCheckbox = tr.querySelector('.cadastros-row-checkbox');
+                if (rowCheckbox && !isRowDisabled) {
+                    rowCheckbox.addEventListener('change', () => {
                         if (!verificarPermissao('OPERADOR')) return;
-                        if (!podeEditarArea(proc.area)) return;
-                        const newResp = e.target.value;
-                        if (!newResp) return;
-                        const updated = [...currentResps, newResp];
-                        setProcessResponsaveis(proc, updated);
-                        if (isRpaResponsavel(newResp)) {
-                            proc.isRpa = true;
-                        }
-                        saveState();
-                        renderCadastrosView();
-                        renderResponsavelFilterOptions();
-                        renderTable();
-                        renderBalancingTable();
-                        renderReviewTable();
-                        renderAutomationsView();
+                        updateBulkDeleteState();
                     });
                 }
                 
-                const productInput = tr.querySelector('.input-activity-product-cell');
-                if (productInput) {
-                    productInput.addEventListener('change', (e) => {
+                const rpaCheckbox = tr.querySelector('.cb-activity-rpa');
+                if (rpaCheckbox && !isRowDisabled) {
+                    rpaCheckbox.addEventListener('change', (e) => {
                         if (!verificarPermissao('OPERADOR')) return;
                         if (!podeEditarArea(proc.area)) return;
-                        proc.produto = e.target.value.trim();
+                        proc.isRpa = e.target.checked;
                         saveState();
-                    });
-                    productInput.addEventListener('focus', () => {
-                        if (isRowDisabled) return;
-                        productInput.style.background = 'rgba(255, 255, 255, 0.08)';
-                        productInput.style.border = '1px solid var(--border-color)';
-                    });
-                    productInput.addEventListener('blur', () => {
-                        productInput.style.background = 'transparent';
-                        productInput.style.border = 'none';
-                    });
-                }
-            }
-            
-            const deleteBtn = tr.querySelector('.btn-delete-activity-cell');
-            if (deleteBtn) {
-                deleteBtn.addEventListener('click', () => {
-                    if (!verificarPermissao('OPERADOR')) { alert('Acesso negado: Perfil OPERADOR ou ADMIN necessário.'); return; }
-                    if (!podeEditarArea(proc.area)) { alert(`Acesso negado: Você só pode excluir atividades da sua equipe (${currentUser.assignedTeam}).`); return; }
-                    if (confirm(`Deseja realmente excluir a atividade "${proc.name}"?`)) {
-                        state.processes = state.processes.filter(p => p.id !== proc.id);
-                        saveState();
-                        renderCadastrosView();
                         renderTable();
                         renderBalancingTable();
                         renderReviewTable();
                         renderAutomationsView();
+                        
+                        const labelText = tr.querySelector('.label-rpa-text');
+                        if (labelText) {
+                            labelText.style.color = e.target.checked ? '#a78bfa' : 'var(--text-muted)';
+                            labelText.style.fontWeight = e.target.checked ? '600' : 'normal';
+                        }
+                    });
+                }
+                
+                const nameInput = tr.querySelector('.input-activity-name-cell');
+                if (nameInput && !isRowDisabled) {
+                    nameInput.addEventListener('change', (e) => {
+                        if (!verificarPermissao('OPERADOR')) return;
+                        if (!podeEditarArea(proc.area)) return;
+                        const val = e.target.value.trim();
+                        if (val) {
+                            proc.name = val;
+                            saveState();
+                        } else {
+                            e.target.value = proc.name;
+                        }
+                    });
+                    nameInput.addEventListener('focus', () => {
+                        if (isRowDisabled) return;
+                        nameInput.style.background = 'rgba(255, 255, 255, 0.08)';
+                        nameInput.style.border = '1px solid var(--border-color)';
+                    });
+                    nameInput.addEventListener('blur', () => {
+                        nameInput.style.background = 'transparent';
+                        nameInput.style.border = 'none';
+                    });
+                }
+                
+                const teamSelect = tr.querySelector('.select-activity-team-cell');
+                if (teamSelect && !isRowDisabled) {
+                    teamSelect.addEventListener('change', (e) => {
+                        if (!verificarPermissao('OPERADOR')) return;
+                        if (!podeEditarArea(proc.area)) return;
+                        const newTeam = e.target.value;
+                        proc.area = newTeam;
+                        setProcessResponsaveis(proc, []);
+                        saveState();
+                        
+                        renderCadastrosView();
+                        renderAreaFilterOptions();
+                        renderResponsavelFilterOptions();
+                        renderTable();
+                        renderBalancingTable();
+                        renderReviewTable();
+                    });
+                    teamSelect.addEventListener('focus', () => {
+                        if (isRowDisabled) return;
+                        teamSelect.style.background = 'rgba(255, 255, 255, 0.08)';
+                        teamSelect.style.border = '1px solid var(--border-color)';
+                    });
+                    teamSelect.addEventListener('blur', () => {
+                        teamSelect.style.background = 'transparent';
+                        teamSelect.style.border = 'none';
+                    });
+                }
+                
+                // Listeners for multi-responsible badges & add dropdown
+                if (!isRowDisabled) {
+                    tr.querySelectorAll('.remove-resp-btn').forEach(btn => {
+                        btn.addEventListener('click', (e) => {
+                            e.stopPropagation();
+                            if (!verificarPermissao('OPERADOR')) return;
+                            if (!podeEditarArea(proc.area)) return;
+                            const respToRemove = btn.dataset.resp;
+                            const updated = currentResps.filter(r => r !== respToRemove);
+                            setProcessResponsaveis(proc, updated);
+                            saveState();
+                            renderCadastrosView();
+                            renderResponsavelFilterOptions();
+                            renderTable();
+                            renderBalancingTable();
+                            renderReviewTable();
+                            renderAutomationsView();
+                        });
+                    });
+
+                    const addRespSelect = tr.querySelector('.select-activity-add-resp');
+                    if (addRespSelect) {
+                        addRespSelect.addEventListener('change', (e) => {
+                            if (!verificarPermissao('OPERADOR')) return;
+                            if (!podeEditarArea(proc.area)) return;
+                            const newResp = e.target.value;
+                            if (!newResp) return;
+                            const updated = [...currentResps, newResp];
+                            setProcessResponsaveis(proc, updated);
+                            if (isRpaResponsavel(newResp)) {
+                                proc.isRpa = true;
+                            }
+                            saveState();
+                            renderCadastrosView();
+                            renderResponsavelFilterOptions();
+                            renderTable();
+                            renderBalancingTable();
+                            renderReviewTable();
+                            renderAutomationsView();
+                        });
                     }
-                });
-            }
-            
-            tableBody.appendChild(tr);
+                    
+                    const productInput = tr.querySelector('.input-activity-product-cell');
+                    if (productInput) {
+                        productInput.addEventListener('change', (e) => {
+                            if (!verificarPermissao('OPERADOR')) return;
+                            if (!podeEditarArea(proc.area)) return;
+                            proc.produto = e.target.value.trim();
+                            saveState();
+                        });
+                        productInput.addEventListener('focus', () => {
+                            if (isRowDisabled) return;
+                            productInput.style.background = 'rgba(255, 255, 255, 0.08)';
+                            productInput.style.border = '1px solid var(--border-color)';
+                        });
+                        productInput.addEventListener('blur', () => {
+                            productInput.style.background = 'transparent';
+                            productInput.style.border = 'none';
+                        });
+                    }
+                }
+                
+                const deleteBtn = tr.querySelector('.btn-delete-activity-cell');
+                if (deleteBtn) {
+                    deleteBtn.addEventListener('click', () => {
+                        if (!verificarPermissao('OPERADOR')) { alert('Acesso negado: Perfil OPERADOR ou ADMIN necessÃ¡rio.'); return; }
+                        if (!podeEditarArea(proc.area)) { alert(`Acesso negado: VocÃª sÃ³ pode excluir atividades da sua equipe (${currentUser.assignedTeam}).`); return; }
+                        if (confirm(`Deseja realmente excluir a atividade "${proc.name}"?`)) {
+                            state.processes = state.processes.filter(p => p.id !== proc.id);
+                            saveState();
+                            renderCadastrosView();
+                            renderTable();
+                            renderBalancingTable();
+                            renderReviewTable();
+                            renderAutomationsView();
+                        }
+                    });
+                }
+                
+                tableBody.appendChild(tr);
+            });
         });
-    });
-    
-    updateBulkDeleteState();
-    
-    // Re-apply permission logic after recreating DOM elements
-    aplicarPerfilDeAcesso();
+        
+        updateBulkDeleteState();
+        aplicarPerfilDeAcesso();
+    }
+
+    renderCadastrosTable();
 }
 
-// Update bulk delete button state helper
 function updateBulkDeleteState() {
     const tableBody = document.getElementById('cadastros-table-body');
     if (!tableBody) return;
@@ -4974,5 +5068,6 @@ function renderAutomationsView() {
         tableBody.appendChild(tr);
     });
 }
+
 
 
