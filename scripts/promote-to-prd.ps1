@@ -47,8 +47,8 @@ $htmlPrd = [System.IO.File]::ReadAllText("$prdDir\index.html", [System.Text.Enco
 $cssPrd = [System.IO.File]::ReadAllText("$prdDir\style.css", [System.Text.Encoding]::UTF8)
 $jsPrd = [System.IO.File]::ReadAllText("$prdDir\app.js", [System.Text.Encoding]::UTF8)
 
-$singlePrd = $htmlPrd.Replace('<link rel="stylesheet" href="style.css">', "<style>`n$cssPrd`n</style>")
-$singlePrd = $singlePrd.Replace('<script src="app.js"></script>', "<script>`n$jsPrd`n</script>")
+$singlePrd = [regex]::Replace($htmlPrd, '<link\s+rel="stylesheet"\s+href="style\.css[^"]*">', "<style>`n$cssPrd`n</style>")
+$singlePrd = [regex]::Replace($singlePrd, '<script\s+src="app\.js[^"]*">\s*</script>', "<script>`n$jsPrd`n</script>")
 [System.IO.File]::WriteAllText("$prdDir\single_file_google_sites.html", $singlePrd, $utf8NoBom)
 
 # 7. Validar código em PRD
