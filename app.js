@@ -89,11 +89,7 @@ function aplicarPerfilDeAcesso() {
         userRoleEl.className = 'user-role-badge role-' + perfil.toLowerCase();
     }
     if (userTeamBadgeEl) {
-        if (perfil === 'ADMIN') {
-            userTeamBadgeEl.textContent = 'Geral (Admin)';
-            userTeamBadgeEl.style.display = 'inline-block';
-            userTeamBadgeEl.title = 'Acesso total a todas as equipes';
-        } else if (currentUser.assignedTeam) {
+        if (perfil === 'OPERADOR' && currentUser.assignedTeam) {
             userTeamBadgeEl.textContent = currentUser.assignedTeam;
             userTeamBadgeEl.style.display = 'inline-block';
             userTeamBadgeEl.title = `Equipe vinculada: ${currentUser.assignedTeam}`;
