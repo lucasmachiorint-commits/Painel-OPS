@@ -1,6 +1,16 @@
 // ============================================================
-// SELF-HEALING STORAGE & CORRUPTED DATA PROTECTION
+// SELF-HEALING STORAGE & GLOBAL ERROR DIAGNOSTICS
 // ============================================================
+window.addEventListener('error', function(event) {
+    console.error('[Painel OPS Diagnostic]', {
+        message: event.message,
+        filename: event.filename,
+        lineno: event.lineno,
+        colno: event.colno,
+        error: event.error
+    });
+});
+
 (function() {
     try {
         const keys = Object.keys(localStorage);
