@@ -1,4 +1,4 @@
-﻿// ============================================================
+// ============================================================
 // SUPABASE AUTH CONFIGURATION
 // ============================================================
 // Substitua pelas credenciais do seu projeto no Supabase Dashboard
@@ -5112,4 +5112,3 @@ function renderAutomationsView() {
         tableBody.appendChild(tr);
     });
 }
-
