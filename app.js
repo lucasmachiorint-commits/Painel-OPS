@@ -163,13 +163,44 @@ function aplicarPerfilDeAcesso() {
     document.querySelectorAll('.col-acao-excluir').forEach(el => {
         el.style.display = isConsulta ? 'none' : '';
     });
-    document.querySelectorAll('.input-volume, .input-minutes, .input-qtd, .input-backlog-volume, .input-area-allocation, .select-review-status, .input-activity-name-cell, .select-activity-team-cell, .select-activity-resp-cell, .input-activity-product-cell, .select-activity-add-resp, .cadastros-row-checkbox, .cb-activity-rpa, .access-perfil-select, #history-month-input, #modal-input-horas-dia, #modal-input-absenteismo, #modal-input-dias-uteis, #modal-input-new-team, #modal-select-team-gerencia, #modal-select-team-diretoria').forEach(el => {
+
+    // Controla inputs estáticos de modais e painéis globais
+    document.querySelectorAll('#history-month-input, #modal-input-horas-dia, #modal-input-absenteismo, #modal-input-dias-uteis, #modal-input-new-team, #modal-select-team-gerencia, #modal-select-team-diretoria, .access-perfil-select').forEach(el => {
         el.disabled = isConsulta;
         el.style.opacity = isConsulta ? '0.5' : '1';
         el.style.pointerEvents = isConsulta ? 'none' : 'auto';
     });
+
+    // Controla inputs em linhas de atividades com base na área da atividade e perfil
+    document.querySelectorAll('tr[data-id]').forEach(tr => {
+        const procId = tr.dataset.id;
+        const proc = (state.processes || []).find(p => p.id === procId);
+        const areaName = proc ? proc.area : (tr.dataset.area || '');
+        const canEditThisArea = podeEditarArea(areaName);
+        const isRowDisabled = isConsulta || !canEditThisArea;
+
+        tr.querySelectorAll('.input-volume, .input-minutes, .input-qtd, .input-backlog-volume, .input-area-allocation, .select-review-status, .input-activity-name-cell, .select-activity-team-cell, .select-activity-resp-cell, .input-activity-product-cell, .select-activity-add-resp, .cadastros-row-checkbox, .cb-activity-rpa').forEach(el => {
+            el.disabled = isRowDisabled;
+            el.style.pointerEvents = isRowDisabled ? 'none' : 'auto';
+            el.style.opacity = isRowDisabled ? '0.6' : '1';
+        });
+
+        tr.querySelectorAll('.cb-activity-rpa').forEach(cb => {
+            const lbl = cb.closest('label');
+            if (lbl) {
+                lbl.style.pointerEvents = isRowDisabled ? 'none' : 'auto';
+                lbl.style.cursor = isRowDisabled ? 'not-allowed' : 'pointer';
+            }
+        });
+
+        tr.querySelectorAll('.remove-resp-btn, .btn-delete-activity-cell').forEach(el => {
+            el.style.pointerEvents = isRowDisabled ? 'none' : 'auto';
+            el.style.display = isRowDisabled ? 'none' : (el.classList.contains('remove-resp-btn') ? 'inline-flex' : 'inline-block');
+        });
+    });
+
     // Controla botões de ação e engrenagens na barra lateral e tabelas
-    document.querySelectorAll('.remove-resp-btn, .btn-config-resp-item').forEach(el => {
+    document.querySelectorAll('.btn-config-resp-item').forEach(el => {
         el.style.pointerEvents = isConsulta ? 'none' : 'auto';
         el.style.display = isConsulta ? 'none' : 'inline-block';
     });
@@ -4425,6 +4456,7 @@ function renderCadastrosView() {
                 tr.className = rowClass;
                 tr.style.display = isExpanded ? 'table-row' : 'none';
                 tr.dataset.id = proc.id;
+                tr.dataset.area = proc.area || '';
                 
                 const canEditThisArea = podeEditarArea(proc.area);
                 const isConsulta = currentUser.perfil === 'CONSULTA';
@@ -4487,8 +4519,8 @@ function renderCadastrosView() {
                         <input type="text" class="input-activity-product-cell" value="${escapeHtml(proc.produto || '')}" placeholder="Produto (Opcional)" ${isRowDisabled ? 'readonly style="width: 100%; border: none; background: transparent; color: var(--text-primary); outline: none; padding: 0.3rem 0.5rem; border-radius: 4px; opacity: 0.7; pointer-events: none;"' : 'style="width: 100%; border: none; background: transparent; color: var(--text-primary); outline: none; padding: 0.3rem 0.5rem; border-radius: 4px;"'}>
                     </td>
                     <td style="text-align: center;">
-                        <label style="display: inline-flex; align-items: center; gap: 0.35rem; cursor: ${isRowDisabled ? 'not-allowed' : 'pointer'}; font-size: 0.8rem; user-select: none;">
-                            <input type="checkbox" class="cb-activity-rpa" ${isRpa ? 'checked' : ''} ${isRowDisabled ? 'disabled style="pointer-events: none; opacity: 0.5;"' : ''}>
+                        <label style="display: inline-flex; align-items: center; gap: 0.35rem; cursor: ${isRowDisabled ? 'not-allowed' : 'pointer'}; font-size: 0.8rem; user-select: none; ${isRowDisabled ? 'pointer-events: none;' : ''}">
+                            <input type="checkbox" class="cb-activity-rpa" ${isRpa ? 'checked' : ''} ${isRowDisabled ? 'disabled style="pointer-events: none; opacity: 0.4;"' : ''}>
                             <span class="label-rpa-text" style="${isRpa ? 'color: #a78bfa; font-weight: 600;' : 'color: var(--text-muted);'} ${isRowDisabled ? 'opacity: 0.6;' : ''}">🤖 RPA</span>
                         </label>
                     </td>
