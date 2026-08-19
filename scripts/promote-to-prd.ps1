@@ -29,7 +29,7 @@ Copy-Item -Path "$hmlDir\style.css" -Destination "$prdDir\style.css" -Force
 Write-Host "`n4. Removendo marcacoes de HML dos arquivos de Producao..."
 $prdHtml = [System.IO.File]::ReadAllText("$prdDir\index.html", [System.Text.Encoding]::UTF8)
 $prdHtmlClean = [System.Text.RegularExpressions.Regex]::Replace($prdHtml, '(?s)<div id="hml-banner-fixed".*?</div>', '')
-$prdHtmlClean = $prdHtmlClean.Replace('style="margin-top: 32px;"', '')
+$prdHtmlClean = [regex]::Replace($prdHtmlClean, '<div class="app-container"[^>]*>', '<div class="app-container">')
 $prdHtmlClean = [System.Text.RegularExpressions.Regex]::Replace($prdHtmlClean, '(?s)<button id="btn-cadastros-sync-prd".*?</button>', '')
 [System.IO.File]::WriteAllText("$prdDir\index.html", $prdHtmlClean, $utf8NoBom)
 

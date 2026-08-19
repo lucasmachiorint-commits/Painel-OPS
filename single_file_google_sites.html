@@ -283,7 +283,7 @@ body.light-theme #theme-toggle .icon-dark {
 }
 
 .content-area {
-    padding: 1.5rem;
+    padding: 1.5rem 1.5rem 6rem 1.5rem;
     flex: 1;
 }
 
@@ -1726,7 +1726,7 @@ body.light-theme input:-webkit-autofill:active {
 </head>
 <body class="dark-theme">
     
-    <div class="app-container" >
+    <div class="app-container">
         <!-- LEFT SIDEBAR -->
         <nav class="sidebar">
             <div class="sidebar-brand">
@@ -1871,9 +1871,14 @@ body.light-theme input:-webkit-autofill:active {
                         <!-- MAIN: ACTIVITIES (ATIVIDADES) TABLE -->
                         <section class="panel glass-panel table-panel">
                             <div class="panel-header-actions" style="margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
-                                <h2 class="panel-title" style="margin-bottom: 0;">
-                                    <i class="fa-solid fa-list-check"></i> Cadastro de Atividades <span class="badge" id="cadastros-activity-count">0</span>
-                                </h2>
+                                <div style="display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
+                                    <h2 class="panel-title" style="margin-bottom: 0;">
+                                        <i class="fa-solid fa-list-check"></i> Cadastro de Atividades <span class="badge" id="cadastros-activity-count">0</span>
+                                    </h2>
+                                    <button id="btn-cadastros-toggle-all" class="btn btn-secondary" onclick="toggleAllCadastrosTeams()" style="padding: 0.25rem 0.6rem; font-size: 0.75rem; gap: 0.35rem;" title="Recolher / Expandir Todas as Equipes">
+                                        <i class="fa-solid fa-chevron-up"></i> Recolher Todas
+                                    </button>
+                                </div>
                                 <div class="header-table-controls" style="gap: 0.75rem; flex-wrap: wrap;">
                                     <button id="btn-cadastros-delete-selected" data-permissao="ADMIN" class="btn btn-secondary" style="background: rgba(244, 63, 94, 0.08); border: 1px solid #f43f5e; color: #f43f5e; display: none;">
                                         <i class="fa-solid fa-trash-can"></i> Excluir Selecionados (<span id="cadastros-selected-count">0</span>)
@@ -1887,9 +1892,7 @@ body.light-theme input:-webkit-autofill:active {
                                         <i class="fa-solid fa-plus"></i> Adicionar Atividade
                                     </button>
                                 </div>
-                            </div>
-
-                                                        <!-- CADASTROS FILTERS BAR (Demanda, Ãrea, ResponsÃ¡vel, Produto, RPA) -->
+                                                      <!-- CADASTROS FILTERS BAR (Demanda, Área, Responsável, Produto, RPA) -->
                             <div class="cadastros-filters-bar" style="display: flex; flex-wrap: wrap; gap: 0.65rem; align-items: center; margin-bottom: 1.25rem; padding: 0.75rem 1rem; background: rgba(255,255,255,0.02); border: 1px solid var(--border-color); border-radius: 8px;">
                                 <!-- 1. Demanda / Atividade -->
                                 <div style="flex: 1.2; min-width: 180px; position: relative;">
@@ -1897,17 +1900,17 @@ body.light-theme input:-webkit-autofill:active {
                                     <input type="text" id="cadastros-filter-search" name="cadastros_search_field_safe" autocomplete="off" data-lpignore="true" data-form-type="other" spellcheck="false" readonly onfocus="this.removeAttribute('readonly');" placeholder="Buscar Demanda / Atividade..." style="width: 100%; padding: 0.45rem 0.75rem 0.45rem 2.1rem; border-radius: 6px; border: 1px solid var(--border-color); background: rgba(255,255,255,0.05); color: var(--text-primary); font-size: 0.83rem; outline: none; transition: all 0.2s;">
                                 </div>
 
-                                <!-- 2. Ãrea / Equipe -->
+                                <!-- 2. Área / Equipe -->
                                 <div style="flex: 1; min-width: 150px;">
                                     <select id="cadastros-filter-area" style="width: 100%; padding: 0.45rem 0.75rem; border-radius: 6px; border: 1px solid var(--border-color); background: rgba(255,255,255,0.05); color: var(--text-primary); font-size: 0.83rem; outline: none; cursor: pointer;">
-                                        <option value="">Todas as Ãreas</option>
+                                        <option value="">Todas as Áreas</option>
                                     </select>
                                 </div>
 
-                                <!-- 3. ResponsÃ¡vel -->
+                                <!-- 3. Responsável -->
                                 <div style="flex: 1; min-width: 150px;">
                                     <select id="cadastros-filter-resp" style="width: 100%; padding: 0.45rem 0.75rem; border-radius: 6px; border: 1px solid var(--border-color); background: rgba(255,255,255,0.05); color: var(--text-primary); font-size: 0.83rem; outline: none; cursor: pointer;">
-                                        <option value="">Todos os ResponsÃ¡veis</option>
+                                        <option value="">Todos os Responsáveis</option>
                                     </select>
                                 </div>
 
@@ -1920,7 +1923,7 @@ body.light-theme input:-webkit-autofill:active {
                                 <div style="min-width: 135px;">
                                     <select id="cadastros-filter-rpa" style="width: 100%; padding: 0.45rem 0.75rem; border-radius: 6px; border: 1px solid var(--border-color); background: rgba(255,255,255,0.05); color: var(--text-primary); font-size: 0.83rem; outline: none; cursor: pointer;">
                                         <option value="">RPA: Todos</option>
-                                        <option value="sim">ðŸ¤– Somente RPA</option>
+                                        <option value="sim">🤖 Somente RPA</option>
                                         <option value="nao">Manual (Sem RPA)</option>
                                     </select>
                                 </div>
@@ -3950,11 +3953,11 @@ async function saveStateToSupabase() {
 
 async function forceResetGlobalState() {
     if (!verificarPermissao('ADMIN')) {
-        alert('Acesso negado: Perfil ADMIN necessÃ¡rio para publicar a base global.');
+        alert('Acesso negado: Perfil ADMIN necessário para publicar a base global.');
         return;
     }
 
-    if (!confirm('Deseja ÃÃrealmente definir e publicar a sua visão atual como a base oficial para TODOS os usuários? Isso sincronizará a tela de todos imediatamente.')) {
+    if (!confirm('Deseja realmente definir e publicar a sua visão atual como a base oficial para TODOS os usuários? Isso sincronizará a tela de todos imediatamente.')) {
         return;
     }
 
@@ -4557,12 +4560,12 @@ function setupEventListeners() {
     const btnBulkDeleteSelected = document.getElementById('btn-cadastros-delete-selected');
     if (btnBulkDeleteSelected) {
         btnBulkDeleteSelected.addEventListener('click', () => {
-            if (!verificarPermissao('ADMIN')) { alert('Acesso negado: Perfil ADMIN necessÃ¡rio.'); return; }
+            if (!verificarPermissao('ADMIN')) { alert('Acesso negado: Perfil ADMIN necessário.'); return; }
             const checkedBoxes = document.querySelectorAll('.cadastros-row-checkbox:checked');
             const idsToDelete = [...checkedBoxes].map(cb => cb.dataset.id);
             if (idsToDelete.length === 0) return;
             
-            if (confirm(`Deseja ÃÃrealmente excluir as ${idsToDelete.length} atividades selecionadas?`)) {
+            if (confirm(`Deseja realmente excluir as ${idsToDelete.length} atividades selecionadas?`)) {
                 state.processes = state.processes.filter(p => !idsToDelete.includes(p.id));
                 saveState();
                 
@@ -4597,7 +4600,7 @@ function setupEventListeners() {
         });
     }
 
-    // AÃÃrea & Owner filter triggers
+    // Área & Owner filter triggers
     const filterAreaEl = document.getElementById('filter-area');
     if (filterAreaEl) {
         filterAreaEl.addEventListener('change', () => {
@@ -4781,7 +4784,7 @@ function setupEventListeners() {
     });
 
     safeAddListener('btn-clear-backlog-volumes', 'click', () => {
-        if (!verificarPermissao('ADMIN')) { alert('Acesso negado: Perfil ADMIN necessÃ¡rio.'); return; }
+        if (!verificarPermissao('ADMIN')) { alert('Acesso negado: Perfil ADMIN necessário.'); return; }
         state.processes.forEach(proc => {
             proc.backlogVolume = '';
         });
@@ -5047,7 +5050,7 @@ function renderBalancingTable() {
             }
         }
         
-        // Click event to highlight corresponding area card on the right (ignore for ResponsÃvel and Backlog inputs)
+        // Click event to highlight corresponding area card on the right (ignore for Responsável and Backlog inputs)
         tr.addEventListener('click', (e) => {
             const td = e.target.closest('td');
             if (!td) return;
@@ -5311,7 +5314,7 @@ function updateCalculations() {
     // Update placeholders for responsible overrides inputs in-place to avoid re-rendering layout
     const horasInputs = document.querySelectorAll('.override-horas');
     horasInputs.forEach(inp => {
-        inp.placeholder = `${horasDia.toFixed(1)} (PadrÃ£o)`;
+        inp.placeholder = `${horasDia.toFixed(1)} (Padrão)`;
     });
     const absInputs = document.querySelectorAll('.override-absenteismo');
     absInputs.forEach(inp => {
@@ -5360,7 +5363,7 @@ function updateBalancingCalculations() {
         let totalHoursRow = 0;
         if (!isStopped) {
             if (isTempoFrequencia) {
-                // Tempo x FrequÃªncia: distributed evenly across working days
+                // Tempo x Frequência: distributed evenly across working days
                 const qtdExec = parseFloat(proc.qtdExecucao) || 0;
                 totalHoursRow = (qtdExec * minutes) / 60 / respParams.diasUteis;
             } else {
@@ -5464,7 +5467,7 @@ function updateBalancingCalculations() {
 
 
 
-    // Update AÃÃrea Allocations Side Panel
+    // Update Área Allocations Side Panel
     renderAreaAllocations();
 }
 
@@ -5642,7 +5645,7 @@ function duplicateProcess(proc) {
 }
 
 function loadExampleData() {
-    if (!verificarPermissao('ADMIN')) { alert('Acesso negado: Perfil ADMIN necessÃ¡rio.'); return; }
+    if (!verificarPermissao('ADMIN')) { alert('Acesso negado: Perfil ADMIN necessário.'); return; }
     state.processes = JSON.parse(JSON.stringify(EXAMPLE_PROCESSES));
     state.params = {
         horasDia: 8.0,
@@ -5688,7 +5691,7 @@ function loadExampleData() {
 }
 
 function resetSimulator() {
-    if (!verificarPermissao('ADMIN')) { alert('Acesso negado: Perfil ADMIN necessÃ¡rio.'); return; }
+    if (!verificarPermissao('ADMIN')) { alert('Acesso negado: Perfil ADMIN necessário.'); return; }
     state.processes = [];
     document.getElementById('filter-area').value = 'all';
     document.getElementById('filter-area-balancing').value = 'all';
@@ -5703,7 +5706,7 @@ function resetSimulator() {
     renderBalancingTable();
 }
 
-// CHART RENDER ENGINE (Grouped by AÃÃrea or Process based on filter selection)
+// CHART RENDER ENGINE (Grouped by Área or Process based on filter selection)
 function renderCharts(totalFteRequired) {
     const isDark = document.body.classList.contains('dark-theme');
     
@@ -5713,7 +5716,7 @@ function renderCharts(totalFteRequired) {
     const primaryColor = style.getPropertyValue('--color-primary').trim();
     const successColor = style.getPropertyValue('--color-success').trim();
 
-    // 1. Doughnut Chart (Aggregated by AÃÃrea or by Process)
+    // 1. Doughnut Chart (Aggregated by Área or by Process)
     const pieCanvas = document.getElementById('chart-pie');
     if (!pieCanvas) return;
 
@@ -6537,7 +6540,7 @@ function renderSnapshotsList() {
             <div class="glass-panel" style="display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 1rem; border-radius: 8px; border: 1px solid rgba(255,255,255,0.05); background: rgba(255,255,255,0.01);">
                 <div>
                     <h4 style="margin: 0; font-size: 0.95rem; font-weight: 600; color: var(--text-primary);">${formatMonth(h.month)}</h4>
-                    <span style="font-size: 0.8rem; color: var(--text-secondary);">${h.data.length} atividades â€ Vol: ${totalVolume.toFixed(0)}</span>
+                    <span style="font-size: 0.8rem; color: var(--text-secondary);">${h.data.length} atividades • Vol: ${totalVolume.toFixed(0)}</span>
                 </div>
                 <button class="btn-row-action btn-delete-snapshot" data-permissao="ADMIN" data-month="${h.month}" title="Excluir Registro" style="color: var(--color-danger); background: transparent; border: none; cursor: pointer; font-size: 0.9rem; padding: 0.2rem;">
                     <i class="fa-solid fa-trash-can"></i>
@@ -6551,7 +6554,7 @@ function renderSnapshotsList() {
     // Add delete listeners
     container.querySelectorAll('.btn-delete-snapshot').forEach(btn => {
         btn.addEventListener('click', (e) => {
-            if (!verificarPermissao('ADMIN')) { alert('Acesso negado: Perfil ADMIN necessÃ¡rio.'); return; }
+            if (!verificarPermissao('ADMIN')) { alert('Acesso negado: Perfil ADMIN necessário.'); return; }
             const btnEl = e.currentTarget;
             const month = btnEl.dataset.month;
             if (confirm(`Tem certeza que deseja excluir o registro de ${formatMonth(month)}?`)) {
@@ -6709,6 +6712,66 @@ function renderHistoryChart() {
 // State tracking for accordion expansion in Cadastros view
 const expandedCadastrosTableTeams = {};
 
+function toggleCadastrosTeam(team, rowClass, headerElement) {
+    const headerTr = headerElement ? headerElement.closest('tr') : document.querySelector(`.cadastros-team-header-row[data-team="${team}"]`);
+    if (!headerTr) return;
+    
+    const icon = headerTr.querySelector('i');
+    const isCurrentlyOpen = icon ? icon.classList.contains('fa-chevron-down') : true;
+    const newOpen = !isCurrentlyOpen;
+    
+    expandedCadastrosTableTeams[team] = newOpen;
+    
+    if (icon) {
+        icon.className = newOpen ? 'fa-solid fa-chevron-down' : 'fa-solid fa-chevron-right';
+        icon.style.width = '20px';
+        icon.style.color = 'var(--text-primary)';
+    }
+    
+    const rows = document.querySelectorAll('.' + rowClass);
+    rows.forEach(r => {
+        r.style.display = newOpen ? 'table-row' : 'none';
+    });
+}
+
+function toggleAllCadastrosTeams() {
+    const headers = document.querySelectorAll('.cadastros-team-header-row');
+    if (headers.length === 0) return;
+    
+    const anyOpen = Array.from(headers).some(h => {
+        const icon = h.querySelector('i');
+        return icon && icon.classList.contains('fa-chevron-down');
+    });
+    
+    const targetState = !anyOpen;
+    
+    headers.forEach(h => {
+        const team = h.getAttribute('data-team');
+        const rowClass = h.getAttribute('data-row-class');
+        if (team) expandedCadastrosTableTeams[team] = targetState;
+        
+        const icon = h.querySelector('i');
+        if (icon) {
+            icon.className = targetState ? 'fa-solid fa-chevron-down' : 'fa-solid fa-chevron-right';
+            icon.style.width = '20px';
+            icon.style.color = 'var(--text-primary)';
+        }
+        
+        if (rowClass) {
+            document.querySelectorAll('.' + rowClass).forEach(r => {
+                r.style.display = targetState ? 'table-row' : 'none';
+            });
+        }
+    });
+    
+    const btnToggleAll = document.getElementById('btn-cadastros-toggle-all');
+    if (btnToggleAll) {
+        btnToggleAll.innerHTML = targetState
+            ? '<i class="fa-solid fa-chevron-up"></i> Recolher Todas'
+            : '<i class="fa-solid fa-chevron-down"></i> Expandir Todas';
+    }
+}
+
 function renderCadastrosView() {
     const teamsList = document.getElementById('cadastros-teams-list');
     const responsiblesList = document.getElementById('cadastros-responsibles-list');
@@ -6794,7 +6857,7 @@ function renderCadastrosView() {
             teamsList.querySelectorAll('.btn-edit-team-item').forEach(btn => {
                 btn.addEventListener('click', (e) => {
                     e.stopPropagation();
-                    if (!verificarPermissao('OPERADOR')) { alert('Acesso negado: Perfil OPERADOR necessÃ¡rio.'); return; }
+                    if (!verificarPermissao('OPERADOR')) { alert('Acesso negado: Perfil OPERADOR necessário.'); return; }
                     const team = btn.getAttribute('data-team');
                     openNewTeamModal(team);
                 });
@@ -6803,9 +6866,9 @@ function renderCadastrosView() {
             teamsList.querySelectorAll('.btn-delete-team-item').forEach(btn => {
                 btn.addEventListener('click', (e) => {
                     e.stopPropagation();
-                    if (!verificarPermissao('ADMIN')) { alert('Acesso negado: Perfil ADMIN necessÃ¡rio.'); return; }
+                    if (!verificarPermissao('ADMIN')) { alert('Acesso negado: Perfil ADMIN necessário.'); return; }
                     const team = btn.getAttribute('data-team');
-                    if (confirm(`Deseja realmente excluir a equipe "${team}"? Todos os responsÃ¡veis e atividades desta equipe ficarÃ£o "Sem Equipe".`)) {
+                    if (confirm(`Deseja realmente excluir a equipe "${team}"? Todos os responsáveis e atividades desta equipe ficarão "Sem Equipe".`)) {
                         state.teams = state.teams.filter(t => t !== team);
                         state.processes.forEach(p => {
                             if (p.area === team) p.area = '';
@@ -6838,7 +6901,7 @@ function renderCadastrosView() {
         if(icon) {
             icon.className = isHidden ? 'fa-solid fa-chevron-down' : 'fa-solid fa-chevron-right';
         }
-        // Limpar qualquer autofill nÃ£o digitado pelo usuÃ¡rio
+        // Limpar qualquer autofill não digitado pelo usuário
         const emailInput = document.getElementById('input-new-responsible-email');
         if (emailInput && !emailInput._hasUserTyping) {
             emailInput.value = '';
@@ -6853,7 +6916,7 @@ function renderCadastrosView() {
     responsiblesList.innerHTML = '';
     
     if (!state.responsaveis || state.responsaveis.length === 0) {
-        responsiblesList.innerHTML = '<div style="color: var(--text-muted); font-size: 0.85rem; padding: 0.5rem;">Nenhum responsÃ¡vel cadastrado.</div>';
+        responsiblesList.innerHTML = '<div style="color: var(--text-muted); font-size: 0.85rem; padding: 0.5rem;">Nenhum responsável cadastrado.</div>';
     } else {
         const teamsToRender = [...(state.teams || []), 'Sem Equipe'];
         
@@ -6895,7 +6958,7 @@ function renderCadastrosView() {
                         <span style="font-weight: 600; color: var(--text-primary);">${escapeHtml(resp.name)}</span>
                         ${resp.email ? `<span style="font-size: 0.72rem; color: var(--text-muted); display: flex; align-items: center; gap: 0.25rem;"><i class="fa-regular fa-envelope" style="font-size: 0.65rem;"></i> ${escapeHtml(resp.email)}</span>` : ''}
                     </div>
-                    ${hasOverrides ? '<i class="fa-solid fa-user-gear" style="color: var(--color-primary); font-size: 0.75rem; margin-left: 0.25rem;" title="ParÃ¢metros customizados ativos"></i>' : ''}
+                    ${hasOverrides ? '<i class="fa-solid fa-user-gear" style="color: var(--color-primary); font-size: 0.75rem; margin-left: 0.25rem;" title="Parâmetros customizados ativos"></i>' : ''}
                 `;
                 
                 const btnGroup = document.createElement('div');
@@ -6905,7 +6968,7 @@ function renderCadastrosView() {
                 btnConfig.className = 'btn-config-resp-item';
                 btnConfig.setAttribute('data-permissao', 'OPERADOR,ADMIN');
                 btnConfig.style.cssText = 'background: transparent; border: none; color: var(--color-primary); cursor: pointer; font-size: 0.85rem; padding: 0.2rem; display: flex; align-items: center; justify-content: center;';
-                btnConfig.title = 'Configurar ParÃ¢metros de Capacidade';
+                btnConfig.title = 'Configurar Parâmetros de Capacidade';
                 btnConfig.innerHTML = '<i class="fa-solid fa-cog"></i>';
                 if (!canEditResp && currentUser.perfil !== 'ADMIN') {
                     btnConfig.style.display = 'none';
@@ -6915,7 +6978,7 @@ function renderCadastrosView() {
                 btnDelete.className = 'btn-delete-resp-item';
                 btnDelete.setAttribute('data-permissao', 'OPERADOR,ADMIN');
                 btnDelete.style.cssText = 'background: transparent; border: none; color: var(--color-danger); cursor: pointer; font-size: 0.85rem; padding: 0.2rem; display: flex; align-items: center; justify-content: center;';
-                btnDelete.title = 'Excluir ResponsÃ¡vel';
+                btnDelete.title = 'Excluir Responsável';
                 btnDelete.innerHTML = '<i class="fa-solid fa-trash-can"></i>';
                 if (!canEditResp && currentUser.perfil !== 'ADMIN') {
                     btnDelete.style.display = 'none';
@@ -6934,9 +6997,9 @@ function renderCadastrosView() {
                 
                 btnDelete.addEventListener('click', (e) => {
                     e.stopPropagation();
-                    if (!verificarPermissao('OPERADOR')) { alert('Acesso negado: Perfil OPERADOR ou ADMIN necessÃ¡rio.'); return; }
-                    if (!podeEditarArea(resp.area)) { alert(`Acesso negado: VocÃª sÃ³ pode excluir responsÃ¡veis da sua prÃ³pria equipe (${currentUser.assignedTeam}).`); return; }
-                    if (confirm(`Tem certeza que deseja excluir o responsÃ¡vel "${resp.name}"? Todas as atividades sob sua responsabilidade ficarÃ£o sem responsÃ¡vel.`)) {
+                    if (!verificarPermissao('OPERADOR')) { alert('Acesso negado: Perfil OPERADOR ou ADMIN necessário.'); return; }
+                    if (!podeEditarArea(resp.area)) { alert(`Acesso negado: Você só pode excluir responsáveis da sua própria equipe (${currentUser.assignedTeam}).`); return; }
+                    if (confirm(`Tem certeza que deseja excluir o responsável "${resp.name}"? Todas as atividades sob sua responsabilidade ficarão sem responsável.`)) {
                         state.responsaveis = state.responsaveis.filter(r => (typeof r === 'object' ? r.name : r) !== resp.name);
                         state.processes.forEach(p => {
                             if (p.responsavel === resp.name) p.responsavel = '';
@@ -7001,7 +7064,7 @@ function renderCadastrosView() {
 
     if (filterAreaEl) {
         const curArea = filterAreaEl.value;
-        const areaOptions = ['<option value="">Todas as Ãreas</option>']
+        const areaOptions = ['<option value="">Todas as Áreas</option>']
             .concat((state.teams || []).map(t => `<option value="${escapeHtml(t)}" ${t === curArea ? 'selected' : ''}>${escapeHtml(t)}</option>`))
             .concat([`<option value="Outros / Sem Equipe" ${curArea === 'Outros / Sem Equipe' ? 'selected' : ''}>Outros / Sem Equipe</option>`]);
         filterAreaEl.innerHTML = areaOptions.join('');
@@ -7011,9 +7074,9 @@ function renderCadastrosView() {
         const curResp = filterRespEl.value;
         const allResps = (state.responsaveis || []).map(r => typeof r === 'object' ? r.name : r).filter(Boolean);
         const uniqueResps = [...new Set(allResps)].sort();
-        const respOptions = ['<option value="">Todos os ResponsÃ¡veis</option>']
+        const respOptions = ['<option value="">Todos os Responsáveis</option>']
             .concat(uniqueResps.map(r => `<option value="${escapeHtml(r)}" ${r === curResp ? 'selected' : ''}>${escapeHtml(r)}</option>`))
-            .concat([`<option value="__SEM_RESP__" ${curResp === '__SEM_RESP__' ? 'selected' : ''}>Sem ResponsÃ¡vel</option>`]);
+            .concat([`<option value="__SEM_RESP__" ${curResp === '__SEM_RESP__' ? 'selected' : ''}>Sem Responsável</option>`]);
         filterRespEl.innerHTML = respOptions.join('');
     }
 
@@ -7060,7 +7123,7 @@ function renderCadastrosView() {
             // 1. Demanda / Atividade
             if (searchVal && !(proc.name || '').toLowerCase().includes(searchVal)) return false;
 
-            // 2. Ãrea / Equipe
+            // 2. Área / Equipe
             if (areaVal) {
                 if (areaVal === 'Outros / Sem Equipe') {
                     if (proc.area && state.teams.includes(proc.area)) return false;
@@ -7069,7 +7132,7 @@ function renderCadastrosView() {
                 }
             }
 
-            // 3. ResponsÃ¡vel
+            // 3. Responsável
             if (respVal) {
                 const resps = getProcessResponsaveis(proc);
                 if (respVal === '__SEM_RESP__') {
@@ -7130,26 +7193,32 @@ function renderCadastrosView() {
             
             if (teamProcs.length === 0) return;
             
-            // OrdenaÃ§Ã£o AlfabÃ©tica A-Z das Atividades da Equipe
+            // Ordenação Alfabética A-Z das Atividades da Equipe
             teamProcs.sort((a, b) => (a.name || '').localeCompare(b.name || '', 'pt-BR', { sensitivity: 'base' }));
             
             const rowClass = 'team-activity-row-' + teamIndex;
-            // Se houver filtros ativos, expande automaticamente para exibir resultados
-            const isExpanded = isAnyFilterActive ? true : (expandedCadastrosTableTeams[team] !== false);
+            // Se houver filtros ativos, expande automaticamente se ainda não definido
+            const isExpanded = (expandedCadastrosTableTeams[team] !== undefined)
+                ? expandedCadastrosTableTeams[team]
+                : true;
             
             // Header Row
             const headerTr = document.createElement('tr');
-            headerTr.style.cssText = 'background: rgba(255,255,255,0.03); cursor: pointer; user-select: none;';
+            headerTr.className = 'cadastros-team-header-row';
+            headerTr.setAttribute('data-team', team);
+            headerTr.setAttribute('data-row-class', rowClass);
+            headerTr.style.cssText = 'background: rgba(255,255,255,0.03); cursor: pointer; user-select: none; transition: background 0.15s;';
+            headerTr.onmouseover = () => { headerTr.style.background = 'rgba(255,255,255,0.06)'; };
+            headerTr.onmouseout = () => { headerTr.style.background = 'rgba(255,255,255,0.03)'; };
             const totalCols = currentUser.perfil === 'ADMIN' ? 7 : (currentUser.perfil === 'OPERADOR' ? 6 : 5);
             headerTr.innerHTML = `
-                <td colspan="${totalCols}" style="padding: 0.8rem; font-weight: 600; color: var(--text-primary); border-top: 1px solid rgba(255,255,255,0.05); border-bottom: 1px solid rgba(255,255,255,0.05);">
-                    <i class="${isExpanded ? 'fa-solid fa-chevron-down' : 'fa-solid fa-chevron-right'}" style="width: 20px;"></i> ${escapeHtml(team)} <span style="background: rgba(255,255,255,0.1); color: var(--text-secondary); padding: 0.1rem 0.5rem; border-radius: 10px; font-size: 0.75rem; margin-left: 0.5rem;">${teamProcs.length} atividades</span>
+                <td colspan="${totalCols}" style="padding: 0.8rem; font-weight: 600; color: var(--text-primary); border-top: 1px solid rgba(255,255,255,0.05); border-bottom: 1px solid rgba(255,255,255,0.05); cursor: pointer;">
+                    <i class="${isExpanded ? 'fa-solid fa-chevron-down' : 'fa-solid fa-chevron-right'}" style="width: 20px; color: var(--text-primary); margin-right: 0.25rem;"></i> ${escapeHtml(team)} <span style="background: rgba(255,255,255,0.1); color: var(--text-secondary); padding: 0.1rem 0.5rem; border-radius: 10px; font-size: 0.75rem; margin-left: 0.5rem;">${teamProcs.length} atividades</span>
                 </td>
             `;
-            headerTr.addEventListener('click', () => {
-                const currentVis = expandedCadastrosTableTeams[team] !== false;
-                expandedCadastrosTableTeams[team] = !currentVis;
-                toggleTableAccordion(headerTr, rowClass, expandedCadastrosTableTeams[team]);
+            headerTr.addEventListener('click', (e) => {
+                e.stopPropagation();
+                toggleCadastrosTeam(team, rowClass, headerTr);
             });
             tableBody.appendChild(headerTr);
             
@@ -7189,7 +7258,7 @@ function renderCadastrosView() {
                     return !currentResps.includes(rName);
                 });
 
-                const unassignedOptionsHtml = '<option value="">+ ResponsÃ¡vel</option>' +
+                const unassignedOptionsHtml = '<option value="">+ Responsável</option>' +
                     unassignedResps.map(resp => {
                         const rName = typeof resp === 'object' ? resp.name : resp;
                         return `<option value="${escapeHtml(rName)}">${escapeHtml(rName)}</option>`;
@@ -7223,7 +7292,7 @@ function renderCadastrosView() {
                     <td style="text-align: center;">
                         <label style="display: inline-flex; align-items: center; gap: 0.35rem; cursor: ${isRowDisabled ? 'default' : 'pointer'}; font-size: 0.8rem; user-select: none;">
                             <input type="checkbox" class="cb-activity-rpa" ${isRpa ? 'checked' : ''} ${isRowDisabled ? 'disabled' : ''}>
-                            <span class="label-rpa-text" style="${isRpa ? 'color: #a78bfa; font-weight: 600;' : 'color: var(--text-muted);'}">ðŸ¤– RPA</span>
+                            <span class="label-rpa-text" style="${isRpa ? 'color: #a78bfa; font-weight: 600;' : 'color: var(--text-muted);'}">🤖 RPA</span>
                         </label>
                     </td>
                     <td class="col-acao-excluir" style="text-align: center; ${isConsulta ? 'display: none;' : ''}">
@@ -7379,8 +7448,8 @@ function renderCadastrosView() {
                 const deleteBtn = tr.querySelector('.btn-delete-activity-cell');
                 if (deleteBtn) {
                     deleteBtn.addEventListener('click', () => {
-                        if (!verificarPermissao('OPERADOR')) { alert('Acesso negado: Perfil OPERADOR ou ADMIN necessÃ¡rio.'); return; }
-                        if (!podeEditarArea(proc.area)) { alert(`Acesso negado: VocÃª sÃ³ pode excluir atividades da sua equipe (${currentUser.assignedTeam}).`); return; }
+                        if (!verificarPermissao('OPERADOR')) { alert('Acesso negado: Perfil OPERADOR ou ADMIN necessário.'); return; }
+                        if (!podeEditarArea(proc.area)) { alert(`Acesso negado: Você só pode excluir atividades da sua equipe (${currentUser.assignedTeam}).`); return; }
                         if (confirm(`Deseja realmente excluir a atividade "${proc.name}"?`)) {
                             state.processes = state.processes.filter(p => p.id !== proc.id);
                             saveState();
