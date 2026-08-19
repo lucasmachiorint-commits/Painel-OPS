@@ -4430,12 +4430,10 @@ function renderCadastrosView() {
                 const isConsulta = currentUser.perfil === 'CONSULTA';
                 const isRowDisabled = isConsulta || !canEditThisArea;
                 
-                const teamOptions = (currentUser.perfil === 'OPERADOR' && currentUser.assignedTeam)
-                    ? `<option value="${escapeHtml(currentUser.assignedTeam)}" selected>${escapeHtml(currentUser.assignedTeam)}</option>`
-                    : '<option value="">-- Sem Equipe --</option>' +
-                        state.teams.map(t => `
-                            <option value="${escapeHtml(t)}" ${proc.area === t ? 'selected' : ''}>${escapeHtml(t)}</option>
-                        `).join('');
+                const teamOptions = '<option value="">-- Sem Equipe --</option>' +
+                    state.teams.map(t => `
+                        <option value="${escapeHtml(t)}" ${proc.area === t ? 'selected' : ''}>${escapeHtml(t)}</option>
+                    `).join('');
                     
                 const currentResps = getProcessResponsaveis(proc);
                 const teamResps = (state.responsaveis || []).filter(resp => {
