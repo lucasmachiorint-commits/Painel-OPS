@@ -1533,6 +1533,7 @@ function populateTeamCoordenadorDatalist() {
 }
 
 function openNewTeamModal(teamToEdit = null) {
+    if (!verificarPermissao('ADMIN')) { alert('Acesso negado: Apenas administradores podem criar ou editar equipes.'); return; }
     const modal = document.getElementById('modal-new-team');
     const nameInput = document.getElementById('modal-input-new-team');
     const coordInput = document.getElementById('modal-input-team-coordenador');
@@ -1588,7 +1589,7 @@ function closeNewTeamModal() {
 }
 
 function saveNewTeamFromModal() {
-    if (!verificarPermissao('OPERADOR')) { alert('Acesso negado: Perfil OPERADOR necessário.'); return; }
+    if (!verificarPermissao('ADMIN')) { alert('Acesso negado: Apenas administradores podem cadastrar ou editar equipes.'); return; }
     const modal = document.getElementById('modal-new-team');
     const nameInput = document.getElementById('modal-input-new-team');
     const gerenciaSelect = document.getElementById('modal-select-team-gerencia');
@@ -2773,9 +2774,13 @@ function renderAreaAllocations() {
 // NEW PROCESS MANAGEMENT
 function addNewProcess() {
     if (!verificarPermissao('OPERADOR')) { alert('Acesso negado: Perfil OPERADOR necessário.'); return; }
+    if (currentUser.perfil === 'OPERADOR' && !currentUser.assignedTeam) {
+        alert('Acesso negado: Seu usuário não possui uma equipe vinculada para cadastrar novas atividades.');
+        return;
+    }
     const newId = 'proc-' + Date.now();
     let defaultArea = state.teams.length > 0 ? state.teams[0] : '';
-    if (currentUser.perfil === 'OPERADOR' && currentUser.assignedTeam) {
+    if (currentUser.perfil === 'OPERADOR') {
         defaultArea = currentUser.assignedTeam;
     }
     
@@ -4035,7 +4040,7 @@ function renderCadastrosView() {
                             ${coordHtml}
                         </div>
                         <div style="display: flex; gap: 0.35rem; align-items: center;">
-                            <button class="btn-edit-team-item" data-permissao="OPERADOR,ADMIN" data-team="${escapeHtml(team)}" style="background: transparent; border: none; color: var(--text-secondary); cursor: pointer; font-size: 0.8rem; padding: 0.2rem;" title="Editar Equipe">
+                            <button class="btn-edit-team-item" data-permissao="ADMIN" data-team="${escapeHtml(team)}" style="background: transparent; border: none; color: var(--text-secondary); cursor: pointer; font-size: 0.8rem; padding: 0.2rem;" title="Editar Equipe">
                                 <i class="fa-solid fa-pen-to-square"></i>
                             </button>
                             <button class="btn-delete-team-item" data-permissao="ADMIN" data-team="${escapeHtml(team)}" style="background: transparent; border: none; color: var(--color-danger); cursor: pointer; font-size: 0.8rem; padding: 0.2rem;" title="Excluir Equipe">
@@ -4049,7 +4054,7 @@ function renderCadastrosView() {
             teamsList.querySelectorAll('.btn-edit-team-item').forEach(btn => {
                 btn.addEventListener('click', (e) => {
                     e.stopPropagation();
-                    if (!verificarPermissao('OPERADOR')) { alert('Acesso negado: Perfil OPERADOR necessário.'); return; }
+                    if (!verificarPermissao('ADMIN')) { alert('Acesso negado: Apenas administradores podem editar equipes.'); return; }
                     const team = btn.getAttribute('data-team');
                     openNewTeamModal(team);
                 });
@@ -4425,10 +4430,12 @@ function renderCadastrosView() {
                 const isConsulta = currentUser.perfil === 'CONSULTA';
                 const isRowDisabled = isConsulta || !canEditThisArea;
                 
-                const teamOptions = '<option value="">-- Sem Equipe --</option>' +
-                    state.teams.map(t => `
-                        <option value="${escapeHtml(t)}" ${proc.area === t ? 'selected' : ''}>${escapeHtml(t)}</option>
-                    `).join('');
+                const teamOptions = (currentUser.perfil === 'OPERADOR' && currentUser.assignedTeam)
+                    ? `<option value="${escapeHtml(currentUser.assignedTeam)}" selected>${escapeHtml(currentUser.assignedTeam)}</option>`
+                    : '<option value="">-- Sem Equipe --</option>' +
+                        state.teams.map(t => `
+                            <option value="${escapeHtml(t)}" ${proc.area === t ? 'selected' : ''}>${escapeHtml(t)}</option>
+                        `).join('');
                     
                 const currentResps = getProcessResponsaveis(proc);
                 const teamResps = (state.responsaveis || []).filter(resp => {
@@ -4482,9 +4489,9 @@ function renderCadastrosView() {
                         <input type="text" class="input-activity-product-cell" value="${escapeHtml(proc.produto || '')}" placeholder="Produto (Opcional)" ${isRowDisabled ? 'readonly style="width: 100%; border: none; background: transparent; color: var(--text-primary); outline: none; padding: 0.3rem 0.5rem; border-radius: 4px; opacity: 0.7; pointer-events: none;"' : 'style="width: 100%; border: none; background: transparent; color: var(--text-primary); outline: none; padding: 0.3rem 0.5rem; border-radius: 4px;"'}>
                     </td>
                     <td style="text-align: center;">
-                        <label style="display: inline-flex; align-items: center; gap: 0.35rem; cursor: ${isRowDisabled ? 'default' : 'pointer'}; font-size: 0.8rem; user-select: none;">
-                            <input type="checkbox" class="cb-activity-rpa" ${isRpa ? 'checked' : ''} ${isRowDisabled ? 'disabled' : ''}>
-                            <span class="label-rpa-text" style="${isRpa ? 'color: #a78bfa; font-weight: 600;' : 'color: var(--text-muted);'}">🤖 RPA</span>
+                        <label style="display: inline-flex; align-items: center; gap: 0.35rem; cursor: ${isRowDisabled ? 'not-allowed' : 'pointer'}; font-size: 0.8rem; user-select: none;">
+                            <input type="checkbox" class="cb-activity-rpa" ${isRpa ? 'checked' : ''} ${isRowDisabled ? 'disabled style="pointer-events: none; opacity: 0.5;"' : ''}>
+                            <span class="label-rpa-text" style="${isRpa ? 'color: #a78bfa; font-weight: 600;' : 'color: var(--text-muted);'} ${isRowDisabled ? 'opacity: 0.6;' : ''}">🤖 RPA</span>
                         </label>
                     </td>
                     <td class="col-acao-excluir" style="text-align: center; ${isConsulta ? 'display: none;' : ''}">
@@ -4498,7 +4505,7 @@ function renderCadastrosView() {
                 const rowCheckbox = tr.querySelector('.cadastros-row-checkbox');
                 if (rowCheckbox && !isRowDisabled) {
                     rowCheckbox.addEventListener('change', () => {
-                        if (!verificarPermissao('OPERADOR')) return;
+                        if (!verificarPermissao('ADMIN')) return;
                         updateBulkDeleteState();
                     });
                 }
@@ -4507,7 +4514,11 @@ function renderCadastrosView() {
                 if (rpaCheckbox && !isRowDisabled) {
                     rpaCheckbox.addEventListener('change', (e) => {
                         if (!verificarPermissao('OPERADOR')) return;
-                        if (!podeEditarArea(proc.area)) return;
+                        if (!podeEditarArea(proc.area)) {
+                            alert(`Acesso negado: Você não pode alterar o status RPA de atividades de outra equipe.`);
+                            e.target.checked = !e.target.checked;
+                            return;
+                        }
                         proc.isRpa = e.target.checked;
                         saveState();
                         renderTable();
@@ -4553,6 +4564,11 @@ function renderCadastrosView() {
                         if (!verificarPermissao('OPERADOR')) return;
                         if (!podeEditarArea(proc.area)) return;
                         const newTeam = e.target.value;
+                        if (currentUser.perfil === 'OPERADOR' && newTeam !== currentUser.assignedTeam) {
+                            alert(`Acesso negado: Operadores só podem manter atividades na sua própria equipe (${currentUser.assignedTeam}).`);
+                            renderCadastrosView();
+                            return;
+                        }
                         proc.area = newTeam;
                         setProcessResponsaveis(proc, []);
                         saveState();
@@ -4748,6 +4764,10 @@ function setupModalParametersListeners() {
             if (respName) {
                 const resp = state.responsaveis.find(r => r.name === respName);
                 if (resp) {
+                    if (!podeEditarArea(resp.area)) {
+                        alert(`Acesso negado: Você só pode restaurar parâmetros de responsáveis da sua equipe (${currentUser.assignedTeam}).`);
+                        return;
+                    }
                     resp.horasDia = null;
                     resp.absenteismo = null;
                     resp.diasUteis = null;
@@ -4764,7 +4784,6 @@ function setupModalParametersListeners() {
     
     if (saveBtn) {
         saveBtn.addEventListener('click', () => {
-            if (!verificarPermissao('OPERADOR')) { alert('Acesso negado: Perfil OPERADOR necessário.'); return; }
             const respName = document.getElementById('modal-param-target-resp').value;
             const hDia = parseFloat(inputHoras.value);
             const abs = parseFloat(inputAbs.value);
@@ -4773,14 +4792,23 @@ function setupModalParametersListeners() {
             const respEmail = respEmailInput ? respEmailInput.value.trim() : '';
             
             if (!respName) {
-                // Editing global defaults
+                // Editing global defaults - ADMIN ONLY
+                if (!verificarPermissao('ADMIN')) {
+                    alert('Acesso negado: Apenas administradores podem alterar os parâmetros padrão globais.');
+                    return;
+                }
                 state.params.horasDia = hDia;
                 state.params.absenteismo = abs;
                 state.params.diasUteis = dUteis;
             } else {
                 // Editing responsible overrides
+                if (!verificarPermissao('OPERADOR')) { alert('Acesso negado: Perfil OPERADOR ou ADMIN necessário.'); return; }
                 const resp = state.responsaveis.find(r => r.name === respName);
                 if (resp) {
+                    if (!podeEditarArea(resp.area)) {
+                        alert(`Acesso negado: Você só pode configurar a capacidade de responsáveis da sua equipe (${currentUser.assignedTeam}).`);
+                        return;
+                    }
                     resp.horasDia = hDia;
                     resp.absenteismo = abs;
                     resp.diasUteis = dUteis;
@@ -4803,6 +4831,19 @@ function setupModalParametersListeners() {
 function openCapacityModal(respName = '') {
     const modal = document.getElementById('modal-parameters');
     if (!modal) return;
+    
+    if (!respName) {
+        if (!verificarPermissao('ADMIN')) {
+            alert('Acesso negado: Apenas administradores podem configurar os parâmetros padrão globais.');
+            return;
+        }
+    } else {
+        const resp = state.responsaveis.find(r => r.name === respName);
+        if (resp && !podeEditarArea(resp.area)) {
+            alert(`Acesso negado: Você só pode configurar a capacidade de responsáveis da sua equipe (${currentUser.assignedTeam}).`);
+            return;
+        }
+    }
     
     const title = document.getElementById('modal-param-title');
     const clearBtn = document.getElementById('btn-modal-param-clear');
@@ -4890,49 +4931,170 @@ function openCapacityModal(respName = '') {
 // ACCESS CONTROL VIEW - GESTÃO DE PERFIS DE USUÁRIO
 // ============================================================
 
-const SETUP_SQL = `-- Execute no SQL Editor do Supabase:
+const SETUP_SQL = `-- ============================================================
+-- SCRIPT DE CONFIGURAÇÃO DE SEGURANÇA E RLS NO SUPABASE (POSTGRESQL)
+-- Execute no SQL Editor do Supabase para aplicar as regras de banco:
+-- ============================================================
 
-CREATE TABLE public.profiles (
+-- 1. TABELA DE PERFIS DE USUÁRIO (PROFILES)
+CREATE TABLE IF NOT EXISTS public.profiles (
   id UUID REFERENCES auth.users(id) ON DELETE CASCADE PRIMARY KEY,
-  email TEXT,
+  email TEXT UNIQUE,
   nome TEXT,
   perfil TEXT DEFAULT 'CONSULTA' CHECK (perfil IN ('ADMIN', 'OPERADOR', 'CONSULTA')),
-  created_at TIMESTAMPTZ DEFAULT now()
+  assigned_team TEXT,
+  created_at TIMESTAMPTZ DEFAULT now(),
+  updated_at TIMESTAMPTZ DEFAULT now()
 );
 
 ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
 
-CREATE POLICY "Perfis visíveis para autenticados"
+-- Funções auxiliares de checagem de permissão
+CREATE OR REPLACE FUNCTION public.is_admin()
+RETURNS BOOLEAN AS $$
+BEGIN
+  RETURN EXISTS (
+    SELECT 1 FROM public.profiles
+    WHERE id = auth.uid() AND perfil = 'ADMIN'
+  );
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+CREATE OR REPLACE FUNCTION public.get_user_assigned_team()
+RETURNS TEXT AS $$
+DECLARE
+  v_team TEXT;
+BEGIN
+  SELECT assigned_team INTO v_team FROM public.profiles WHERE id = auth.uid();
+  RETURN v_team;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+-- Políticas para public.profiles
+CREATE POLICY "Perfis visíveis para todos os autenticados"
   ON public.profiles FOR SELECT
   USING (auth.role() = 'authenticated');
 
-CREATE POLICY "Admins podem atualizar perfis"
+CREATE POLICY "Admins e o próprio usuário podem atualizar perfis"
   ON public.profiles FOR UPDATE
   USING (
     auth.uid() = id
-    OR EXISTS (
-      SELECT 1 FROM public.profiles
-      WHERE id = auth.uid() AND perfil = 'ADMIN'
-    )
+    OR public.is_admin()
   );
 
+-- Trigger para registrar perfil ao criar usuário no Supabase Auth
 CREATE OR REPLACE FUNCTION public.handle_new_user()
 RETURNS TRIGGER AS $$
 BEGIN
-  INSERT INTO public.profiles (id, email, nome, perfil)
+  INSERT INTO public.profiles (id, email, nome, perfil, assigned_team)
   VALUES (
     NEW.id,
     NEW.email,
     COALESCE(NEW.raw_user_meta_data->>'nome', split_part(NEW.email, '@', 1)),
-    COALESCE(NEW.raw_user_meta_data->>'perfil', 'CONSULTA')
-  );
+    COALESCE(NEW.raw_user_meta_data->>'perfil', 'CONSULTA'),
+    NEW.raw_user_meta_data->>'assigned_team'
+  )
+  ON CONFLICT (id) DO UPDATE
+  SET email = EXCLUDED.email;
   RETURN NEW;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
+DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
 CREATE TRIGGER on_auth_user_created
   AFTER INSERT ON auth.users
-  FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();`;
+  FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();
+
+-- ============================================================
+-- 2. POLÍTICAS RLS PARA TABELAS RELACIONAIS (EQUIPES, RESPONSÁVEIS, ATIVIDADES)
+-- ============================================================
+
+-- A) TABELA DE EQUIPES: Apenas ADMIN pode criar/editar/excluir
+CREATE TABLE IF NOT EXISTS public.equipes (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  nome TEXT UNIQUE NOT NULL,
+  gerencia TEXT,
+  diretoria TEXT,
+  coordenador TEXT,
+  coordenador_email TEXT,
+  created_at TIMESTAMPTZ DEFAULT now()
+);
+ALTER TABLE public.equipes ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "equipes_select_policy" ON public.equipes FOR SELECT USING (auth.role() = 'authenticated');
+CREATE POLICY "equipes_insert_policy" ON public.equipes FOR INSERT WITH CHECK (public.is_admin());
+CREATE POLICY "equipes_update_policy" ON public.equipes FOR UPDATE USING (public.is_admin());
+CREATE POLICY "equipes_delete_policy" ON public.equipes FOR DELETE USING (public.is_admin());
+
+-- B) TABELA DE RESPONSÁVEIS: OPERADOR só pode alterar sua própria equipe
+CREATE TABLE IF NOT EXISTS public.responsaveis (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  nome TEXT NOT NULL,
+  email TEXT,
+  area_name TEXT NOT NULL,
+  horas_dia NUMERIC(4,2),
+  absenteismo NUMERIC(5,2),
+  dias_uteis INTEGER,
+  created_at TIMESTAMPTZ DEFAULT now()
+);
+ALTER TABLE public.responsaveis ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "responsaveis_select_policy" ON public.responsaveis FOR SELECT USING (auth.role() = 'authenticated');
+CREATE POLICY "responsaveis_insert_policy" ON public.responsaveis FOR INSERT WITH CHECK (
+  public.is_admin() OR (
+    EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND perfil = 'OPERADOR')
+    AND area_name = public.get_user_assigned_team()
+  )
+);
+CREATE POLICY "responsaveis_update_policy" ON public.responsaveis FOR UPDATE USING (
+  public.is_admin() OR (
+    EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND perfil = 'OPERADOR')
+    AND area_name = public.get_user_assigned_team()
+  )
+);
+CREATE POLICY "responsaveis_delete_policy" ON public.responsaveis FOR DELETE USING (
+  public.is_admin() OR (
+    EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND perfil = 'OPERADOR')
+    AND area_name = public.get_user_assigned_team()
+  )
+);
+
+-- C) TABELA DE ATIVIDADES: OPERADOR só pode inserir/editar/deletar atividades da sua equipe
+CREATE TABLE IF NOT EXISTS public.atividades (
+  id TEXT PRIMARY KEY,
+  name TEXT NOT NULL,
+  area_name TEXT NOT NULL,
+  responsavel TEXT,
+  produto TEXT,
+  is_rpa BOOLEAN DEFAULT false,
+  volume NUMERIC(10,2),
+  minutos NUMERIC(10,2) DEFAULT 0,
+  qtd_execucao NUMERIC(10,2),
+  backlog_volume NUMERIC(10,2),
+  review_status TEXT DEFAULT 'Manter',
+  created_at TIMESTAMPTZ DEFAULT now()
+);
+ALTER TABLE public.atividades ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "atividades_select_policy" ON public.atividades FOR SELECT USING (auth.role() = 'authenticated');
+CREATE POLICY "atividades_insert_policy" ON public.atividades FOR INSERT WITH CHECK (
+  public.is_admin() OR (
+    EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND perfil = 'OPERADOR')
+    AND area_name = public.get_user_assigned_team()
+  )
+);
+CREATE POLICY "atividades_update_policy" ON public.atividades FOR UPDATE USING (
+  public.is_admin() OR (
+    EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND perfil = 'OPERADOR')
+    AND area_name = public.get_user_assigned_team()
+  )
+);
+CREATE POLICY "atividades_delete_policy" ON public.atividades FOR DELETE USING (
+  public.is_admin() OR (
+    EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND perfil = 'OPERADOR')
+    AND area_name = public.get_user_assigned_team()
+  )
+);`;
 
 async function renderAccessControlView() {
     const client = getSupabase();
