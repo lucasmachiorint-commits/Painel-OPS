@@ -42,7 +42,7 @@ test.describe('Multi-Country & Localization E2E Tests', () => {
         await expect(optHSP).toContainText('Hispana (AR, MX, CO)');
     });
 
-    test('3. Should switch to Hispana, translate navigation to Spanish, and hide RPA from sidebar', async ({ page }) => {
+    test('3. Should switch to Hispana, translate navigation to Spanish, and deactivate Historial, Balanceo, and RPA menus', async ({ page }) => {
         await page.locator('#btn-country-active').click();
         await page.locator('.country-dropdown-option[data-country="HISPANA"]').click();
 
@@ -50,13 +50,13 @@ test.describe('Multi-Country & Localization E2E Tests', () => {
         await expect(page.locator('#country-name-label')).toHaveText(/Hispana/i);
         await expect(page.locator('#country-flag-icon')).toHaveText('🌐');
 
-        // Check translated navigation items
+        // Check translated navigation items (only active ones)
         await expect(page.locator('.menu-item[data-view="dashboard"] span')).toHaveText('Tablero');
-        await expect(page.locator('.menu-item[data-view="history"] span')).toHaveText('Historial');
         await expect(page.locator('.menu-item[data-view="cadastros"] span')).toHaveText('Registros');
-        await expect(page.locator('.menu-item[data-view="balancing"] span')).toHaveText('Balanceo');
         
-        // RPA / Automations must be HIDDEN in Hispana
+        // Historial, Balanceo, and RPA must be DEACTIVATED / HIDDEN in Hispana
+        await expect(page.locator('.menu-item[data-view="history"]')).toBeHidden();
+        await expect(page.locator('.menu-item[data-view="balancing"]')).toBeHidden();
         await expect(page.locator('.menu-item[data-view="automations"]')).toBeHidden();
 
         // Check breadcrumb and title
@@ -105,11 +105,13 @@ test.describe('Multi-Country & Localization E2E Tests', () => {
         await expect(page.locator('.col-rpa-header')).toBeHidden();
     });
 
-    test('6. Should switch back to Brasil and restore Portuguese labels and RPA features', async ({ page }) => {
+    test('6. Should switch back to Brasil and restore all menus (Histórico, Balanceamento, Automações) and labels', async ({ page }) => {
         // Switch to Hispana first
         await page.locator('#btn-country-active').click();
         await page.locator('.country-dropdown-option[data-country="HISPANA"]').click();
         await expect(page.locator('#app-view-title')).toHaveText('Tablero');
+        await expect(page.locator('.menu-item[data-view="history"]')).toBeHidden();
+        await expect(page.locator('.menu-item[data-view="balancing"]')).toBeHidden();
         await expect(page.locator('.menu-item[data-view="automations"]')).toBeHidden();
 
         // Switch back to Brasil
@@ -121,7 +123,9 @@ test.describe('Multi-Country & Localization E2E Tests', () => {
         await expect(page.locator('#app-view-title')).toHaveText('Dashboard');
         await expect(page.locator('.menu-item[data-view="cadastros"] span')).toHaveText('Cadastros');
         
-        // RPA restored
+        // All menus restored in Brasil
+        await expect(page.locator('.menu-item[data-view="history"]')).toBeVisible();
+        await expect(page.locator('.menu-item[data-view="balancing"]')).toBeVisible();
         await expect(page.locator('.menu-item[data-view="automations"]')).toBeVisible();
     });
 });

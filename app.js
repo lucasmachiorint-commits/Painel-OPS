@@ -217,7 +217,7 @@ function aplicarPerfilDeAcesso() {
         el.style.display = isConsulta ? 'none' : 'inline-block';
     });
 
-    // Controla visibilidade de RPA de acordo com a região/país
+    // Controla visibilidade de RPA e Menus de acordo com a região/país
     applyCountryRpaVisibility();
 }
 
@@ -225,13 +225,25 @@ function applyCountryRpaVisibility() {
     const isHsp = currentCountry === 'HISPANA';
     const isAdmin = currentUser.perfil === 'ADMIN';
 
-    // 1. Menu lateral de Automações (RPA)
+    // 1. Menu lateral de Histórico / Historial (desativado temporariamente para Hispana)
+    const historyMenuItem = document.querySelector('.sidebar-menu .menu-item[data-view="history"]');
+    if (historyMenuItem) {
+        historyMenuItem.style.display = isHsp ? 'none' : '';
+    }
+
+    // 2. Menu lateral de Balanceamento / Balanceo (desativado temporariamente para Hispana)
+    const balancingMenuItem = document.querySelector('.sidebar-menu .menu-item[data-view="balancing"]');
+    if (balancingMenuItem) {
+        balancingMenuItem.style.display = isHsp ? 'none' : (isAdmin ? '' : 'none');
+    }
+
+    // 3. Menu lateral de Automações (RPA) (desativado para Hispana)
     const rpaMenuItem = document.querySelector('.sidebar-menu .menu-item[data-view="automations"]');
     if (rpaMenuItem) {
         rpaMenuItem.style.display = isHsp ? 'none' : '';
     }
 
-    // 2. Cards de KPI no Dashboard
+    // 4. Cards de KPI no Dashboard
     document.querySelectorAll('.rpa-cluster-card').forEach(el => {
         if (isHsp) {
             el.style.display = 'none';
@@ -240,7 +252,7 @@ function applyCountryRpaVisibility() {
         }
     });
 
-    // 3. Filtro de RPA em Cadastros
+    // 5. Filtro de RPA em Cadastros
     const rpaFilterGroup = document.querySelector('.cadastros-rpa-filter-group');
     if (rpaFilterGroup) {
         rpaFilterGroup.style.display = isHsp ? 'none' : '';
@@ -250,15 +262,15 @@ function applyCountryRpaVisibility() {
         rpaFilterEl.value = '';
     }
 
-    // 4. Cabeçalho de coluna RPA na tabela de Cadastros
+    // 6. Cabeçalho de coluna RPA na tabela de Cadastros
     const rpaHeader = document.querySelector('#cadastros-table th.col-rpa-header') || document.querySelector('#cadastros-table th[data-i18n="th_rpa_automation"]');
     if (rpaHeader) {
         rpaHeader.style.display = isHsp ? 'none' : '';
     }
 
-    // 5. Se o usuário estiver na tela de automações e trocar para Hispana, redireciona para Dashboard
+    // 7. Se o usuário estiver em uma tela desativada para Hispana e trocar de país, redireciona para Dashboard
     const currentHash = (window.location.hash || '').replace('#/', '').trim();
-    if (isHsp && currentHash === 'automations') {
+    if (isHsp && (currentHash === 'automations' || currentHash === 'history' || currentHash === 'balancing')) {
         switchToView('dashboard');
     }
 }
