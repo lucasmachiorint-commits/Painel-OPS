@@ -1,3 +1,7 @@
+param (
+    [string]$TestFile = ""
+)
+
 $ErrorActionPreference = "Stop"
 $nodeDir = "C:\Users\331262\.gemini\antigravity\scratch\tools\node-v20.18.0-win-x64"
 $hmlDir = "C:\Users\331262\.gemini\antigravity\scratch\Painel-OPS-HML"
@@ -14,7 +18,11 @@ Set-Location $hmlDir
 & "$hmlDir\scripts\validate-code.ps1"
 
 # 2. Executar suíte Playwright
-& "$nodeDir\node.exe" "$hmlDir\node_modules\@playwright\test\cli.js" test
+if ($TestFile -ne "") {
+    & "$nodeDir\node.exe" "$hmlDir\node_modules\@playwright\test\cli.js" test $TestFile
+} else {
+    & "$nodeDir\node.exe" "$hmlDir\node_modules\@playwright\test\cli.js" test
+}
 
 if ($LASTEXITCODE -eq 0) {
     Write-Host "`n=========================================================="

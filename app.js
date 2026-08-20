@@ -37,13 +37,24 @@ window.addEventListener('error', function(event) {
 const SUPABASE_URL = 'https://maguyzjhldcgpcvkvkqe.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1hZ3V5empobGRjZ3Bjdmt2a3FlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQ2NTU0MDMsImV4cCI6MjEwMDIzMTQwM30.Ow9xruE1qAFTX3mqELERxrY3CRBOdV_n4MoXXhtt3Y8';
 
+// Configuração isolada de autenticação para Homologação (HML)
+const HML_AUTH_STORAGE_KEY = 'sb-painel-ops-hml-auth-token';
+const HML_ACTIVITY_STORAGE_KEY = 'painel_ops_hml_last_activity';
+
 let supabaseClient = null;
 let realtimeChannel = null;
 if (window.supabase) {
     try {
-        supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+            auth: {
+                storageKey: HML_AUTH_STORAGE_KEY,
+                persistSession: true,
+                autoRefreshToken: true,
+                detectSessionInUrl: true
+            }
+        });
     } catch (err) {
-        console.warn('Erro ao inicializar Supabase Client:', err);
+        console.warn('Erro ao inicializar Supabase Client em HML:', err);
     }
 }
 
@@ -300,7 +311,14 @@ const EXAMPLE_PROCESSES = [
 function getSupabase() {
     if (!supabaseClient && window.supabase && typeof window.supabase.createClient === 'function') {
         try {
-            supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+            supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+                auth: {
+                    storageKey: HML_AUTH_STORAGE_KEY,
+                    persistSession: true,
+                    autoRefreshToken: true,
+                    detectSessionInUrl: true
+                }
+            });
         } catch (err) {
             console.error('Erro ao inicializar Supabase Client:', err);
         }
@@ -334,7 +352,7 @@ const INACTIVITY_TIMEOUT_MS = 30 * 60 * 1000; // 30 minutos
 
 function recordUserActivity() {
     if (window._authUserId) {
-        localStorage.setItem('painel_ops_last_activity', String(Date.now()));
+        localStorage.setItem(HML_ACTIVITY_STORAGE_KEY, String(Date.now()));
     }
 }
 
@@ -492,7 +510,7 @@ async function handleSignup() {
 
 async function handleLogout(isAutoTimeout = false) {
     unsubscribeRealtime();
-    localStorage.removeItem('painel_ops_last_activity');
+    localStorage.removeItem(HML_ACTIVITY_STORAGE_KEY);
     const client = getSupabase();
     if (client) {
         try {
@@ -924,13 +942,13 @@ document.addEventListener('DOMContentLoaded', async () => {
                 showAuthOverlay();
                 setAuthViewMode('reset');
             } else {
-                const lastActivity = parseInt(localStorage.getItem('painel_ops_last_activity') || '0', 10);
+                const lastActivity = parseInt(localStorage.getItem(HML_ACTIVITY_STORAGE_KEY) || '0', 10);
                 const isInactive = lastActivity === 0 || (Date.now() - lastActivity) > INACTIVITY_TIMEOUT_MS;
 
                 if (isInactive) {
                     console.log('[Auth Init] Sessão inexistente ou expirada (>30min de inatividade). Exibindo login.');
                     try { await client.auth.signOut(); } catch (_) {}
-                    localStorage.removeItem('painel_ops_last_activity');
+                    localStorage.removeItem(HML_ACTIVITY_STORAGE_KEY);
                     window._authUserId = null;
                     showAuthOverlay();
                     if (lastActivity > 0) {
@@ -950,6 +968,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         } catch (sessionErr) {
             console.error('Erro ao recuperar sessão existente do Supabase:', sessionErr);
             try {
+                localStorage.removeItem(HML_AUTH_STORAGE_KEY);
                 const projName = SUPABASE_URL.split('//')[1]?.split('.')[0];
                 if (projName) {
                     localStorage.removeItem(`sb-${projName}-auth-token`);
