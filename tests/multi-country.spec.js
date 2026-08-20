@@ -72,9 +72,10 @@ test.describe('Multi-Country & Localization E2E Tests', () => {
         // RPA cards in Dashboard KPI cluster must be hidden
         await expect(page.locator('.rpa-cluster-card').first()).toBeHidden();
 
-        // Filter options
-        await expect(page.locator('#filter-area option[value="all"]')).toHaveText('Todas las Áreas');
-        await expect(page.locator('#filter-responsavel option[value="all"]')).toContainText('Todos los Responsables');
+        // FTE Indicators
+        await expect(page.locator('h3[data-i18n="kpi_fte_required"]')).toHaveText('FTE Actividades');
+        await expect(page.locator('h3[data-i18n="kpi_fte_area"]')).toHaveText('FTE del Área');
+        await expect(page.locator('#widget-fte-area')).toHaveText('1');
 
         // Non-RPA KPI card title
         await expect(page.locator('h3[data-i18n="kpi_total_activities"]')).toHaveText('Total de Actividades');

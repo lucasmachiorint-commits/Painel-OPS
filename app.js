@@ -345,8 +345,11 @@ const I18N = {
         status_connecting: 'Conectando...',
         status_sync: 'Sincronizado',
         status_offline: 'Offline (Local)',
-        kpi_fte_required: 'FTEs Requeridos',
+        kpi_fte_required: 'FTE Atividades',
         kpi_resources_needed: 'Recursos necessários',
+        kpi_fte_area: 'FTE da Área',
+        kpi_fte_area_sub: 'Total de funcionários',
+        kpi_team_in: 'Equipe em',
         kpi_total_activities: 'Total de Atividades',
         kpi_activities_registered: 'Atividades cadastradas',
         kpi_rpa_activities: 'RPA • Atividades',
@@ -506,8 +509,11 @@ const I18N = {
         status_connecting: 'Conectando...',
         status_sync: 'Sincronizado',
         status_offline: 'Offline (Local)',
-        kpi_fte_required: 'FTEs Requeridos',
+        kpi_fte_required: 'FTE Actividades',
         kpi_resources_needed: 'Recursos necesarios',
+        kpi_fte_area: 'FTE del Área',
+        kpi_fte_area_sub: 'Total de empleados',
+        kpi_team_in: 'Equipo en',
         kpi_total_activities: 'Total de Actividades',
         kpi_activities_registered: 'Actividades registradas',
         kpi_rpa_activities: 'RPA • Actividades',
@@ -3619,6 +3625,28 @@ function updateCalculations() {
                 elFteReqSub.textContent = isFiltered && currentFilterValue !== 'all' ? `${t('kpi_demand_in', 'Demanda em')} ${currentFilterValue}` : t('kpi_resources_needed', 'Recursos necessários');
                 elFteReqSub.style.color = '';
             }
+        }
+    }
+
+    // Update FTE da Área / Capacidade de Recursos (Total de funcionários cadastrados na área/geral)
+    let targetResponsiblesCount = 0;
+    if (isFiltered && currentFilterValue !== 'all') {
+        targetResponsiblesCount = (state.responsaveis || []).filter(r => {
+            const rArea = typeof r === 'object' ? r.area : '';
+            return rArea === currentFilterValue;
+        }).length;
+    } else {
+        targetResponsiblesCount = (state.responsaveis || []).length;
+    }
+
+    const elFteArea = document.getElementById('widget-fte-area');
+    const elFteAreaSub = document.getElementById('widget-fte-area-sub');
+    if (elFteArea) {
+        elFteArea.textContent = targetResponsiblesCount;
+        if (elFteAreaSub) {
+            elFteAreaSub.textContent = isFiltered && currentFilterValue !== 'all' 
+                ? `${t('kpi_team_in', 'Equipe em')} ${currentFilterValue}` 
+                : t('kpi_fte_area_sub', 'Total de funcionários');
         }
     }
     
