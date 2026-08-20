@@ -52,12 +52,14 @@ $prdApp = [System.IO.File]::ReadAllText("$prdDir\app.js", [System.Text.Encoding]
 $prdApp = [regex]::Replace($prdApp, '(?m)^// Configura[^\r\n]*\r?\n', '')
 $prdApp = [regex]::Replace($prdApp, '(?m)^const HML_AUTH_STORAGE_KEY[^\r\n]*\r?\n', '')
 $prdApp = [regex]::Replace($prdApp, '(?m)^const HML_ACTIVITY_STORAGE_KEY[^\r\n]*\r?\n', '')
+$prdApp = [regex]::Replace($prdApp, '(?m)^const HML_SESSION_ACTIVE_KEY[^\r\n]*\r?\n', '')
 
 # 5b. Reverter createClient customizado (com auth options) para padrão PRD
 $prdApp = [regex]::Replace($prdApp, "(?s)supabaseClient = window\.supabase\.createClient\(SUPABASE_URL, SUPABASE_ANON_KEY, \{.*?\}\);", "supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);")
 
 # 5c. Substituir referências restantes de HML_ACTIVITY_STORAGE_KEY para string literal PRD
 $prdApp = $prdApp.Replace("HML_ACTIVITY_STORAGE_KEY", "'painel_ops_last_activity'")
+$prdApp = $prdApp.Replace("HML_SESSION_ACTIVE_KEY", "'painel_ops_session_active'")
 
 # 5d. Substituir referências restantes de HML_AUTH_STORAGE_KEY (se houver)
 $prdApp = $prdApp.Replace("HML_AUTH_STORAGE_KEY", "'sb-maguyzjhldcgpcvkvkqe-auth-token'")
@@ -118,7 +120,7 @@ Write-Host "   Encoding normalizado."
 # 10. Verificação final: confirmar que NÃO há resíduos de HML no app.js PRD
 Write-Host "`n9. Verificacao final de residuos HML..."
 $finalCheck = [System.IO.File]::ReadAllText("$prdDir\app.js", [System.Text.Encoding]::UTF8)
-$residuos = @("HML_AUTH_STORAGE_KEY", "HML_ACTIVITY_STORAGE_KEY", "hml_default", "board-changes-hml", "importPrdDataToHml")
+$residuos = @("HML_AUTH_STORAGE_KEY", "HML_ACTIVITY_STORAGE_KEY", "HML_SESSION_ACTIVE_KEY", "hml_default", "board-changes-hml", "importPrdDataToHml")
 $hasResidues = $false
 foreach ($r in $residuos) {
     if ($finalCheck.Contains($r)) {
