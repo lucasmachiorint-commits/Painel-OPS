@@ -17,7 +17,10 @@ Set-Location $hmlDir
 # 1. Validar sintaxe base
 & "$hmlDir\scripts\validate-code.ps1"
 
-# 2. Executar suíte Playwright
+# 2. Recompilar bundle single file
+& "$hmlDir\scripts\compile-bundle.ps1"
+
+# 3. Executar suíte Playwright
 if ($TestFile -ne "") {
     & "$nodeDir\node.exe" "$hmlDir\node_modules\@playwright\test\cli.js" test $TestFile
 } else {

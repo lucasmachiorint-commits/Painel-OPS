@@ -218,6 +218,419 @@ function aplicarPerfilDeAcesso() {
     });
 }
 
+// ============================================================
+// MULTI-COUNTRY / REGION CONFIGURATION & I18N
+// ============================================================
+let currentCountry = localStorage.getItem('painel_ops_current_country') || 'BR'; // 'BR' | 'HISPANA'
+
+const COUNTRY_CONFIG = {
+    'BR': {
+        code: 'BR',
+        name: 'Brasil',
+        flag: '🇧🇷',
+        locale: 'pt-BR',
+        boardStateId: 'hml_default',
+        realtimeChannel: 'board-changes-hml',
+        storageKey: 'capacity_fte_hub_state_BR'
+    },
+    'HISPANA': {
+        code: 'HISPANA',
+        name: 'Hispana (AR, MX, CO)',
+        flag: '🌐',
+        locale: 'es-LatAm',
+        boardStateId: 'hml_hispana',
+        realtimeChannel: 'board-changes-hml-hispana',
+        storageKey: 'capacity_fte_hub_state_HISPANA'
+    }
+};
+
+const I18N = {
+    'pt-BR': {
+        section_overview: 'Geral',
+        section_management: 'Gestão',
+        section_admin: 'Admin',
+        menu_dashboard: 'Dashboard',
+        menu_dashboard_title: 'Dashboard Operacional',
+        menu_history: 'Histórico',
+        menu_history_title: 'Histórico de Volumes',
+        menu_cadastros: 'Cadastros',
+        menu_cadastros_title: 'Estrutura e Cadastros',
+        menu_balancing: 'Balanceamento',
+        menu_balancing_title: 'Balanceamento de Backlog',
+        menu_automations: 'Automações',
+        menu_automations_title: 'Quadro de Automações (RPA)',
+        menu_access: 'Acesso',
+        menu_access_title: 'Controle de Acesso e Perfis',
+        view_title_dashboard: 'Dashboard',
+        view_sub_dashboard: 'Visão operacional de volumes mensais, FTEs requeridos e capacidade por equipe.',
+        view_title_history: 'Histórico',
+        view_sub_history: 'Snapshots mensais salvos e evolução temporal dos volumes operacionais.',
+        view_title_cadastros: 'Cadastros',
+        view_sub_cadastros: 'Estrutura organizacional, equipes, colaboradores responsáveis e catálogo de atividades.',
+        view_title_balancing: 'Balanceamento',
+        view_sub_balancing: 'Planejamento diário de backlog e comparação de capacidade alocada vs. necessária.',
+        view_title_automations: 'Automações (RPA)',
+        view_sub_automations: 'Quadro analítico de processos robotizados, FTEs absorvidos e horas economizadas.',
+        view_title_access: 'Controle de Acesso',
+        view_sub_access: 'Gestão centralizada de usuários, atribuição de perfis (ADMIN/OPERADOR/CONSULTA) e vinculação de equipes.',
+        filter_area_title: 'Filtrar por Área / Equipe em todas as telas',
+        filter_resp_title: 'Filtrar por Responsável em todas as telas',
+        opt_all_areas: 'Todas as Áreas',
+        opt_all_resps: 'Todos os Responsáveis',
+        btn_publish: 'Publicar para Todos',
+        btn_publish_title: 'Publicar sua visão atual como a base oficial para todos os usuários',
+        btn_export: 'Exportar Excel',
+        btn_export_title: 'Exportar CSV (Excel)',
+        btn_print: 'Imprimir / PDF',
+        btn_print_title: 'Imprimir / PDF',
+        btn_change_pass_title: 'Alterar minha senha',
+        btn_logout_title: 'Sair do sistema',
+        status_connecting: 'Conectando...',
+        status_sync: 'Sincronizado',
+        status_offline: 'Offline (Local)',
+        kpi_fte_required: 'FTEs Requeridos',
+        kpi_total_activities: 'Total de Atividades',
+        kpi_rpa_activities: 'RPA • Atividades',
+        kpi_rpa_capacity: 'RPA • Capacity Absorvido',
+        kpi_available_capacity: 'Capacidade Disponível',
+        kpi_monthly_hours: 'Horas Mensais',
+        kpi_saved_hours: 'Horas Economizadas',
+        th_activity: 'Atividade',
+        th_area: 'Área Responsável',
+        th_responsavel: 'Responsável',
+        th_volume: 'Volume / Mês',
+        th_time: 'Tempo (min)',
+        th_freq: 'Qtd / Freq.',
+        th_hours: 'Horas / Mês',
+        th_fte: 'FTE Requerido',
+        th_actions: 'Ações',
+        th_review: 'Revisão',
+        th_rpa: 'RPA',
+        review_keep: 'Manter',
+        review_stop: 'Parar',
+        review_start: 'Começar',
+        panel_teams: 'Equipes (Áreas)',
+        panel_responsaveis: 'Responsáveis',
+        panel_activities: 'Cadastro de Atividades',
+        btn_new_team: 'Nova Equipe',
+        btn_new_resp: 'Novo Responsável',
+        btn_add_activity: 'Adicionar Atividade',
+        btn_organogram: 'Organograma',
+        btn_params: 'Parâmetros',
+        toast_country_switched: '🇧🇷 Ambiente alternado para Brasil (Português)'
+    },
+    'es-LatAm': {
+        section_overview: 'General',
+        section_management: 'Gestión',
+        section_admin: 'Admin',
+        menu_dashboard: 'Tablero',
+        menu_dashboard_title: 'Tablero Operacional',
+        menu_history: 'Historial',
+        menu_history_title: 'Historial de Volúmenes',
+        menu_cadastros: 'Registros',
+        menu_cadastros_title: 'Estructura y Registros',
+        menu_balancing: 'Balanceo',
+        menu_balancing_title: 'Balanceo de Backlog',
+        menu_automations: 'Automatizaciones',
+        menu_automations_title: 'Panel de Automatizaciones (RPA)',
+        menu_access: 'Acceso',
+        menu_access_title: 'Control de Acceso y Perfiles',
+        view_title_dashboard: 'Tablero',
+        view_sub_dashboard: 'Visión operativa de volúmenes mensuales, FTEs requeridos y capacidad por equipo.',
+        view_title_history: 'Historial',
+        view_sub_history: 'Snapshots mensuales guardados y evolución temporal de volúmenes operativos.',
+        view_title_cadastros: 'Registros',
+        view_sub_cadastros: 'Estructura organizacional, equipos, colaboradores responsables y catálogo de actividades.',
+        view_title_balancing: 'Balanceo',
+        view_sub_balancing: 'Planificación diaria de backlog y comparación de capacidad asignada vs. requerida.',
+        view_title_automations: 'Automatizaciones (RPA)',
+        view_sub_automations: 'Panel analítico de procesos robotizados, FTEs absorbidos y horas ahorradas.',
+        view_title_access: 'Control de Acceso',
+        view_sub_access: 'Gestión centralizada de usuarios, asignación de perfiles (ADMIN/OPERADOR/CONSULTA) y vinculación de equipos.',
+        filter_area_title: 'Filtrar por Área / Equipo en todas las pantallas',
+        filter_resp_title: 'Filtrar por Responsable en todas las pantallas',
+        opt_all_areas: 'Todas las Áreas',
+        opt_all_resps: 'Todos los Responsables',
+        btn_publish: 'Publicar para Todos',
+        btn_publish_title: 'Publicar su vista actual como la base oficial para todos los usuarios',
+        btn_export: 'Exportar Excel',
+        btn_export_title: 'Exportar CSV (Excel)',
+        btn_print: 'Imprimir / PDF',
+        btn_print_title: 'Imprimir / PDF',
+        btn_change_pass_title: 'Cambiar mi contraseña',
+        btn_logout_title: 'Cerrar sesión',
+        status_connecting: 'Conectando...',
+        status_sync: 'Sincronizado',
+        status_offline: 'Desconectado (Local)',
+        kpi_fte_required: 'FTEs Requeridos',
+        kpi_total_activities: 'Total de Actividades',
+        kpi_rpa_activities: 'RPA • Actividades',
+        kpi_rpa_capacity: 'RPA • Capacidad Absorbida',
+        kpi_available_capacity: 'Capacidad Disponible',
+        kpi_monthly_hours: 'Horas Mensuales',
+        kpi_saved_hours: 'Horas Ahorradas',
+        th_activity: 'Actividad',
+        th_area: 'Área Responsable',
+        th_responsavel: 'Responsable',
+        th_volume: 'Volumen / Mes',
+        th_time: 'Tiempo (min)',
+        th_freq: 'Cant / Frec.',
+        th_hours: 'Horas / Mes',
+        th_fte: 'FTE Requerido',
+        th_actions: 'Acciones',
+        th_review: 'Revisión',
+        th_rpa: 'RPA',
+        review_keep: 'Mantener',
+        review_stop: 'Parar',
+        review_start: 'Comenzar',
+        panel_teams: 'Equipos (Áreas)',
+        panel_responsaveis: 'Responsables',
+        panel_activities: 'Catálogo de Actividades',
+        btn_new_team: 'Nuevo Equipo',
+        btn_new_resp: 'Nuevo Responsable',
+        btn_add_activity: 'Agregar Actividad',
+        btn_organogram: 'Organigrama',
+        btn_params: 'Parámetros',
+        toast_country_switched: '🌐 Ambiente cambiado a Hispana (AR, MX, CO - Español)'
+    }
+};
+
+function toggleCountryDropdown(e) {
+    if (e) e.stopPropagation();
+    const container = document.getElementById('country-selector-header');
+    const menu = document.getElementById('country-dropdown-menu');
+    if (!container || !menu) return;
+    
+    const isOpen = container.classList.contains('open');
+    if (isOpen) {
+        container.classList.remove('open');
+        menu.style.display = 'none';
+    } else {
+        container.classList.add('open');
+        menu.style.display = 'flex';
+    }
+}
+
+document.addEventListener('click', (e) => {
+    const container = document.getElementById('country-selector-header');
+    const menu = document.getElementById('country-dropdown-menu');
+    if (container && menu && container.classList.contains('open')) {
+        if (!container.contains(e.target)) {
+            container.classList.remove('open');
+            menu.style.display = 'none';
+        }
+    }
+});
+
+async function selectCountry(countryCode) {
+    const container = document.getElementById('country-selector-header');
+    const menu = document.getElementById('country-dropdown-menu');
+    if (container) container.classList.remove('open');
+    if (menu) menu.style.display = 'none';
+
+    if (countryCode === currentCountry) return;
+    await switchCountry(countryCode);
+}
+
+async function switchCountry(countryCode) {
+    if (!COUNTRY_CONFIG[countryCode]) return;
+
+    // 1. Salvar estado atual do país vigente
+    saveState();
+
+    // 2. Atualizar estado de país
+    currentCountry = countryCode;
+    try {
+        localStorage.setItem('painel_ops_current_country', countryCode);
+    } catch (_) {}
+
+    // 3. Atualizar UI do seletor
+    const flagEl = document.getElementById('country-flag-icon');
+    const labelEl = document.getElementById('country-name-label');
+    if (flagEl) flagEl.textContent = COUNTRY_CONFIG[countryCode].flag;
+    if (labelEl) labelEl.textContent = COUNTRY_CONFIG[countryCode].name;
+
+    document.querySelectorAll('.country-dropdown-option').forEach(opt => {
+        const c = opt.getAttribute('data-country');
+        const check = opt.querySelector('.country-opt-check');
+        if (c === countryCode) {
+            opt.classList.add('active');
+            if (check) check.style.display = 'inline-block';
+        } else {
+            opt.classList.remove('active');
+            if (check) check.style.display = 'none';
+        }
+    });
+
+    // 4. Carregar estado do novo país
+    loadState();
+
+    // 5. Aplicar tradução
+    applyI18n(COUNTRY_CONFIG[countryCode].locale);
+
+    // 6. Atualizar conexão em tempo real se autenticado
+    if (window._authUserId) {
+        subscribeRealtime();
+        try {
+            await loadStateFromSupabase();
+        } catch (_) {}
+    }
+
+    // 7. Re-renderizar todas as telas
+    refreshCurrentUserAssignedTeam();
+    refreshAllViews();
+
+    const dict = I18N[COUNTRY_CONFIG[countryCode].locale] || I18N['pt-BR'];
+    showToast(dict.toast_country_switched, 'info', 4000);
+}
+
+function applyI18n(locale) {
+    const dict = I18N[locale] || I18N['pt-BR'];
+    document.documentElement.lang = locale === 'es-LatAm' ? 'es' : 'pt-BR';
+
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.getAttribute('data-i18n');
+        if (dict[key]) {
+            el.textContent = dict[key];
+        }
+    });
+
+    document.querySelectorAll('[data-i18n-title]').forEach(el => {
+        const key = el.getAttribute('data-i18n-title');
+        if (dict[key]) {
+            el.setAttribute('title', dict[key]);
+        }
+    });
+
+    document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+        const key = el.getAttribute('data-i18n-placeholder');
+        if (dict[key]) {
+            el.setAttribute('placeholder', dict[key]);
+        }
+    });
+
+    if (typeof VIEW_META !== 'undefined' && VIEW_META) {
+        if (locale === 'es-LatAm') {
+            if (VIEW_META['dashboard']) {
+                VIEW_META['dashboard'].title = dict.view_title_dashboard;
+                VIEW_META['dashboard'].section = dict.section_overview;
+                VIEW_META['dashboard'].subtitle = dict.view_sub_dashboard;
+            }
+            if (VIEW_META['history']) {
+                VIEW_META['history'].title = dict.view_title_history;
+                VIEW_META['history'].section = dict.section_overview;
+                VIEW_META['history'].subtitle = dict.view_sub_history;
+            }
+            if (VIEW_META['cadastros']) {
+                VIEW_META['cadastros'].title = dict.view_title_cadastros;
+                VIEW_META['cadastros'].section = dict.section_management;
+                VIEW_META['cadastros'].subtitle = dict.view_sub_cadastros;
+            }
+            if (VIEW_META['balancing']) {
+                VIEW_META['balancing'].title = dict.view_title_balancing;
+                VIEW_META['balancing'].section = dict.section_management;
+                VIEW_META['balancing'].subtitle = dict.view_sub_balancing;
+            }
+            if (VIEW_META['automations']) {
+                VIEW_META['automations'].title = dict.view_title_automations;
+                VIEW_META['automations'].section = dict.section_management;
+                VIEW_META['automations'].subtitle = dict.view_sub_automations;
+            }
+            if (VIEW_META['access-control']) {
+                VIEW_META['access-control'].title = dict.view_title_access;
+                VIEW_META['access-control'].section = dict.section_admin;
+                VIEW_META['access-control'].subtitle = dict.view_sub_access;
+            }
+        } else {
+            if (VIEW_META['dashboard']) {
+                VIEW_META['dashboard'].title = 'Dashboard';
+                VIEW_META['dashboard'].section = 'Geral';
+                VIEW_META['dashboard'].subtitle = 'Visão operacional de volumes mensais, FTEs requeridos e capacidade por equipe.';
+            }
+            if (VIEW_META['history']) {
+                VIEW_META['history'].title = 'Histórico';
+                VIEW_META['history'].section = 'Geral';
+                VIEW_META['history'].subtitle = 'Snapshots mensais salvos e evolução temporal dos volumes operacionais.';
+            }
+            if (VIEW_META['cadastros']) {
+                VIEW_META['cadastros'].title = 'Cadastros';
+                VIEW_META['cadastros'].section = 'Gestão';
+                VIEW_META['cadastros'].subtitle = 'Estrutura organizacional, equipes, colaboradores responsáveis e catálogo de atividades.';
+            }
+            if (VIEW_META['balancing']) {
+                VIEW_META['balancing'].title = 'Balanceamento';
+                VIEW_META['balancing'].section = 'Gestão';
+                VIEW_META['balancing'].subtitle = 'Planejamento diário de backlog e comparação de capacidade alocada vs. necessária.';
+            }
+            if (VIEW_META['automations']) {
+                VIEW_META['automations'].title = 'Automações (RPA)';
+                VIEW_META['automations'].section = 'Gestão';
+                VIEW_META['automations'].subtitle = 'Quadro analítico de processos robotizados, FTEs absorvidos e horas economizadas.';
+            }
+            if (VIEW_META['access-control']) {
+                VIEW_META['access-control'].title = 'Controle de Acesso';
+                VIEW_META['access-control'].section = 'Administração';
+                VIEW_META['access-control'].subtitle = 'Gestão centralizada de usuários, atribuição de perfis (ADMIN/OPERADOR/CONSULTA) e vinculação de equipes.';
+            }
+        }
+
+        const hashView = (window.location.hash || '').replace('#/', '').trim();
+        const activeView = (hashView && VIEW_META[hashView]) ? hashView : 'dashboard';
+        if (typeof updateViewHeader === 'function') {
+            updateViewHeader(activeView);
+        }
+    }
+}
+
+// DEFAULT HISPANA DATA (AR, MX, CO)
+const EXAMPLE_PROCESSES_HISPANA = [
+    { id: 'hsp-1', name: 'Dar aviso a los responsables de atención por inconvenientes en la App', area: 'App/Atención', responsavel: 'Valeria Sotes', responsaveis: ['Valeria Sotes'], volume: 21, minutos: 15, qtdExecucao: 21, backlogVolume: '', allocatedResource: '', reviewStatus: 'Manter', isRpa: false, observacao: 'Finket avisa y desde operaciones damos reportamos a atencion' },
+    { id: 'hsp-2', name: 'Actualización de procesos/productos', area: 'Producto/Expansión', responsavel: 'Valeria Sotes', responsaveis: ['Valeria Sotes'], volume: 0, minutos: 0, qtdExecucao: 1, backlogVolume: '', allocatedResource: '', reviewStatus: 'Manter', isRpa: false },
+    { id: 'hsp-3', name: 'Soporte en expansión y nuevos productos', area: 'Producto/Expansión', responsavel: 'Valeria Sotes', responsaveis: ['Valeria Sotes'], volume: 0, minutos: 0, qtdExecucao: 1, backlogVolume: '', allocatedResource: '', reviewStatus: 'Manter', isRpa: false },
+    { id: 'hsp-4', name: 'Parametrización del conciliador FDELIUS', area: 'Conciliaciones', responsavel: 'Valeria Sotes', responsaveis: ['Valeria Sotes'], volume: 1, minutos: 60, qtdExecucao: 1, backlogVolume: '', allocatedResource: '', reviewStatus: 'Manter', isRpa: false, observacao: 'Para pruebas y ajustes de reporte' },
+    { id: 'hsp-5', name: 'Identificación de procesos de conciliación y armado de flujos', area: 'Conciliaciones', responsavel: 'Valeria Sotes', responsaveis: ['Valeria Sotes'], volume: 0, minutos: 0, qtdExecucao: 1, backlogVolume: '', allocatedResource: '', reviewStatus: 'Manter', isRpa: false },
+    { id: 'hsp-6', name: 'Registro en Gsurf de pagos AVON/NATURA', area: 'Tesorería/Operaciones', responsavel: 'Valeria Sotes', responsaveis: ['Valeria Sotes'], volume: 4, minutos: 40, qtdExecucao: 4, backlogVolume: '', allocatedResource: '', reviewStatus: 'Manter', isRpa: false },
+    { id: 'hsp-7', name: 'Armado de flujo de caja Argentina', area: 'Operaciones/Conciliaciones', responsavel: 'Valeria Sotes', responsaveis: ['Valeria Sotes'], volume: 21, minutos: 90, qtdExecucao: 21, backlogVolume: '', allocatedResource: '', reviewStatus: 'Manter', isRpa: false, observacao: 'Semi automatizado' },
+    { id: 'hsp-8', name: 'Armado de flujo de caja México', area: 'Operaciones/Conciliaciones', responsavel: 'Valeria Sotes', responsaveis: ['Valeria Sotes'], volume: 21, minutos: 90, qtdExecucao: 21, backlogVolume: '', allocatedResource: '', reviewStatus: 'Manter', isRpa: false, observacao: 'DataBricks' },
+    { id: 'hsp-9', name: 'Levantar requerimientos al equipo de producto por fallas o mejoras del BO de Finket', area: 'Conciliaciones', responsavel: 'Valeria Sotes', responsaveis: ['Valeria Sotes'], volume: 21, minutos: 15, qtdExecucao: 21, backlogVolume: '', allocatedResource: '', reviewStatus: 'Manter', isRpa: false },
+    { id: 'hsp-10', name: 'Soporte para requerimientos del BCRA', area: 'Operaciones', responsavel: 'Valeria Sotes', responsaveis: ['Valeria Sotes'], volume: 1, minutos: 30, qtdExecucao: 1, backlogVolume: '', allocatedResource: '', reviewStatus: 'Manter', isRpa: false },
+    { id: 'hsp-11', name: 'Armado y envío de provisión del pendiente por la adquirencia a FIDEM', area: 'Conciliaciones', responsavel: 'Valeria Sotes', responsaveis: ['Valeria Sotes'], volume: 1, minutos: 90, qtdExecucao: 1, backlogVolume: '', allocatedResource: '', reviewStatus: 'Manter', isRpa: false },
+    { id: 'hsp-12', name: 'Bajada de liquidaciones diarias desde los diferentes portales de los adquirentes', area: 'Conciliaciones', responsavel: 'Valeria Sotes', responsaveis: ['Valeria Sotes'], volume: 21, minutos: 30, qtdExecucao: 21, backlogVolume: '', allocatedResource: '', reviewStatus: 'Manter', isRpa: false, observacao: '(Naranja, Payway, Cabal y Fiserv)' },
+    { id: 'hsp-13', name: 'Bajada de liquidaciones mensuales desde los diferentes portales de los adquirentes', area: 'Conciliaciones', responsavel: 'Valeria Sotes', responsaveis: ['Valeria Sotes'], volume: 1, minutos: 30, qtdExecucao: 1, backlogVolume: '', allocatedResource: '', reviewStatus: 'Manter', isRpa: false, observacao: '(Naranja, Payway, Cabal y Fiserv)' },
+    { id: 'hsp-14', name: 'Cierre de operaciones de México', area: 'Conciliaciones', responsavel: 'Valeria Sotes', responsaveis: ['Valeria Sotes'], volume: 0, minutos: 0, qtdExecucao: 1, backlogVolume: '', allocatedResource: '', reviewStatus: 'Manter', isRpa: false },
+    { id: 'hsp-15', name: 'Cierre de operaciones de Argentina', area: 'Conciliaciones', responsavel: 'Valeria Sotes', responsaveis: ['Valeria Sotes'], volume: 0, minutos: 0, qtdExecucao: 1, backlogVolume: '', allocatedResource: '', reviewStatus: 'Manter', isRpa: false },
+    { id: 'hsp-16', name: 'Acreditación de ganancias a las consultoras', area: 'Conciliaciones', responsavel: 'Valeria Sotes', responsaveis: ['Valeria Sotes'], volume: 1, minutos: 60, qtdExecucao: 1, backlogVolume: '', allocatedResource: '', reviewStatus: 'Manter', isRpa: false, observacao: 'Desde tesoreria la quieren diaria' },
+    { id: 'hsp-17', name: 'Transaccional de Billetera (Transferencias in/out, Pago de Boleta, SIRCUPA, Saldo Final al Conciliaciones)', area: 'Conciliaciones', responsavel: 'Valeria Sotes', responsaveis: ['Valeria Sotes'], volume: 1, minutos: 60, qtdExecucao: 1, backlogVolume: '', allocatedResource: '', reviewStatus: 'Manter', isRpa: false, observacao: '(Finket vs. BIND y Finket vs Saldo final App)' },
+    { id: 'hsp-18', name: 'Rendimientos', area: 'Conciliaciones', responsavel: 'Valeria Sotes', responsaveis: ['Valeria Sotes'], volume: 0, minutos: 0, qtdExecucao: 1, backlogVolume: '', allocatedResource: '', reviewStatus: 'Manter', isRpa: false, observacao: 'Desde tesoreria la estan reclamando' },
+    { id: 'hsp-19', name: 'Pagos a Natura', area: 'Tesorería', responsavel: 'Valeria Sotes', responsaveis: ['Valeria Sotes'], volume: 0, minutos: 0, qtdExecucao: 8, backlogVolume: '', allocatedResource: '', reviewStatus: 'Manter', isRpa: false, observacao: 'Conciliacion que corresponde a operaciones' },
+    { id: 'hsp-20', name: 'Pago a las consultoras', area: 'Tesorería', responsavel: 'Valeria Sotes', responsaveis: ['Valeria Sotes'], volume: 0, minutos: 0, qtdExecucao: 21, backlogVolume: '', allocatedResource: '', reviewStatus: 'Manter', isRpa: false, observacao: 'Tesoreria reclama que es de operaciones' },
+    { id: 'hsp-21', name: 'Creation vs adquirencia', area: 'Conciliaciones', responsavel: 'Valeria Sotes', responsaveis: ['Valeria Sotes'], volume: 1, minutos: 120, qtdExecucao: 1, backlogVolume: '', allocatedResource: '', reviewStatus: 'Manter', isRpa: false, observacao: 'GLOBAL' }
+];
+
+const DEFAULT_TEAMS_HISPANA = [
+    'Conciliaciones',
+    'Operaciones/Conciliaciones',
+    'Tesorería',
+    'Tesorería/Operaciones',
+    'App/Atención',
+    'Producto/Expansión',
+    'Operaciones'
+];
+
+const DEFAULT_TEAM_HIERARCHY_HISPANA = {
+    'Conciliaciones': { gerencia: 'Conciliación y Operaciones', diretoria: 'Operaciones Hispana', coordenador: 'Valeria Sotes', coordenadorEmail: '' },
+    'Operaciones/Conciliaciones': { gerencia: 'Conciliación y Operaciones', diretoria: 'Operaciones Hispana', coordenador: 'Valeria Sotes', coordenadorEmail: '' },
+    'Tesorería': { gerencia: 'Tesorería', diretoria: 'Operaciones Hispana', coordenador: 'Valeria Sotes', coordenadorEmail: '' },
+    'Tesorería/Operaciones': { gerencia: 'Tesorería', diretoria: 'Operaciones Hispana', coordenador: 'Valeria Sotes', coordenadorEmail: '' },
+    'App/Atención': { gerencia: 'Atención al Cliente', diretoria: 'Operaciones Hispana', coordenador: 'Valeria Sotes', coordenadorEmail: '' },
+    'Producto/Expansión': { gerencia: 'Producto', diretoria: 'Operaciones Hispana', coordenador: 'Valeria Sotes', coordenadorEmail: '' },
+    'Operaciones': { gerencia: 'Operaciones Generales', diretoria: 'Operaciones Hispana', coordenador: 'Valeria Sotes', coordenadorEmail: '' }
+};
+
+const DEFAULT_RESPONSAVEIS_HISPANA = [
+    { name: 'Valeria Sotes', email: '', area: 'Conciliaciones', horasDia: null, absenteismo: null, diasUteis: null }
+];
+
 // APPLICATION STATE MANAGEMENT
 let state = {
     params: {
@@ -901,6 +1314,28 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (btnSignup) btnSignup.addEventListener('click', handleSignup);
     if (btnLogout) btnLogout.addEventListener('click', () => handleLogout(false));
 
+    // Sync Country Selector & i18n
+    const savedCountry = localStorage.getItem('painel_ops_current_country');
+    if (savedCountry && COUNTRY_CONFIG[savedCountry]) {
+        currentCountry = savedCountry;
+    }
+    const flagEl = document.getElementById('country-flag-icon');
+    const labelEl = document.getElementById('country-name-label');
+    if (flagEl && COUNTRY_CONFIG[currentCountry]) flagEl.textContent = COUNTRY_CONFIG[currentCountry].flag;
+    if (labelEl && COUNTRY_CONFIG[currentCountry]) labelEl.textContent = COUNTRY_CONFIG[currentCountry].name;
+    document.querySelectorAll('.country-dropdown-option').forEach(opt => {
+        const c = opt.getAttribute('data-country');
+        const check = opt.querySelector('.country-opt-check');
+        if (c === currentCountry) {
+            opt.classList.add('active');
+            if (check) check.style.display = 'inline-block';
+        } else {
+            opt.classList.remove('active');
+            if (check) check.style.display = 'none';
+        }
+    });
+    applyI18n(COUNTRY_CONFIG[currentCountry]?.locale || 'pt-BR');
+
     loadState();
     setupEventListeners();
     
@@ -1112,15 +1547,18 @@ function subscribeRealtime() {
 
     updateRealtimeStatusUI('CONNECTING');
 
+    const targetId = COUNTRY_CONFIG[currentCountry]?.boardStateId || 'hml_default';
+    const targetChannel = COUNTRY_CONFIG[currentCountry]?.realtimeChannel || 'board-changes-hml';
+
     realtimeChannel = client
-        .channel('board-changes-hml')
+        .channel(targetChannel)
         .on('postgres_changes', {
             event: '*',
             schema: 'public',
             table: 'board_state',
-            filter: 'id=eq.hml_default'
+            filter: `id=eq.${targetId}`
         }, (payload) => {
-            console.log('[Realtime HML] Evento recebido via WebSocket:', payload.eventType, payload);
+            console.log(`[Realtime HML ${currentCountry}] Evento recebido via WebSocket:`, payload.eventType, payload);
             
             const payloadData = payload.new || payload.record;
             if (payloadData && payloadData.data) {
@@ -1138,7 +1576,11 @@ function subscribeRealtime() {
                 
                 state = payloadData.data;
                 applyStateMigrations();
-                localStorage.setItem('capacity_fte_hub_state', JSON.stringify(state));
+                const storageKey = COUNTRY_CONFIG[currentCountry]?.storageKey || 'capacity_fte_hub_state_BR';
+                localStorage.setItem(storageKey, JSON.stringify(state));
+                if (currentCountry === 'BR') {
+                    localStorage.setItem('capacity_fte_hub_state', JSON.stringify(state));
+                }
                 refreshAllViews();
 
                 // 3. Debounce toast popups so multiple rapid events show at most 1 clean notification
@@ -1150,7 +1592,7 @@ function subscribeRealtime() {
             }
         })
         .subscribe((status, err) => {
-            console.log('[Realtime HML] Status da inscrição:', status, err || '');
+            console.log(`[Realtime HML ${currentCountry}] Status da inscrição:`, status, err || '');
             if (status === 'SUBSCRIBED') {
                 updateRealtimeStatusUI('SUBSCRIBED');
             } else if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
@@ -1183,11 +1625,12 @@ async function saveStateToSupabase() {
 
     try {
         const myUserId = window._authUserId;
+        const targetId = COUNTRY_CONFIG[currentCountry]?.boardStateId || 'hml_default';
 
         const { error } = await client
             .from('board_state')
             .upsert({
-                id: 'hml_default',
+                id: targetId,
                 data: state,
                 updated_by: myUserId || null,
                 updated_at: new Date().toISOString()
@@ -1219,7 +1662,7 @@ async function forceResetGlobalState() {
         return;
     }
 
-    if (!confirm('Deseja realmente definir e publicar a sua visão atual como a base oficial para TODOS os usuários? Isso sincronizará a tela de todos imediatamente.')) {
+    if (!confirm('Deseja realmente definir e publicar a sua visão atual como a base oficial para TODOS os usuários nesta região? Isso sincronizará a tela de todos imediatamente.')) {
         return;
     }
 
@@ -1227,11 +1670,12 @@ async function forceResetGlobalState() {
     if (!client) return;
 
     try {
+        const targetId = COUNTRY_CONFIG[currentCountry]?.boardStateId || 'hml_default';
         const { data: { user } } = await client.auth.getUser();
         const { error } = await client
             .from('board_state')
             .upsert({
-                id: 'hml_default',
+                id: targetId,
                 data: state,
                 updated_by: user ? user.id : null,
                 updated_at: new Date().toISOString()
@@ -1254,10 +1698,11 @@ async function loadStateFromSupabase() {
     if (!client) return false;
 
     try {
+        const targetId = COUNTRY_CONFIG[currentCountry]?.boardStateId || 'hml_default';
         const { data, error } = await client
             .from('board_state')
             .select('data, updated_at')
-            .eq('id', 'hml_default')
+            .eq('id', targetId)
             .maybeSingle();
 
         if (error) {
@@ -1271,14 +1716,18 @@ async function loadStateFromSupabase() {
         }
 
         if (!data || !data.data) {
-            console.log('[Supabase Load] Nenhum registro existente na tabela board_state.');
+            console.log(`[Supabase Load ${currentCountry}] Nenhum registro existente na tabela board_state.`);
             return false;
         }
 
         state = data.data;
         applyStateMigrations();
-        localStorage.setItem('capacity_fte_hub_state', JSON.stringify(state));
-        console.log('[Supabase Load] Estado compartilhado carregado com sucesso!');
+        const storageKey = COUNTRY_CONFIG[currentCountry]?.storageKey || 'capacity_fte_hub_state_BR';
+        localStorage.setItem(storageKey, JSON.stringify(state));
+        if (currentCountry === 'BR') {
+            localStorage.setItem('capacity_fte_hub_state', JSON.stringify(state));
+        }
+        console.log(`[Supabase Load ${currentCountry}] Estado compartilhado carregado com sucesso!`);
         return true;
     } catch (err) {
         console.error('[Supabase Load Exception]', err);
@@ -1309,10 +1758,11 @@ async function importPrdDataToHml() {
     try {
         showToast('Buscando dados atuais de Produção (PRD)...', 'info', 4000);
         
+        const prdId = currentCountry === 'HISPANA' ? 'hispana' : 'default';
         const { data, error } = await client
             .from('board_state')
             .select('data')
-            .eq('id', 'default')
+            .eq('id', prdId)
             .maybeSingle();
             
         if (error) {
@@ -1322,7 +1772,7 @@ async function importPrdDataToHml() {
         }
         
         if (!data || !data.data) {
-            alert('Nenhum dado encontrado no banco de Produção (PRD).');
+            alert('Nenhum dado encontrado no banco de Produção (PRD) para esta região.');
             return;
         }
         
@@ -1330,7 +1780,7 @@ async function importPrdDataToHml() {
         state = JSON.parse(JSON.stringify(data.data));
         applyStateMigrations();
         
-        // Salva diretamente em HML (id: 'hml_default')
+        // Salva diretamente em HML
         saveState();
         
         refreshCurrentUserAssignedTeam();
@@ -1392,9 +1842,9 @@ function applyStateMigrations() {
     if (!state.params) {
         state.params = {
             horasDia: 8.0,
-            absenteismo: 0,
+            absenteismo: 20,
             diasUteis: 21,
-            teamSize: 1
+            teamSize: 5.0
         };
     }
     if (!state.areaAllocations) state.areaAllocations = {};
@@ -1402,11 +1852,14 @@ function applyStateMigrations() {
         state.processes.sort((a, b) => (a.name || '').localeCompare(b.name || '', 'pt-BR', { sensitivity: 'base' }));
     }
     if (!state.processes) {
-        state.processes = JSON.parse(JSON.stringify(EXAMPLE_PROCESSES));
+        state.processes = currentCountry === 'HISPANA'
+            ? JSON.parse(JSON.stringify(EXAMPLE_PROCESSES_HISPANA))
+            : JSON.parse(JSON.stringify(EXAMPLE_PROCESSES));
     }
 
+    const exampleList = currentCountry === 'HISPANA' ? EXAMPLE_PROCESSES_HISPANA : EXAMPLE_PROCESSES;
     state.processes.forEach(p => {
-        const match = EXAMPLE_PROCESSES.find(ep => ep.name === p.name);
+        const match = exampleList.find(ep => ep.name === p.name);
         if (match && (!p.area || p.area.trim() === '')) p.area = match.area;
         if (p.backlogVolume === undefined) p.backlogVolume = '';
         if (p.allocatedResource === undefined) p.allocatedResource = '';
@@ -1420,15 +1873,19 @@ function applyStateMigrations() {
     });
     if (state.history === undefined) state.history = [];
     if (state.teams === undefined) {
-        if (state.customAreas && state.customAreas.length > 0) {
-            state.teams = ['Backoffice', 'Governança', 'Seguros/N2', 'Eficiência Operacional', ...state.customAreas];
+        if (currentCountry === 'HISPANA') {
+            state.teams = [...DEFAULT_TEAMS_HISPANA];
         } else {
-            state.teams = ['Backoffice', 'Governança', 'Seguros/N2', 'Eficiência Operacional'];
+            if (state.customAreas && state.customAreas.length > 0) {
+                state.teams = ['Backoffice', 'Governança', 'Seguros/N2', 'Eficiência Operacional', ...state.customAreas];
+            } else {
+                state.teams = ['Backoffice', 'Governança', 'Seguros/N2', 'Eficiência Operacional'];
+            }
         }
     }
     if (!state.teamHierarchy) state.teamHierarchy = {};
     
-    const defaultRelations = {
+    const defaultRelations = currentCountry === 'HISPANA' ? DEFAULT_TEAM_HIERARCHY_HISPANA : {
         'Backoffice': { gerencia: 'Conciliação', diretoria: 'Operações' },
         'Governança': { gerencia: 'Suporte Operacional', diretoria: 'Operações' },
         'Seguros/N2': { gerencia: 'Atendimento', diretoria: 'Operações' },
@@ -1437,7 +1894,7 @@ function applyStateMigrations() {
     
     state.teams.forEach(team => {
         if (!state.teamHierarchy[team]) {
-            state.teamHierarchy[team] = defaultRelations[team] || { gerencia: 'Suporte Operacional', diretoria: 'Operações', coordenador: '', coordenadorEmail: '' };
+            state.teamHierarchy[team] = defaultRelations[team] || { gerencia: currentCountry === 'HISPANA' ? 'Operaciones Generales' : 'Suporte Operacional', diretoria: currentCountry === 'HISPANA' ? 'Operaciones Hispana' : 'Operações', coordenador: '', coordenadorEmail: '' };
         }
         if (state.teamHierarchy[team].coordenador === undefined) {
             state.teamHierarchy[team].coordenador = '';
@@ -1448,12 +1905,16 @@ function applyStateMigrations() {
     });
 
     if (!state.responsaveis) {
-        const uniqueResps = [...new Set(state.processes.map(p => p.responsavel || '').filter(r => r.trim() !== ''))].sort();
-        state.responsaveis = uniqueResps.map(r => {
-            const procWithResp = state.processes.find(p => p.responsavel === r);
-            const inheritedArea = procWithResp ? procWithResp.area : '';
-            return { name: r, area: inheritedArea, horasDia: null, absenteismo: null, diasUteis: null };
-        });
+        if (currentCountry === 'HISPANA') {
+            state.responsaveis = JSON.parse(JSON.stringify(DEFAULT_RESPONSAVEIS_HISPANA));
+        } else {
+            const uniqueResps = [...new Set(state.processes.map(p => p.responsavel || '').filter(r => r.trim() !== ''))].sort();
+            state.responsaveis = uniqueResps.map(r => {
+                const procWithResp = state.processes.find(p => p.responsavel === r);
+                const inheritedArea = procWithResp ? procWithResp.area : '';
+                return { name: r, area: inheritedArea, horasDia: null, absenteismo: null, diasUteis: null };
+            });
+        }
     } else if (Array.isArray(state.responsaveis) && state.responsaveis.length > 0 && typeof state.responsaveis[0] === 'string') {
         state.responsaveis = state.responsaveis.map(r => {
             const procWithResp = state.processes.find(p => p.responsavel === r);
@@ -1479,7 +1940,8 @@ function applyStateMigrations() {
 
 // LOAD STATE FROM LOCALSTORAGE WITH AREA & BACKLOG MIGRATION
 function loadState() {
-    const saved = localStorage.getItem('capacity_fte_hub_state');
+    const storageKey = COUNTRY_CONFIG[currentCountry]?.storageKey || 'capacity_fte_hub_state_BR';
+    const saved = localStorage.getItem(storageKey) || (currentCountry === 'BR' ? localStorage.getItem('capacity_fte_hub_state') : null);
     let useDefaults = false;
     
     if (saved) {
@@ -1501,23 +1963,39 @@ function loadState() {
     }
 
     if (useDefaults) {
-        state.processes = JSON.parse(JSON.stringify(EXAMPLE_PROCESSES));
-        state.customAreas = [];
-        state.areaAllocations = {};
-        state.teams = ['Backoffice', 'Governança', 'Seguros/N2', 'Eficiência Operacional'];
-        const uniqueResps = [...new Set(state.processes.map(p => p.responsavel || '').filter(r => r.trim() !== ''))].sort();
-        state.responsaveis = uniqueResps.map(r => {
-            const procWithResp = state.processes.find(p => p.responsavel === r);
-            const inheritedArea = procWithResp ? procWithResp.area : '';
-            return { name: r, area: inheritedArea, horasDia: null, absenteismo: null, diasUteis: null };
-        });
-        state.history = [];
-        state.params = {
-            horasDia: 8.0,
-            absenteismo: 20,
-            diasUteis: 21,
-            teamSize: 5.0
-        };
+        if (currentCountry === 'HISPANA') {
+            state.processes = JSON.parse(JSON.stringify(EXAMPLE_PROCESSES_HISPANA));
+            state.customAreas = [];
+            state.areaAllocations = {};
+            state.teams = [...DEFAULT_TEAMS_HISPANA];
+            state.teamHierarchy = JSON.parse(JSON.stringify(DEFAULT_TEAM_HIERARCHY_HISPANA));
+            state.responsaveis = JSON.parse(JSON.stringify(DEFAULT_RESPONSAVEIS_HISPANA));
+            state.history = [];
+            state.params = {
+                horasDia: 8.0,
+                absenteismo: 20,
+                diasUteis: 21,
+                teamSize: 5.0
+            };
+        } else {
+            state.processes = JSON.parse(JSON.stringify(EXAMPLE_PROCESSES));
+            state.customAreas = [];
+            state.areaAllocations = {};
+            state.teams = ['Backoffice', 'Governança', 'Seguros/N2', 'Eficiência Operacional'];
+            const uniqueResps = [...new Set(state.processes.map(p => p.responsavel || '').filter(r => r.trim() !== ''))].sort();
+            state.responsaveis = uniqueResps.map(r => {
+                const procWithResp = state.processes.find(p => p.responsavel === r);
+                const inheritedArea = procWithResp ? procWithResp.area : '';
+                return { name: r, area: inheritedArea, horasDia: null, absenteismo: null, diasUteis: null };
+            });
+            state.history = [];
+            state.params = {
+                horasDia: 8.0,
+                absenteismo: 20,
+                diasUteis: 21,
+                teamSize: 5.0
+            };
+        }
         saveState();
     }
 
@@ -1538,16 +2016,19 @@ function loadState() {
 let _saveDebounceTimer = null;
 
 function saveState() {
-    localStorage.setItem('capacity_fte_hub_state', JSON.stringify(state));
+    const storageKey = COUNTRY_CONFIG[currentCountry]?.storageKey || 'capacity_fte_hub_state_BR';
+    localStorage.setItem(storageKey, JSON.stringify(state));
+    if (currentCountry === 'BR') {
+        localStorage.setItem('capacity_fte_hub_state', JSON.stringify(state));
+    }
     
     // Somente persiste no Supabase se houver usuário autenticado
     if (!window._authUserId) return;
 
-    // Debounce to prevent flooding Supabase with calls on every keystroke
     if (_saveDebounceTimer) clearTimeout(_saveDebounceTimer);
     _saveDebounceTimer = setTimeout(() => {
         saveStateToSupabase();
-    }, 1000);
+    }, 400);
 }
 
 // GET RESPONSIBLE SPECIFIC CAPACITY PARAMETERS WITH GLOBAL FALLBACK
@@ -1845,12 +2326,12 @@ function renderOrganogramFlowchart() {
 const VIEW_META = {
     'dashboard': {
         title: 'Dashboard',
-        section: 'Visão Geral',
+        section: 'Geral',
         subtitle: 'Visão operacional de volumes mensais, FTEs requeridos e capacidade por equipe.'
     },
     'history': {
         title: 'Histórico',
-        section: 'Visão Geral',
+        section: 'Geral',
         subtitle: 'Snapshots mensais salvos e evolução temporal dos volumes operacionais.'
     },
     'cadastros': {

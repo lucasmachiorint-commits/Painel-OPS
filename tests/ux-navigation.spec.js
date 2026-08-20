@@ -1,4 +1,4 @@
-﻿// @ts-check
+// @ts-check
 const { test, expect } = require('@playwright/test');
 const path = require('path');
 
@@ -22,19 +22,19 @@ test.describe('Painel OPS - UX Revamp & Navegação E2E', () => {
     await expect(title).toHaveText('Dashboard');
 
     const sectionTitle = page.locator('#bc-section-title');
-    await expect(sectionTitle).toHaveText('Visão Geral');
+    await expect(sectionTitle).toHaveText('Geral');
 
     const subtitle = page.locator('#app-view-subtitle');
     await expect(subtitle).toContainText('Visão operacional');
   });
 
-  test('2. Sidebar deve conter seções organizadas (Visão Geral, Gestão, Administração)', async ({ page }) => {
+  test('2. Sidebar deve conter seções organizadas (Geral, Gestão, Administração)', async ({ page }) => {
     const sectionLabels = page.locator('.menu-section-label');
     const count = await sectionLabels.count();
     expect(count).toBeGreaterThanOrEqual(2);
 
     const firstLabel = sectionLabels.first();
-    await expect(firstLabel).toHaveText('Visão Geral');
+    await expect(firstLabel).toHaveText('Geral');
   });
 
   test('3. Navegar para Cadastros deve atualizar breadcrumb, subtítulo e exibir a tela', async ({ page }) => {
