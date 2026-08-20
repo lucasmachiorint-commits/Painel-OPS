@@ -48,18 +48,18 @@ Write-Host "   index.html limpo de marcacoes HML."
 Write-Host "`n5. Convertendo constantes e referencias de HML para PRD no app.js..."
 $prdApp = [System.IO.File]::ReadAllText("$prdDir\app.js", [System.Text.Encoding]::UTF8)
 
-# 5a. Remover as constantes HML-specific e o comentário sobre HML (CRLF)
-$prdApp = $prdApp.Replace("// Configuração isolada de autenticação para Homologação (HML)`r`nconst HML_AUTH_STORAGE_KEY = 'sb-painel-ops-hml-auth-token';`r`nconst HML_ACTIVITY_STORAGE_KEY = 'painel_ops_hml_last_activity';`r`n", "")
-# Fallback: tentar com LF
-$prdApp = $prdApp.Replace("// Configuração isolada de autenticação para Homologação (HML)`nconst HML_AUTH_STORAGE_KEY = 'sb-painel-ops-hml-auth-token';`nconst HML_ACTIVITY_STORAGE_KEY = 'painel_ops_hml_last_activity';`n", "")
+# 5a. Remover as constantes HML-specific e o comentário sobre HML usando regex
+$prdApp = [regex]::Replace($prdApp, '(?m)^// Configura[^\r\n]*\r?\n', '')
+$prdApp = [regex]::Replace($prdApp, '(?m)^const HML_AUTH_STORAGE_KEY[^\r\n]*\r?\n', '')
+$prdApp = [regex]::Replace($prdApp, '(?m)^const HML_ACTIVITY_STORAGE_KEY[^\r\n]*\r?\n', '')
 
 # 5b. Reverter createClient customizado (com auth options) para padrão PRD
 $prdApp = [regex]::Replace($prdApp, "(?s)supabaseClient = window\.supabase\.createClient\(SUPABASE_URL, SUPABASE_ANON_KEY, \{.*?\}\);", "supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);")
 
-# 5c. Substituir referências diretas de HML_ACTIVITY_STORAGE_KEY para string literal PRD
+# 5c. Substituir referências restantes de HML_ACTIVITY_STORAGE_KEY para string literal PRD
 $prdApp = $prdApp.Replace("HML_ACTIVITY_STORAGE_KEY", "'painel_ops_last_activity'")
 
-# 5d. Substituir referências diretas de HML_AUTH_STORAGE_KEY (se houver)
+# 5d. Substituir referências restantes de HML_AUTH_STORAGE_KEY (se houver)
 $prdApp = $prdApp.Replace("HML_AUTH_STORAGE_KEY", "'sb-maguyzjhldcgpcvkvkqe-auth-token'")
 
 # 5e. Substituir board_state IDs de HML para PRD
