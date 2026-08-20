@@ -1720,6 +1720,240 @@ body.light-theme input:-webkit-autofill:active {
     -webkit-text-fill-color: #1e1b18 !important;
 }
 
+/* ============================================================
+   UX REVAMP: SIDEBAR SECTIONS, BREADCRUMB, FILTERS & USER CHIP
+   ============================================================ */
+
+/* Menu Section Labels in Sidebar */
+.menu-section-label {
+    font-size: 0.62rem;
+    font-weight: 800;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    opacity: 0.7;
+    padding: 0.6rem 0.2rem 0.2rem;
+    pointer-events: none;
+    user-select: none;
+    text-align: center;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    margin-top: 0.35rem;
+    list-style: none;
+}
+
+.menu-section-label:first-child {
+    border-top: none;
+    margin-top: 0;
+    padding-top: 0;
+}
+
+body.light-theme .menu-section-label {
+    color: var(--text-muted);
+    border-top-color: rgba(0, 0, 0, 0.06);
+}
+
+/* Header & Breadcrumb */
+.app-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.85rem 1.5rem;
+    background: var(--bg-glass);
+    border-bottom: 1px solid var(--border-color);
+    backdrop-filter: var(--backdrop-blur);
+    -webkit-backdrop-filter: var(--backdrop-blur);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.header-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    min-width: 240px;
+}
+
+.breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    font-weight: 500;
+}
+
+.breadcrumb .bc-app {
+    color: var(--color-primary);
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.breadcrumb .bc-sep {
+    opacity: 0.5;
+    font-size: 0.7rem;
+}
+
+.breadcrumb .bc-section {
+    color: var(--text-secondary);
+}
+
+.breadcrumb .bc-page {
+    color: var(--text-primary);
+    font-weight: 600;
+}
+
+.app-title {
+    font-size: 1.35rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    line-height: 1.2;
+    margin: 0;
+}
+
+.view-subtitle {
+    font-size: 0.78rem;
+    color: var(--text-secondary);
+    margin: 0;
+    line-height: 1.2;
+}
+
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    flex-wrap: wrap;
+}
+
+/* Global Context Filters in Header */
+.header-global-filters {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.global-filter-group {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    padding: 0.3rem 0.6rem;
+    transition: all var(--transition-fast);
+}
+
+.global-filter-group:hover, .global-filter-group:focus-within {
+    border-color: var(--color-primary);
+    background: rgba(255, 255, 255, 0.07);
+}
+
+body.light-theme .global-filter-group {
+    background: #ffffff;
+    border-color: #cbd5e1;
+}
+
+.global-filter-group .filter-icon {
+    font-size: 0.75rem;
+    color: var(--color-primary);
+}
+
+.global-filter-group select {
+    background: transparent;
+    border: none;
+    color: var(--text-primary);
+    font-size: 0.8rem;
+    font-weight: 600;
+    outline: none;
+    cursor: pointer;
+    max-width: 140px;
+}
+
+.global-filter-group select option {
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+}
+
+body.light-theme .global-filter-group select option {
+    background: #ffffff;
+    color: #1e293b;
+}
+
+/* Integrated Header User Chip */
+.user-chip-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.25rem 0.6rem;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid var(--border-color);
+    margin-left: 0.25rem;
+}
+
+body.light-theme .user-chip-header {
+    background: #ffffff;
+    border-color: #cbd5e1;
+}
+
+.user-chip-avatar {
+    font-size: 1.35rem;
+    color: var(--color-primary);
+}
+
+.user-chip-details {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.1;
+}
+
+.user-chip-name {
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    max-width: 110px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.user-chip-badges {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    margin-top: 0.1rem;
+}
+
+.btn-user-action {
+    background: transparent;
+    border: 1px solid var(--border-color);
+    color: var(--text-secondary);
+    border-radius: 6px;
+    padding: 0.25rem 0.45rem;
+    cursor: pointer;
+    font-size: 0.72rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+
+.btn-user-action:hover {
+    border-color: var(--color-primary);
+    color: var(--color-primary);
+}
+
+.btn-user-action.btn-logout:hover {
+    background: rgba(244, 63, 94, 0.15);
+    border-color: #f43f5e;
+    color: #f43f5e;
+}
+
+
 
 
 </style>
@@ -1756,31 +1990,35 @@ body.light-theme input:-webkit-autofill:active {
             </div>
             
             <ul class="sidebar-menu">
-                <li class="menu-item active" data-view="cadastros" title="Cadastros">
-                    <i class="fa-solid fa-address-book"></i>
-                    <span>Cadastros</span>
-                </li>
-                <li class="menu-item" data-view="dashboard" title="Dashboard">
+                <!-- SEÇÃO: VISÃO GERAL -->
+                <li class="menu-section-label" title="Visão Geral">Visão Geral</li>
+                <li class="menu-item active" data-view="dashboard" title="Dashboard Operacional">
                     <i class="fa-solid fa-chart-pie"></i>
                     <span>Dashboard</span>
-                </li>
-                <li class="menu-item" data-view="balancing" title="Balanceamento" data-permissao="ADMIN">
-                    <i class="fa-solid fa-scale-balanced"></i>
-                    <span>Balanceamento</span>
-                </li>
-                <li class="menu-item" data-view="review" title="Revisão de Atividades" style="display: none;">
-                    <i class="fa-solid fa-clipboard-check"></i>
-                    <span>Revisão</span>
-                </li>
-                <li class="menu-item" data-view="automations" title="Quadro de Automações (RPA)">
-                    <i class="fa-solid fa-robot"></i>
-                    <span>Automações</span>
                 </li>
                 <li class="menu-item" data-view="history" title="Histórico de Volumes">
                     <i class="fa-solid fa-chart-line"></i>
                     <span>Histórico</span>
                 </li>
-                <li class="menu-item" data-view="access-control" data-permissao="ADMIN" title="Controle de Acesso">
+
+                <!-- SEÇÃO: GESTÃO -->
+                <li class="menu-section-label" title="Gestão da Operação">Gestão</li>
+                <li class="menu-item" data-view="cadastros" title="Estrutura e Cadastros">
+                    <i class="fa-solid fa-address-book"></i>
+                    <span>Cadastros</span>
+                </li>
+                <li class="menu-item" data-view="balancing" title="Balanceamento de Backlog" data-permissao="ADMIN">
+                    <i class="fa-solid fa-scale-balanced"></i>
+                    <span>Balanceamento</span>
+                </li>
+                <li class="menu-item" data-view="automations" title="Quadro de Automações (RPA)">
+                    <i class="fa-solid fa-robot"></i>
+                    <span>Automações</span>
+                </li>
+
+                <!-- SEÇÃO: ADMINISTRAÇÃO -->
+                <li class="menu-section-label admin-only" title="Administração e Governança" data-permissao="ADMIN">Administração</li>
+                <li class="menu-item" data-view="access-control" data-permissao="ADMIN" title="Controle de Acesso e Perfis">
                     <i class="fa-solid fa-shield-halved"></i>
                     <span>Acesso</span>
                 </li>
@@ -1800,14 +2038,38 @@ body.light-theme input:-webkit-autofill:active {
             <!-- HEADER -->
             <header class="app-header">
                 <div class="header-info">
-                    <h2 class="app-title" id="app-view-title">Cadastro</h2>
+                    <nav class="breadcrumb" id="app-breadcrumb">
+                        <span class="bc-app"><i class="fa-solid fa-chart-simple"></i> EmanaPay</span>
+                        <span class="bc-sep">›</span>
+                        <span class="bc-section" id="bc-section-title">Visão Geral</span>
+                        <span class="bc-sep">›</span>
+                        <span class="bc-page" id="bc-page-title">Dashboard</span>
+                    </nav>
+                    <h2 class="app-title" id="app-view-title">Dashboard</h2>
+                    <p class="view-subtitle" id="app-view-subtitle">Visão operacional de volumes mensais, FTEs requeridos e capacidade por equipe.</p>
                 </div>
                 <div class="header-actions">
+                    <!-- Global Context Filters -->
+                    <div class="header-global-filters" id="header-global-filters">
+                        <div class="global-filter-group" title="Filtrar por Área / Equipe em todas as telas">
+                            <i class="fa-solid fa-layer-group filter-icon"></i>
+                            <select id="global-filter-area">
+                                <option value="all">Todas as Áreas</option>
+                            </select>
+                        </div>
+                        <div class="global-filter-group" title="Filtrar por Responsável em todas as telas">
+                            <i class="fa-solid fa-user filter-icon"></i>
+                            <select id="global-filter-resp">
+                                <option value="all">Todos os Responsáveis</option>
+                            </select>
+                        </div>
+                    </div>
+
                     <div id="realtime-status-badge" style="display: flex; align-items: center; gap: 0.4rem; padding: 0.4rem 0.8rem; border-radius: 20px; font-size: 0.8rem; background: rgba(255,255,255,0.05); color: var(--text-muted);" title="Status da sincronização em tempo real (Supabase)">
                         <span class="status-dot" style="width: 8px; height: 8px; border-radius: 50%; background: #eab308; display: inline-block;"></span>
                         <span class="status-text">Conectando...</span>
                     </div>
-                    <button id="btn-reset-global-state" class="btn btn-secondary" data-permissao="ADMIN" title="Publicar sua visão atual como a base oficial para todos os usuários" onclick="forceResetGlobalState()">
+                    <button id="btn-reset-global-state" class="btn btn-secondary" data-permissao="ADMIN" title="Publicar sua visão atual como a base oficial para todos os usuários" onclick="forceResetGlobalState()" style="display: none;">
                         <i class="fa-solid fa-cloud-arrow-up"></i> Publicar para Todos
                     </button>
                     <button id="btn-export-csv" class="btn btn-primary-outline" title="Exportar CSV (Excel)">
@@ -1816,12 +2078,30 @@ body.light-theme input:-webkit-autofill:active {
                     <button id="btn-print" class="btn btn-primary" title="Imprimir / PDF">
                         <i class="fa-solid fa-print"></i> Imprimir / PDF
                     </button>
+
+                    <!-- Integrated User Chip in Header -->
+                    <div id="header-user-chip" class="user-chip-header">
+                        <i class="fa-solid fa-circle-user user-chip-avatar"></i>
+                        <div class="user-chip-details">
+                            <span id="userName" class="user-chip-name">Usuário</span>
+                            <div class="user-chip-badges">
+                                <span id="userRole" class="user-role-badge role-consulta">CONSULTA</span>
+                                <span id="userTeamBadge" style="display: none;"></span>
+                            </div>
+                        </div>
+                        <button id="btn-open-change-pass" onclick="openChangePasswordModal()" title="Alterar minha senha" class="btn-user-action">
+                            <i class="fa-solid fa-key"></i>
+                        </button>
+                        <button id="btn-logout" onclick="handleLogout()" title="Sair do sistema" class="btn-user-action btn-logout">
+                            <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                        </button>
+                    </div>
                 </div>
             </header>
 
             <main class="content-area">
                 <!-- VIEW 0: CADASTROS -->
-                <div id="view-cadastros" class="tab-view" style="display: block;">
+                <div id="view-cadastros" class="tab-view" style="display: none;">
                     <div class="grid-2-col" style="grid-template-columns: 300px 1fr; gap: 1.5rem;">
                         <!-- SIDEBAR: EQUIPES & RESPONSÁVEIS -->
                         <aside style="display: flex; flex-direction: column; gap: 1.5rem;">
@@ -1964,7 +2244,7 @@ body.light-theme input:-webkit-autofill:active {
                 </div>
 
                 <!-- VIEW 1: DASHBOARD -->
-                <div id="view-dashboard" class="tab-view" style="display: none;">
+                <div id="view-dashboard" class="tab-view" style="display: block;">
                     <div style="display: flex; flex-direction: column; gap: 1.5rem;">
                         <!-- DASHBOARD MAIN PANEL -->
                         <div class="dashboard-main" style="width: 100%;">
@@ -2704,27 +2984,6 @@ body.light-theme input:-webkit-autofill:active {
         </div>
     </div>
 
-    <!-- TOP RIGHT FIXED CONTROLS -->
-    <div id="top-right-fixed-controls" class="top-right-controls" style="position: fixed; top: 1.5rem; right: 1.5rem; z-index: 9999; display: flex; align-items: center; gap: 0.75rem;">
-        <!-- USER CHIP -->
-        <div id="header-user-chip" style="display: flex; align-items: center; gap: 0.6rem; padding: 0.3rem 0.75rem 0.3rem 0.5rem; border-radius: 999px; background: var(--bg-glass); border: 1px solid var(--border-color); box-shadow: var(--shadow-premium); cursor: default; user-select: none; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);">
-            <i class="fa-solid fa-circle-user" style="font-size: 1.4rem; color: var(--color-primary);"></i>
-            <div style="display: flex; flex-direction: column; line-height: 1.2;">
-                <span id="userName" style="font-size: 0.82rem; font-weight: 600; color: var(--text-primary); max-width: 140px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">Usuário</span>
-                <div style="display: flex; align-items: center; gap: 0.35rem; margin-top: 0.1rem; flex-wrap: wrap;">
-                    <span id="userRole" class="user-role-badge role-consulta" style="font-size: 0.68rem; padding: 0.05rem 0.4rem; width: fit-content;">CONSULTA</span>
-                    <span id="userTeamBadge" style="font-size: 0.68rem; padding: 0.05rem 0.4rem; border-radius: 4px; background: rgba(235,92,39,0.12); color: var(--color-primary); border: 1px solid rgba(235,92,39,0.25); display: none; font-weight: 500;"></span>
-                </div>
-            </div>
-            <button id="btn-open-change-pass" onclick="openChangePasswordModal()" title="Alterar minha senha" style="background: transparent; border: 1px solid var(--border-color); color: var(--text-secondary); border-radius: 6px; padding: 0.3rem 0.55rem; cursor: pointer; font-size: 0.78rem; display: flex; align-items: center; gap: 0.3rem; transition: all 0.2s;" onmouseover="this.style.borderColor='var(--color-primary)';this.style.color='var(--color-primary)'" onmouseout="this.style.borderColor='var(--border-color)';this.style.color='var(--text-secondary)'">
-                <i class="fa-solid fa-key"></i> Senha
-            </button>
-            <button id="btn-logout" onclick="handleLogout()" title="Sair do sistema" style="background: transparent; border: 1px solid var(--border-color); color: var(--text-secondary); border-radius: 6px; padding: 0.3rem 0.55rem; cursor: pointer; font-size: 0.78rem; display: flex; align-items: center; gap: 0.3rem; transition: all 0.2s; white-space: nowrap;" onmouseover="this.style.background='rgba(244,63,94,0.12)';this.style.color='#f43f5e';this.style.borderColor='rgba(244,63,94,0.3)'" onmouseout="this.style.background='transparent';this.style.color='var(--text-secondary)';this.style.borderColor='var(--border-color)'">
-                <i class="fa-solid fa-arrow-right-from-bracket"></i> Sair
-            </button>
-        </div>
-    </div>
-
     <!-- Hidden Printable Area for Clean PDF -->
     <div id="print-area" class="print-only"></div>
 
@@ -2852,13 +3111,24 @@ window.addEventListener('error', function(event) {
 const SUPABASE_URL = 'https://maguyzjhldcgpcvkvkqe.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1hZ3V5empobGRjZ3Bjdmt2a3FlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQ2NTU0MDMsImV4cCI6MjEwMDIzMTQwM30.Ow9xruE1qAFTX3mqELERxrY3CRBOdV_n4MoXXhtt3Y8';
 
+// Configuração isolada de autenticação para Homologação (HML)
+const HML_AUTH_STORAGE_KEY = 'sb-painel-ops-hml-auth-token';
+const HML_ACTIVITY_STORAGE_KEY = 'painel_ops_hml_last_activity';
+
 let supabaseClient = null;
 let realtimeChannel = null;
 if (window.supabase) {
     try {
-        supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+            auth: {
+                storageKey: HML_AUTH_STORAGE_KEY,
+                persistSession: true,
+                autoRefreshToken: true,
+                detectSessionInUrl: true
+            }
+        });
     } catch (err) {
-        console.warn('Erro ao inicializar Supabase Client:', err);
+        console.warn('Erro ao inicializar Supabase Client em HML:', err);
     }
 }
 
@@ -3115,7 +3385,14 @@ const EXAMPLE_PROCESSES = [
 function getSupabase() {
     if (!supabaseClient && window.supabase && typeof window.supabase.createClient === 'function') {
         try {
-            supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+            supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+                auth: {
+                    storageKey: HML_AUTH_STORAGE_KEY,
+                    persistSession: true,
+                    autoRefreshToken: true,
+                    detectSessionInUrl: true
+                }
+            });
         } catch (err) {
             console.error('Erro ao inicializar Supabase Client:', err);
         }
@@ -3149,7 +3426,7 @@ const INACTIVITY_TIMEOUT_MS = 30 * 60 * 1000; // 30 minutos
 
 function recordUserActivity() {
     if (window._authUserId) {
-        localStorage.setItem('painel_ops_last_activity', String(Date.now()));
+        localStorage.setItem(HML_ACTIVITY_STORAGE_KEY, String(Date.now()));
     }
 }
 
@@ -3307,7 +3584,7 @@ async function handleSignup() {
 
 async function handleLogout(isAutoTimeout = false) {
     unsubscribeRealtime();
-    localStorage.removeItem('painel_ops_last_activity');
+    localStorage.removeItem(HML_ACTIVITY_STORAGE_KEY);
     const client = getSupabase();
     if (client) {
         try {
@@ -3657,6 +3934,10 @@ async function setupUserSession(user) {
         refreshCurrentUserAssignedTeam();
         refreshAllViews();
         aplicarPerfilDeAcesso();
+        
+        const hashView = (window.location.hash || '').replace('#/', '').trim();
+        const targetView = (hashView && VIEW_META[hashView]) ? hashView : 'dashboard';
+        switchToView(targetView);
     } catch (err) {
         alert('[DIAGNÓSTICO] Erro em setupUserSession: ' + (err.message || err));
         console.error('Erro em setupUserSession:', err);
@@ -3739,13 +4020,13 @@ document.addEventListener('DOMContentLoaded', async () => {
                 showAuthOverlay();
                 setAuthViewMode('reset');
             } else {
-                const lastActivity = parseInt(localStorage.getItem('painel_ops_last_activity') || '0', 10);
+                const lastActivity = parseInt(localStorage.getItem(HML_ACTIVITY_STORAGE_KEY) || '0', 10);
                 const isInactive = lastActivity === 0 || (Date.now() - lastActivity) > INACTIVITY_TIMEOUT_MS;
 
                 if (isInactive) {
                     console.log('[Auth Init] Sessão inexistente ou expirada (>30min de inatividade). Exibindo login.');
                     try { await client.auth.signOut(); } catch (_) {}
-                    localStorage.removeItem('painel_ops_last_activity');
+                    localStorage.removeItem(HML_ACTIVITY_STORAGE_KEY);
                     window._authUserId = null;
                     showAuthOverlay();
                     if (lastActivity > 0) {
@@ -3765,6 +4046,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         } catch (sessionErr) {
             console.error('Erro ao recuperar sessão existente do Supabase:', sessionErr);
             try {
+                localStorage.removeItem(HML_AUTH_STORAGE_KEY);
                 const projName = SUPABASE_URL.split('//')[1]?.split('.')[0];
                 if (projName) {
                     localStorage.removeItem(`sb-${projName}-auth-token`);
@@ -3800,10 +4082,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     
     renderAreaFilterOptions();
     renderResponsavelFilterOptions();
-    renderCadastrosView();
-    renderTable();
-    renderBalancingTable();
-    renderReviewTable();
+    
+    const hashView = (window.location.hash || '').replace('#/', '').trim();
+    const targetView = (hashView && VIEW_META[hashView]) ? hashView : 'dashboard';
+    switchToView(targetView);
 });
 
 // TOAST NOTIFICATION SYSTEM
@@ -4527,49 +4809,200 @@ function saveNewTeamFromModal() {
     renderReviewTable();
 }
 
+// ============================================================
+// VIEW METADATA & BREADCRUMB / HEADER MANAGEMENT
+// ============================================================
+const VIEW_META = {
+    'dashboard': {
+        title: 'Dashboard',
+        section: 'Visão Geral',
+        subtitle: 'Visão operacional de volumes mensais, FTEs requeridos e capacidade por equipe.'
+    },
+    'history': {
+        title: 'Histórico',
+        section: 'Visão Geral',
+        subtitle: 'Snapshots mensais salvos e evolução temporal dos volumes operacionais.'
+    },
+    'cadastros': {
+        title: 'Cadastros',
+        section: 'Gestão',
+        subtitle: 'Estrutura organizacional, equipes, colaboradores responsáveis e catálogo de atividades.'
+    },
+    'balancing': {
+        title: 'Balanceamento',
+        section: 'Gestão',
+        subtitle: 'Planejamento diário de backlog e comparação de capacidade alocada vs. necessária.'
+    },
+    'automations': {
+        title: 'Automações (RPA)',
+        section: 'Gestão',
+        subtitle: 'Quadro analítico de processos robotizados, FTEs absorvidos e horas economizadas.'
+    },
+    'access-control': {
+        title: 'Controle de Acesso',
+        section: 'Administração',
+        subtitle: 'Gestão centralizada de usuários, atribuição de perfis (ADMIN/OPERADOR/CONSULTA) e vinculação de equipes.'
+    }
+};
+
+function updateViewHeader(view) {
+    const meta = VIEW_META[view] || { title: view, section: 'Visão Geral', subtitle: '' };
+    
+    const titleEl = document.getElementById('app-view-title');
+    const sectionEl = document.getElementById('bc-section-title');
+    const pageEl = document.getElementById('bc-page-title');
+    const subtitleEl = document.getElementById('app-view-subtitle');
+    
+    if (titleEl) titleEl.textContent = meta.title;
+    if (sectionEl) sectionEl.textContent = meta.section;
+    if (pageEl) pageEl.textContent = meta.title;
+    if (subtitleEl) subtitleEl.textContent = meta.subtitle;
+
+    // Control visibility of action buttons per view
+    const btnReset = document.getElementById('btn-reset-global-state');
+    const btnExport = document.getElementById('btn-export-csv');
+    const btnPrint = document.getElementById('btn-print');
+    
+    if (btnReset) btnReset.style.display = (view === 'cadastros' && currentUser.perfil === 'ADMIN') ? 'inline-flex' : 'none';
+    if (btnExport) btnExport.style.display = (view === 'dashboard' || view === 'cadastros' || view === 'balancing' || view === 'automations') ? 'inline-flex' : 'none';
+    if (btnPrint) btnPrint.style.display = (view === 'dashboard' || view === 'cadastros' || view === 'balancing' || view === 'automations') ? 'inline-flex' : 'none';
+}
+
+function switchToView(view) {
+    if (!view) view = 'dashboard';
+    const targetEl = document.getElementById(`view-${view}`);
+    if (!targetEl) view = 'dashboard';
+
+    // Verify RBAC access
+    const menuItem = document.querySelector(`.sidebar-menu .menu-item[data-view="${view}"]`);
+    if (menuItem && (menuItem.getAttribute('data-rbac-hidden') === 'true' || menuItem.style.display === 'none')) {
+        view = 'dashboard';
+    }
+
+    // Update active menu item
+    document.querySelectorAll('.sidebar-menu .menu-item').forEach(mi => {
+        if (mi.dataset.view === view) {
+            mi.classList.add('active');
+        } else {
+            mi.classList.remove('active');
+        }
+    });
+
+    // Show selected view
+    document.querySelectorAll('.tab-view').forEach(tv => tv.style.display = 'none');
+    const activeViewEl = document.getElementById(`view-${view}`);
+    if (activeViewEl) activeViewEl.style.display = 'block';
+
+    // Update Header and hash
+    updateViewHeader(view);
+    if (window.location.hash !== `#/${view}`) {
+        window.history.replaceState(null, '', `#/${view}`);
+    }
+
+    // Render view content
+    if (view === 'cadastros') {
+        renderCadastrosView();
+    } else if (view === 'dashboard') {
+        renderTable();
+    } else if (view === 'balancing') {
+        renderBalancingTable();
+    } else if (view === 'automations') {
+        renderAutomationsView();
+    } else if (view === 'history') {
+        initHistoryView();
+    } else if (view === 'access-control') {
+        renderAccessControlView();
+    }
+}
+
+// GLOBAL FILTER SYNCHRONIZATION
+let _isSyncingFilters = false;
+
+function applyGlobalFilter(areaVal, respVal) {
+    if (_isSyncingFilters) return;
+    _isSyncingFilters = true;
+
+    try {
+        // 1. Sync Dashboard filters
+        const fArea = document.getElementById('filter-area');
+        const fResp = document.getElementById('filter-responsavel');
+        if (fArea && areaVal !== undefined) fArea.value = areaVal;
+        if (fResp && respVal !== undefined) fResp.value = respVal;
+
+        // 2. Sync Balancing filters
+        const fAreaBal = document.getElementById('filter-area-balancing');
+        const fRespBal = document.getElementById('filter-responsavel-balancing');
+        if (fAreaBal && areaVal !== undefined) fAreaBal.value = areaVal;
+        if (fRespBal && respVal !== undefined) fRespBal.value = respVal;
+
+        // 3. Sync RPA filter
+        const fAreaRpa = document.getElementById('filter-area-rpa');
+        if (fAreaRpa && areaVal !== undefined) fAreaRpa.value = areaVal === 'all' ? '' : areaVal;
+
+        // 4. Sync Cadastros filter
+        const fAreaCad = document.getElementById('cadastros-filter-area');
+        const fRespCad = document.getElementById('cadastros-filter-resp');
+        if (fAreaCad && areaVal !== undefined) fAreaCad.value = areaVal === 'all' ? '' : areaVal;
+        if (fRespCad && respVal !== undefined) fRespCad.value = respVal === 'all' ? '' : respVal;
+
+        // 5. Trigger active view refresh
+        const activeView = document.querySelector('.tab-view[style*="block"]')?.id?.replace('view-', '') || 'dashboard';
+        if (activeView === 'dashboard') renderTable();
+        else if (activeView === 'balancing') renderBalancingTable();
+        else if (activeView === 'automations') renderAutomationsView();
+        else if (activeView === 'cadastros') renderCadastrosTable();
+    } finally {
+        _isSyncingFilters = false;
+    }
+}
+
+function syncGlobalFiltersToHeader(areaVal, respVal) {
+    if (_isSyncingFilters) return;
+    _isSyncingFilters = true;
+    try {
+        const gArea = document.getElementById('global-filter-area');
+        const gResp = document.getElementById('global-filter-resp');
+        if (gArea && areaVal !== undefined) gArea.value = areaVal;
+        if (gResp && respVal !== undefined) gResp.value = respVal;
+    } finally {
+        _isSyncingFilters = false;
+    }
+}
+
 // SETUP REGISTERED EVENT LISTENERS
 function setupEventListeners() {
-    // Menu Tab Switcher
+    // Menu Tab Switcher (Delegated to switchToView)
     document.querySelectorAll('.sidebar-menu .menu-item').forEach(item => {
         item.addEventListener('click', (e) => {
             const menuItem = e.currentTarget;
             if (menuItem.getAttribute('data-rbac-hidden') === 'true' || menuItem.style.display === 'none') return;
             const view = menuItem.dataset.view;
-            
-            // Update active menu tab
-            document.querySelectorAll('.sidebar-menu .menu-item').forEach(mi => mi.classList.remove('active'));
-            menuItem.classList.add('active');
-            
-            // Show/hide views
-            document.querySelectorAll('.tab-view').forEach(tv => tv.style.display = 'none');
-            document.getElementById(`view-${view}`).style.display = 'block';
-            
-            // Update header title & refresh tables
-            const headerTitle = document.getElementById('app-view-title');
-            if (view === 'cadastros') {
-                headerTitle.textContent = 'Cadastro';
-                renderCadastrosView();
-            } else if (view === 'dashboard') {
-                headerTitle.textContent = 'Processos e atividades';
-                renderTable();
-            } else if (view === 'balancing') {
-                headerTitle.textContent = 'Balanceamento de Backlog';
-                renderBalancingTable();
-            } else if (view === 'review') {
-                headerTitle.textContent = 'Revisão de Atividades';
-                renderReviewTable();
-            } else if (view === 'automations') {
-                headerTitle.textContent = 'Quadro de Automações (RPA)';
-                renderAutomationsView();
-            } else if (view === 'history') {
-                headerTitle.textContent = 'Histórico de Volumes';
-                initHistoryView();
-            } else if (view === 'access-control') {
-                headerTitle.textContent = 'Controle de Acesso';
-                renderAccessControlView();
-            }
+            switchToView(view);
         });
     });
+
+    // Hash change event (Back/Forward browser buttons)
+    window.addEventListener('hashchange', () => {
+        const hashView = (window.location.hash || '').replace('#/', '').trim();
+        if (hashView && VIEW_META[hashView]) {
+            switchToView(hashView);
+        }
+    });
+
+    // Global Header Filters
+    const gFilterArea = document.getElementById('global-filter-area');
+    if (gFilterArea) {
+        gFilterArea.addEventListener('change', (e) => {
+            applyGlobalFilter(e.target.value, undefined);
+        });
+    }
+
+    const gFilterResp = document.getElementById('global-filter-resp');
+    if (gFilterResp) {
+        gFilterResp.addEventListener('change', (e) => {
+            applyGlobalFilter(undefined, e.target.value);
+        });
+    }
 
     // Initialize Capacity Modal Listeners
     setupModalParametersListeners();
@@ -4639,10 +5072,11 @@ function setupEventListeners() {
         });
     }
 
-    // Área & Owner filter triggers
+    // Área & Owner filter triggers with 2-way sync to global header filters
     const filterAreaEl = document.getElementById('filter-area');
     if (filterAreaEl) {
         filterAreaEl.addEventListener('change', () => {
+            syncGlobalFiltersToHeader(filterAreaEl.value, undefined);
             renderTable();
         });
     }
@@ -4650,6 +5084,7 @@ function setupEventListeners() {
     const filterRespEl = document.getElementById('filter-responsavel');
     if (filterRespEl) {
         filterRespEl.addEventListener('change', () => {
+            syncGlobalFiltersToHeader(undefined, filterRespEl.value);
             renderTable();
         });
     }
@@ -4657,6 +5092,7 @@ function setupEventListeners() {
     const filterAreaBalEl = document.getElementById('filter-area-balancing');
     if (filterAreaBalEl) {
         filterAreaBalEl.addEventListener('change', () => {
+            syncGlobalFiltersToHeader(filterAreaBalEl.value, undefined);
             renderBalancingTable();
         });
     }
@@ -4664,6 +5100,7 @@ function setupEventListeners() {
     const filterRespBalEl = document.getElementById('filter-responsavel-balancing');
     if (filterRespBalEl) {
         filterRespBalEl.addEventListener('change', () => {
+            syncGlobalFiltersToHeader(undefined, filterRespBalEl.value);
             renderBalancingTable();
         });
     }
@@ -6150,11 +6587,13 @@ function renderAreaFilterOptions() {
     const filterSelect = document.getElementById('filter-area');
     const filterSelectBalancing = document.getElementById('filter-area-balancing');
     const filterSelectReview = document.getElementById('filter-area-review');
+    const globalFilterArea = document.getElementById('global-filter-area');
     if (!filterSelect || !filterSelectBalancing || !filterSelectReview) return;
     
     const currentValue = filterSelect.value;
     const currentValueBalancing = filterSelectBalancing.value;
     const currentValueReview = filterSelectReview.value;
+    const currentValueGlobal = globalFilterArea ? globalFilterArea.value : 'all';
     
     const optionsHtml = '<option value="all">Todas as Áreas</option>' +
         (state.teams || []).map(area =>
@@ -6164,6 +6603,7 @@ function renderAreaFilterOptions() {
     filterSelect.innerHTML = optionsHtml;
     filterSelectBalancing.innerHTML = optionsHtml;
     filterSelectReview.innerHTML = optionsHtml;
+    if (globalFilterArea) globalFilterArea.innerHTML = optionsHtml;
     
     const allAreas = state.teams || [];
     
@@ -6183,6 +6623,14 @@ function renderAreaFilterOptions() {
         filterSelectReview.value = currentValueReview;
     } else {
         filterSelectReview.value = 'all';
+    }
+
+    if (globalFilterArea) {
+        if (allAreas.includes(currentValueGlobal)) {
+            globalFilterArea.value = currentValueGlobal;
+        } else {
+            globalFilterArea.value = 'all';
+        }
     }
 }
 
@@ -6308,11 +6756,13 @@ function renderResponsavelFilterOptions() {
     const filterSelect = document.getElementById('filter-responsavel');
     const filterSelectBalancing = document.getElementById('filter-responsavel-balancing');
     const filterSelectReview = document.getElementById('filter-responsavel-review');
+    const globalFilterResp = document.getElementById('global-filter-resp');
     if (!filterSelect || !filterSelectBalancing || !filterSelectReview) return;
     
     const currentValue = filterSelect.value;
     const currentValueBalancing = filterSelectBalancing.value;
     const currentValueReview = filterSelectReview.value;
+    const currentValueGlobal = globalFilterResp ? globalFilterResp.value : 'all';
     
     // Get all registered responsaveis
     const uniqueResponsaveis = state.responsaveis || [];
@@ -6326,6 +6776,7 @@ function renderResponsavelFilterOptions() {
     filterSelect.innerHTML = optionsHtml;
     filterSelectBalancing.innerHTML = optionsHtml;
     filterSelectReview.innerHTML = optionsHtml;
+    if (globalFilterResp) globalFilterResp.innerHTML = optionsHtml;
     
     if (names.includes(currentValue)) {
         filterSelect.value = currentValue;
@@ -6343,6 +6794,14 @@ function renderResponsavelFilterOptions() {
         filterSelectReview.value = currentValueReview;
     } else {
         filterSelectReview.value = 'all';
+    }
+
+    if (globalFilterResp) {
+        if (names.includes(currentValueGlobal)) {
+            globalFilterResp.value = currentValueGlobal;
+        } else {
+            globalFilterResp.value = 'all';
+        }
     }
 }
 

@@ -860,6 +860,10 @@ async function setupUserSession(user) {
         refreshCurrentUserAssignedTeam();
         refreshAllViews();
         aplicarPerfilDeAcesso();
+        
+        const hashView = (window.location.hash || '').replace('#/', '').trim();
+        const targetView = (hashView && VIEW_META[hashView]) ? hashView : 'dashboard';
+        switchToView(targetView);
     } catch (err) {
         alert('[DIAGNÓSTICO] Erro em setupUserSession: ' + (err.message || err));
         console.error('Erro em setupUserSession:', err);
@@ -1004,10 +1008,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     
     renderAreaFilterOptions();
     renderResponsavelFilterOptions();
-    renderCadastrosView();
-    renderTable();
-    renderBalancingTable();
-    renderReviewTable();
+    
+    const hashView = (window.location.hash || '').replace('#/', '').trim();
+    const targetView = (hashView && VIEW_META[hashView]) ? hashView : 'dashboard';
+    switchToView(targetView);
 });
 
 // TOAST NOTIFICATION SYSTEM
@@ -1731,49 +1735,200 @@ function saveNewTeamFromModal() {
     renderReviewTable();
 }
 
+// ============================================================
+// VIEW METADATA & BREADCRUMB / HEADER MANAGEMENT
+// ============================================================
+const VIEW_META = {
+    'dashboard': {
+        title: 'Dashboard',
+        section: 'Visão Geral',
+        subtitle: 'Visão operacional de volumes mensais, FTEs requeridos e capacidade por equipe.'
+    },
+    'history': {
+        title: 'Histórico',
+        section: 'Visão Geral',
+        subtitle: 'Snapshots mensais salvos e evolução temporal dos volumes operacionais.'
+    },
+    'cadastros': {
+        title: 'Cadastros',
+        section: 'Gestão',
+        subtitle: 'Estrutura organizacional, equipes, colaboradores responsáveis e catálogo de atividades.'
+    },
+    'balancing': {
+        title: 'Balanceamento',
+        section: 'Gestão',
+        subtitle: 'Planejamento diário de backlog e comparação de capacidade alocada vs. necessária.'
+    },
+    'automations': {
+        title: 'Automações (RPA)',
+        section: 'Gestão',
+        subtitle: 'Quadro analítico de processos robotizados, FTEs absorvidos e horas economizadas.'
+    },
+    'access-control': {
+        title: 'Controle de Acesso',
+        section: 'Administração',
+        subtitle: 'Gestão centralizada de usuários, atribuição de perfis (ADMIN/OPERADOR/CONSULTA) e vinculação de equipes.'
+    }
+};
+
+function updateViewHeader(view) {
+    const meta = VIEW_META[view] || { title: view, section: 'Visão Geral', subtitle: '' };
+    
+    const titleEl = document.getElementById('app-view-title');
+    const sectionEl = document.getElementById('bc-section-title');
+    const pageEl = document.getElementById('bc-page-title');
+    const subtitleEl = document.getElementById('app-view-subtitle');
+    
+    if (titleEl) titleEl.textContent = meta.title;
+    if (sectionEl) sectionEl.textContent = meta.section;
+    if (pageEl) pageEl.textContent = meta.title;
+    if (subtitleEl) subtitleEl.textContent = meta.subtitle;
+
+    // Control visibility of action buttons per view
+    const btnReset = document.getElementById('btn-reset-global-state');
+    const btnExport = document.getElementById('btn-export-csv');
+    const btnPrint = document.getElementById('btn-print');
+    
+    if (btnReset) btnReset.style.display = (view === 'cadastros' && currentUser.perfil === 'ADMIN') ? 'inline-flex' : 'none';
+    if (btnExport) btnExport.style.display = (view === 'dashboard' || view === 'cadastros' || view === 'balancing' || view === 'automations') ? 'inline-flex' : 'none';
+    if (btnPrint) btnPrint.style.display = (view === 'dashboard' || view === 'cadastros' || view === 'balancing' || view === 'automations') ? 'inline-flex' : 'none';
+}
+
+function switchToView(view) {
+    if (!view) view = 'dashboard';
+    const targetEl = document.getElementById(`view-${view}`);
+    if (!targetEl) view = 'dashboard';
+
+    // Verify RBAC access
+    const menuItem = document.querySelector(`.sidebar-menu .menu-item[data-view="${view}"]`);
+    if (menuItem && (menuItem.getAttribute('data-rbac-hidden') === 'true' || menuItem.style.display === 'none')) {
+        view = 'dashboard';
+    }
+
+    // Update active menu item
+    document.querySelectorAll('.sidebar-menu .menu-item').forEach(mi => {
+        if (mi.dataset.view === view) {
+            mi.classList.add('active');
+        } else {
+            mi.classList.remove('active');
+        }
+    });
+
+    // Show selected view
+    document.querySelectorAll('.tab-view').forEach(tv => tv.style.display = 'none');
+    const activeViewEl = document.getElementById(`view-${view}`);
+    if (activeViewEl) activeViewEl.style.display = 'block';
+
+    // Update Header and hash
+    updateViewHeader(view);
+    if (window.location.hash !== `#/${view}`) {
+        window.history.replaceState(null, '', `#/${view}`);
+    }
+
+    // Render view content
+    if (view === 'cadastros') {
+        renderCadastrosView();
+    } else if (view === 'dashboard') {
+        renderTable();
+    } else if (view === 'balancing') {
+        renderBalancingTable();
+    } else if (view === 'automations') {
+        renderAutomationsView();
+    } else if (view === 'history') {
+        initHistoryView();
+    } else if (view === 'access-control') {
+        renderAccessControlView();
+    }
+}
+
+// GLOBAL FILTER SYNCHRONIZATION
+let _isSyncingFilters = false;
+
+function applyGlobalFilter(areaVal, respVal) {
+    if (_isSyncingFilters) return;
+    _isSyncingFilters = true;
+
+    try {
+        // 1. Sync Dashboard filters
+        const fArea = document.getElementById('filter-area');
+        const fResp = document.getElementById('filter-responsavel');
+        if (fArea && areaVal !== undefined) fArea.value = areaVal;
+        if (fResp && respVal !== undefined) fResp.value = respVal;
+
+        // 2. Sync Balancing filters
+        const fAreaBal = document.getElementById('filter-area-balancing');
+        const fRespBal = document.getElementById('filter-responsavel-balancing');
+        if (fAreaBal && areaVal !== undefined) fAreaBal.value = areaVal;
+        if (fRespBal && respVal !== undefined) fRespBal.value = respVal;
+
+        // 3. Sync RPA filter
+        const fAreaRpa = document.getElementById('filter-area-rpa');
+        if (fAreaRpa && areaVal !== undefined) fAreaRpa.value = areaVal === 'all' ? '' : areaVal;
+
+        // 4. Sync Cadastros filter
+        const fAreaCad = document.getElementById('cadastros-filter-area');
+        const fRespCad = document.getElementById('cadastros-filter-resp');
+        if (fAreaCad && areaVal !== undefined) fAreaCad.value = areaVal === 'all' ? '' : areaVal;
+        if (fRespCad && respVal !== undefined) fRespCad.value = respVal === 'all' ? '' : respVal;
+
+        // 5. Trigger active view refresh
+        const activeView = document.querySelector('.tab-view[style*="block"]')?.id?.replace('view-', '') || 'dashboard';
+        if (activeView === 'dashboard') renderTable();
+        else if (activeView === 'balancing') renderBalancingTable();
+        else if (activeView === 'automations') renderAutomationsView();
+        else if (activeView === 'cadastros') renderCadastrosTable();
+    } finally {
+        _isSyncingFilters = false;
+    }
+}
+
+function syncGlobalFiltersToHeader(areaVal, respVal) {
+    if (_isSyncingFilters) return;
+    _isSyncingFilters = true;
+    try {
+        const gArea = document.getElementById('global-filter-area');
+        const gResp = document.getElementById('global-filter-resp');
+        if (gArea && areaVal !== undefined) gArea.value = areaVal;
+        if (gResp && respVal !== undefined) gResp.value = respVal;
+    } finally {
+        _isSyncingFilters = false;
+    }
+}
+
 // SETUP REGISTERED EVENT LISTENERS
 function setupEventListeners() {
-    // Menu Tab Switcher
+    // Menu Tab Switcher (Delegated to switchToView)
     document.querySelectorAll('.sidebar-menu .menu-item').forEach(item => {
         item.addEventListener('click', (e) => {
             const menuItem = e.currentTarget;
             if (menuItem.getAttribute('data-rbac-hidden') === 'true' || menuItem.style.display === 'none') return;
             const view = menuItem.dataset.view;
-            
-            // Update active menu tab
-            document.querySelectorAll('.sidebar-menu .menu-item').forEach(mi => mi.classList.remove('active'));
-            menuItem.classList.add('active');
-            
-            // Show/hide views
-            document.querySelectorAll('.tab-view').forEach(tv => tv.style.display = 'none');
-            document.getElementById(`view-${view}`).style.display = 'block';
-            
-            // Update header title & refresh tables
-            const headerTitle = document.getElementById('app-view-title');
-            if (view === 'cadastros') {
-                headerTitle.textContent = 'Cadastro';
-                renderCadastrosView();
-            } else if (view === 'dashboard') {
-                headerTitle.textContent = 'Processos e atividades';
-                renderTable();
-            } else if (view === 'balancing') {
-                headerTitle.textContent = 'Balanceamento de Backlog';
-                renderBalancingTable();
-            } else if (view === 'review') {
-                headerTitle.textContent = 'Revisão de Atividades';
-                renderReviewTable();
-            } else if (view === 'automations') {
-                headerTitle.textContent = 'Quadro de Automações (RPA)';
-                renderAutomationsView();
-            } else if (view === 'history') {
-                headerTitle.textContent = 'Histórico de Volumes';
-                initHistoryView();
-            } else if (view === 'access-control') {
-                headerTitle.textContent = 'Controle de Acesso';
-                renderAccessControlView();
-            }
+            switchToView(view);
         });
     });
+
+    // Hash change event (Back/Forward browser buttons)
+    window.addEventListener('hashchange', () => {
+        const hashView = (window.location.hash || '').replace('#/', '').trim();
+        if (hashView && VIEW_META[hashView]) {
+            switchToView(hashView);
+        }
+    });
+
+    // Global Header Filters
+    const gFilterArea = document.getElementById('global-filter-area');
+    if (gFilterArea) {
+        gFilterArea.addEventListener('change', (e) => {
+            applyGlobalFilter(e.target.value, undefined);
+        });
+    }
+
+    const gFilterResp = document.getElementById('global-filter-resp');
+    if (gFilterResp) {
+        gFilterResp.addEventListener('change', (e) => {
+            applyGlobalFilter(undefined, e.target.value);
+        });
+    }
 
     // Initialize Capacity Modal Listeners
     setupModalParametersListeners();
@@ -1843,10 +1998,11 @@ function setupEventListeners() {
         });
     }
 
-    // Área & Owner filter triggers
+    // Área & Owner filter triggers with 2-way sync to global header filters
     const filterAreaEl = document.getElementById('filter-area');
     if (filterAreaEl) {
         filterAreaEl.addEventListener('change', () => {
+            syncGlobalFiltersToHeader(filterAreaEl.value, undefined);
             renderTable();
         });
     }
@@ -1854,6 +2010,7 @@ function setupEventListeners() {
     const filterRespEl = document.getElementById('filter-responsavel');
     if (filterRespEl) {
         filterRespEl.addEventListener('change', () => {
+            syncGlobalFiltersToHeader(undefined, filterRespEl.value);
             renderTable();
         });
     }
@@ -1861,6 +2018,7 @@ function setupEventListeners() {
     const filterAreaBalEl = document.getElementById('filter-area-balancing');
     if (filterAreaBalEl) {
         filterAreaBalEl.addEventListener('change', () => {
+            syncGlobalFiltersToHeader(filterAreaBalEl.value, undefined);
             renderBalancingTable();
         });
     }
@@ -1868,6 +2026,7 @@ function setupEventListeners() {
     const filterRespBalEl = document.getElementById('filter-responsavel-balancing');
     if (filterRespBalEl) {
         filterRespBalEl.addEventListener('change', () => {
+            syncGlobalFiltersToHeader(undefined, filterRespBalEl.value);
             renderBalancingTable();
         });
     }
@@ -3354,11 +3513,13 @@ function renderAreaFilterOptions() {
     const filterSelect = document.getElementById('filter-area');
     const filterSelectBalancing = document.getElementById('filter-area-balancing');
     const filterSelectReview = document.getElementById('filter-area-review');
+    const globalFilterArea = document.getElementById('global-filter-area');
     if (!filterSelect || !filterSelectBalancing || !filterSelectReview) return;
     
     const currentValue = filterSelect.value;
     const currentValueBalancing = filterSelectBalancing.value;
     const currentValueReview = filterSelectReview.value;
+    const currentValueGlobal = globalFilterArea ? globalFilterArea.value : 'all';
     
     const optionsHtml = '<option value="all">Todas as Áreas</option>' +
         (state.teams || []).map(area =>
@@ -3368,6 +3529,7 @@ function renderAreaFilterOptions() {
     filterSelect.innerHTML = optionsHtml;
     filterSelectBalancing.innerHTML = optionsHtml;
     filterSelectReview.innerHTML = optionsHtml;
+    if (globalFilterArea) globalFilterArea.innerHTML = optionsHtml;
     
     const allAreas = state.teams || [];
     
@@ -3387,6 +3549,14 @@ function renderAreaFilterOptions() {
         filterSelectReview.value = currentValueReview;
     } else {
         filterSelectReview.value = 'all';
+    }
+
+    if (globalFilterArea) {
+        if (allAreas.includes(currentValueGlobal)) {
+            globalFilterArea.value = currentValueGlobal;
+        } else {
+            globalFilterArea.value = 'all';
+        }
     }
 }
 
@@ -3512,11 +3682,13 @@ function renderResponsavelFilterOptions() {
     const filterSelect = document.getElementById('filter-responsavel');
     const filterSelectBalancing = document.getElementById('filter-responsavel-balancing');
     const filterSelectReview = document.getElementById('filter-responsavel-review');
+    const globalFilterResp = document.getElementById('global-filter-resp');
     if (!filterSelect || !filterSelectBalancing || !filterSelectReview) return;
     
     const currentValue = filterSelect.value;
     const currentValueBalancing = filterSelectBalancing.value;
     const currentValueReview = filterSelectReview.value;
+    const currentValueGlobal = globalFilterResp ? globalFilterResp.value : 'all';
     
     // Get all registered responsaveis
     const uniqueResponsaveis = state.responsaveis || [];
@@ -3530,6 +3702,7 @@ function renderResponsavelFilterOptions() {
     filterSelect.innerHTML = optionsHtml;
     filterSelectBalancing.innerHTML = optionsHtml;
     filterSelectReview.innerHTML = optionsHtml;
+    if (globalFilterResp) globalFilterResp.innerHTML = optionsHtml;
     
     if (names.includes(currentValue)) {
         filterSelect.value = currentValue;
@@ -3547,6 +3720,14 @@ function renderResponsavelFilterOptions() {
         filterSelectReview.value = currentValueReview;
     } else {
         filterSelectReview.value = 'all';
+    }
+
+    if (globalFilterResp) {
+        if (names.includes(currentValueGlobal)) {
+            globalFilterResp.value = currentValueGlobal;
+        } else {
+            globalFilterResp.value = 'all';
+        }
     }
 }
 

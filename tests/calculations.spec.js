@@ -37,11 +37,11 @@ test.describe('Painel OPS - Validação de Cálculos & Capacidade E2E', () => {
     page.on('pageerror', err => errors.push(err.message));
 
     // Clica nas abas principais
-    const tabs = ['dashboard', 'cadastros', 'balancing', 'review', 'rpa-metrics'];
+    const tabs = ['dashboard', 'cadastros', 'balancing', 'automations', 'history'];
     for (const tab of tabs) {
       await page.evaluate((targetTab) => {
         // @ts-ignore
-        if (typeof switchView === 'function') switchView(targetTab);
+        if (typeof switchToView === 'function') switchToView(targetTab);
       }, tab);
       await page.waitForTimeout(100);
     }

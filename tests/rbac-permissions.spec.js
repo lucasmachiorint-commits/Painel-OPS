@@ -23,7 +23,8 @@ test.describe('Painel OPS - RBAC & Permissões E2E', () => {
       // @ts-ignore
       aplicarPerfilDeAcesso();
       // @ts-ignore
-      renderCadastrosView();
+      if (typeof switchToView === 'function') switchToView('cadastros');
+      else renderCadastrosView();
     });
 
     // 1. Botão de Nova Equipe e Padrão Global visíveis
@@ -51,7 +52,8 @@ test.describe('Painel OPS - RBAC & Permissões E2E', () => {
       // @ts-ignore
       aplicarPerfilDeAcesso();
       // @ts-ignore
-      renderCadastrosView();
+      if (typeof switchToView === 'function') switchToView('cadastros');
+      else renderCadastrosView();
     });
 
     // 1. Botões de criação de equipe e parâmetro global devem estar OCULTOS
@@ -81,7 +83,8 @@ test.describe('Painel OPS - RBAC & Permissões E2E', () => {
       // @ts-ignore
       aplicarPerfilDeAcesso();
       // @ts-ignore
-      renderCadastrosView();
+      if (typeof switchToView === 'function') switchToView('cadastros');
+      else renderCadastrosView();
     });
 
     // 1. Coluna de exclusão deve estar oculta

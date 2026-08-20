@@ -1702,4 +1702,238 @@ body.light-theme input:-webkit-autofill:active {
     -webkit-text-fill-color: #1e1b18 !important;
 }
 
+/* ============================================================
+   UX REVAMP: SIDEBAR SECTIONS, BREADCRUMB, FILTERS & USER CHIP
+   ============================================================ */
+
+/* Menu Section Labels in Sidebar */
+.menu-section-label {
+    font-size: 0.62rem;
+    font-weight: 800;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    opacity: 0.7;
+    padding: 0.6rem 0.2rem 0.2rem;
+    pointer-events: none;
+    user-select: none;
+    text-align: center;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    margin-top: 0.35rem;
+    list-style: none;
+}
+
+.menu-section-label:first-child {
+    border-top: none;
+    margin-top: 0;
+    padding-top: 0;
+}
+
+body.light-theme .menu-section-label {
+    color: var(--text-muted);
+    border-top-color: rgba(0, 0, 0, 0.06);
+}
+
+/* Header & Breadcrumb */
+.app-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.85rem 1.5rem;
+    background: var(--bg-glass);
+    border-bottom: 1px solid var(--border-color);
+    backdrop-filter: var(--backdrop-blur);
+    -webkit-backdrop-filter: var(--backdrop-blur);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.header-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    min-width: 240px;
+}
+
+.breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    font-weight: 500;
+}
+
+.breadcrumb .bc-app {
+    color: var(--color-primary);
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.breadcrumb .bc-sep {
+    opacity: 0.5;
+    font-size: 0.7rem;
+}
+
+.breadcrumb .bc-section {
+    color: var(--text-secondary);
+}
+
+.breadcrumb .bc-page {
+    color: var(--text-primary);
+    font-weight: 600;
+}
+
+.app-title {
+    font-size: 1.35rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    line-height: 1.2;
+    margin: 0;
+}
+
+.view-subtitle {
+    font-size: 0.78rem;
+    color: var(--text-secondary);
+    margin: 0;
+    line-height: 1.2;
+}
+
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    flex-wrap: wrap;
+}
+
+/* Global Context Filters in Header */
+.header-global-filters {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.global-filter-group {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    padding: 0.3rem 0.6rem;
+    transition: all var(--transition-fast);
+}
+
+.global-filter-group:hover, .global-filter-group:focus-within {
+    border-color: var(--color-primary);
+    background: rgba(255, 255, 255, 0.07);
+}
+
+body.light-theme .global-filter-group {
+    background: #ffffff;
+    border-color: #cbd5e1;
+}
+
+.global-filter-group .filter-icon {
+    font-size: 0.75rem;
+    color: var(--color-primary);
+}
+
+.global-filter-group select {
+    background: transparent;
+    border: none;
+    color: var(--text-primary);
+    font-size: 0.8rem;
+    font-weight: 600;
+    outline: none;
+    cursor: pointer;
+    max-width: 140px;
+}
+
+.global-filter-group select option {
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+}
+
+body.light-theme .global-filter-group select option {
+    background: #ffffff;
+    color: #1e293b;
+}
+
+/* Integrated Header User Chip */
+.user-chip-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.25rem 0.6rem;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid var(--border-color);
+    margin-left: 0.25rem;
+}
+
+body.light-theme .user-chip-header {
+    background: #ffffff;
+    border-color: #cbd5e1;
+}
+
+.user-chip-avatar {
+    font-size: 1.35rem;
+    color: var(--color-primary);
+}
+
+.user-chip-details {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.1;
+}
+
+.user-chip-name {
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    max-width: 110px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.user-chip-badges {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    margin-top: 0.1rem;
+}
+
+.btn-user-action {
+    background: transparent;
+    border: 1px solid var(--border-color);
+    color: var(--text-secondary);
+    border-radius: 6px;
+    padding: 0.25rem 0.45rem;
+    cursor: pointer;
+    font-size: 0.72rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+
+.btn-user-action:hover {
+    border-color: var(--color-primary);
+    color: var(--color-primary);
+}
+
+.btn-user-action.btn-logout:hover {
+    background: rgba(244, 63, 94, 0.15);
+    border-color: #f43f5e;
+    color: #f43f5e;
+}
+
+
 
