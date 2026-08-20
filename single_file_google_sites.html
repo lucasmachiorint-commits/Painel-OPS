@@ -2591,7 +2591,7 @@ body.light-theme .country-opt-title {
                                 </div>
 
                                 <!-- 5. RPA -->
-                                <div style="min-width: 135px;">
+                                <div class="cadastros-rpa-filter-group" style="min-width: 135px;">
                                     <select id="cadastros-filter-rpa" style="width: 100%; padding: 0.45rem 0.75rem; border-radius: 6px; border: 1px solid var(--border-color); background: rgba(255,255,255,0.05); color: var(--text-primary); font-size: 0.83rem; outline: none; cursor: pointer;">
                                         <option value="" data-i18n="opt_rpa_all">RPA: Todos</option>
                                         <option value="sim" data-i18n="opt_rpa_only">🤖 Somente RPA</option>
@@ -2614,7 +2614,7 @@ body.light-theme .country-opt-title {
                                             <th style="width: 18%;" data-i18n="th_team_area">Equipe / Área Responsável</th>
                                             <th style="width: 18%;" data-i18n="th_responsavel">Responsável</th>
                                             <th style="width: 15%;" data-i18n="th_product">Produto</th>
-                                            <th style="width: 12%; text-align: center;" data-i18n="th_rpa_automation">Automação (RPA)</th>
+                                            <th class="col-rpa-header" style="width: 12%; text-align: center;" data-i18n="th_rpa_automation">Automação (RPA)</th>
                                             <th class="col-acao-excluir" style="width: 5%; text-align: center;" data-i18n="th_actions">Ações</th>
                                         </tr>
                                     </thead>
@@ -3673,6 +3673,51 @@ function aplicarPerfilDeAcesso() {
         el.style.pointerEvents = isConsulta ? 'none' : 'auto';
         el.style.display = isConsulta ? 'none' : 'inline-block';
     });
+
+    // Controla visibilidade de RPA de acordo com a região/país
+    applyCountryRpaVisibility();
+}
+
+function applyCountryRpaVisibility() {
+    const isHsp = currentCountry === 'HISPANA';
+    const isAdmin = currentUser.perfil === 'ADMIN';
+
+    // 1. Menu lateral de Automações (RPA)
+    const rpaMenuItem = document.querySelector('.sidebar-menu .menu-item[data-view="automations"]');
+    if (rpaMenuItem) {
+        rpaMenuItem.style.display = isHsp ? 'none' : '';
+    }
+
+    // 2. Cards de KPI no Dashboard
+    document.querySelectorAll('.rpa-cluster-card').forEach(el => {
+        if (isHsp) {
+            el.style.display = 'none';
+        } else {
+            el.style.display = el.classList.contains('admin-only') && !isAdmin ? 'none' : '';
+        }
+    });
+
+    // 3. Filtro de RPA em Cadastros
+    const rpaFilterGroup = document.querySelector('.cadastros-rpa-filter-group');
+    if (rpaFilterGroup) {
+        rpaFilterGroup.style.display = isHsp ? 'none' : '';
+    }
+    const rpaFilterEl = document.getElementById('cadastros-filter-rpa');
+    if (rpaFilterEl && isHsp) {
+        rpaFilterEl.value = '';
+    }
+
+    // 4. Cabeçalho de coluna RPA na tabela de Cadastros
+    const rpaHeader = document.querySelector('#cadastros-table th.col-rpa-header') || document.querySelector('#cadastros-table th[data-i18n="th_rpa_automation"]');
+    if (rpaHeader) {
+        rpaHeader.style.display = isHsp ? 'none' : '';
+    }
+
+    // 5. Se o usuário estiver na tela de automações e trocar para Hispana, redireciona para Dashboard
+    const currentHash = (window.location.hash || '').replace('#/', '').trim();
+    if (isHsp && currentHash === 'automations') {
+        switchToView('dashboard');
+    }
 }
 
 // ============================================================
@@ -4229,6 +4274,8 @@ function applyI18n(locale) {
             updateViewHeader(activeView);
         }
     }
+
+    applyCountryRpaVisibility();
 }
 
 // DEFAULT HISPANA DATA (AR, MX, CO)
@@ -5453,6 +5500,7 @@ async function importPrdDataToHml() {
 
 function isRpaActivity(proc) {
     if (!proc) return false;
+    if (currentCountry === 'HISPANA') return false;
     return proc.isRpa === true || proc.isRpa === 'true' || proc.isRpa === 1;
 }
 
@@ -9008,6 +9056,9 @@ function renderCadastrosView() {
             return true;
         });
 
+        const isHsp = currentCountry === 'HISPANA';
+        const totalCols = (currentUser.perfil === 'ADMIN' ? 7 : (currentUser.perfil === 'OPERADOR' ? 6 : 5)) - (isHsp ? 1 : 0);
+
         // Render Activities Table (Accordion by Team)
         tableBody.innerHTML = '';
         activityCountBadge.textContent = isAnyFilterActive
@@ -9015,7 +9066,6 @@ function renderCadastrosView() {
             : `${state.processes.length}`;
         
         if (filteredProcesses.length === 0) {
-            const totalCols = currentUser.perfil === 'ADMIN' ? 7 : (currentUser.perfil === 'OPERADOR' ? 6 : 5);
             tableBody.innerHTML = `
                 <tr>
                     <td colspan="${totalCols}" style="text-align: center; color: var(--text-muted); padding: 2.5rem 1rem;">
@@ -9060,7 +9110,6 @@ function renderCadastrosView() {
             headerTr.style.cssText = 'background: rgba(255,255,255,0.03); cursor: pointer; user-select: none; transition: background 0.15s;';
             headerTr.onmouseover = () => { headerTr.style.background = 'rgba(255,255,255,0.06)'; };
             headerTr.onmouseout = () => { headerTr.style.background = 'rgba(255,255,255,0.03)'; };
-            const totalCols = currentUser.perfil === 'ADMIN' ? 7 : (currentUser.perfil === 'OPERADOR' ? 6 : 5);
             headerTr.innerHTML = `
                 <td colspan="${totalCols}" style="padding: 0.8rem; font-weight: 600; color: var(--text-primary); border-top: 1px solid rgba(255,255,255,0.05); border-bottom: 1px solid rgba(255,255,255,0.05); cursor: pointer;">
                     <i class="${isExpanded ? 'fa-solid fa-chevron-down' : 'fa-solid fa-chevron-right'}" style="width: 20px; color: var(--text-primary); margin-right: 0.25rem;"></i> ${escapeHtml(team)} <span style="background: rgba(255,255,255,0.1); color: var(--text-secondary); padding: 0.1rem 0.5rem; border-radius: 10px; font-size: 0.75rem; margin-left: 0.5rem;">${teamProcs.length} ${t('lbl_activities_count', 'atividades')}</span>
@@ -9140,7 +9189,7 @@ function renderCadastrosView() {
                     <td>
                         <input type="text" class="input-activity-product-cell" value="${escapeHtml(proc.produto || '')}" placeholder="${t('placeholder_product_opt', 'Produto (Opcional)')}" ${isRowDisabled ? 'readonly style="width: 100%; border: none; background: transparent; color: var(--text-primary); outline: none; padding: 0.3rem 0.5rem; border-radius: 4px; opacity: 0.7; pointer-events: none;"' : 'style="width: 100%; border: none; background: transparent; color: var(--text-primary); outline: none; padding: 0.3rem 0.5rem; border-radius: 4px;"'}>
                     </td>
-                    <td style="text-align: center;">
+                    <td class="col-rpa-cell" style="text-align: center; ${isHsp ? 'display: none;' : ''}">
                         <label style="display: inline-flex; align-items: center; gap: 0.35rem; cursor: ${isRowDisabled ? 'not-allowed' : 'pointer'}; font-size: 0.8rem; user-select: none; ${isRowDisabled ? 'pointer-events: none;' : ''}">
                             <input type="checkbox" class="cb-activity-rpa" ${isRpa ? 'checked' : ''} ${isRowDisabled ? 'disabled style="pointer-events: none; opacity: 0.4;"' : ''}>
                             <span class="label-rpa-text" style="${isRpa ? 'color: #a78bfa; font-weight: 600;' : 'color: var(--text-muted);'} ${isRowDisabled ? 'opacity: 0.6;' : ''}">🤖 RPA</span>

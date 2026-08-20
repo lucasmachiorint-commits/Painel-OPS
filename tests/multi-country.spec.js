@@ -42,7 +42,7 @@ test.describe('Multi-Country & Localization E2E Tests', () => {
         await expect(optHSP).toContainText('Hispana (AR, MX, CO)');
     });
 
-    test('3. Should switch to Hispana and translate navigation and titles to Spanish', async ({ page }) => {
+    test('3. Should switch to Hispana, translate navigation to Spanish, and hide RPA from sidebar', async ({ page }) => {
         await page.locator('#btn-country-active').click();
         await page.locator('.country-dropdown-option[data-country="HISPANA"]').click();
 
@@ -55,7 +55,9 @@ test.describe('Multi-Country & Localization E2E Tests', () => {
         await expect(page.locator('.menu-item[data-view="history"] span')).toHaveText('Historial');
         await expect(page.locator('.menu-item[data-view="cadastros"] span')).toHaveText('Registros');
         await expect(page.locator('.menu-item[data-view="balancing"] span')).toHaveText('Balanceo');
-        await expect(page.locator('.menu-item[data-view="automations"] span')).toHaveText('Automatizaciones');
+        
+        // RPA / Automations must be HIDDEN in Hispana
+        await expect(page.locator('.menu-item[data-view="automations"]')).toBeHidden();
 
         // Check breadcrumb and title
         await expect(page.locator('#app-view-title')).toHaveText('Tablero');
@@ -63,17 +65,19 @@ test.describe('Multi-Country & Localization E2E Tests', () => {
         await expect(page.locator('#app-view-subtitle')).toContainText('Visión operacional');
     });
 
-    test('4. Should translate KPI cards, filter options, and table headers on Hispana', async ({ page }) => {
+    test('4. Should translate KPI cards, filter options, table headers, and hide all RPA widgets on Hispana', async ({ page }) => {
         await page.locator('#btn-country-active').click();
         await page.locator('.country-dropdown-option[data-country="HISPANA"]').click();
+
+        // RPA cards in Dashboard KPI cluster must be hidden
+        await expect(page.locator('.rpa-cluster-card').first()).toBeHidden();
 
         // Filter options
         await expect(page.locator('#filter-area option[value="all"]')).toHaveText('Todas las Áreas');
         await expect(page.locator('#filter-responsavel option[value="all"]')).toContainText('Todos los Responsables');
 
-        // KPI card titles
+        // Non-RPA KPI card title
         await expect(page.locator('h3[data-i18n="kpi_total_activities"]')).toHaveText('Total de Actividades');
-        await expect(page.locator('h3[data-i18n="kpi_rpa_capacity"]')).toHaveText('RPA • Capacidad Absorbida');
 
         // Table headers
         await expect(page.locator('#fte-table th[data-i18n="th_activity"]')).toHaveText('Proceso / Actividad');
@@ -84,7 +88,7 @@ test.describe('Multi-Country & Localization E2E Tests', () => {
         await expect(page.locator('#fte-table th[data-i18n="th_freq"]')).toHaveText('Frec. Ejecución Mes');
     });
 
-    test('5. Should load Hispana activities with Valeria Sotes in Registros view', async ({ page }) => {
+    test('5. Should load Hispana activities with Valeria Sotes and hide RPA column/filter in Registros view', async ({ page }) => {
         await page.locator('#btn-country-active').click();
         await page.locator('.country-dropdown-option[data-country="HISPANA"]').click();
 
@@ -95,13 +99,18 @@ test.describe('Multi-Country & Localization E2E Tests', () => {
         // Check for Conciliaciones team or Valeria Sotes responsible
         const bodyText = await page.locator('#view-cadastros').textContent();
         expect(bodyText).toContain('Valeria Sotes');
+
+        // RPA filter dropdown and RPA column header must be hidden
+        await expect(page.locator('.cadastros-rpa-filter-group')).toBeHidden();
+        await expect(page.locator('.col-rpa-header')).toBeHidden();
     });
 
-    test('6. Should switch back to Brasil and restore Portuguese labels', async ({ page }) => {
+    test('6. Should switch back to Brasil and restore Portuguese labels and RPA features', async ({ page }) => {
         // Switch to Hispana first
         await page.locator('#btn-country-active').click();
         await page.locator('.country-dropdown-option[data-country="HISPANA"]').click();
         await expect(page.locator('#app-view-title')).toHaveText('Tablero');
+        await expect(page.locator('.menu-item[data-view="automations"]')).toBeHidden();
 
         // Switch back to Brasil
         await page.locator('#btn-country-active').click();
@@ -111,5 +120,8 @@ test.describe('Multi-Country & Localization E2E Tests', () => {
         await expect(page.locator('#country-flag-icon')).toHaveText('🇧🇷');
         await expect(page.locator('#app-view-title')).toHaveText('Dashboard');
         await expect(page.locator('.menu-item[data-view="cadastros"] span')).toHaveText('Cadastros');
+        
+        // RPA restored
+        await expect(page.locator('.menu-item[data-view="automations"]')).toBeVisible();
     });
 });
