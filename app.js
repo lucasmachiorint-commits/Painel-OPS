@@ -40,6 +40,7 @@ const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
 // Configuração isolada de autenticação para Homologação (HML)
 const HML_AUTH_STORAGE_KEY = 'sb-painel-ops-hml-auth-token';
 const HML_ACTIVITY_STORAGE_KEY = 'painel_ops_hml_last_activity';
+const HML_SESSION_ACTIVE_KEY = 'painel_ops_hml_session_active';
 
 let supabaseClient = null;
 let realtimeChannel = null;
@@ -416,6 +417,7 @@ async function handleLogin() {
         } else {
             const user = (data && data.session && data.session.user) ? data.session.user : (data ? data.user : null);
             if (user) {
+                sessionStorage.setItem(HML_SESSION_ACTIVE_KEY, 'true');
                 recordUserActivity();
                 // Forçar ocultação do overlay de login e exibição do painel principal
                 const overlay = document.getElementById('auth-overlay');
@@ -424,7 +426,6 @@ async function handleLogin() {
                 try {
                     await setupUserSession(user);
                 } catch (sessionErr) {
-                    alert('[DIAGNÓSTICO] Erro em setupUserSession: ' + (sessionErr.message || sessionErr));
                     console.error('Erro em setupUserSession após login:', sessionErr);
                 }
             } else {
@@ -432,7 +433,6 @@ async function handleLogin() {
             }
         }
     } catch (err) {
-        alert('[DIAGNÓSTICO] Erro fatal no handleLogin: ' + (err.message || err));
         showAuthError(formatAuthError(err ? err.message : ''));
     } finally {
         if (btnLogin) {
@@ -489,6 +489,8 @@ async function handleSignup() {
         } else {
             const user = (data && data.session && data.session.user) ? data.session.user : (data ? data.user : null);
             if (user) {
+                sessionStorage.setItem(HML_SESSION_ACTIVE_KEY, 'true');
+                recordUserActivity();
                 showAuthInfo("Conta criada e autenticada com sucesso!");
                 hideAuthOverlay();
                 await setupUserSession(user);
@@ -510,6 +512,7 @@ async function handleSignup() {
 
 async function handleLogout(isAutoTimeout = false) {
     unsubscribeRealtime();
+    sessionStorage.removeItem(HML_SESSION_ACTIVE_KEY);
     localStorage.removeItem(HML_ACTIVITY_STORAGE_KEY);
     const client = getSupabase();
     if (client) {
@@ -689,6 +692,9 @@ async function handleSaveResetPassword() {
             }
             const user = (data && data.user) ? data.user : null;
             if (user) {
+                sessionStorage.setItem(HML_SESSION_ACTIVE_KEY, 'true');
+                recordUserActivity();
+                hideAuthOverlay();
                 await setupUserSession(user);
             } else {
                 setAuthViewMode('login');
@@ -934,7 +940,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     });
 
-    // Check existing Supabase session using getSupabase() helper with 30-min inactivity check
+    // Check existing Supabase session using getSupabase() helper with sessionStorage and 30-min inactivity check
     const client = getSupabase();
     if (client) {
         // Verificar se abriu através de link de recuperação de senha
@@ -946,16 +952,18 @@ document.addEventListener('DOMContentLoaded', async () => {
                 showAuthOverlay();
                 setAuthViewMode('reset');
             } else {
+                const hasActiveSession = sessionStorage.getItem(HML_SESSION_ACTIVE_KEY) === 'true';
                 const lastActivity = parseInt(localStorage.getItem(HML_ACTIVITY_STORAGE_KEY) || '0', 10);
-                const isInactive = lastActivity === 0 || (Date.now() - lastActivity) > INACTIVITY_TIMEOUT_MS;
+                const isInactive = !hasActiveSession || lastActivity === 0 || (Date.now() - lastActivity) > INACTIVITY_TIMEOUT_MS;
 
                 if (isInactive) {
-                    console.log('[Auth Init] Sessão inexistente ou expirada (>30min de inatividade). Exibindo login.');
-                    try { await client.auth.signOut(); } catch (_) {}
+                    console.log('[Auth Init] Sessão inexistente ou expirada. Exibindo tela de login obrigatória.');
+                    sessionStorage.removeItem(HML_SESSION_ACTIVE_KEY);
                     localStorage.removeItem(HML_ACTIVITY_STORAGE_KEY);
+                    try { await client.auth.signOut(); } catch (_) {}
                     window._authUserId = null;
                     showAuthOverlay();
-                    if (lastActivity > 0) {
+                    if (hasActiveSession && lastActivity > 0) {
                         showAuthInfo('Sua sessão expirou após 30 minutos de inatividade. Por favor, faça login.');
                     }
                 } else {
@@ -965,12 +973,14 @@ document.addEventListener('DOMContentLoaded', async () => {
                         recordUserActivity();
                         await setupUserSession(session.user);
                     } else {
+                        sessionStorage.removeItem(HML_SESSION_ACTIVE_KEY);
                         showAuthOverlay();
                     }
                 }
             }
         } catch (sessionErr) {
             console.error('Erro ao recuperar sessão existente do Supabase:', sessionErr);
+            sessionStorage.removeItem(HML_SESSION_ACTIVE_KEY);
             try {
                 localStorage.removeItem(HML_AUTH_STORAGE_KEY);
                 const projName = SUPABASE_URL.split('//')[1]?.split('.')[0];
@@ -992,10 +1002,16 @@ document.addEventListener('DOMContentLoaded', async () => {
                         showAuthOverlay();
                         setAuthViewMode('reset');
                     } else {
-                        recordUserActivity();
-                        await setupUserSession(session.user);
+                        const hasActiveSession = sessionStorage.getItem(HML_SESSION_ACTIVE_KEY) === 'true';
+                        if (hasActiveSession) {
+                            recordUserActivity();
+                            await setupUserSession(session.user);
+                        } else {
+                            showAuthOverlay();
+                        }
                     }
-                } else if (event === 'SIGNED_OUT' && window._authUserId) {
+                } else if (event === 'SIGNED_OUT') {
+                    sessionStorage.removeItem(HML_SESSION_ACTIVE_KEY);
                     showAuthOverlay();
                 }
             });

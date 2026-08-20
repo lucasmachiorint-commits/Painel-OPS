@@ -1,5 +1,6 @@
 // @ts-check
 const { test, expect } = require('@playwright/test');
+const path = require('path');
 
 const LIVE_HML_URL = 'https://lucasmachiorint-commits.github.io/Painel-OPS/hml.html';
 
@@ -16,10 +17,18 @@ test('Diagnóstico Live HML: Limpeza de Cache e Exibição do Modal de Login', a
   const userNameText = await page.locator('#userName').textContent();
   const userRoleText = await page.locator('#userRole').textContent();
 
+  const screenshotPath = path.resolve(__dirname, '../../brain/0cf73b4e-0602-4d7d-a92e-6a4591451db0/live_hml_screenshot.png');
+  await page.screenshot({ path: screenshotPath, fullPage: true });
+
+  const storageItems = await page.evaluate(() => {
+    return { ...localStorage };
+  });
+
   console.log('=== DIAGNÓSTICO LIVE HML ===');
   console.log('isOverlayVisible:', isOverlayVisible);
   console.log('overlayDisplay:', overlayDisplay);
   console.log('userNameText:', userNameText);
   console.log('userRoleText:', userRoleText);
+  console.log('storageItems:', storageItems);
   console.log('=============================');
 });
