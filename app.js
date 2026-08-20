@@ -205,7 +205,677 @@ function aplicarPerfilDeAcesso() {
         el.style.pointerEvents = isConsulta ? 'none' : 'auto';
         el.style.display = isConsulta ? 'none' : 'inline-block';
     });
+
+    // Controla visibilidade de RPA e Menus de acordo com a região/país
+    applyCountryRpaVisibility();
 }
+
+function applyCountryRpaVisibility() {
+    const isHsp = currentCountry === 'HISPANA';
+    const isAdmin = currentUser.perfil === 'ADMIN';
+
+    // 1. Menu lateral de Histórico / Historial (desativado temporariamente para Hispana)
+    const historyMenuItem = document.querySelector('.sidebar-menu .menu-item[data-view="history"]');
+    if (historyMenuItem) {
+        historyMenuItem.style.display = isHsp ? 'none' : '';
+    }
+
+    // 2. Menu lateral de Balanceamento / Balanceo (desativado temporariamente para Hispana)
+    const balancingMenuItem = document.querySelector('.sidebar-menu .menu-item[data-view="balancing"]');
+    if (balancingMenuItem) {
+        balancingMenuItem.style.display = isHsp ? 'none' : (isAdmin ? '' : 'none');
+    }
+
+    // 3. Menu lateral de Automações (RPA) (desativado para Hispana)
+    const rpaMenuItem = document.querySelector('.sidebar-menu .menu-item[data-view="automations"]');
+    if (rpaMenuItem) {
+        rpaMenuItem.style.display = isHsp ? 'none' : '';
+    }
+
+    // 4. Cards de KPI no Dashboard
+    document.querySelectorAll('.rpa-cluster-card').forEach(el => {
+        if (isHsp) {
+            el.style.display = 'none';
+        } else {
+            el.style.display = el.classList.contains('admin-only') && !isAdmin ? 'none' : '';
+        }
+    });
+
+    // 5. Filtro de RPA em Cadastros
+    const rpaFilterGroup = document.querySelector('.cadastros-rpa-filter-group');
+    if (rpaFilterGroup) {
+        rpaFilterGroup.style.display = isHsp ? 'none' : '';
+    }
+    const rpaFilterEl = document.getElementById('cadastros-filter-rpa');
+    if (rpaFilterEl && isHsp) {
+        rpaFilterEl.value = '';
+    }
+
+    // 6. Cabeçalho de coluna RPA na tabela de Cadastros
+    const rpaHeader = document.querySelector('#cadastros-table th.col-rpa-header') || document.querySelector('#cadastros-table th[data-i18n="th_rpa_automation"]');
+    if (rpaHeader) {
+        rpaHeader.style.display = isHsp ? 'none' : '';
+    }
+
+    // 7. Se o usuário estiver em uma tela desativada para Hispana e trocar de país, redireciona para Dashboard
+    const currentHash = (window.location.hash || '').replace('#/', '').trim();
+    if (isHsp && (currentHash === 'automations' || currentHash === 'history' || currentHash === 'balancing')) {
+        switchToView('dashboard');
+    }
+}
+
+// ============================================================
+// MULTI-COUNTRY / REGION CONFIGURATION & I18N
+// ============================================================
+let currentCountry = localStorage.getItem('painel_ops_current_country') || 'BR'; // 'BR' | 'HISPANA'
+
+const COUNTRY_CONFIG = {
+    'BR': {
+        code: 'BR',
+        name: 'Brasil',
+        flag: '🇧🇷',
+        locale: 'pt-BR',
+        boardStateId: 'default',
+        realtimeChannel: 'board-changes',
+        storageKey: 'capacity_fte_hub_state_BR'
+    },
+    'HISPANA': {
+        code: 'HISPANA',
+        name: 'Hispana (AR, MX, CO)',
+        flag: '🌐',
+        locale: 'es-LatAm',
+        boardStateId: 'hispana_default',
+        realtimeChannel: 'board-changes-hispana',
+        storageKey: 'capacity_fte_hub_state_HISPANA'
+    }
+};
+
+const I18N = {
+    'pt-BR': {
+        section_overview: 'Geral',
+        section_management: 'Gestão',
+        section_admin: 'Admin',
+        menu_dashboard: 'Dashboard',
+        menu_dashboard_title: 'Dashboard Operacional',
+        menu_history: 'Histórico',
+        menu_history_title: 'Histórico de Volumes',
+        menu_cadastros: 'Cadastros',
+        menu_cadastros_title: 'Estrutura e Cadastros',
+        menu_balancing: 'Balanceamento',
+        menu_balancing_title: 'Balanceamento de Backlog',
+        menu_automations: 'Automações',
+        menu_automations_title: 'Quadro de Automações (RPA)',
+        menu_access: 'Acesso',
+        menu_access_title: 'Controle de Acesso e Perfis',
+        view_title_dashboard: 'Dashboard',
+        view_sub_dashboard: 'Visão operacional de volumes mensais, FTEs requeridos e capacidade por equipe.',
+        view_title_history: 'Histórico',
+        view_sub_history: 'Snapshots mensais salvos e evolução temporal dos volumes operacionais.',
+        view_title_cadastros: 'Cadastros',
+        view_sub_cadastros: 'Estrutura organizacional, equipes, colaboradores responsáveis e catálogo de atividades.',
+        view_title_balancing: 'Balanceamento',
+        view_sub_balancing: 'Planejamento diário de backlog e comparação de capacidade alocada vs. necessária.',
+        view_title_automations: 'Automações (RPA)',
+        view_sub_automations: 'Quadro analítico de processos robotizados, FTEs absorvidos e horas economizadas.',
+        view_title_access: 'Controle de Acesso',
+        view_sub_access: 'Gestão centralizada de usuários, atribuição de perfis (ADMIN/OPERADOR/CONSULTA) e vinculação de equipes.',
+        filter_area_title: 'Filtrar por Área / Equipe em todas as telas',
+        filter_resp_title: 'Filtrar por Responsável em todas as telas',
+        opt_all_areas: 'Todas as Áreas',
+        opt_all_resps: 'Todos os Responsáveis',
+        btn_publish: 'Publicar para Todos',
+        btn_publish_title: 'Publicar sua visão atual como a base oficial para todos os usuários',
+        btn_export: 'Exportar Excel',
+        btn_export_title: 'Exportar CSV (Excel)',
+        btn_print: 'Imprimir / PDF',
+        btn_print_title: 'Imprimir / PDF',
+        btn_change_pass_title: 'Alterar minha senha',
+        btn_logout_title: 'Sair do sistema',
+        status_connecting: 'Conectando...',
+        status_sync: 'Sincronizado',
+        status_offline: 'Offline (Local)',
+        kpi_fte_required: 'FTE Atividades',
+        kpi_resources_needed: 'Recursos necessários',
+        kpi_fte_area: 'FTE da Área',
+        kpi_fte_area_sub: 'Total de funcionários',
+        kpi_team_in: 'Equipe em',
+        kpi_total_activities: 'Total de Atividades',
+        kpi_activities_registered: 'Atividades cadastradas',
+        kpi_rpa_activities: 'RPA • Atividades',
+        kpi_rpa_capacity: 'RPA • Capacity Absorvido',
+        kpi_under_construction: 'Em construção',
+        kpi_without_time: 'atividade(s) sem tempo',
+        kpi_of_activities: 'das atividades',
+        kpi_of_capacity: 'do capacity',
+        kpi_of_capacity_total: 'do capacity total',
+        kpi_demand_in: 'Demanda em',
+        kpi_available_capacity: 'Capacidade Disponível',
+        kpi_monthly_hours: 'Horas Mensuais',
+        kpi_saved_hours: 'Horas Economizadas',
+        kpi_total_backlog_hours: 'Total Horas Backlog',
+        kpi_hours_required: 'Horas requeridas',
+        kpi_fte_required_backlog: 'FTEs Requeridos Backlog',
+        kpi_activities_keep: 'Atividades a Manter',
+        kpi_keep_execution: 'Manter a execução',
+        kpi_activities_stop: 'Atividades a Parar',
+        kpi_stop_execution: 'Encerrar execução',
+        kpi_activities_start: 'Atividades a Começar',
+        kpi_start_execution: 'Novas iniciativas',
+        kpi_total_rpa: 'Total de Automações (RPA)',
+        kpi_rpa_capacity_fte: 'Capacity Automatizado (FTEs)',
+        kpi_saved_hours_month: 'Horas Economizadas / Mês',
+        kpi_in_auto_execution: 'em execução automática',
+        panel_processes_activities: 'Processos e Atividades',
+        panel_activities_catalog: 'Cadastro de Atividades',
+        panel_resources_by_area: 'Recursos por Área',
+        panel_resources_by_area_desc: 'Insira a quantidade de colaboradores alocados para cada equipe. Clique em um processo na tabela para focar e editar a respectiva equipe.',
+        panel_backlog_planning: 'Planejamento de Backlog',
+        panel_review_activities: 'Revisão de Atividades',
+        panel_automations_rpa: 'Quadro de Automações (RPA)',
+        panel_teams: 'Equipes (Áreas)',
+        panel_responsaveis: 'Responsáveis',
+        panel_activities: 'Cadastro de Atividades',
+        th_activity: 'Processo / Atividade',
+        th_area: 'Área Responsável',
+        th_responsavel: 'Responsável',
+        th_volume: 'Volume / Qtd. Mês',
+        th_time: 'Tempo (Minutos)',
+        th_freq: 'Freq. Execução Mês',
+        th_hours: 'Horas / Mês',
+        th_fte: 'FTE (%)',
+        th_actions: 'Ações',
+        th_activity_name: 'Nome da Atividade / Demanda',
+        th_team_area: 'Equipe / Área Responsável',
+        th_product: 'Produto',
+        th_rpa_automation: 'Automação (RPA)',
+        th_backlog_volume: 'Volume do Backlog',
+        th_hours_required: 'Horas Requeridas',
+        th_fte_required: 'FTE Requerido (%)',
+        th_current_metric: 'Métrica Atual',
+        th_review_action: 'Ação de Revisão (Decisão)',
+        th_rpa_proc_name: 'Processo / Atividade Automatizada',
+        th_capacity_fte_pct: 'Capacity (FTE / %)',
+        lbl_total_filtered: 'Total Filtrado',
+        lbl_total_general: 'Total Geral',
+        lbl_no_team: 'Sem Equipe',
+        lbl_no_resp: 'Sem Responsável',
+        lbl_no_coord: 'Sem Coordenador',
+        lbl_coord: 'Coord:',
+        lbl_other_no_team: 'Outros / Sem Equipe',
+        lbl_activities_count: 'atividades',
+        lbl_demands_count: 'demandas',
+        lbl_members_count: 'integrantes',
+        status_stopped_no_fte: 'Parado (Sem FTE)',
+        status_routine_fixed: 'Rotina (Fixa)',
+        status_inferior: 'Inferior',
+        status_superior: 'Superior',
+        status_equivalent: 'Equivalente',
+        lbl_allocated: 'Alocado:',
+        lbl_fte_needed: 'FTE Requerido:',
+        btn_toggle_all: 'Recolher Todas',
+        btn_toggle_all_expand: 'Expandir Todas',
+        btn_delete_selected: 'Excluir Selecionados',
+        btn_copy_prd: 'Copiar Dados de PRD',
+        btn_import_activities: 'Importar Atividades',
+        btn_add_activity: 'Adicionar Atividade',
+        btn_clear_filters: 'Limpar',
+        btn_import_active_volumes: 'Importar Volumes do Dashboard',
+        btn_clear_backlog_volumes: 'Limpar Backlog',
+        btn_view_flowchart: 'Ver Fluxograma',
+        btn_global_params: 'Padrão Global',
+        btn_add: 'Adicionar',
+        btn_add_resp_option: '+ Responsável',
+        btn_new_team: 'Nova Equipe',
+        btn_new_resp: 'Novo Responsável',
+        btn_organogram: 'Organograma',
+        btn_params: 'Parâmetros',
+        lbl_region_country: 'Região / País',
+        dropdown_header_region: 'Selecione a Região Operacional',
+        placeholder_search_activity: 'Buscar Demanda / Atividade...',
+        placeholder_filter_product: 'Filtrar Produto...',
+        placeholder_new_resp: 'Novo Responsável',
+        placeholder_write_email: 'Escreva o e-mail',
+        placeholder_enter_backlog: 'Digite o backlog',
+        placeholder_product_opt: 'Produto (Opcional)',
+        opt_select_team: 'Selecione a equipe',
+        opt_rpa_all: 'RPA: Todos',
+        opt_rpa_only: 'Somente RPA',
+        opt_rpa_manual: 'Manual (Sem RPA)',
+        empty_no_activities: 'Nenhuma atividade cadastrada',
+        empty_no_activities_filter: 'Nenhuma atividade cadastrada nesta busca/filtro.',
+        empty_no_activities_found: 'Nenhuma atividade encontrada',
+        empty_adjust_filters: 'Tente ajustar ou limpar os filtros aplicados acima.',
+        empty_no_teams: 'Nenhuma equipe cadastrada.',
+        empty_no_responsaveis: 'Nenhum responsável cadastrado.',
+        empty_review_desc: 'Cadastre atividades no menu Dashboard para poder revisá-las aqui.',
+        empty_rpa_title: 'Nenhuma atividade configurada como RPA / Automação',
+        empty_rpa_desc: 'Para adicionar uma atividade ao quadro de Automações, marque a opção RPA no menu Cadastro ou inclua RPA / Robô no nome da atividade.',
+        review_keep: 'Manter',
+        review_stop: 'Parar',
+        review_start: 'Começar',
+        toast_country_switched: '🇧🇷 Ambiente alternado para Brasil (Português)'
+    },
+    'es-LatAm': {
+        section_overview: 'General',
+        section_management: 'Gestión',
+        section_admin: 'Admin',
+        menu_dashboard: 'Tablero',
+        menu_dashboard_title: 'Tablero Operacional',
+        menu_history: 'Historial',
+        menu_history_title: 'Historial de Volúmenes',
+        menu_cadastros: 'Registros',
+        menu_cadastros_title: 'Estructura y Registros',
+        menu_balancing: 'Balanceo',
+        menu_balancing_title: 'Balanceo de Backlog',
+        menu_automations: 'Automatizaciones',
+        menu_automations_title: 'Panel de Automatizaciones (RPA)',
+        menu_access: 'Acceso',
+        menu_access_title: 'Control de Acceso y Perfiles',
+        view_title_dashboard: 'Tablero',
+        view_sub_dashboard: 'Visión operacional de volúmenes mensuales, FTEs requeridos y capacidad por equipo.',
+        view_title_history: 'Historial',
+        view_sub_history: 'Instantáneas mensuales guardadas y evolución temporal de volúmenes.',
+        view_title_cadastros: 'Registros',
+        view_sub_cadastros: 'Estructura organizacional, equipos, colaboradores responsables y catálogo de actividades.',
+        view_title_balancing: 'Balanceo',
+        view_sub_balancing: 'Planificación diaria de backlog y comparación de capacidad asignada vs. requerida.',
+        view_title_automations: 'Automatizaciones (RPA)',
+        view_sub_automations: 'Panel analítico de procesos robotizados, FTEs absorbidos y horas ahorradas.',
+        view_title_access: 'Control de Acceso',
+        view_sub_access: 'Gestión centralizada de usuarios, perfiles (ADMIN/OPERADOR/CONSULTA) y vinculación de equipos.',
+        filter_area_title: 'Filtrar por Área / Equipo en todas las vistas',
+        filter_resp_title: 'Filtrar por Responsable en todas las vistas',
+        opt_all_areas: 'Todas las Áreas',
+        opt_all_resps: 'Todos los Responsables',
+        btn_publish: 'Publicar para Todos',
+        btn_publish_title: 'Publicar su vista actual como la base oficial para todos los usuarios',
+        btn_export: 'Exportar Excel',
+        btn_export_title: 'Exportar CSV (Excel)',
+        btn_print: 'Imprimir / PDF',
+        btn_print_title: 'Imprimir / PDF',
+        btn_change_pass_title: 'Cambiar mi contraseña',
+        btn_logout_title: 'Cerrar sesión',
+        status_connecting: 'Conectando...',
+        status_sync: 'Sincronizado',
+        status_offline: 'Offline (Local)',
+        kpi_fte_required: 'FTE Actividades',
+        kpi_resources_needed: 'Recursos necesarios',
+        kpi_fte_area: 'FTE del Área',
+        kpi_fte_area_sub: 'Total de empleados',
+        kpi_team_in: 'Equipo en',
+        kpi_total_activities: 'Total de Actividades',
+        kpi_activities_registered: 'Actividades registradas',
+        kpi_rpa_activities: 'RPA • Actividades',
+        kpi_rpa_capacity: 'RPA • Capacidad Absorbida',
+        kpi_under_construction: 'En construcción',
+        kpi_without_time: 'actividad(es) sin tiempo',
+        kpi_of_activities: 'de las actividades',
+        kpi_of_capacity: 'de la capacidad',
+        kpi_of_capacity_total: 'de la capacidad total',
+        kpi_demand_in: 'Demanda en',
+        kpi_available_capacity: 'Capacidad Disponible',
+        kpi_monthly_hours: 'Horas Mensuales',
+        kpi_saved_hours: 'Horas Ahorradas',
+        kpi_total_backlog_hours: 'Total Horas Backlog',
+        kpi_hours_required: 'Horas requeridas',
+        kpi_fte_required_backlog: 'FTEs Requeridos Backlog',
+        kpi_activities_keep: 'Actividades a Mantener',
+        kpi_keep_execution: 'Mantener la ejecución',
+        kpi_activities_stop: 'Actividades a Detener',
+        kpi_stop_execution: 'Finalizar ejecución',
+        kpi_activities_start: 'Actividades a Comenzar',
+        kpi_start_execution: 'Nuevas iniciativas',
+        kpi_total_rpa: 'Total de Automatizaciones (RPA)',
+        kpi_rpa_capacity_fte: 'Capacidad Automatizada (FTEs)',
+        kpi_saved_hours_month: 'Horas Ahorradas / Mes',
+        kpi_in_auto_execution: 'en ejecución automática',
+        panel_processes_activities: 'Procesos y Actividades',
+        panel_activities_catalog: 'Registro de Actividades',
+        panel_resources_by_area: 'Recursos por Área',
+        panel_resources_by_area_desc: 'Ingrese la cantidad de colaboradores asignados a cada equipo. Haga clic en un proceso de la tabla para enfocar y editar el equipo correspondiente.',
+        panel_backlog_planning: 'Planificación de Backlog',
+        panel_review_activities: 'Revisión de Actividades',
+        panel_automations_rpa: 'Panel de Automatizaciones (RPA)',
+        panel_teams: 'Equipos (Áreas)',
+        panel_responsaveis: 'Responsables',
+        panel_activities: 'Registro de Actividades',
+        th_activity: 'Proceso / Actividad',
+        th_area: 'Área Responsable',
+        th_responsavel: 'Responsable',
+        th_volume: 'Volumen / Cant. Mes',
+        th_time: 'Tiempo (Minutos)',
+        th_freq: 'Frec. Ejecución Mes',
+        th_hours: 'Horas / Mes',
+        th_fte: 'FTE (%)',
+        th_actions: 'Acciones',
+        th_activity_name: 'Nombre de la Actividad / Demanda',
+        th_team_area: 'Equipo / Área Responsable',
+        th_product: 'Producto',
+        th_rpa_automation: 'Automatización (RPA)',
+        th_backlog_volume: 'Volumen del Backlog',
+        th_hours_required: 'Horas Requeridas',
+        th_fte_required: 'FTE Requerido (%)',
+        th_current_metric: 'Métrica Actual',
+        th_review_action: 'Acción de Revisión (Decisión)',
+        th_rpa_proc_name: 'Proceso / Actividad Automatizada',
+        th_capacity_fte_pct: 'Capacidad (FTE / %)',
+        lbl_total_filtered: 'Total Filtrado',
+        lbl_total_general: 'Total General',
+        lbl_no_team: 'Sin Equipo',
+        lbl_no_resp: 'Sin Responsable',
+        lbl_no_coord: 'Sin Coordinador',
+        lbl_coord: 'Coord:',
+        lbl_other_no_team: 'Otros / Sin Equipo',
+        lbl_activities_count: 'actividades',
+        lbl_demands_count: 'demandas',
+        lbl_members_count: 'integrantes',
+        status_stopped_no_fte: 'Inactivo (Sin FTE)',
+        status_routine_fixed: 'Rutina (Fija)',
+        status_inferior: 'Inferior',
+        status_superior: 'Superior',
+        status_equivalent: 'Equivalente',
+        lbl_allocated: 'Asignado:',
+        lbl_fte_needed: 'FTE Requerido:',
+        btn_toggle_all: 'Plegar Todas',
+        btn_toggle_all_expand: 'Expandir Todas',
+        btn_delete_selected: 'Eliminar Seleccionados',
+        btn_copy_prd: 'Copiar Datos de PRD',
+        btn_import_activities: 'Importar Actividades',
+        btn_add_activity: 'Agregar Actividad',
+        btn_clear_filters: 'Limpiar',
+        btn_import_active_volumes: 'Importar Volúmenes del Tablero',
+        btn_clear_backlog_volumes: 'Limpiar Backlog',
+        btn_view_flowchart: 'Ver Organigrama',
+        btn_global_params: 'Estándar Global',
+        btn_add: 'Agregar',
+        btn_add_resp_option: '+ Responsable',
+        btn_new_team: 'Nuevo Equipo',
+        btn_new_resp: 'Nuevo Responsable',
+        btn_organogram: 'Organigrama',
+        btn_params: 'Parámetros',
+        lbl_region_country: 'Región / País',
+        dropdown_header_region: 'Seleccione la Región Operativa',
+        placeholder_search_activity: 'Buscar Demanda / Actividad...',
+        placeholder_filter_product: 'Filtrar Producto...',
+        placeholder_new_resp: 'Nuevo Responsable',
+        placeholder_write_email: 'Escriba el correo',
+        placeholder_enter_backlog: 'Ingrese el backlog',
+        placeholder_product_opt: 'Producto (Opcional)',
+        opt_select_team: 'Seleccione el equipo',
+        opt_rpa_all: 'RPA: Todos',
+        opt_rpa_only: 'Solo RPA',
+        opt_rpa_manual: 'Manual (Sin RPA)',
+        empty_no_activities: 'Ninguna actividad registrada',
+        empty_no_activities_filter: 'Ninguna actividad registrada en esta búsqueda/filtro.',
+        empty_no_activities_found: 'Ninguna actividad encontrada',
+        empty_adjust_filters: 'Intente ajustar o limpiar los filtros aplicados arriba.',
+        empty_no_teams: 'Ningún equipo registrado.',
+        empty_no_responsaveis: 'Ningún responsable registrado.',
+        empty_review_desc: 'Registre actividades en el menú Tablero para poder revisarlas aquí.',
+        empty_rpa_title: 'Ninguna actividad configurada como RPA / Automatización',
+        empty_rpa_desc: 'Para agregar una actividad al panel de Automatizaciones, marque la opción RPA en el menú Registros o incluya RPA / Robot en el nombre de la actividad.',
+        review_keep: 'Mantener',
+        review_stop: 'Detener',
+        review_start: 'Comenzar',
+        toast_country_switched: '🌐 Ambiente cambiado a Hispana (Español)'
+    }
+};
+
+function t(key, fallback = '') {
+    const locale = COUNTRY_CONFIG[currentCountry]?.locale || 'pt-BR';
+    const dict = I18N[locale] || I18N['pt-BR'];
+    if (dict && dict[key] !== undefined) return dict[key];
+    if (I18N['pt-BR'] && I18N['pt-BR'][key] !== undefined) return I18N['pt-BR'][key];
+    return fallback;
+}
+
+function toggleCountryDropdown(e) {
+    if (e) {
+        e.preventDefault();
+        e.stopPropagation();
+    }
+    const container = document.getElementById('country-selector-header');
+    const menu = document.getElementById('country-dropdown-menu');
+    if (!container || !menu) return;
+    
+    const isOpen = container.classList.contains('open') && menu.style.display !== 'none';
+    if (isOpen) {
+        container.classList.remove('open');
+        menu.style.display = 'none';
+    } else {
+        container.classList.add('open');
+        menu.style.display = 'flex';
+    }
+}
+
+document.addEventListener('click', (e) => {
+    const container = document.getElementById('country-selector-header');
+    const menu = document.getElementById('country-dropdown-menu');
+    if (container && menu && container.classList.contains('open')) {
+        if (!container.contains(e.target)) {
+            container.classList.remove('open');
+            menu.style.display = 'none';
+        }
+    }
+});
+
+async function selectCountry(countryCode, e) {
+    if (e) {
+        e.preventDefault();
+        e.stopPropagation();
+    }
+    const container = document.getElementById('country-selector-header');
+    const menu = document.getElementById('country-dropdown-menu');
+    if (container) container.classList.remove('open');
+    if (menu) menu.style.display = 'none';
+
+    if (countryCode === currentCountry) return;
+    await switchCountry(countryCode);
+}
+
+async function switchCountry(countryCode) {
+    if (!COUNTRY_CONFIG[countryCode]) return;
+
+    // 1. Salvar estado atual do país vigente
+    saveState();
+
+    // 2. Atualizar estado de país
+    currentCountry = countryCode;
+    try {
+        localStorage.setItem('painel_ops_current_country', countryCode);
+    } catch (_) {}
+
+    // 3. Atualizar UI do seletor
+    const flagEl = document.getElementById('country-flag-icon');
+    const labelEl = document.getElementById('country-name-label');
+    if (flagEl) flagEl.textContent = COUNTRY_CONFIG[countryCode].flag;
+    if (labelEl) labelEl.textContent = COUNTRY_CONFIG[countryCode].name;
+
+    document.querySelectorAll('.country-dropdown-option').forEach(opt => {
+        const c = opt.getAttribute('data-country');
+        const check = opt.querySelector('.country-opt-check');
+        if (c === countryCode) {
+            opt.classList.add('active');
+            if (check) check.style.display = 'inline-block';
+        } else {
+            opt.classList.remove('active');
+            if (check) check.style.display = 'none';
+        }
+    });
+
+    // 4. Carregar estado do novo país (localStorage ou defaults da Hispana)
+    loadState();
+
+    // 5. Aplicar tradução
+    applyI18n(COUNTRY_CONFIG[countryCode].locale);
+
+    // 6. Atualizar conexão em tempo real se autenticado
+    if (window._authUserId) {
+        subscribeRealtime();
+        try {
+            const hasRemoteState = await loadStateFromSupabase();
+            if (!hasRemoteState) {
+                await saveStateToSupabase();
+            }
+        } catch (_) {}
+    }
+
+    // 7. Re-renderizar todas as telas
+    refreshCurrentUserAssignedTeam();
+    refreshAllViews();
+
+    const dict = I18N[COUNTRY_CONFIG[countryCode].locale] || I18N['pt-BR'];
+    showToast(dict.toast_country_switched, 'info', 4000);
+}
+
+function applyI18n(locale) {
+    const dict = I18N[locale] || I18N['pt-BR'];
+    document.documentElement.lang = locale === 'es-LatAm' ? 'es' : 'pt-BR';
+
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.getAttribute('data-i18n');
+        if (dict[key]) {
+            el.textContent = dict[key];
+        }
+    });
+
+    document.querySelectorAll('[data-i18n-title]').forEach(el => {
+        const key = el.getAttribute('data-i18n-title');
+        if (dict[key]) {
+            el.setAttribute('title', dict[key]);
+        }
+    });
+
+    document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+        const key = el.getAttribute('data-i18n-placeholder');
+        if (dict[key]) {
+            el.setAttribute('placeholder', dict[key]);
+        }
+    });
+
+    if (typeof VIEW_META !== 'undefined' && VIEW_META) {
+        if (locale === 'es-LatAm') {
+            if (VIEW_META['dashboard']) {
+                VIEW_META['dashboard'].title = dict.view_title_dashboard;
+                VIEW_META['dashboard'].section = dict.section_overview;
+                VIEW_META['dashboard'].subtitle = dict.view_sub_dashboard;
+            }
+            if (VIEW_META['history']) {
+                VIEW_META['history'].title = dict.view_title_history;
+                VIEW_META['history'].section = dict.section_overview;
+                VIEW_META['history'].subtitle = dict.view_sub_history;
+            }
+            if (VIEW_META['cadastros']) {
+                VIEW_META['cadastros'].title = dict.view_title_cadastros;
+                VIEW_META['cadastros'].section = dict.section_management;
+                VIEW_META['cadastros'].subtitle = dict.view_sub_cadastros;
+            }
+            if (VIEW_META['balancing']) {
+                VIEW_META['balancing'].title = dict.view_title_balancing;
+                VIEW_META['balancing'].section = dict.section_management;
+                VIEW_META['balancing'].subtitle = dict.view_sub_balancing;
+            }
+            if (VIEW_META['automations']) {
+                VIEW_META['automations'].title = dict.view_title_automations;
+                VIEW_META['automations'].section = dict.section_management;
+                VIEW_META['automations'].subtitle = dict.view_sub_automations;
+            }
+            if (VIEW_META['access-control']) {
+                VIEW_META['access-control'].title = dict.view_title_access;
+                VIEW_META['access-control'].section = dict.section_admin;
+                VIEW_META['access-control'].subtitle = dict.view_sub_access;
+            }
+        } else {
+            if (VIEW_META['dashboard']) {
+                VIEW_META['dashboard'].title = 'Dashboard';
+                VIEW_META['dashboard'].section = 'Geral';
+                VIEW_META['dashboard'].subtitle = 'Visão operacional de volumes mensais, FTEs requeridos e capacidade por equipe.';
+            }
+            if (VIEW_META['history']) {
+                VIEW_META['history'].title = 'Histórico';
+                VIEW_META['history'].section = 'Geral';
+                VIEW_META['history'].subtitle = 'Snapshots mensais salvos e evolução temporal dos volumes operacionais.';
+            }
+            if (VIEW_META['cadastros']) {
+                VIEW_META['cadastros'].title = 'Cadastros';
+                VIEW_META['cadastros'].section = 'Gestão';
+                VIEW_META['cadastros'].subtitle = 'Estrutura organizacional, equipes, colaboradores responsáveis e catálogo de atividades.';
+            }
+            if (VIEW_META['balancing']) {
+                VIEW_META['balancing'].title = 'Balanceamento';
+                VIEW_META['balancing'].section = 'Gestão';
+                VIEW_META['balancing'].subtitle = 'Planejamento diário de backlog e comparação de capacidade alocada vs. necessária.';
+            }
+            if (VIEW_META['automations']) {
+                VIEW_META['automations'].title = 'Automações (RPA)';
+                VIEW_META['automations'].section = 'Gestão';
+                VIEW_META['automations'].subtitle = 'Quadro analítico de processos robotizados, FTEs absorvidos e horas economizadas.';
+            }
+            if (VIEW_META['access-control']) {
+                VIEW_META['access-control'].title = 'Controle de Acesso';
+                VIEW_META['access-control'].section = 'Administração';
+                VIEW_META['access-control'].subtitle = 'Gestão centralizada de usuários, atribuição de perfis (ADMIN/OPERADOR/CONSULTA) e vinculação de equipes.';
+            }
+        }
+
+        const hashView = (window.location.hash || '').replace('#/', '').trim();
+        const activeView = (hashView && VIEW_META[hashView]) ? hashView : 'dashboard';
+        if (typeof updateViewHeader === 'function') {
+            updateViewHeader(activeView);
+        }
+    }
+
+    applyCountryRpaVisibility();
+}
+
+// DEFAULT HISPANA DATA (AR, MX, CO)
+const EXAMPLE_PROCESSES_HISPANA = [
+    { id: 'hsp-1', name: 'Dar aviso a los responsables de atención por inconvenientes en la App', area: 'App/Atención', responsavel: 'Valeria Sotes', responsaveis: ['Valeria Sotes'], volume: 21, minutos: 15, qtdExecucao: 21, backlogVolume: '', allocatedResource: '', reviewStatus: 'Manter', isRpa: false, observacao: 'Finket avisa y desde operaciones damos reportamos a atencion' },
+    { id: 'hsp-2', name: 'Actualización de procesos/productos', area: 'Producto/Expansión', responsavel: 'Valeria Sotes', responsaveis: ['Valeria Sotes'], volume: 0, minutos: 0, qtdExecucao: 1, backlogVolume: '', allocatedResource: '', reviewStatus: 'Manter', isRpa: false },
+    { id: 'hsp-3', name: 'Soporte en expansión y nuevos productos', area: 'Producto/Expansión', responsavel: 'Valeria Sotes', responsaveis: ['Valeria Sotes'], volume: 0, minutos: 0, qtdExecucao: 1, backlogVolume: '', allocatedResource: '', reviewStatus: 'Manter', isRpa: false },
+    { id: 'hsp-4', name: 'Parametrización del conciliador FDELIUS', area: 'Conciliaciones', responsavel: 'Valeria Sotes', responsaveis: ['Valeria Sotes'], volume: 1, minutos: 60, qtdExecucao: 1, backlogVolume: '', allocatedResource: '', reviewStatus: 'Manter', isRpa: false, observacao: 'Para pruebas y ajustes de reporte' },
+    { id: 'hsp-5', name: 'Identificación de procesos de conciliación y armado de flujos', area: 'Conciliaciones', responsavel: 'Valeria Sotes', responsaveis: ['Valeria Sotes'], volume: 0, minutos: 0, qtdExecucao: 1, backlogVolume: '', allocatedResource: '', reviewStatus: 'Manter', isRpa: false },
+    { id: 'hsp-6', name: 'Registro en Gsurf de pagos AVON/NATURA', area: 'Tesorería/Operaciones', responsavel: 'Valeria Sotes', responsaveis: ['Valeria Sotes'], volume: 4, minutos: 40, qtdExecucao: 4, backlogVolume: '', allocatedResource: '', reviewStatus: 'Manter', isRpa: false },
+    { id: 'hsp-7', name: 'Armado de flujo de caja Argentina', area: 'Operaciones/Conciliaciones', responsavel: 'Valeria Sotes', responsaveis: ['Valeria Sotes'], volume: 21, minutos: 90, qtdExecucao: 21, backlogVolume: '', allocatedResource: '', reviewStatus: 'Manter', isRpa: false, observacao: 'Semi automatizado' },
+    { id: 'hsp-8', name: 'Armado de flujo de caja México', area: 'Operaciones/Conciliaciones', responsavel: 'Valeria Sotes', responsaveis: ['Valeria Sotes'], volume: 21, minutos: 90, qtdExecucao: 21, backlogVolume: '', allocatedResource: '', reviewStatus: 'Manter', isRpa: false, observacao: 'DataBricks' },
+    { id: 'hsp-9', name: 'Levantar requerimientos al equipo de producto por fallas o mejoras del BO de Finket', area: 'Conciliaciones', responsavel: 'Valeria Sotes', responsaveis: ['Valeria Sotes'], volume: 21, minutos: 15, qtdExecucao: 21, backlogVolume: '', allocatedResource: '', reviewStatus: 'Manter', isRpa: false },
+    { id: 'hsp-10', name: 'Soporte para requerimientos del BCRA', area: 'Operaciones', responsavel: 'Valeria Sotes', responsaveis: ['Valeria Sotes'], volume: 1, minutos: 30, qtdExecucao: 1, backlogVolume: '', allocatedResource: '', reviewStatus: 'Manter', isRpa: false },
+    { id: 'hsp-11', name: 'Armado y envío de provisión del pendiente por la adquirencia a FIDEM', area: 'Conciliaciones', responsavel: 'Valeria Sotes', responsaveis: ['Valeria Sotes'], volume: 1, minutos: 90, qtdExecucao: 1, backlogVolume: '', allocatedResource: '', reviewStatus: 'Manter', isRpa: false },
+    { id: 'hsp-12', name: 'Bajada de liquidaciones diarias desde los diferentes portales de los adquirentes', area: 'Conciliaciones', responsavel: 'Valeria Sotes', responsaveis: ['Valeria Sotes'], volume: 21, minutos: 30, qtdExecucao: 21, backlogVolume: '', allocatedResource: '', reviewStatus: 'Manter', isRpa: false, observacao: '(Naranja, Payway, Cabal y Fiserv)' },
+    { id: 'hsp-13', name: 'Bajada de liquidaciones mensuales desde los diferentes portales de los adquirentes', area: 'Conciliaciones', responsavel: 'Valeria Sotes', responsaveis: ['Valeria Sotes'], volume: 1, minutos: 30, qtdExecucao: 1, backlogVolume: '', allocatedResource: '', reviewStatus: 'Manter', isRpa: false, observacao: '(Naranja, Payway, Cabal y Fiserv)' },
+    { id: 'hsp-14', name: 'Cierre de operaciones de México', area: 'Conciliaciones', responsavel: 'Valeria Sotes', responsaveis: ['Valeria Sotes'], volume: 0, minutos: 0, qtdExecucao: 1, backlogVolume: '', allocatedResource: '', reviewStatus: 'Manter', isRpa: false },
+    { id: 'hsp-15', name: 'Cierre de operaciones de Argentina', area: 'Conciliaciones', responsavel: 'Valeria Sotes', responsaveis: ['Valeria Sotes'], volume: 0, minutos: 0, qtdExecucao: 1, backlogVolume: '', allocatedResource: '', reviewStatus: 'Manter', isRpa: false },
+    { id: 'hsp-16', name: 'Acreditación de ganancias a las consultoras', area: 'Conciliaciones', responsavel: 'Valeria Sotes', responsaveis: ['Valeria Sotes'], volume: 1, minutos: 60, qtdExecucao: 1, backlogVolume: '', allocatedResource: '', reviewStatus: 'Manter', isRpa: false, observacao: 'Desde tesoreria la quieren diaria' },
+    { id: 'hsp-17', name: 'Transaccional de Billetera (Transferencias in/out, Pago de Boleta, SIRCUPA, Saldo Final al Conciliaciones)', area: 'Conciliaciones', responsavel: 'Valeria Sotes', responsaveis: ['Valeria Sotes'], volume: 1, minutos: 60, qtdExecucao: 1, backlogVolume: '', allocatedResource: '', reviewStatus: 'Manter', isRpa: false, observacao: '(Finket vs. BIND y Finket vs Saldo final App)' },
+    { id: 'hsp-18', name: 'Rendimientos', area: 'Conciliaciones', responsavel: 'Valeria Sotes', responsaveis: ['Valeria Sotes'], volume: 0, minutos: 0, qtdExecucao: 1, backlogVolume: '', allocatedResource: '', reviewStatus: 'Manter', isRpa: false, observacao: 'Desde tesoreria la estan reclamando' },
+    { id: 'hsp-19', name: 'Pagos a Natura', area: 'Tesorería', responsavel: 'Valeria Sotes', responsaveis: ['Valeria Sotes'], volume: 0, minutos: 0, qtdExecucao: 8, backlogVolume: '', allocatedResource: '', reviewStatus: 'Manter', isRpa: false, observacao: 'Conciliacion que corresponde a operaciones' },
+    { id: 'hsp-20', name: 'Pago a las consultoras', area: 'Tesorería', responsavel: 'Valeria Sotes', responsaveis: ['Valeria Sotes'], volume: 0, minutos: 0, qtdExecucao: 21, backlogVolume: '', allocatedResource: '', reviewStatus: 'Manter', isRpa: false, observacao: 'Tesoreria reclama que es de operaciones' },
+    { id: 'hsp-21', name: 'Creation vs adquirencia', area: 'Conciliaciones', responsavel: 'Valeria Sotes', responsaveis: ['Valeria Sotes'], volume: 1, minutos: 120, qtdExecucao: 1, backlogVolume: '', allocatedResource: '', reviewStatus: 'Manter', isRpa: false, observacao: 'GLOBAL' }
+];
+
+const DEFAULT_TEAMS_HISPANA = [
+    'Conciliaciones',
+    'Operaciones/Conciliaciones',
+    'Tesorería',
+    'Tesorería/Operaciones',
+    'App/Atención',
+    'Producto/Expansión',
+    'Operaciones'
+];
+
+const DEFAULT_TEAM_HIERARCHY_HISPANA = {
+    'Conciliaciones': { gerencia: 'Conciliación y Operaciones', diretoria: 'Operaciones Hispana', coordenador: 'Valeria Sotes', coordenadorEmail: '' },
+    'Operaciones/Conciliaciones': { gerencia: 'Conciliación y Operaciones', diretoria: 'Operaciones Hispana', coordenador: 'Valeria Sotes', coordenadorEmail: '' },
+    'Tesorería': { gerencia: 'Tesorería', diretoria: 'Operaciones Hispana', coordenador: 'Valeria Sotes', coordenadorEmail: '' },
+    'Tesorería/Operaciones': { gerencia: 'Tesorería', diretoria: 'Operaciones Hispana', coordenador: 'Valeria Sotes', coordenadorEmail: '' },
+    'App/Atención': { gerencia: 'Atención al Cliente', diretoria: 'Operaciones Hispana', coordenador: 'Valeria Sotes', coordenadorEmail: '' },
+    'Producto/Expansión': { gerencia: 'Producto', diretoria: 'Operaciones Hispana', coordenador: 'Valeria Sotes', coordenadorEmail: '' },
+    'Operaciones': { gerencia: 'Operaciones Generales', diretoria: 'Operaciones Hispana', coordenador: 'Valeria Sotes', coordenadorEmail: '' }
+};
+
+const DEFAULT_RESPONSAVEIS_HISPANA = [
+    { name: 'Valeria Sotes', email: '', area: 'Conciliaciones', horasDia: null, absenteismo: null, diasUteis: null }
+];
 
 // APPLICATION STATE MANAGEMENT
 let state = {
@@ -883,6 +1553,28 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (btnSignup) btnSignup.addEventListener('click', handleSignup);
     if (btnLogout) btnLogout.addEventListener('click', () => handleLogout(false));
 
+    // Sync Country Selector & i18n
+    const savedCountry = localStorage.getItem('painel_ops_current_country');
+    if (savedCountry && COUNTRY_CONFIG[savedCountry]) {
+        currentCountry = savedCountry;
+    }
+    const flagEl = document.getElementById('country-flag-icon');
+    const labelEl = document.getElementById('country-name-label');
+    if (flagEl && COUNTRY_CONFIG[currentCountry]) flagEl.textContent = COUNTRY_CONFIG[currentCountry].flag;
+    if (labelEl && COUNTRY_CONFIG[currentCountry]) labelEl.textContent = COUNTRY_CONFIG[currentCountry].name;
+    document.querySelectorAll('.country-dropdown-option').forEach(opt => {
+        const c = opt.getAttribute('data-country');
+        const check = opt.querySelector('.country-opt-check');
+        if (c === currentCountry) {
+            opt.classList.add('active');
+            if (check) check.style.display = 'inline-block';
+        } else {
+            opt.classList.remove('active');
+            if (check) check.style.display = 'none';
+        }
+    });
+    applyI18n(COUNTRY_CONFIG[currentCountry]?.locale || 'pt-BR');
+
     loadState();
     setupEventListeners();
     
@@ -1094,15 +1786,18 @@ function subscribeRealtime() {
 
     updateRealtimeStatusUI('CONNECTING');
 
+    const targetId = COUNTRY_CONFIG[currentCountry]?.boardStateId || 'default';
+    const targetChannel = COUNTRY_CONFIG[currentCountry]?.realtimeChannel || 'board-changes';
+
     realtimeChannel = client
-        .channel('board-changes')
+        .channel(targetChannel)
         .on('postgres_changes', {
             event: '*',
             schema: 'public',
             table: 'board_state',
-            filter: 'id=eq.default'
+            filter: `id=eq.${targetId}`
         }, (payload) => {
-            console.log('[Realtime] Evento recebido via WebSocket:', payload.eventType, payload);
+            console.log(`[Realtime HML ${currentCountry}] Evento recebido via WebSocket:`, payload.eventType, payload);
             
             const payloadData = payload.new || payload.record;
             if (payloadData && payloadData.data) {
@@ -1120,7 +1815,11 @@ function subscribeRealtime() {
                 
                 state = payloadData.data;
                 applyStateMigrations();
-                localStorage.setItem('capacity_fte_hub_state', JSON.stringify(state));
+                const storageKey = COUNTRY_CONFIG[currentCountry]?.storageKey || 'capacity_fte_hub_state_BR';
+                localStorage.setItem(storageKey, JSON.stringify(state));
+                if (currentCountry === 'BR') {
+                    localStorage.setItem('capacity_fte_hub_state', JSON.stringify(state));
+                }
                 refreshAllViews();
 
                 // 3. Debounce toast popups so multiple rapid events show at most 1 clean notification
@@ -1132,7 +1831,7 @@ function subscribeRealtime() {
             }
         })
         .subscribe((status, err) => {
-            console.log('[Realtime] Status da inscrição:', status, err || '');
+            console.log(`[Realtime HML ${currentCountry}] Status da inscrição:`, status, err || '');
             if (status === 'SUBSCRIBED') {
                 updateRealtimeStatusUI('SUBSCRIBED');
             } else if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
@@ -1165,11 +1864,12 @@ async function saveStateToSupabase() {
 
     try {
         const myUserId = window._authUserId;
+        const targetId = COUNTRY_CONFIG[currentCountry]?.boardStateId || 'default';
 
         const { error } = await client
             .from('board_state')
             .upsert({
-                id: 'default',
+                id: targetId,
                 data: state,
                 updated_by: myUserId || null,
                 updated_at: new Date().toISOString()
@@ -1201,7 +1901,7 @@ async function forceResetGlobalState() {
         return;
     }
 
-    if (!confirm('Deseja realmente definir e publicar a sua visão atual como a base oficial para TODOS os usuários? Isso sincronizará a tela de todos imediatamente.')) {
+    if (!confirm('Deseja realmente definir e publicar a sua visão atual como a base oficial para TODOS os usuários nesta região? Isso sincronizará a tela de todos imediatamente.')) {
         return;
     }
 
@@ -1209,11 +1909,12 @@ async function forceResetGlobalState() {
     if (!client) return;
 
     try {
+        const targetId = COUNTRY_CONFIG[currentCountry]?.boardStateId || 'default';
         const { data: { user } } = await client.auth.getUser();
         const { error } = await client
             .from('board_state')
             .upsert({
-                id: 'default',
+                id: targetId,
                 data: state,
                 updated_by: user ? user.id : null,
                 updated_at: new Date().toISOString()
@@ -1236,10 +1937,11 @@ async function loadStateFromSupabase() {
     if (!client) return false;
 
     try {
+        const targetId = COUNTRY_CONFIG[currentCountry]?.boardStateId || 'default';
         const { data, error } = await client
             .from('board_state')
             .select('data, updated_at')
-            .eq('id', 'default')
+            .eq('id', targetId)
             .maybeSingle();
 
         if (error) {
@@ -1253,14 +1955,18 @@ async function loadStateFromSupabase() {
         }
 
         if (!data || !data.data) {
-            console.log('[Supabase Load] Nenhum registro existente na tabela board_state.');
+            console.log(`[Supabase Load ${currentCountry}] Nenhum registro existente na tabela board_state.`);
             return false;
         }
 
         state = data.data;
         applyStateMigrations();
-        localStorage.setItem('capacity_fte_hub_state', JSON.stringify(state));
-        console.log('[Supabase Load] Estado compartilhado carregado com sucesso!');
+        const storageKey = COUNTRY_CONFIG[currentCountry]?.storageKey || 'capacity_fte_hub_state_BR';
+        localStorage.setItem(storageKey, JSON.stringify(state));
+        if (currentCountry === 'BR') {
+            localStorage.setItem('capacity_fte_hub_state', JSON.stringify(state));
+        }
+        console.log(`[Supabase Load ${currentCountry}] Estado compartilhado carregado com sucesso!`);
         return true;
     } catch (err) {
         console.error('[Supabase Load Exception]', err);
@@ -1272,6 +1978,7 @@ async function loadStateFromSupabase() {
 
 function isRpaActivity(proc) {
     if (!proc) return false;
+    if (currentCountry === 'HISPANA') return false;
     return proc.isRpa === true || proc.isRpa === 'true' || proc.isRpa === 1;
 }
 
@@ -1310,9 +2017,9 @@ function applyStateMigrations() {
     if (!state.params) {
         state.params = {
             horasDia: 8.0,
-            absenteismo: 0,
+            absenteismo: 20,
             diasUteis: 21,
-            teamSize: 1
+            teamSize: 5.0
         };
     }
     if (!state.areaAllocations) state.areaAllocations = {};
@@ -1320,11 +2027,14 @@ function applyStateMigrations() {
         state.processes.sort((a, b) => (a.name || '').localeCompare(b.name || '', 'pt-BR', { sensitivity: 'base' }));
     }
     if (!state.processes) {
-        state.processes = JSON.parse(JSON.stringify(EXAMPLE_PROCESSES));
+        state.processes = currentCountry === 'HISPANA'
+            ? JSON.parse(JSON.stringify(EXAMPLE_PROCESSES_HISPANA))
+            : JSON.parse(JSON.stringify(EXAMPLE_PROCESSES));
     }
 
+    const exampleList = currentCountry === 'HISPANA' ? EXAMPLE_PROCESSES_HISPANA : EXAMPLE_PROCESSES;
     state.processes.forEach(p => {
-        const match = EXAMPLE_PROCESSES.find(ep => ep.name === p.name);
+        const match = exampleList.find(ep => ep.name === p.name);
         if (match && (!p.area || p.area.trim() === '')) p.area = match.area;
         if (p.backlogVolume === undefined) p.backlogVolume = '';
         if (p.allocatedResource === undefined) p.allocatedResource = '';
@@ -1338,15 +2048,19 @@ function applyStateMigrations() {
     });
     if (state.history === undefined) state.history = [];
     if (state.teams === undefined) {
-        if (state.customAreas && state.customAreas.length > 0) {
-            state.teams = ['Backoffice', 'Governança', 'Seguros/N2', 'Eficiência Operacional', ...state.customAreas];
+        if (currentCountry === 'HISPANA') {
+            state.teams = [...DEFAULT_TEAMS_HISPANA];
         } else {
-            state.teams = ['Backoffice', 'Governança', 'Seguros/N2', 'Eficiência Operacional'];
+            if (state.customAreas && state.customAreas.length > 0) {
+                state.teams = ['Backoffice', 'Governança', 'Seguros/N2', 'Eficiência Operacional', ...state.customAreas];
+            } else {
+                state.teams = ['Backoffice', 'Governança', 'Seguros/N2', 'Eficiência Operacional'];
+            }
         }
     }
     if (!state.teamHierarchy) state.teamHierarchy = {};
     
-    const defaultRelations = {
+    const defaultRelations = currentCountry === 'HISPANA' ? DEFAULT_TEAM_HIERARCHY_HISPANA : {
         'Backoffice': { gerencia: 'Conciliação', diretoria: 'Operações' },
         'Governança': { gerencia: 'Suporte Operacional', diretoria: 'Operações' },
         'Seguros/N2': { gerencia: 'Atendimento', diretoria: 'Operações' },
@@ -1355,7 +2069,7 @@ function applyStateMigrations() {
     
     state.teams.forEach(team => {
         if (!state.teamHierarchy[team]) {
-            state.teamHierarchy[team] = defaultRelations[team] || { gerencia: 'Suporte Operacional', diretoria: 'Operações', coordenador: '', coordenadorEmail: '' };
+            state.teamHierarchy[team] = defaultRelations[team] || { gerencia: currentCountry === 'HISPANA' ? 'Operaciones Generales' : 'Suporte Operacional', diretoria: currentCountry === 'HISPANA' ? 'Operaciones Hispana' : 'Operações', coordenador: '', coordenadorEmail: '' };
         }
         if (state.teamHierarchy[team].coordenador === undefined) {
             state.teamHierarchy[team].coordenador = '';
@@ -1366,12 +2080,16 @@ function applyStateMigrations() {
     });
 
     if (!state.responsaveis) {
-        const uniqueResps = [...new Set(state.processes.map(p => p.responsavel || '').filter(r => r.trim() !== ''))].sort();
-        state.responsaveis = uniqueResps.map(r => {
-            const procWithResp = state.processes.find(p => p.responsavel === r);
-            const inheritedArea = procWithResp ? procWithResp.area : '';
-            return { name: r, area: inheritedArea, horasDia: null, absenteismo: null, diasUteis: null };
-        });
+        if (currentCountry === 'HISPANA') {
+            state.responsaveis = JSON.parse(JSON.stringify(DEFAULT_RESPONSAVEIS_HISPANA));
+        } else {
+            const uniqueResps = [...new Set(state.processes.map(p => p.responsavel || '').filter(r => r.trim() !== ''))].sort();
+            state.responsaveis = uniqueResps.map(r => {
+                const procWithResp = state.processes.find(p => p.responsavel === r);
+                const inheritedArea = procWithResp ? procWithResp.area : '';
+                return { name: r, area: inheritedArea, horasDia: null, absenteismo: null, diasUteis: null };
+            });
+        }
     } else if (Array.isArray(state.responsaveis) && state.responsaveis.length > 0 && typeof state.responsaveis[0] === 'string') {
         state.responsaveis = state.responsaveis.map(r => {
             const procWithResp = state.processes.find(p => p.responsavel === r);
@@ -1397,7 +2115,8 @@ function applyStateMigrations() {
 
 // LOAD STATE FROM LOCALSTORAGE WITH AREA & BACKLOG MIGRATION
 function loadState() {
-    const saved = localStorage.getItem('capacity_fte_hub_state');
+    const storageKey = COUNTRY_CONFIG[currentCountry]?.storageKey || 'capacity_fte_hub_state_BR';
+    const saved = localStorage.getItem(storageKey) || (currentCountry === 'BR' ? localStorage.getItem('capacity_fte_hub_state') : null);
     let useDefaults = false;
     
     if (saved) {
@@ -1419,23 +2138,39 @@ function loadState() {
     }
 
     if (useDefaults) {
-        state.processes = JSON.parse(JSON.stringify(EXAMPLE_PROCESSES));
-        state.customAreas = [];
-        state.areaAllocations = {};
-        state.teams = ['Backoffice', 'Governança', 'Seguros/N2', 'Eficiência Operacional'];
-        const uniqueResps = [...new Set(state.processes.map(p => p.responsavel || '').filter(r => r.trim() !== ''))].sort();
-        state.responsaveis = uniqueResps.map(r => {
-            const procWithResp = state.processes.find(p => p.responsavel === r);
-            const inheritedArea = procWithResp ? procWithResp.area : '';
-            return { name: r, area: inheritedArea, horasDia: null, absenteismo: null, diasUteis: null };
-        });
-        state.history = [];
-        state.params = {
-            horasDia: 8.0,
-            absenteismo: 20,
-            diasUteis: 21,
-            teamSize: 5.0
-        };
+        if (currentCountry === 'HISPANA') {
+            state.processes = JSON.parse(JSON.stringify(EXAMPLE_PROCESSES_HISPANA));
+            state.customAreas = [];
+            state.areaAllocations = {};
+            state.teams = [...DEFAULT_TEAMS_HISPANA];
+            state.teamHierarchy = JSON.parse(JSON.stringify(DEFAULT_TEAM_HIERARCHY_HISPANA));
+            state.responsaveis = JSON.parse(JSON.stringify(DEFAULT_RESPONSAVEIS_HISPANA));
+            state.history = [];
+            state.params = {
+                horasDia: 8.0,
+                absenteismo: 20,
+                diasUteis: 21,
+                teamSize: 5.0
+            };
+        } else {
+            state.processes = JSON.parse(JSON.stringify(EXAMPLE_PROCESSES));
+            state.customAreas = [];
+            state.areaAllocations = {};
+            state.teams = ['Backoffice', 'Governança', 'Seguros/N2', 'Eficiência Operacional'];
+            const uniqueResps = [...new Set(state.processes.map(p => p.responsavel || '').filter(r => r.trim() !== ''))].sort();
+            state.responsaveis = uniqueResps.map(r => {
+                const procWithResp = state.processes.find(p => p.responsavel === r);
+                const inheritedArea = procWithResp ? procWithResp.area : '';
+                return { name: r, area: inheritedArea, horasDia: null, absenteismo: null, diasUteis: null };
+            });
+            state.history = [];
+            state.params = {
+                horasDia: 8.0,
+                absenteismo: 20,
+                diasUteis: 21,
+                teamSize: 5.0
+            };
+        }
         saveState();
     }
 
@@ -1456,16 +2191,19 @@ function loadState() {
 let _saveDebounceTimer = null;
 
 function saveState() {
-    localStorage.setItem('capacity_fte_hub_state', JSON.stringify(state));
+    const storageKey = COUNTRY_CONFIG[currentCountry]?.storageKey || 'capacity_fte_hub_state_BR';
+    localStorage.setItem(storageKey, JSON.stringify(state));
+    if (currentCountry === 'BR') {
+        localStorage.setItem('capacity_fte_hub_state', JSON.stringify(state));
+    }
     
     // Somente persiste no Supabase se houver usuário autenticado
     if (!window._authUserId) return;
 
-    // Debounce to prevent flooding Supabase with calls on every keystroke
     if (_saveDebounceTimer) clearTimeout(_saveDebounceTimer);
     _saveDebounceTimer = setTimeout(() => {
         saveStateToSupabase();
-    }, 1000);
+    }, 400);
 }
 
 // GET RESPONSIBLE SPECIFIC CAPACITY PARAMETERS WITH GLOBAL FALLBACK
@@ -1763,12 +2501,12 @@ function renderOrganogramFlowchart() {
 const VIEW_META = {
     'dashboard': {
         title: 'Dashboard',
-        section: 'Visão Geral',
+        section: 'Geral',
         subtitle: 'Visão operacional de volumes mensais, FTEs requeridos e capacidade por equipe.'
     },
     'history': {
         title: 'Histórico',
-        section: 'Visão Geral',
+        section: 'Geral',
         subtitle: 'Snapshots mensais salvos e evolução temporal dos volumes operacionais.'
     },
     'cadastros': {
@@ -2306,7 +3044,7 @@ function renderTable() {
             document.getElementById('fte-table').style.display = 'table';
             
             const tr = document.createElement('tr');
-            tr.innerHTML = `<td colspan="8" style="text-align: center; color: var(--text-muted); padding: 2rem;">Nenhuma atividade cadastrada nesta busca/filtro.</td>`;
+            tr.innerHTML = `<td colspan="8" style="text-align: center; color: var(--text-muted); padding: 2rem;">${t('empty_no_activities_filter', 'Nenhuma atividade cadastrada nesta busca/filtro.')}</td>`;
             tableBody.appendChild(tr);
         }
         updateCalculations();
@@ -2339,10 +3077,10 @@ function renderTable() {
                 </div>
             </td>
             <td>
-                <span class="badge-area" style="font-size: 0.85rem; padding: 0.25rem 0.5rem; border-radius: 4px; background: rgba(235, 92, 39, 0.08); color: var(--color-primary); border: 1px solid rgba(235, 92, 39, 0.15);">${escapeHtml(proc.area || 'Sem Equipe')}</span>
+                <span class="badge-area" style="font-size: 0.85rem; padding: 0.25rem 0.5rem; border-radius: 4px; background: rgba(235, 92, 39, 0.08); color: var(--color-primary); border: 1px solid rgba(235, 92, 39, 0.15);">${escapeHtml(proc.area || t('lbl_no_team', 'Sem Equipe'))}</span>
             </td>
             <td>
-                <span style="font-size: 0.9rem; color: var(--text-secondary);">${escapeHtml(proc.responsavel || 'Sem Responsável')}</span>
+                <span style="font-size: 0.9rem; color: var(--text-secondary);">${escapeHtml(proc.responsavel || t('lbl_no_resp', 'Sem Responsável'))}</span>
             </td>
             <td class="consulta-hidden">
                 <input type="number" class="input-volume" value="${proc.volume}" placeholder="---" min="0" ${isRowDisabled ? 'disabled style="opacity: 0.6; pointer-events: none;"' : ''}>
@@ -2423,7 +3161,7 @@ function renderBalancingTable() {
             document.getElementById('balancing-table').style.display = 'table';
             
             const tr = document.createElement('tr');
-            tr.innerHTML = `<td colspan="7" style="text-align: center; color: var(--text-muted); padding: 2rem;">Nenhuma atividade cadastrada nesta busca/filtro.</td>`;
+            tr.innerHTML = `<td colspan="7" style="text-align: center; color: var(--text-muted); padding: 2rem;">${t('empty_no_activities_filter', 'Nenhuma atividade cadastrada nesta busca/filtro.')}</td>`;
             balancingBody.appendChild(tr);
         }
         updateBalancingCalculations();
@@ -2447,9 +3185,9 @@ function renderBalancingTable() {
         
         let volumeFieldHtml = '';
         if (proc.reviewStatus === 'Parar') {
-            volumeFieldHtml = `<input type="text" class="input-backlog-volume" value="Parado (Sem FTE)" disabled style="opacity: 0.6; cursor: not-allowed; text-align: center; background: rgba(255, 255, 255, 0.02);">`;
+            volumeFieldHtml = `<input type="text" class="input-backlog-volume" value="${t('status_stopped_no_fte', 'Parado (Sem FTE)')}" disabled style="opacity: 0.6; cursor: not-allowed; text-align: center; background: rgba(255, 255, 255, 0.02);">`;
         } else if (isTempoFrequencia) {
-            volumeFieldHtml = `<input type="text" class="input-backlog-volume" value="Rotina (Fixa)" disabled style="opacity: 0.6; cursor: not-allowed; text-align: center; background: rgba(255, 255, 255, 0.02);">`;
+            volumeFieldHtml = `<input type="text" class="input-backlog-volume" value="${t('status_routine_fixed', 'Rotina (Fixa)')}" disabled style="opacity: 0.6; cursor: not-allowed; text-align: center; background: rgba(255, 255, 255, 0.02);">`;
         } else if (!canEditThisArea) {
             const hasBacklog = proc.backlogVolume !== undefined && proc.backlogVolume !== '';
             const backlogVolVal = hasBacklog ? parseFloat(proc.backlogVolume) : '';
@@ -2457,7 +3195,7 @@ function renderBalancingTable() {
         } else {
             const hasBacklog = proc.backlogVolume !== undefined && proc.backlogVolume !== '';
             const backlogVolVal = hasBacklog ? parseFloat(proc.backlogVolume) : '';
-            volumeFieldHtml = `<input type="number" class="input-backlog-volume" value="${backlogVolVal}" placeholder="Digite o backlog" min="0">`;
+            volumeFieldHtml = `<input type="number" class="input-backlog-volume" value="${backlogVolVal}" placeholder="${t('placeholder_enter_backlog', 'Digite o backlog')}" min="0">`;
         }
         
         const reviewBadgeHtml = proc.reviewStatus && proc.reviewStatus !== 'Manter'
@@ -2474,11 +3212,11 @@ function renderBalancingTable() {
             </td>
             <td>
                 <span class="badge" style="margin-left: 0; background: rgba(235, 92, 39, 0.15); border: 1px solid var(--color-primary); color: var(--color-primary); box-shadow: none;">
-                    ${escapeHtml(proc.area)}
+                    ${escapeHtml(proc.area || t('lbl_no_team', 'Sem Equipe'))}
                 </span>
             </td>
             <td>
-                <span style="font-size: 0.9rem; color: var(--text-secondary);">${escapeHtml(proc.responsavel || 'Sem Responsável')}</span>
+                <span style="font-size: 0.9rem; color: var(--text-secondary);">${escapeHtml(proc.responsavel || t('lbl_no_resp', 'Sem Responsável'))}</span>
             </td>
             <td>${minutes.toFixed(0)} min</td>
             <td>
@@ -2793,17 +3531,39 @@ function updateCalculations() {
     const elFteReqSub = document.getElementById('widget-fte-required-sub');
     if (elFteReq) {
         if (pendingTimeCount > 0) {
-            elFteReq.innerHTML = `<span style="font-size: 1.15rem; color: #f59e0b; font-weight: 700;">Em construção</span>`;
+            elFteReq.innerHTML = `<span style="font-size: 1.15rem; color: #f59e0b; font-weight: 700;">${t('kpi_under_construction', 'Em construção')}</span>`;
             if (elFteReqSub) {
-                elFteReqSub.textContent = `${pendingTimeCount} atividade(s) sem tempo`;
+                elFteReqSub.textContent = `${pendingTimeCount} ${t('kpi_without_time', 'atividade(s) sem tempo')}`;
                 elFteReqSub.style.color = '#f59e0b';
             }
         } else {
             elFteReq.textContent = targetFteDecAccum.toFixed(2);
             if (elFteReqSub) {
-                elFteReqSub.textContent = isFiltered && currentFilterValue !== 'all' ? `Demanda em ${currentFilterValue}` : 'Recursos necessários';
+                elFteReqSub.textContent = isFiltered && currentFilterValue !== 'all' ? `${t('kpi_demand_in', 'Demanda em')} ${currentFilterValue}` : t('kpi_resources_needed', 'Recursos necessários');
                 elFteReqSub.style.color = '';
             }
+        }
+    }
+
+    // Update FTE da Área / Capacidade de Recursos (Total de funcionários cadastrados na área/geral)
+    let targetResponsiblesCount = 0;
+    if (isFiltered && currentFilterValue !== 'all') {
+        targetResponsiblesCount = (state.responsaveis || []).filter(r => {
+            const rArea = typeof r === 'object' ? r.area : '';
+            return rArea === currentFilterValue;
+        }).length;
+    } else {
+        targetResponsiblesCount = (state.responsaveis || []).length;
+    }
+
+    const elFteArea = document.getElementById('widget-fte-area');
+    const elFteAreaSub = document.getElementById('widget-fte-area-sub');
+    if (elFteArea) {
+        elFteArea.textContent = targetResponsiblesCount;
+        if (elFteAreaSub) {
+            elFteAreaSub.textContent = isFiltered && currentFilterValue !== 'all' 
+                ? `${t('kpi_team_in', 'Equipe em')} ${currentFilterValue}` 
+                : t('kpi_fte_area_sub', 'Total de funcionários');
         }
     }
     
@@ -2816,13 +3576,13 @@ function updateCalculations() {
     if (elRpaCount) elRpaCount.textContent = targetRpaCount;
 
     const elRpaCountSub = document.getElementById('widget-rpa-count-sub');
-    if (elRpaCountSub) elRpaCountSub.textContent = `${pctRpaCount.toFixed(1)}% das atividades`;
+    if (elRpaCountSub) elRpaCountSub.textContent = `${pctRpaCount.toFixed(1)}% ${t('kpi_of_activities', 'das atividades')}`;
 
     const elRpaFte = document.getElementById('widget-rpa-fte');
     if (elRpaFte) elRpaFte.textContent = targetRpaFteDecAccum.toFixed(2);
 
     const elRpaFteSub = document.getElementById('widget-rpa-fte-sub');
-    if (elRpaFteSub) elRpaFteSub.textContent = `${pctRpaFte.toFixed(1)}% do capacity`;
+    if (elRpaFteSub) elRpaFteSub.textContent = `${pctRpaFte.toFixed(1)}% ${t('kpi_of_capacity', 'do capacity')}`;
 
     // Update placeholders for responsible overrides inputs in-place to avoid re-rendering layout
     const horasInputs = document.querySelectorAll('.override-horas');
@@ -2966,21 +3726,19 @@ function updateBalancingCalculations() {
     const elBacklogFteSub = document.getElementById('widget-backlog-fte-sub');
     if (elBacklogFte) {
         if (pendingTimeCountBalancing > 0) {
-            elBacklogFte.innerHTML = `<span style="font-size: 1.15rem; color: #f59e0b; font-weight: 700;">Em construção</span>`;
+            elBacklogFte.innerHTML = `<span style="font-size: 1.15rem; color: #f59e0b; font-weight: 700;">${t('kpi_under_construction', 'Em construção')}</span>`;
             if (elBacklogFteSub) {
-                elBacklogFteSub.textContent = `${pendingTimeCountBalancing} atividade(s) sem tempo`;
+                elBacklogFteSub.textContent = `${pendingTimeCountBalancing} ${t('kpi_without_time', 'atividade(s) sem tempo')}`;
                 elBacklogFteSub.style.color = '#f59e0b';
             }
         } else {
             elBacklogFte.textContent = totalFteDecAccum.toFixed(2);
             if (elBacklogFteSub) {
-                elBacklogFteSub.textContent = 'Recursos necessários';
+                elBacklogFteSub.textContent = t('kpi_resources_needed', 'Recursos necessários');
                 elBacklogFteSub.style.color = '';
             }
         }
     }
-
-
 
     // Update Área Allocations Side Panel
     renderAreaAllocations();
@@ -2999,7 +3757,8 @@ function renderAreaAllocations() {
     
     // Check if we need to do a full rebuild or if we can just update in place
     const existingCards = listContainer.querySelectorAll('.area-alloc-card');
-    const needsFullRebuild = existingCards.length !== areas.length;
+    const existingAreaNames = Array.from(existingCards).map(c => c.dataset.area);
+    const needsFullRebuild = areas.length !== existingAreaNames.length || !areas.every((a, i) => a === existingAreaNames[i]);
     
     if (needsFullRebuild) {
         listContainer.innerHTML = '';
@@ -3032,18 +3791,18 @@ function renderAreaAllocations() {
         let statusHtml = '';
         if (allocatedNum === 0) {
             if (requiredFte > 0) {
-                statusHtml = `<span class="badge" style="margin-left: 0; background: rgba(244, 63, 94, 0.15); border: 1px solid #f43f5e; color: #f43f5e; box-shadow: none;">Inferior</span>`;
+                statusHtml = `<span class="badge" style="margin-left: 0; background: rgba(244, 63, 94, 0.15); border: 1px solid #f43f5e; color: #f43f5e; box-shadow: none;">${t('status_inferior', 'Inferior')}</span>`;
             } else {
-                statusHtml = `<span class="badge" style="margin-left: 0; background: rgba(14, 165, 233, 0.15); border: 1px solid #0ea5e9; color: #0ea5e9; box-shadow: none;">Equivalente</span>`;
+                statusHtml = `<span class="badge" style="margin-left: 0; background: rgba(14, 165, 233, 0.15); border: 1px solid #0ea5e9; color: #0ea5e9; box-shadow: none;">${t('status_equivalent', 'Equivalente')}</span>`;
             }
         } else {
             const diff = allocatedNum - requiredFte;
             if (Math.abs(diff) < 0.05) {
-                statusHtml = `<span class="badge" style="margin-left: 0; background: rgba(14, 165, 233, 0.15); border: 1px solid #0ea5e9; color: #0ea5e9; box-shadow: none;">Equivalente</span>`;
+                statusHtml = `<span class="badge" style="margin-left: 0; background: rgba(14, 165, 233, 0.15); border: 1px solid #0ea5e9; color: #0ea5e9; box-shadow: none;">${t('status_equivalent', 'Equivalente')}</span>`;
             } else if (diff > 0) {
-                statusHtml = `<span class="badge" style="margin-left: 0; background: rgba(16, 185, 129, 0.15); border: 1px solid #10b981; color: #10b981; box-shadow: none;">Superior</span>`;
+                statusHtml = `<span class="badge" style="margin-left: 0; background: rgba(16, 185, 129, 0.15); border: 1px solid #10b981; color: #10b981; box-shadow: none;">${t('status_superior', 'Superior')}</span>`;
             } else {
-                statusHtml = `<span class="badge" style="margin-left: 0; background: rgba(244, 63, 94, 0.15); border: 1px solid #f43f5e; color: #f43f5e; box-shadow: none;">Inferior</span>`;
+                statusHtml = `<span class="badge" style="margin-left: 0; background: rgba(244, 63, 94, 0.15); border: 1px solid #f43f5e; color: #f43f5e; box-shadow: none;">${t('status_inferior', 'Inferior')}</span>`;
             }
         }
         
@@ -3077,10 +3836,10 @@ function renderAreaAllocations() {
                 </div>
                 <div class="area-alloc-body">
                     <div class="area-alloc-stat">
-                        FTE Requerido: <span>${requiredFte.toFixed(2)}</span>
+                        ${t('lbl_fte_needed', 'FTE Requerido:')} <span>${requiredFte.toFixed(2)}</span>
                     </div>
                     <div style="display: flex; align-items: center; gap: 0.5rem;">
-                        <span style="font-size: 0.75rem; color: var(--text-secondary);">Alocado:</span>
+                        <span style="font-size: 0.75rem; color: var(--text-secondary);">${t('lbl_allocated', 'Alocado:')}</span>
                         <div class="area-allocation-value" style="padding: 0.2rem 0.6rem; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 4px; font-weight: 500; font-size: 0.9rem; min-width: 40px; text-align: center;">
                             ${allocatedNum}
                         </div>
@@ -3690,7 +4449,7 @@ function renderAreaFilterOptions() {
     const currentValueReview = filterSelectReview.value;
     const currentValueGlobal = globalFilterArea ? globalFilterArea.value : 'all';
     
-    const optionsHtml = '<option value="all">Todas as Áreas</option>' +
+    const optionsHtml = `<option value="all">${t('opt_all_areas', 'Todas as Áreas')}</option>` +
         (state.teams || []).map(area =>
             `<option value="${escapeHtml(area)}">${escapeHtml(area)}</option>`
         ).join('');
@@ -3887,7 +4646,7 @@ function updateSingleRespSelect(selectEl, areaValue, preferredVal) {
     const currentVal = (preferredVal !== undefined) ? preferredVal : selectEl.value;
     const names = getResponsaveisForArea(areaValue);
     
-    let html = `<option value="all">Todos os Responsáveis${areaValue && areaValue !== 'all' ? ` (${names.length})` : ''}</option>`;
+    let html = `<option value="all">${t('opt_all_resps', 'Todos os Responsáveis')}${areaValue && areaValue !== 'all' ? ` (${names.length})` : ''}</option>`;
     names.forEach(name => {
         html += `<option value="${escapeHtml(name)}">${escapeHtml(name)}</option>`;
     });
@@ -3929,7 +4688,7 @@ function renderResponsavelFilterOptions(targetArea) {
         const cadArea = targetArea !== undefined ? targetArea : (cadFilterArea ? cadFilterArea.value : '');
         const names = getResponsaveisForArea(cadArea);
         const curVal = cadFilterResp.value;
-        let html = '<option value="">Todos os Responsáveis</option>';
+        let html = `<option value="">${t('opt_all_resps', 'Todos os Responsáveis')}</option>`;
         names.forEach(name => {
             html += `<option value="${escapeHtml(name)}">${escapeHtml(name)}</option>`;
         });
@@ -4458,13 +5217,13 @@ function renderCadastrosView() {
             const teamOptions = (state.teams || []).map(team => `
                 <option value="${escapeHtml(team)}">${escapeHtml(team)}</option>
             `).join('');
-            newRespTeamSelect.innerHTML = `<option value="" disabled selected>Selecione a equipe</option>` + teamOptions;
+            newRespTeamSelect.innerHTML = `<option value="" disabled selected>${t('opt_select_team', 'Selecione a equipe')}</option>` + teamOptions;
         }
     }
 
     // 1. Render Teams List
     if (!state.teams || state.teams.length === 0) {
-        if(teamsList) teamsList.innerHTML = '<div style="color: var(--text-muted); font-size: 0.85rem; padding: 0.5rem;">Nenhuma equipe cadastrada.</div>';
+        if(teamsList) teamsList.innerHTML = `<div style="color: var(--text-muted); font-size: 0.85rem; padding: 0.5rem;">${t('empty_no_teams', 'Nenhuma equipe cadastrada.')}</div>`;
     } else {
         if(teamsList) {
             teamsList.innerHTML = state.teams.map(team => {
@@ -4472,8 +5231,8 @@ function renderCadastrosView() {
                 const coordName = hierarchy.coordenador ? hierarchy.coordenador : '';
                 const coordEmail = hierarchy.coordenadorEmail ? hierarchy.coordenadorEmail : '';
                 const coordHtml = coordName 
-                    ? `<div style="font-size: 0.73rem; color: var(--text-muted); margin-top: 0.15rem; display: flex; align-items: center; gap: 0.25rem;"><i class="fa-solid fa-user-tie" style="font-size: 0.65rem; color: var(--color-primary);"></i> Coord: ${escapeHtml(coordName)}${coordEmail ? ` <span style="opacity: 0.75; font-size: 0.68rem;">(${escapeHtml(coordEmail)})</span>` : ''}</div>`
-                    : `<div style="font-size: 0.73rem; color: var(--text-muted); margin-top: 0.15rem; opacity: 0.6;">Sem Coordenador</div>`;
+                    ? `<div style="font-size: 0.73rem; color: var(--text-muted); margin-top: 0.15rem; display: flex; align-items: center; gap: 0.25rem;"><i class="fa-solid fa-user-tie" style="font-size: 0.65rem; color: var(--color-primary);"></i> ${t('lbl_coord', 'Coord:')} ${escapeHtml(coordName)}${coordEmail ? ` <span style="opacity: 0.75; font-size: 0.68rem;">(${escapeHtml(coordEmail)})</span>` : ''}</div>`
+                    : `<div style="font-size: 0.73rem; color: var(--text-muted); margin-top: 0.15rem; opacity: 0.6;">${t('lbl_no_coord', 'Sem Coordenador')}</div>`;
 
                 return `
                     <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.45rem 0.65rem; border-radius: 6px; border: 1px solid rgba(255,255,255,0.03); background: rgba(255,255,255,0.01);">
@@ -4507,7 +5266,7 @@ function renderCadastrosView() {
                     e.stopPropagation();
                     if (!verificarPermissao('ADMIN')) { alert('Acesso negado: Perfil ADMIN necessário.'); return; }
                     const team = btn.getAttribute('data-team');
-                    if (confirm(`Deseja realmente excluir a equipe "${team}"? Todos os responsáveis e atividades desta equipe ficarão "Sem Equipe".`)) {
+                    if (confirm(`${t('confirm_delete_team', 'Deseja realmente excluir a equipe')} "${team}"? ${t('confirm_delete_team_msg', 'Todos os responsáveis e atividades desta equipe ficarão "Sem Equipe".')}`)) {
                         state.teams = state.teams.filter(t => t !== team);
                         state.processes.forEach(p => {
                             if (p.area === team) p.area = '';
@@ -4555,14 +5314,14 @@ function renderCadastrosView() {
     responsiblesList.innerHTML = '';
     
     if (!state.responsaveis || state.responsaveis.length === 0) {
-        responsiblesList.innerHTML = '<div style="color: var(--text-muted); font-size: 0.85rem; padding: 0.5rem;">Nenhum responsável cadastrado.</div>';
+        responsiblesList.innerHTML = `<div style="color: var(--text-muted); font-size: 0.85rem; padding: 0.5rem;">${t('empty_no_responsaveis', 'Nenhum responsável cadastrado.')}</div>`;
     } else {
-        const teamsToRender = [...(state.teams || []), 'Sem Equipe'];
+        const teamsToRender = [...(state.teams || []), t('lbl_no_team', 'Sem Equipe')];
         
         teamsToRender.forEach(team => {
             const teamResps = (state.responsaveis || []).filter(r => {
                 const rArea = typeof r === 'object' ? r.area : '';
-                if (team === 'Sem Equipe') {
+                if (team === t('lbl_no_team', 'Sem Equipe')) {
                     return !rArea || !state.teams.includes(rArea);
                 }
                 return rArea === team;
@@ -4597,7 +5356,7 @@ function renderCadastrosView() {
                         <span style="font-weight: 600; color: var(--text-primary);">${escapeHtml(resp.name)}</span>
                         ${resp.email ? `<span style="font-size: 0.72rem; color: var(--text-muted); display: flex; align-items: center; gap: 0.25rem;"><i class="fa-regular fa-envelope" style="font-size: 0.65rem;"></i> ${escapeHtml(resp.email)}</span>` : ''}
                     </div>
-                    ${hasOverrides ? '<i class="fa-solid fa-user-gear" style="color: var(--color-primary); font-size: 0.75rem; margin-left: 0.25rem;" title="Parâmetros customizados ativos"></i>' : ''}
+                    ${hasOverrides ? `<i class="fa-solid fa-user-gear" style="color: var(--color-primary); font-size: 0.75rem; margin-left: 0.25rem;" title="${t('lbl_custom_params', 'Parâmetros customizados ativos')}"></i>` : ''}
                 `;
                 
                 const btnGroup = document.createElement('div');
@@ -4607,7 +5366,7 @@ function renderCadastrosView() {
                 btnConfig.className = 'btn-config-resp-item';
                 btnConfig.setAttribute('data-permissao', 'OPERADOR,ADMIN');
                 btnConfig.style.cssText = 'background: transparent; border: none; color: var(--color-primary); cursor: pointer; font-size: 0.85rem; padding: 0.2rem; display: flex; align-items: center; justify-content: center;';
-                btnConfig.title = 'Configurar Parâmetros de Capacidade';
+                btnConfig.title = t('btn_config_capacity', 'Configurar Parâmetros de Capacidade');
                 btnConfig.innerHTML = '<i class="fa-solid fa-cog"></i>';
                 if (!canEditResp && currentUser.perfil !== 'ADMIN') {
                     btnConfig.style.display = 'none';
@@ -4617,7 +5376,7 @@ function renderCadastrosView() {
                 btnDelete.className = 'btn-delete-resp-item';
                 btnDelete.setAttribute('data-permissao', 'OPERADOR,ADMIN');
                 btnDelete.style.cssText = 'background: transparent; border: none; color: var(--color-danger); cursor: pointer; font-size: 0.85rem; padding: 0.2rem; display: flex; align-items: center; justify-content: center;';
-                btnDelete.title = 'Excluir Responsável';
+                btnDelete.title = t('btn_delete_resp', 'Excluir Responsável');
                 btnDelete.innerHTML = '<i class="fa-solid fa-trash-can"></i>';
                 if (!canEditResp && currentUser.perfil !== 'ADMIN') {
                     btnDelete.style.display = 'none';
@@ -4637,8 +5396,8 @@ function renderCadastrosView() {
                 btnDelete.addEventListener('click', (e) => {
                     e.stopPropagation();
                     if (!verificarPermissao('OPERADOR')) { alert('Acesso negado: Perfil OPERADOR ou ADMIN necessário.'); return; }
-                    if (!podeEditarArea(resp.area)) { alert(`Acesso negado: Você só pode excluir responsáveis da sua própria equipe (${currentUser.assignedTeam}).`); return; }
-                    if (confirm(`Tem certeza que deseja excluir o responsável "${resp.name}"? Todas as atividades sob sua responsabilidade ficarão sem responsável.`)) {
+                    if (!podeEditarArea(resp.area)) { alert(`${t('msg_access_denied_team', 'Acesso negado: Você só pode excluir responsáveis da sua própria equipe')} (${currentUser.assignedTeam}).`); return; }
+                    if (confirm(`${t('confirm_delete_resp', 'Tem certeza que deseja excluir o responsável')} "${resp.name}"? ${t('confirm_delete_resp_msg', 'Todas as atividades sob sua responsabilidade ficarão sem responsável.')}`)) {
                         state.responsaveis = state.responsaveis.filter(r => (typeof r === 'object' ? r.name : r) !== resp.name);
                         state.processes.forEach(p => {
                             if (p.responsavel === resp.name) p.responsavel = '';
@@ -4703,9 +5462,9 @@ function renderCadastrosView() {
 
     if (filterAreaEl) {
         const curArea = filterAreaEl.value;
-        const areaOptions = ['<option value="">Todas as Áreas</option>']
+        const areaOptions = [`<option value="">${t('opt_all_areas', 'Todas as Áreas')}</option>`]
             .concat((state.teams || []).map(t => `<option value="${escapeHtml(t)}" ${t === curArea ? 'selected' : ''}>${escapeHtml(t)}</option>`))
-            .concat([`<option value="Outros / Sem Equipe" ${curArea === 'Outros / Sem Equipe' ? 'selected' : ''}>Outros / Sem Equipe</option>`]);
+            .concat([`<option value="Outros / Sem Equipe" ${curArea === 'Outros / Sem Equipe' ? 'selected' : ''}>${t('lbl_other_no_team', 'Outros / Sem Equipe')}</option>`]);
         filterAreaEl.innerHTML = areaOptions.join('');
     }
 
@@ -4713,9 +5472,9 @@ function renderCadastrosView() {
         const curResp = filterRespEl.value;
         const allResps = (state.responsaveis || []).map(r => typeof r === 'object' ? r.name : r).filter(Boolean);
         const uniqueResps = [...new Set(allResps)].sort();
-        const respOptions = ['<option value="">Todos os Responsáveis</option>']
+        const respOptions = [`<option value="">${t('opt_all_resps', 'Todos os Responsáveis')}</option>`]
             .concat(uniqueResps.map(r => `<option value="${escapeHtml(r)}" ${r === curResp ? 'selected' : ''}>${escapeHtml(r)}</option>`))
-            .concat([`<option value="__SEM_RESP__" ${curResp === '__SEM_RESP__' ? 'selected' : ''}>Sem Responsável</option>`]);
+            .concat([`<option value="__SEM_RESP__" ${curResp === '__SEM_RESP__' ? 'selected' : ''}>${t('lbl_no_resp', 'Sem Responsável')}</option>`]);
         filterRespEl.innerHTML = respOptions.join('');
     }
 
@@ -4764,7 +5523,7 @@ function renderCadastrosView() {
 
             // 2. Área / Equipe
             if (areaVal) {
-                if (areaVal === 'Outros / Sem Equipe') {
+                if (areaVal === 'Outros / Sem Equipe' || areaVal === t('lbl_other_no_team', 'Outros / Sem Equipe')) {
                     if (proc.area && state.teams.includes(proc.area)) return false;
                 } else if (proc.area !== areaVal) {
                     return false;
@@ -4797,6 +5556,9 @@ function renderCadastrosView() {
             return true;
         });
 
+        const isHsp = currentCountry === 'HISPANA';
+        const totalCols = (currentUser.perfil === 'ADMIN' ? 7 : (currentUser.perfil === 'OPERADOR' ? 6 : 5)) - (isHsp ? 1 : 0);
+
         // Render Activities Table (Accordion by Team)
         tableBody.innerHTML = '';
         activityCountBadge.textContent = isAnyFilterActive
@@ -4804,12 +5566,11 @@ function renderCadastrosView() {
             : `${state.processes.length}`;
         
         if (filteredProcesses.length === 0) {
-            const totalCols = currentUser.perfil === 'ADMIN' ? 7 : (currentUser.perfil === 'OPERADOR' ? 6 : 5);
             tableBody.innerHTML = `
                 <tr>
                     <td colspan="${totalCols}" style="text-align: center; color: var(--text-muted); padding: 2.5rem 1rem;">
-                        <div style="font-size: 1.1rem; margin-bottom: 0.4rem; color: var(--text-secondary);"><i class="fa-solid fa-filter-circle-xmark"></i> Nenhuma atividade encontrada</div>
-                        <span style="font-size: 0.85rem; opacity: 0.7;">Tente ajustar ou limpar os filtros aplicados acima.</span>
+                        <div style="font-size: 1.1rem; margin-bottom: 0.4rem; color: var(--text-secondary);"><i class="fa-solid fa-filter-circle-xmark"></i> ${t('empty_no_activities_found', 'Nenhuma atividade encontrada')}</div>
+                        <span style="font-size: 0.85rem; opacity: 0.7;">${t('empty_adjust_filters', 'Tente ajustar ou limpar os filtros aplicados acima.')}</span>
                     </td>
                 </tr>
             `;
@@ -4820,11 +5581,11 @@ function renderCadastrosView() {
             return;
         }
         
-        const activityTeamsToRender = [...(state.teams || []), 'Outros / Sem Equipe'];
+        const activityTeamsToRender = [...(state.teams || []), t('lbl_other_no_team', 'Outros / Sem Equipe')];
         
         activityTeamsToRender.forEach((team, teamIndex) => {
             let teamProcs = [];
-            if (team === 'Outros / Sem Equipe') {
+            if (team === t('lbl_other_no_team', 'Outros / Sem Equipe')) {
                 teamProcs = filteredProcesses.filter(p => !p.area || !state.teams.includes(p.area));
             } else {
                 teamProcs = filteredProcesses.filter(p => p.area === team);
@@ -4849,10 +5610,9 @@ function renderCadastrosView() {
             headerTr.style.cssText = 'background: rgba(255,255,255,0.03); cursor: pointer; user-select: none; transition: background 0.15s;';
             headerTr.onmouseover = () => { headerTr.style.background = 'rgba(255,255,255,0.06)'; };
             headerTr.onmouseout = () => { headerTr.style.background = 'rgba(255,255,255,0.03)'; };
-            const totalCols = currentUser.perfil === 'ADMIN' ? 7 : (currentUser.perfil === 'OPERADOR' ? 6 : 5);
             headerTr.innerHTML = `
                 <td colspan="${totalCols}" style="padding: 0.8rem; font-weight: 600; color: var(--text-primary); border-top: 1px solid rgba(255,255,255,0.05); border-bottom: 1px solid rgba(255,255,255,0.05); cursor: pointer;">
-                    <i class="${isExpanded ? 'fa-solid fa-chevron-down' : 'fa-solid fa-chevron-right'}" style="width: 20px; color: var(--text-primary); margin-right: 0.25rem;"></i> ${escapeHtml(team)} <span style="background: rgba(255,255,255,0.1); color: var(--text-secondary); padding: 0.1rem 0.5rem; border-radius: 10px; font-size: 0.75rem; margin-left: 0.5rem;">${teamProcs.length} atividades</span>
+                    <i class="${isExpanded ? 'fa-solid fa-chevron-down' : 'fa-solid fa-chevron-right'}" style="width: 20px; color: var(--text-primary); margin-right: 0.25rem;"></i> ${escapeHtml(team)} <span style="background: rgba(255,255,255,0.1); color: var(--text-secondary); padding: 0.1rem 0.5rem; border-radius: 10px; font-size: 0.75rem; margin-left: 0.5rem;">${teamProcs.length} ${t('lbl_activities_count', 'atividades')}</span>
                 </td>
             `;
             headerTr.addEventListener('click', (e) => {
@@ -4873,7 +5633,7 @@ function renderCadastrosView() {
                 const isConsulta = currentUser.perfil === 'CONSULTA';
                 const isRowDisabled = isConsulta || !canEditThisArea;
                 
-                const teamOptions = '<option value="">-- Sem Equipe --</option>' +
+                const teamOptions = `<option value="">-- ${t('lbl_no_team', 'Sem Equipe')} --</option>` +
                     state.teams.map(t => `
                         <option value="${escapeHtml(t)}" ${proc.area === t ? 'selected' : ''}>${escapeHtml(t)}</option>
                     `).join('');
@@ -4898,7 +5658,7 @@ function renderCadastrosView() {
                     return !currentResps.includes(rName);
                 });
 
-                const unassignedOptionsHtml = '<option value="">+ Responsável</option>' +
+                const unassignedOptionsHtml = `<option value="">${t('btn_add_resp_option', '+ Responsável')}</option>` +
                     unassignedResps.map(resp => {
                         const rName = typeof resp === 'object' ? resp.name : resp;
                         return `<option value="${escapeHtml(rName)}">${escapeHtml(rName)}</option>`;
@@ -4927,9 +5687,9 @@ function renderCadastrosView() {
                         </div>
                     </td>
                     <td>
-                        <input type="text" class="input-activity-product-cell" value="${escapeHtml(proc.produto || '')}" placeholder="Produto (Opcional)" ${isRowDisabled ? 'readonly style="width: 100%; border: none; background: transparent; color: var(--text-primary); outline: none; padding: 0.3rem 0.5rem; border-radius: 4px; opacity: 0.7; pointer-events: none;"' : 'style="width: 100%; border: none; background: transparent; color: var(--text-primary); outline: none; padding: 0.3rem 0.5rem; border-radius: 4px;"'}>
+                        <input type="text" class="input-activity-product-cell" value="${escapeHtml(proc.produto || '')}" placeholder="${t('placeholder_product_opt', 'Produto (Opcional)')}" ${isRowDisabled ? 'readonly style="width: 100%; border: none; background: transparent; color: var(--text-primary); outline: none; padding: 0.3rem 0.5rem; border-radius: 4px; opacity: 0.7; pointer-events: none;"' : 'style="width: 100%; border: none; background: transparent; color: var(--text-primary); outline: none; padding: 0.3rem 0.5rem; border-radius: 4px;"'}>
                     </td>
-                    <td style="text-align: center;">
+                    <td class="col-rpa-cell" style="text-align: center; ${isHsp ? 'display: none;' : ''}">
                         <label style="display: inline-flex; align-items: center; gap: 0.35rem; cursor: ${isRowDisabled ? 'not-allowed' : 'pointer'}; font-size: 0.8rem; user-select: none; ${isRowDisabled ? 'pointer-events: none;' : ''}">
                             <input type="checkbox" class="cb-activity-rpa" ${isRpa ? 'checked' : ''} ${isRowDisabled ? 'disabled style="pointer-events: none; opacity: 0.4;"' : ''}>
                             <span class="label-rpa-text" style="${isRpa ? 'color: #a78bfa; font-weight: 600;' : 'color: var(--text-muted);'} ${isRowDisabled ? 'opacity: 0.6;' : ''}">🤖 RPA</span>
@@ -5694,7 +6454,7 @@ function renderAutomationsView() {
     const filterSelect = document.getElementById('filter-area-rpa');
     if (filterSelect) {
         const currentVal = filterSelect.value;
-        filterSelect.innerHTML = '<option value="all">Todas as Áreas</option>';
+        filterSelect.innerHTML = `<option value="all">${t('opt_all_areas', 'Todas as Áreas')}</option>`;
         (state.teams || []).forEach(t => {
             const opt = document.createElement('option');
             opt.value = t;
@@ -5753,12 +6513,12 @@ function renderAutomationsView() {
     const elViewCount = document.getElementById('rpa-view-total-count');
     if (elViewCount) elViewCount.textContent = totalRpaCount;
     const elViewCountSub = document.getElementById('rpa-view-total-count-sub');
-    if (elViewCountSub) elViewCountSub.textContent = `${pctRpaCount.toFixed(1)}% das atividades`;
+    if (elViewCountSub) elViewCountSub.textContent = `${pctRpaCount.toFixed(1)}% ${t('kpi_of_activities', 'das atividades')}`;
     
     const elViewFte = document.getElementById('rpa-view-total-fte');
     if (elViewFte) elViewFte.textContent = totalRpaFteDec.toFixed(2);
     const elViewFteSub = document.getElementById('rpa-view-total-fte-sub');
-    if (elViewFteSub) elViewFteSub.textContent = `${pctRpaFte.toFixed(1)}% do capacity total`;
+    if (elViewFteSub) elViewFteSub.textContent = `${pctRpaFte.toFixed(1)}% ${t('kpi_of_capacity_total', 'do capacity total')}`;
     
     const elViewHours = document.getElementById('rpa-view-total-hours');
     if (elViewHours) elViewHours.textContent = totalRpaHours.toFixed(1) + 'h';
@@ -5796,10 +6556,10 @@ function renderAutomationsView() {
                 </div>
             </td>
             <td>
-                <span class="badge-area" style="font-size: 0.85rem; padding: 0.25rem 0.5rem; border-radius: 4px; background: rgba(235, 92, 39, 0.08); color: var(--color-primary); border: 1px solid rgba(235, 92, 39, 0.15);">${escapeHtml(proc.area || 'Sem Equipe')}</span>
+                <span class="badge-area" style="font-size: 0.85rem; padding: 0.25rem 0.5rem; border-radius: 4px; background: rgba(235, 92, 39, 0.08); color: var(--color-primary); border: 1px solid rgba(235, 92, 39, 0.15);">${escapeHtml(proc.area || t('lbl_no_team', 'Sem Equipe'))}</span>
             </td>
             <td>
-                <span style="font-size: 0.9rem; color: var(--text-secondary);">${escapeHtml(proc.responsavel || 'Sem Responsável')}</span>
+                <span style="font-size: 0.9rem; color: var(--text-secondary);">${escapeHtml(proc.responsavel || t('lbl_no_resp', 'Sem Responsável'))}</span>
             </td>
             <td>
                 <span style="font-size: 0.9rem; color: var(--text-primary);">${escapeHtml(proc.produto || '-')}</span>

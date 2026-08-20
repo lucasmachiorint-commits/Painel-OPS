@@ -5,7 +5,7 @@ $ErrorActionPreference = "Stop"
 
 $hmlDir = "C:\Users\331262\.gemini\antigravity\scratch\Painel-OPS-HML"
 $prdDir = "C:\Users\331262\.gemini\antigravity\scratch\capacity-fte-calculator-v2"
-$compileHmlScript = "C:\Users\331262\.gemini\antigravity\brain\0cf73b4e-0602-4d7d-a92e-6a4591451db0\scratch\compile_hml.ps1"
+$compileHmlScript = "$hmlDir\scripts\compile-bundle.ps1"
 $utf8NoBom = New-Object System.Text.UTF8Encoding($false)
 
 Write-Host "=========================================================="
@@ -67,9 +67,12 @@ $prdApp = $prdApp.Replace("HML_AUTH_STORAGE_KEY", "'sb-maguyzjhldcgpcvkvkqe-auth
 # 5e. Substituir board_state IDs de HML para PRD
 $prdApp = $prdApp.Replace("'hml_default'", "'default'")
 $prdApp = $prdApp.Replace("filter: 'id=eq.hml_default'", "filter: 'id=eq.default'")
+$prdApp = $prdApp.Replace("'hml_hispana'", "'hispana_default'")
+$prdApp = $prdApp.Replace("filter: 'id=eq.hml_hispana'", "filter: 'id=eq.hispana_default'")
 
 # 5f. Substituir canal realtime
 $prdApp = $prdApp.Replace("'board-changes-hml'", "'board-changes'")
+$prdApp = $prdApp.Replace("'board-changes-hml-hispana'", "'board-changes-hispana'")
 
 # 5g. Substituir logs com prefixo HML
 $prdApp = $prdApp.Replace('[Realtime HML]', '[Realtime]')
@@ -120,7 +123,7 @@ Write-Host "   Encoding normalizado."
 # 10. Verificação final: confirmar que NÃO há resíduos de HML no app.js PRD
 Write-Host "`n9. Verificacao final de residuos HML..."
 $finalCheck = [System.IO.File]::ReadAllText("$prdDir\app.js", [System.Text.Encoding]::UTF8)
-$residuos = @("HML_AUTH_STORAGE_KEY", "HML_ACTIVITY_STORAGE_KEY", "HML_SESSION_ACTIVE_KEY", "hml_default", "board-changes-hml", "importPrdDataToHml")
+$residuos = @("HML_AUTH_STORAGE_KEY", "HML_ACTIVITY_STORAGE_KEY", "HML_SESSION_ACTIVE_KEY", "hml_default", "hml_hispana", "board-changes-hml", "importPrdDataToHml")
 $hasResidues = $false
 foreach ($r in $residuos) {
     if ($finalCheck.Contains($r)) {
