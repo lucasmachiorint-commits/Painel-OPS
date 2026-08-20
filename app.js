@@ -317,6 +317,8 @@ const I18N = {
         btn_add_activity: 'Adicionar Atividade',
         btn_organogram: 'Organograma',
         btn_params: 'Parâmetros',
+        lbl_region_country: 'Região / País',
+        dropdown_header_region: 'Selecione a Região Operacional',
         toast_country_switched: '🇧🇷 Ambiente alternado para Brasil (Português)'
     },
     'es-LatAm': {
@@ -336,9 +338,9 @@ const I18N = {
         menu_access: 'Acceso',
         menu_access_title: 'Control de Acceso y Perfiles',
         view_title_dashboard: 'Tablero',
-        view_sub_dashboard: 'Visión operativa de volúmenes mensuales, FTEs requeridos y capacidad por equipo.',
+        view_sub_dashboard: 'Visión operacional de volúmenes mensuales, FTEs requeridos y capacidad por equipo.',
         view_title_history: 'Historial',
-        view_sub_history: 'Snapshots mensuales guardados y evolución temporal de volúmenes operativos.',
+        view_sub_history: 'Instantáneas mensuales guardadas y evolución temporal de volúmenes.',
         view_title_cadastros: 'Registros',
         view_sub_cadastros: 'Estructura organizacional, equipos, colaboradores responsables y catálogo de actividades.',
         view_title_balancing: 'Balanceo',
@@ -346,9 +348,9 @@ const I18N = {
         view_title_automations: 'Automatizaciones (RPA)',
         view_sub_automations: 'Panel analítico de procesos robotizados, FTEs absorbidos y horas ahorradas.',
         view_title_access: 'Control de Acceso',
-        view_sub_access: 'Gestión centralizada de usuarios, asignación de perfiles (ADMIN/OPERADOR/CONSULTA) y vinculación de equipos.',
-        filter_area_title: 'Filtrar por Área / Equipo en todas las pantallas',
-        filter_resp_title: 'Filtrar por Responsable en todas las pantallas',
+        view_sub_access: 'Gestión centralizada de usuarios, perfiles (ADMIN/OPERADOR/CONSULTA) y vinculación de equipos.',
+        filter_area_title: 'Filtrar por Área / Equipo en todas las vistas',
+        filter_resp_title: 'Filtrar por Responsable en todas as vistas',
         opt_all_areas: 'Todas las Áreas',
         opt_all_resps: 'Todos los Responsables',
         btn_publish: 'Publicar para Todos',
@@ -361,7 +363,7 @@ const I18N = {
         btn_logout_title: 'Cerrar sesión',
         status_connecting: 'Conectando...',
         status_sync: 'Sincronizado',
-        status_offline: 'Desconectado (Local)',
+        status_offline: 'Offline (Local)',
         kpi_fte_required: 'FTEs Requeridos',
         kpi_total_activities: 'Total de Actividades',
         kpi_rpa_activities: 'RPA • Actividades',
@@ -374,34 +376,39 @@ const I18N = {
         th_responsavel: 'Responsable',
         th_volume: 'Volumen / Mes',
         th_time: 'Tiempo (min)',
-        th_freq: 'Cant / Frec.',
+        th_freq: 'Cant. / Frec.',
         th_hours: 'Horas / Mes',
         th_fte: 'FTE Requerido',
         th_actions: 'Acciones',
         th_review: 'Revisión',
         th_rpa: 'RPA',
         review_keep: 'Mantener',
-        review_stop: 'Parar',
+        review_stop: 'Detener',
         review_start: 'Comenzar',
         panel_teams: 'Equipos (Áreas)',
         panel_responsaveis: 'Responsables',
-        panel_activities: 'Catálogo de Actividades',
+        panel_activities: 'Registro de Actividades',
         btn_new_team: 'Nuevo Equipo',
         btn_new_resp: 'Nuevo Responsable',
         btn_add_activity: 'Agregar Actividad',
         btn_organogram: 'Organigrama',
         btn_params: 'Parámetros',
-        toast_country_switched: '🌐 Ambiente cambiado a Hispana (AR, MX, CO - Español)'
+        lbl_region_country: 'Región / País',
+        dropdown_header_region: 'Seleccione la Región Operativa',
+        toast_country_switched: '🌐 Ambiente cambiado a Hispana (Español)'
     }
 };
 
 function toggleCountryDropdown(e) {
-    if (e) e.stopPropagation();
+    if (e) {
+        e.preventDefault();
+        e.stopPropagation();
+    }
     const container = document.getElementById('country-selector-header');
     const menu = document.getElementById('country-dropdown-menu');
     if (!container || !menu) return;
     
-    const isOpen = container.classList.contains('open');
+    const isOpen = container.classList.contains('open') && menu.style.display !== 'none';
     if (isOpen) {
         container.classList.remove('open');
         menu.style.display = 'none';
@@ -422,7 +429,11 @@ document.addEventListener('click', (e) => {
     }
 });
 
-async function selectCountry(countryCode) {
+async function selectCountry(countryCode, e) {
+    if (e) {
+        e.preventDefault();
+        e.stopPropagation();
+    }
     const container = document.getElementById('country-selector-header');
     const menu = document.getElementById('country-dropdown-menu');
     if (container) container.classList.remove('open');
@@ -462,7 +473,7 @@ async function switchCountry(countryCode) {
         }
     });
 
-    // 4. Carregar estado do novo país
+    // 4. Carregar estado do novo país (localStorage ou defaults da Hispana)
     loadState();
 
     // 5. Aplicar tradução
@@ -472,7 +483,10 @@ async function switchCountry(countryCode) {
     if (window._authUserId) {
         subscribeRealtime();
         try {
-            await loadStateFromSupabase();
+            const hasRemoteState = await loadStateFromSupabase();
+            if (!hasRemoteState) {
+                await saveStateToSupabase();
+            }
         } catch (_) {}
     }
 

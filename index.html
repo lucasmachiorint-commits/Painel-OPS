@@ -114,24 +114,37 @@
                         <!-- Country Selector (Opção B - Header Dropdown) -->
                         <div class="country-selector-header" id="country-selector-header">
                             <button id="btn-country-active" class="btn-country-trigger" onclick="toggleCountryDropdown(event)" title="Selecionar Região / País">
-                                <span id="country-flag-icon" class="country-flag-icon">🇧🇷</span>
-                                <span id="country-name-label" class="country-name-label">Brasil</span>
+                                <div class="country-trigger-flag-badge">
+                                    <span id="country-flag-icon" class="country-flag-icon">🇧🇷</span>
+                                </div>
+                                <div class="country-trigger-text">
+                                    <span class="country-trigger-caption" data-i18n="lbl_region_country">Região / País</span>
+                                    <span id="country-name-label" class="country-name-label">Brasil</span>
+                                </div>
                                 <i class="fa-solid fa-chevron-down country-chevron"></i>
                             </button>
                             <div id="country-dropdown-menu" class="country-dropdown-menu" style="display: none;">
-                                <div class="country-dropdown-option active" data-country="BR" onclick="selectCountry('BR')">
-                                    <span class="country-flag-icon">🇧🇷</span>
+                                <div class="country-dropdown-header">
+                                    <i class="fa-solid fa-globe"></i>
+                                    <span data-i18n="dropdown_header_region">Selecione a Região Operacional</span>
+                                </div>
+                                <div class="country-dropdown-option active" data-country="BR" onclick="selectCountry('BR', event)">
+                                    <div class="country-opt-flag-badge">
+                                        <span class="country-flag-icon">🇧🇷</span>
+                                    </div>
                                     <div class="country-opt-info">
                                         <span class="country-opt-title">Brasil</span>
-                                        <span class="country-opt-sub">Português (pt-BR)</span>
+                                        <span class="country-opt-sub">Operação Brasil • Português (pt-BR)</span>
                                     </div>
                                     <i class="fa-solid fa-check country-opt-check" id="check-country-BR"></i>
                                 </div>
-                                <div class="country-dropdown-option" data-country="HISPANA" onclick="selectCountry('HISPANA')">
-                                    <span class="country-flag-icon">🌐</span>
+                                <div class="country-dropdown-option" data-country="HISPANA" onclick="selectCountry('HISPANA', event)">
+                                    <div class="country-opt-flag-badge">
+                                        <span class="country-flag-icon">🌐</span>
+                                    </div>
                                     <div class="country-opt-info">
                                         <span class="country-opt-title">Hispana (AR, MX, CO)</span>
-                                        <span class="country-opt-sub">Español (es-LatAm)</span>
+                                        <span class="country-opt-sub">Argentina, México, Colombia • Español</span>
                                     </div>
                                     <i class="fa-solid fa-check country-opt-check" id="check-country-HISPANA" style="display: none;"></i>
                                 </div>
