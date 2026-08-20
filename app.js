@@ -2800,7 +2800,37 @@ function updateCalculations() {
     const targetRpaFteDecAccum = targetRpaFtePctAccum / 100;
     const totalCount = targetProcesses.length;
     const pctRpaCount = totalCount > 0 ? (targetRpaCount / totalCount * 100) : 0;
-    const pctRpaFte = targetFtePctAccum > 0 ? (targetRpaFtePctAccum / targetFtePctAccum * 100) : 0;
+
+    // Calculate available capacity (total resources / FTEs) for the selected area or overall
+    let targetCapacity = 0;
+    if (isFiltered && currentFilterValue !== 'all') {
+        const allocatedVal = state.areaAllocations && state.areaAllocations[currentFilterValue] !== undefined && state.areaAllocations[currentFilterValue] !== '' ? parseFloat(state.areaAllocations[currentFilterValue]) : 0;
+        const teamMembersCount = (state.responsaveis || []).filter(r => (typeof r === 'object' && r && r.area === currentFilterValue)).length;
+        if (allocatedVal > 0) {
+            targetCapacity = allocatedVal;
+        } else if (teamMembersCount > 0) {
+            targetCapacity = teamMembersCount;
+        } else {
+            targetCapacity = state.params.teamSize || 0;
+        }
+    } else {
+        let totalAllocatedSum = 0;
+        if (state.areaAllocations) {
+            Object.values(state.areaAllocations).forEach(val => {
+                const num = parseFloat(val);
+                if (!isNaN(num) && num > 0) totalAllocatedSum += num;
+            });
+        }
+        if (totalAllocatedSum > 0) {
+            targetCapacity = totalAllocatedSum;
+        } else if ((state.responsaveis || []).length > 0) {
+            targetCapacity = (state.responsaveis || []).length;
+        } else {
+            targetCapacity = state.params.teamSize || 0;
+        }
+    }
+
+    const pctRpaFte = targetCapacity > 0 ? (targetRpaFteDecAccum / targetCapacity * 100) : 0;
 
     // Render Totals Rows in table footer
     document.getElementById('total-hours').textContent = totalHoursAccum.toFixed(1) + 'h';
@@ -2858,7 +2888,7 @@ function updateCalculations() {
     if (elRpaFte) elRpaFte.textContent = targetRpaFteDecAccum.toFixed(2);
 
     const elRpaFteSub = document.getElementById('widget-rpa-fte-sub');
-    if (elRpaFteSub) elRpaFteSub.textContent = `${pctRpaFte.toFixed(1)}% de ganho em FTEs`;
+    if (elRpaFteSub) elRpaFteSub.textContent = `${pctRpaFte.toFixed(1)}% do capacity`;
 
     // Update placeholders for responsible overrides inputs in-place to avoid re-rendering layout
     const horasInputs = document.querySelectorAll('.override-horas');
