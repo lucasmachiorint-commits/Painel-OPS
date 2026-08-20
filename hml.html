@@ -5035,8 +5035,8 @@ function updateViewHeader(view) {
     const btnPrint = document.getElementById('btn-print');
     
     if (btnReset) btnReset.style.display = (view === 'cadastros' && currentUser.perfil === 'ADMIN') ? 'inline-flex' : 'none';
-    if (btnExport) btnExport.style.display = (view === 'dashboard' || view === 'cadastros' || view === 'balancing' || view === 'automations') ? 'inline-flex' : 'none';
-    if (btnPrint) btnPrint.style.display = (view === 'dashboard' || view === 'cadastros' || view === 'balancing' || view === 'automations') ? 'inline-flex' : 'none';
+    if (btnExport) btnExport.style.display = (view === 'dashboard' || view === 'cadastros' || view === 'balancing' || view === 'automations' || view === 'history') ? 'inline-flex' : 'none';
+    if (btnPrint) btnPrint.style.display = (view === 'dashboard' || view === 'cadastros' || view === 'balancing' || view === 'automations' || view === 'history') ? 'inline-flex' : 'none';
 }
 
 function switchToView(view) {
@@ -6586,13 +6586,44 @@ function updateChartsTheme() {
 
 // EXPORT TO CSV (Excel Compatible - Exports active tab content)
 function exportToCSV() {
+    const activeMenuItem = document.querySelector('.sidebar-menu .menu-item.active');
+    const activeTab = activeMenuItem ? activeMenuItem.dataset.view : 'dashboard';
+
+    if (activeTab === 'history') {
+        if (!state.history || state.history.length === 0) {
+            alert("Não há registros de histórico ou snapshots salvos para exportar.");
+            return;
+        }
+
+        let csvContent = "data:text/csv;charset=utf-8,\uFEFF"; // Add BOM for Excel Portuguese encoding
+        csvContent += "RELATORIO DE HISTORICO DE DEMANDAS E VOLUMES MENSAIS\n";
+        csvContent += "MES / SNAPSHOT;PROCESSO / ATIVIDADE;AREA RESPONSAVEL;RESPONSAVEL;VOLUME MES\n";
+
+        state.history.forEach(snap => {
+            const monthFormatted = typeof formatMonth === 'function' ? formatMonth(snap.month) : snap.month;
+            (snap.data || []).forEach(item => {
+                const name = `"${(item.name || '').replace(/"/g, '""')}"`;
+                const area = `"${(item.area || 'Sem Equipe').replace(/"/g, '""')}"`;
+                const resp = `"${(item.responsavel || 'Sem Responsável').replace(/"/g, '""')}"`;
+                const vol = item.volume !== undefined && item.volume !== null ? item.volume : 0;
+                csvContent += `"${monthFormatted}";${name};${area};${resp};${vol}\n`;
+            });
+        });
+
+        const encodedUri = encodeURI(csvContent);
+        const link = document.createElement("a");
+        link.setAttribute("href", encodedUri);
+        link.setAttribute("download", `Capacity_FTE_Historico_${new Date().toISOString().slice(0,10)}.csv`);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        return;
+    }
+
     if (state.processes.length === 0) {
         alert("Não há dados para exportar.");
         return;
     }
-
-    const activeMenuItem = document.querySelector('.sidebar-menu .menu-item.active');
-    const activeTab = activeMenuItem ? activeMenuItem.dataset.view : 'dashboard';
 
     let csvContent = "data:text/csv;charset=utf-8,\uFEFF"; // Add BOM for Excel Portuguese encoding
     
