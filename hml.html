@@ -125,62 +125,15 @@ body::before {
 body::after {
     bottom: 15%;
     right: 10%;
-/* GLOBAL CUSTOM SCROLLBARS (ALWAYS VISIBLE, ACCESSIBLE, HIGH CONTRAST) */
-* {
-    scrollbar-width: thin;
-    scrollbar-color: rgba(255, 255, 255, 0.35) rgba(255, 255, 255, 0.05);
-}
-
-body.light-theme * {
-    scrollbar-color: rgba(0, 0, 0, 0.35) rgba(0, 0, 0, 0.05);
-}
-
-::-webkit-scrollbar {
-    width: 10px;
-    height: 10px;
-}
-
-::-webkit-scrollbar-track {
-    background: rgba(255, 255, 255, 0.04);
-    border-radius: 8px;
-}
-
-body.light-theme ::-webkit-scrollbar-track {
-    background: rgba(0, 0, 0, 0.05);
-}
-
-::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.28);
-    border-radius: 8px;
-    border: 2px solid transparent;
-    background-clip: content-box;
-    transition: background-color var(--transition-fast);
-}
-
-::-webkit-scrollbar-thumb:hover {
-    background: var(--color-primary);
-    background-clip: content-box;
-}
-
-body.light-theme ::-webkit-scrollbar-thumb {
-    background: rgba(0, 0, 0, 0.28);
-    border: 2px solid transparent;
-    background-clip: content-box;
-}
-
-body.light-theme ::-webkit-scrollbar-thumb:hover {
-    background: var(--color-primary);
-    background-clip: content-box;
+    background-color: var(--color-secondary);
 }
 
 /* LAYOUT CONTAINER */
 .app-container {
-    width: 100%;
-    max-width: 100%;
+    width: 100vw;
     height: 100vh;
     display: flex;
     overflow: hidden;
-    box-sizing: border-box;
 }
 
 /* SIDEBAR STYLING */
@@ -323,51 +276,14 @@ body.light-theme #theme-toggle .icon-dark {
 /* MAIN CONTENT AREA STYLING */
 .main-content {
     flex: 1;
-    min-width: 0;
     display: flex;
     flex-direction: column;
     height: 100%;
     overflow-y: auto;
-    overflow-x: hidden;
-    scroll-behavior: smooth;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: thin;
-    scrollbar-color: rgba(235, 92, 39, 0.6) rgba(0, 0, 0, 0.25);
-    outline: none;
-}
-
-.main-content:focus {
-    outline: none;
-}
-
-.main-content::-webkit-scrollbar {
-    width: 12px;
-}
-
-.main-content::-webkit-scrollbar-track {
-    background: rgba(0, 0, 0, 0.2);
-    border-radius: 8px;
-}
-
-body.light-theme .main-content::-webkit-scrollbar-track {
-    background: rgba(0, 0, 0, 0.05);
-}
-
-.main-content::-webkit-scrollbar-thumb {
-    background: rgba(235, 92, 39, 0.55);
-    border-radius: 8px;
-    border: 2px solid transparent;
-    background-clip: content-box;
-    transition: background-color var(--transition-fast);
-}
-
-.main-content::-webkit-scrollbar-thumb:hover {
-    background: #eb5c27;
-    background-clip: content-box;
 }
 
 .content-area {
-    padding: 1.5rem 1.5rem 8rem 1.5rem;
+    padding: 1.5rem 1.5rem 6rem 1.5rem;
     flex: 1;
 }
 
@@ -2450,7 +2366,7 @@ body.light-theme .country-opt-title {
         </nav>
 
         <!-- MAIN CONTENT AREA -->
-        <div class="main-content" tabindex="0" role="region" aria-label="Conteúdo Principal">
+        <div class="main-content">
             <!-- HEADER -->
             <header class="app-header">
                 <div class="header-top-row">
