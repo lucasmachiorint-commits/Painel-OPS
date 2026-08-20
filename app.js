@@ -190,7 +190,7 @@ function aplicarPerfilDeAcesso() {
         const canEditThisArea = podeEditarArea(areaName);
         const isRowDisabled = isConsulta || !canEditThisArea;
 
-        tr.querySelectorAll('.input-volume, .input-minutes, .input-qtd, .input-backlog-volume, .input-area-allocation, .select-review-status, .input-activity-name-cell, .select-activity-team-cell, .select-activity-resp-cell, .input-activity-product-cell, .select-activity-add-resp, .select-dashboard-team-cell, .select-dashboard-add-resp, .cadastros-row-checkbox, .cb-activity-rpa').forEach(el => {
+        tr.querySelectorAll('.input-volume, .input-minutes, .input-qtd, .input-backlog-volume, .input-area-allocation, .select-review-status, .input-activity-name-cell, .select-activity-team-cell, .select-activity-resp-cell, .input-activity-product-cell, .select-activity-add-resp, .cadastros-row-checkbox, .cb-activity-rpa').forEach(el => {
             el.disabled = isRowDisabled;
             el.style.pointerEvents = isRowDisabled ? 'none' : 'auto';
             el.style.opacity = isRowDisabled ? '0.6' : '1';
@@ -204,9 +204,9 @@ function aplicarPerfilDeAcesso() {
             }
         });
 
-        tr.querySelectorAll('.remove-resp-btn, .remove-resp-btn-dashboard, .btn-delete-activity-cell').forEach(el => {
+        tr.querySelectorAll('.remove-resp-btn, .btn-delete-activity-cell').forEach(el => {
             el.style.pointerEvents = isRowDisabled ? 'none' : 'auto';
-            el.style.display = isRowDisabled ? 'none' : (el.classList.contains('remove-resp-btn') || el.classList.contains('remove-resp-btn-dashboard') ? 'inline-flex' : 'inline-block');
+            el.style.display = isRowDisabled ? 'none' : (el.classList.contains('remove-resp-btn') ? 'inline-flex' : 'inline-block');
         });
     });
 
@@ -2393,67 +2393,6 @@ function renderTable() {
         const isConsulta = currentUser.perfil === 'CONSULTA';
         const isRowDisabled = isConsulta || !canEditThisArea;
         
-        const isAdmin = currentUser.perfil === 'ADMIN';
-
-        // 1. Team Column HTML (Editable for ADMIN, static badge for others)
-        let teamColHtml = '';
-        if (isAdmin) {
-            const teamOptions = '<option value="">-- Sem Equipe --</option>' +
-                state.teams.map(t => `
-                    <option value="${escapeHtml(t)}" ${proc.area === t ? 'selected' : ''}>${escapeHtml(t)}</option>
-                `).join('');
-            teamColHtml = `
-                <select class="select-dashboard-team-cell" style="width: 100%; border: 1px solid rgba(235, 92, 39, 0.25); background: rgba(235, 92, 39, 0.06); color: var(--color-primary); font-weight: 600; outline: none; padding: 0.3rem 0.5rem; border-radius: 6px; font-size: 0.82rem; cursor: pointer;">
-                    ${teamOptions}
-                </select>
-            `;
-        } else {
-            teamColHtml = `<span class="badge-area" style="font-size: 0.85rem; padding: 0.25rem 0.5rem; border-radius: 4px; background: rgba(235, 92, 39, 0.08); color: var(--color-primary); border: 1px solid rgba(235, 92, 39, 0.15);">${escapeHtml(proc.area || 'Sem Equipe')}</span>`;
-        }
-
-        // 2. Responsável Column HTML (Editable badges + select for ADMIN, static text for others)
-        let respColHtml = '';
-        const currentResps = getProcessResponsaveis(proc);
-
-        if (isAdmin) {
-            // Only allow responsáveis belonging to proc.area (or already assigned)
-            const teamResps = (state.responsaveis || []).filter(resp => {
-                const rName = typeof resp === 'object' ? resp.name : resp;
-                const rArea = typeof resp === 'object' ? resp.area : '';
-                return !proc.area || !rArea || rArea === proc.area || currentResps.includes(rName);
-            });
-            const respsToDisplay = teamResps.length > 0 ? teamResps : (state.responsaveis || []);
-
-            const assignedBadgesHtml = currentResps.map(rName => `
-                <span class="badge-resp-tag" style="font-size: 0.75rem; padding: 0.15rem 0.45rem; border-radius: 12px; background: rgba(99, 102, 241, 0.12); color: #818cf8; border: 1px solid rgba(99, 102, 241, 0.25); display: inline-flex; align-items: center; gap: 0.25rem;">
-                    ${escapeHtml(rName)}
-                    <i class="fa-solid fa-xmark remove-resp-btn-dashboard" data-resp="${escapeHtml(rName)}" style="cursor: pointer; opacity: 0.7; font-size: 0.68rem;" title="Remover ${escapeHtml(rName)}"></i>
-                </span>
-            `).join('');
-
-            const unassignedResps = respsToDisplay.filter(resp => {
-                const rName = typeof resp === 'object' ? resp.name : resp;
-                return !currentResps.includes(rName);
-            });
-
-            const unassignedOptionsHtml = '<option value="">+ Responsável</option>' +
-                unassignedResps.map(resp => {
-                    const rName = typeof resp === 'object' ? resp.name : resp;
-                    return `<option value="${escapeHtml(rName)}">${escapeHtml(rName)}</option>`;
-                }).join('');
-
-            respColHtml = `
-                <div class="dashboard-resp-container" style="display: flex; flex-wrap: wrap; gap: 0.25rem; align-items: center; min-width: 130px;">
-                    ${assignedBadgesHtml}
-                    <select class="select-dashboard-add-resp" style="border: 1px dashed var(--border-color); background: rgba(255,255,255,0.03); color: var(--text-secondary); outline: none; padding: 0.2rem 0.4rem; border-radius: 4px; font-size: 0.75rem; cursor: pointer;">
-                        ${unassignedOptionsHtml}
-                    </select>
-                </div>
-            `;
-        } else {
-            respColHtml = `<span style="font-size: 0.9rem; color: var(--text-secondary);">${escapeHtml(proc.responsavel || 'Sem Responsável')}</span>`;
-        }
-        
         tr.innerHTML = `
             <td>
                 <div style="display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; width: 100%;">
@@ -2466,10 +2405,10 @@ function renderTable() {
                 </div>
             </td>
             <td>
-                ${teamColHtml}
+                <span class="badge-area" style="font-size: 0.85rem; padding: 0.25rem 0.5rem; border-radius: 4px; background: rgba(235, 92, 39, 0.08); color: var(--color-primary); border: 1px solid rgba(235, 92, 39, 0.15);">${escapeHtml(proc.area || 'Sem Equipe')}</span>
             </td>
             <td>
-                ${respColHtml}
+                <span style="font-size: 0.9rem; color: var(--text-secondary);">${escapeHtml(proc.responsavel || 'Sem Responsável')}</span>
             </td>
             <td class="consulta-hidden">
                 <input type="number" class="input-volume" value="${proc.volume}" placeholder="---" min="0" ${isRowDisabled ? 'disabled style="opacity: 0.6; pointer-events: none;"' : ''}>
@@ -2517,66 +2456,6 @@ function renderTable() {
                 }
                 updateCalculations();
             });
-        }
-
-        // Admin inline editing of Team & Responsáveis on Dashboard
-        if (isAdmin && !isRowDisabled) {
-            const teamSelect = tr.querySelector('.select-dashboard-team-cell');
-            if (teamSelect) {
-                teamSelect.addEventListener('change', (e) => {
-                    const newTeam = e.target.value;
-                    proc.area = newTeam;
-                    // Filter existing responsáveis to only those belonging to newTeam
-                    const validResps = currentResps.filter(rName => {
-                        const rObj = (state.responsaveis || []).find(r => (typeof r === 'object' ? r.name : r) === rName);
-                        return rObj && typeof rObj === 'object' && rObj.area === newTeam;
-                    });
-                    setProcessResponsaveis(proc, validResps);
-                    saveState();
-                    renderTable();
-                    renderCadastrosView();
-                    renderResponsavelFilterOptions();
-                    renderBalancingTable();
-                    renderReviewTable();
-                    renderAutomationsView();
-                });
-            }
-
-            tr.querySelectorAll('.remove-resp-btn-dashboard').forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    const respToRemove = btn.dataset.resp;
-                    const updated = currentResps.filter(r => r !== respToRemove);
-                    setProcessResponsaveis(proc, updated);
-                    saveState();
-                    renderTable();
-                    renderCadastrosView();
-                    renderResponsavelFilterOptions();
-                    renderBalancingTable();
-                    renderReviewTable();
-                    renderAutomationsView();
-                });
-            });
-
-            const addRespSelect = tr.querySelector('.select-dashboard-add-resp');
-            if (addRespSelect) {
-                addRespSelect.addEventListener('change', (e) => {
-                    const newResp = e.target.value;
-                    if (!newResp) return;
-                    const updated = [...currentResps, newResp];
-                    setProcessResponsaveis(proc, updated);
-                    if (isRpaResponsavel(newResp)) {
-                        proc.isRpa = true;
-                    }
-                    saveState();
-                    renderTable();
-                    renderCadastrosView();
-                    renderResponsavelFilterOptions();
-                    renderBalancingTable();
-                    renderReviewTable();
-                    renderAutomationsView();
-                });
-            }
         }
 
         tableBody.appendChild(tr);
