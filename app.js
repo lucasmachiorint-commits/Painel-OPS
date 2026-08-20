@@ -373,7 +373,7 @@ function handleUserInteraction() {
 // Verificador periódico de inatividade
 setInterval(async () => {
     if (!window._authUserId) return;
-    const lastActivity = parseInt(localStorage.getItem('painel_ops_last_activity') || '0', 10);
+    const lastActivity = parseInt(localStorage.getItem(HML_ACTIVITY_STORAGE_KEY) || '0', 10);
     if (lastActivity > 0 && (Date.now() - lastActivity) > INACTIVITY_TIMEOUT_MS) {
         console.log('[Auth] Sessão expirada por inatividade (30 minutos).');
         await handleLogout(true);
@@ -1735,6 +1735,94 @@ function saveNewTeamFromModal() {
     renderReviewTable();
 }
 
+// ORGANOGRAM FLOWCHART MODAL
+function openOrganogramModal() {
+    const modal = document.getElementById('modal-organogram');
+    if (!modal) return;
+    renderOrganogramFlowchart();
+    modal.style.display = 'flex';
+}
+
+function closeOrganogramModal() {
+    const modal = document.getElementById('modal-organogram');
+    if (modal) modal.style.display = 'none';
+}
+
+function renderOrganogramFlowchart() {
+    const container = document.getElementById('organogram-flowchart-content');
+    if (!container) return;
+
+    const hierarchy = state.teamHierarchy || {};
+    const teams = state.teams || [];
+
+    const diretoriaName = 'Diretoria de Operações';
+    const gerenciasMap = {};
+
+    teams.forEach(team => {
+        const info = hierarchy[team] || { gerencia: 'Outras / Suporte', diretoria: 'Operações' };
+        const gerencia = info.gerencia || 'Geral';
+        if (!gerenciasMap[gerencia]) {
+            gerenciasMap[gerencia] = [];
+        }
+        gerenciasMap[gerencia].push({
+            team,
+            coordenador: info.coordenador || '',
+            coordenadorEmail: info.coordenadorEmail || ''
+        });
+    });
+
+    let html = `
+        <div class="tree-node-diretoria" style="margin-bottom: 2rem;">
+            <div style="font-size: 1.1rem; font-weight: 700; color: #fff;">
+                <i class="fa-solid fa-building-columns" style="color: var(--color-primary); margin-right: 0.5rem;"></i> ${escapeHtml(diretoriaName)}
+            </div>
+            <span class="tree-node-badge">Diretoria Executiva</span>
+        </div>
+        <div class="tree-gerencias-row">
+    `;
+
+    const gerenciaNames = Object.keys(gerenciasMap).sort();
+    gerenciaNames.forEach(gerName => {
+        const teamList = gerenciasMap[gerName];
+        html += `
+            <div class="tree-gerencia-block">
+                <div class="tree-node-gerencia">
+                    <div style="font-weight: 700; color: #fff; font-size: 0.95rem;">
+                        <i class="fa-solid fa-folder-tree" style="color: #60a5fa; margin-right: 0.4rem;"></i> ${escapeHtml(gerName)}
+                    </div>
+                    <span class="tree-node-badge" style="color: #93c5fd;">Gerência Operacional</span>
+                </div>
+                <div class="tree-teams-row">
+        `;
+
+        teamList.forEach(t => {
+            const teamMemberCount = (state.responsaveis || []).filter(r => r.area === t.team).length;
+            const teamProcessCount = (state.processes || []).filter(p => p.area === t.team).length;
+            html += `
+                <div class="tree-node-team">
+                    <div style="font-weight: 600; color: var(--text-primary); font-size: 0.88rem;">
+                        <i class="fa-solid fa-users" style="color: var(--color-primary); margin-right: 0.3rem;"></i> ${escapeHtml(t.team)}
+                    </div>
+                    ${t.coordenador ? `<div style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.2rem;"><i class="fa-solid fa-user-tie"></i> ${escapeHtml(t.coordenador)}</div>` : ''}
+                    <div style="display: flex; justify-content: center; gap: 0.6rem; font-size: 0.72rem; color: var(--text-muted); margin-top: 0.35rem;">
+                        <span><i class="fa-solid fa-user"></i> ${teamMemberCount} integrantes</span>
+                        <span>•</span>
+                        <span><i class="fa-solid fa-list-check"></i> ${teamProcessCount} demandas</span>
+                    </div>
+                </div>
+            `;
+        });
+
+        html += `
+                </div>
+            </div>
+        `;
+    });
+
+    html += `</div>`;
+    container.innerHTML = html;
+}
+
 // ============================================================
 // VIEW METADATA & BREADCRUMB / HEADER MANAGEMENT
 // ============================================================
@@ -1932,6 +2020,18 @@ function setupEventListeners() {
 
     // Initialize Capacity Modal Listeners
     setupModalParametersListeners();
+
+    // Organogram Modal Listeners
+    const btnCloseOrganogram = document.getElementById('btn-close-organogram');
+    const btnCloseOrganogramFooter = document.getElementById('btn-close-organogram-footer');
+    const modalOrganogram = document.getElementById('modal-organogram');
+    if (btnCloseOrganogram) btnCloseOrganogram.addEventListener('click', closeOrganogramModal);
+    if (btnCloseOrganogramFooter) btnCloseOrganogramFooter.addEventListener('click', closeOrganogramModal);
+    if (modalOrganogram) {
+        modalOrganogram.addEventListener('click', (e) => {
+            if (e.target === modalOrganogram) closeOrganogramModal();
+        });
+    }
 
     // Global parameters button trigger
     const btnGlobalParams = document.getElementById('btn-global-params');
@@ -2767,7 +2867,8 @@ function updateBalancingCalculations() {
             if (isTempoFrequencia) {
                 // Tempo x Frequência: distributed evenly across working days
                 const qtdExec = parseFloat(proc.qtdExecucao) || 0;
-                totalHoursRow = (qtdExec * minutes) / 60 / respParams.diasUteis;
+                const dUteis = Math.max(1, respParams.diasUteis || state.params.diasUteis || 21);
+                totalHoursRow = (qtdExec * minutes) / 60 / dUteis;
             } else {
                 // Volume x Tempo: backlog to clear in the day
                 const hasBacklog = proc.backlogVolume !== undefined && proc.backlogVolume !== '';
@@ -2801,7 +2902,8 @@ function updateBalancingCalculations() {
         if (!isStopped) {
             if (isTempoFrequencia) {
                 const qtdExec = parseFloat(proc.qtdExecucao) || 0;
-                totalHoursRow = (qtdExec * minutes) / 60 / respParams.diasUteis;
+                const dUteis = Math.max(1, respParams.diasUteis || state.params.diasUteis || 21);
+                totalHoursRow = (qtdExec * minutes) / 60 / dUteis;
             } else {
                 const hasBacklog = proc.backlogVolume !== undefined && proc.backlogVolume !== '';
                 const backlogVol = hasBacklog ? parseFloat(proc.backlogVolume) : 0;
@@ -2904,7 +3006,7 @@ function renderAreaAllocations() {
             
             if (isTempoFrequencia) {
                 const qtdExec = parseFloat(proc.qtdExecucao) || 0;
-                areaDailyHours += (qtdExec * minutes) / 60 / diasUteis;
+                areaDailyHours += (qtdExec * minutes) / 60 / Math.max(1, diasUteis);
             } else {
                 const hasBacklog = proc.backlogVolume !== undefined && proc.backlogVolume !== '';
                 const backlogVol = hasBacklog ? parseFloat(proc.backlogVolume) : 0;
@@ -3140,6 +3242,7 @@ function renderCharts(totalFteRequired) {
         : state.processes.filter(p => p.area === filterValue);
 
     filteredList.forEach(p => {
+        if (p.reviewStatus === 'Parar') return;
         const hasVolume = p.volume !== null && p.volume !== '';
         const multiplier = hasVolume ? parseFloat(p.volume) : (p.qtdExecucao !== null && p.qtdExecucao !== '' ? parseFloat(p.qtdExecucao) : 0);
         const minutes = p.minutos !== null && p.minutos !== '' ? parseFloat(p.minutos) : 0;
