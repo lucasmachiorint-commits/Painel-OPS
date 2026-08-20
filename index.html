@@ -109,7 +109,7 @@
                         <p class="view-subtitle" id="app-view-subtitle">Visão operacional de volumes mensais, FTEs requeridos e capacidade por equipe.</p>
                     </div>
 
-                    <!-- Integrated User Chip anchored at Top-Right -->
+                    <!-- Integrated User Chip anchored at Top-Right with Realtime Status -->
                     <div id="header-user-chip" class="user-chip-header">
                         <i class="fa-solid fa-circle-user user-chip-avatar"></i>
                         <div class="user-chip-details">
@@ -118,13 +118,19 @@
                                 <span id="userRole" class="user-role-badge role-consulta">CONSULTA</span>
                                 <span id="userTeamBadge" style="display: none;"></span>
                             </div>
+                            <div id="realtime-status-badge" class="realtime-status-inline" title="Status da sincronização em tempo real (Supabase)">
+                                <span class="status-dot"></span>
+                                <span class="status-text">Conectando...</span>
+                            </div>
                         </div>
-                        <button id="btn-open-change-pass" onclick="openChangePasswordModal()" title="Alterar minha senha" class="btn-user-action">
-                            <i class="fa-solid fa-key"></i>
-                        </button>
-                        <button id="btn-logout" onclick="handleLogout()" title="Sair do sistema" class="btn-user-action btn-logout">
-                            <i class="fa-solid fa-arrow-right-from-bracket"></i>
-                        </button>
+                        <div class="user-chip-actions">
+                            <button id="btn-open-change-pass" onclick="openChangePasswordModal()" title="Alterar minha senha" class="btn-user-action">
+                                <i class="fa-solid fa-key"></i>
+                            </button>
+                            <button id="btn-logout" onclick="handleLogout()" title="Sair do sistema" class="btn-user-action btn-logout">
+                                <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                            </button>
+                        </div>
                     </div>
                 </div>
 
@@ -146,10 +152,6 @@
                     </div>
 
                     <div class="header-action-buttons">
-                        <div id="realtime-status-badge" style="display: flex; align-items: center; gap: 0.4rem; padding: 0.4rem 0.8rem; border-radius: 20px; font-size: 0.8rem; background: rgba(255,255,255,0.05); color: var(--text-muted);" title="Status da sincronização em tempo real (Supabase)">
-                            <span class="status-dot" style="width: 8px; height: 8px; border-radius: 50%; background: #eab308; display: inline-block;"></span>
-                            <span class="status-text">Conectando...</span>
-                        </div>
                         <button id="btn-reset-global-state" class="btn btn-secondary" data-permissao="ADMIN" title="Publicar sua visão atual como a base oficial para todos os usuários" onclick="forceResetGlobalState()" style="display: none;">
                             <i class="fa-solid fa-cloud-arrow-up"></i> Publicar para Todos
                         </button>
