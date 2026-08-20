@@ -40,7 +40,7 @@
     
     --text-primary: #f8fafc;
     --text-secondary: #92ab9e;
-    --text-muted: #4e6b5c;
+    --text-muted: #7a9c8c;
     
     --color-primary: #eb5c27;       /* Emana Pay Orange */
     --color-secondary: #e55f91;     /* Emana Pay Pink */
@@ -542,14 +542,14 @@ body.light-theme .readonly-group {
 }
 
 .primary-glow {
-    background: rgba(14, 165, 233, 0.1);
+    background: rgba(235, 92, 39, 0.12);
     color: var(--color-primary);
-    box-shadow: 0 0 15px rgba(14, 165, 233, 0.2);
+    box-shadow: 0 0 15px var(--glow-primary);
 }
 .secondary-glow {
-    background: rgba(168, 85, 247, 0.1);
+    background: rgba(229, 95, 145, 0.12);
     color: var(--color-secondary);
-    box-shadow: 0 0 15px rgba(168, 85, 247, 0.2);
+    box-shadow: 0 0 15px var(--glow-secondary);
 }
 .success-glow {
     background: rgba(16, 185, 129, 0.1);
@@ -727,6 +727,12 @@ body.light-theme .total-row {
     transition: transform var(--transition-fast), background var(--transition-fast), border-color var(--transition-fast), box-shadow var(--transition-fast);
 }
 
+/* FOCUS VISIBLE ACCESSIBILITY */
+button:focus-visible, input:focus-visible, select:focus-visible, .menu-item:focus-visible {
+    outline: 2px solid var(--color-primary) !important;
+    outline-offset: 2px !important;
+}
+
 .btn:active {
     transform: scale(0.97);
 }
@@ -737,25 +743,25 @@ body.light-theme .total-row {
 }
 
 .btn-primary:hover {
-    background: #0284c7;
-    box-shadow: 0 0 15px rgba(14, 165, 233, 0.4);
+    background: #cf4817;
+    box-shadow: 0 0 15px var(--glow-primary);
 }
 
 .btn-secondary {
-    background: rgba(168, 85, 247, 0.2);
-    border-color: rgba(168, 85, 247, 0.4);
-    color: #e9d5ff;
+    background: rgba(229, 95, 145, 0.15);
+    border-color: rgba(229, 95, 145, 0.35);
+    color: #fbcfe8;
 }
 
 .btn-secondary:hover {
     background: var(--color-secondary);
     color: white;
-    box-shadow: 0 0 15px rgba(168, 85, 247, 0.4);
+    box-shadow: 0 0 15px var(--glow-secondary);
 }
 
 body.light-theme .btn-secondary {
-    background: rgba(124, 58, 237, 0.1);
-    border-color: rgba(124, 58, 237, 0.3);
+    background: rgba(205, 60, 114, 0.1);
+    border-color: rgba(205, 60, 114, 0.3);
     color: var(--color-secondary);
 }
 body.light-theme .btn-secondary:hover {
@@ -1660,6 +1666,24 @@ body.light-theme .select-review-area option, body.light-theme .select-review-sta
     border: 1px solid rgba(16, 185, 129, 0.3);
 }
 
+body.light-theme .role-admin {
+    background: rgba(207, 72, 23, 0.12);
+    color: #b33a0d;
+    border-color: rgba(207, 72, 23, 0.35);
+}
+
+body.light-theme .role-operador {
+    background: rgba(79, 70, 229, 0.12);
+    color: #4338ca;
+    border-color: rgba(79, 70, 229, 0.35);
+}
+
+body.light-theme .role-consulta {
+    background: rgba(5, 150, 105, 0.12);
+    color: #047857;
+    border-color: rgba(5, 150, 105, 0.35);
+}
+
 .select-profile {
     width: 100%;
     background: var(--bg-tertiary);
@@ -1720,6 +1744,292 @@ body.light-theme input:-webkit-autofill:active {
     -webkit-text-fill-color: #1e1b18 !important;
 }
 
+/* ============================================================
+   UX REVAMP: SIDEBAR SECTIONS, BREADCRUMB, FILTERS & USER CHIP
+   ============================================================ */
+
+/* Menu Section Labels in Sidebar */
+.menu-section-label {
+    font-size: 0.60rem;
+    font-weight: 800;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    opacity: 0.7;
+    padding: 0.6rem 0.2rem 0.2rem;
+    pointer-events: none;
+    user-select: none;
+    text-align: center;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    margin-top: 0.35rem;
+    list-style: none;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+}
+
+.menu-section-label:first-child {
+    border-top: none;
+    margin-top: 0;
+    padding-top: 0;
+}
+
+body.light-theme .menu-section-label {
+    color: var(--text-muted);
+    border-top-color: rgba(0, 0, 0, 0.06);
+}
+
+/* Header & Breadcrumb */
+.app-header {
+    display: flex;
+    flex-direction: column;
+    padding: 0.85rem 1.5rem 0.75rem;
+    background: var(--bg-glass);
+    border-bottom: 1px solid var(--border-color);
+    backdrop-filter: var(--backdrop-blur);
+    -webkit-backdrop-filter: var(--backdrop-blur);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    gap: 0.65rem;
+}
+
+.header-top-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    width: 100%;
+    gap: 1rem;
+}
+
+.header-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    min-width: 240px;
+    flex: 1;
+}
+
+.breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    font-weight: 500;
+}
+
+.breadcrumb .bc-app {
+    color: var(--color-primary);
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.breadcrumb .bc-sep {
+    opacity: 0.5;
+    font-size: 0.7rem;
+}
+
+.breadcrumb .bc-section {
+    color: var(--text-secondary);
+}
+
+.breadcrumb .bc-page {
+    color: var(--text-primary);
+    font-weight: 600;
+}
+
+.app-title {
+    font-size: 1.35rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    line-height: 1.2;
+    margin: 0;
+}
+
+.view-subtitle {
+    font-size: 0.78rem;
+    color: var(--text-secondary);
+    margin: 0;
+    line-height: 1.2;
+}
+
+.header-actions-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    padding-top: 0.1rem;
+}
+
+.header-action-buttons {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    margin-left: auto;
+}
+
+/* Global Context Filters in Header */
+.header-global-filters {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.global-filter-group {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    padding: 0.3rem 0.6rem;
+    transition: all var(--transition-fast);
+}
+
+.global-filter-group:hover, .global-filter-group:focus-within {
+    border-color: var(--color-primary);
+    background: rgba(255, 255, 255, 0.07);
+}
+
+body.light-theme .global-filter-group {
+    background: #ffffff;
+    border-color: #cbd5e1;
+}
+
+.global-filter-group .filter-icon {
+    font-size: 0.75rem;
+    color: var(--color-primary);
+}
+
+.global-filter-group select {
+    background: transparent;
+    border: none;
+    color: var(--text-primary);
+    font-size: 0.8rem;
+    font-weight: 600;
+    outline: none;
+    cursor: pointer;
+    max-width: 140px;
+}
+
+.global-filter-group select option {
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+}
+
+body.light-theme .global-filter-group select option {
+    background: #ffffff;
+    color: #1e293b;
+}
+
+/* Integrated Header User Chip (Top-Right Anchored) */
+.user-chip-header {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    padding: 0.35rem 0.8rem;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid var(--border-color);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    flex-shrink: 0;
+    align-self: flex-start;
+}
+
+body.light-theme .user-chip-header {
+    background: #ffffff;
+    border-color: #cbd5e1;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.user-chip-avatar {
+    font-size: 1.5rem;
+    color: var(--color-primary);
+}
+
+.user-chip-details {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    line-height: 1.1;
+}
+
+.user-chip-name {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    max-width: 130px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.user-chip-badges {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.realtime-status-inline {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-size: 0.68rem;
+    color: var(--text-muted);
+    font-weight: 500;
+    margin-top: 0.1rem;
+    user-select: none;
+}
+
+.realtime-status-inline .status-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #eab308;
+    display: inline-block;
+    flex-shrink: 0;
+}
+
+.user-chip-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    margin-left: 0.2rem;
+}
+
+.btn-user-action {
+    background: transparent;
+    border: 1px solid var(--border-color);
+    color: var(--text-secondary);
+    border-radius: 6px;
+    padding: 0.25rem 0.45rem;
+    cursor: pointer;
+    font-size: 0.72rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+
+.btn-user-action:hover {
+    border-color: var(--color-primary);
+    color: var(--color-primary);
+}
+
+.btn-user-action.btn-logout:hover {
+    background: rgba(244, 63, 94, 0.15);
+    border-color: #f43f5e;
+    color: #f43f5e;
+}
+
+
 
 
 </style>
@@ -1751,31 +2061,35 @@ body.light-theme input:-webkit-autofill:active {
             </div>
             
             <ul class="sidebar-menu">
-                <li class="menu-item active" data-view="cadastros" title="Cadastros">
-                    <i class="fa-solid fa-address-book"></i>
-                    <span>Cadastros</span>
-                </li>
-                <li class="menu-item" data-view="dashboard" title="Dashboard">
+                <!-- SEÇÃO: VISÃO GERAL -->
+                <li class="menu-section-label" title="Visão Geral">Visão Geral</li>
+                <li class="menu-item active" data-view="dashboard" title="Dashboard Operacional">
                     <i class="fa-solid fa-chart-pie"></i>
                     <span>Dashboard</span>
-                </li>
-                <li class="menu-item" data-view="balancing" title="Balanceamento" data-permissao="ADMIN">
-                    <i class="fa-solid fa-scale-balanced"></i>
-                    <span>Balanceamento</span>
-                </li>
-                <li class="menu-item" data-view="review" title="Revisão de Atividades" style="display: none;">
-                    <i class="fa-solid fa-clipboard-check"></i>
-                    <span>Revisão</span>
-                </li>
-                <li class="menu-item" data-view="automations" title="Quadro de Automações (RPA)">
-                    <i class="fa-solid fa-robot"></i>
-                    <span>Automações</span>
                 </li>
                 <li class="menu-item" data-view="history" title="Histórico de Volumes">
                     <i class="fa-solid fa-chart-line"></i>
                     <span>Histórico</span>
                 </li>
-                <li class="menu-item" data-view="access-control" data-permissao="ADMIN" title="Controle de Acesso">
+
+                <!-- SEÇÃO: GESTÃO -->
+                <li class="menu-section-label" title="Gestão da Operação">Gestão</li>
+                <li class="menu-item" data-view="cadastros" title="Estrutura e Cadastros">
+                    <i class="fa-solid fa-address-book"></i>
+                    <span>Cadastros</span>
+                </li>
+                <li class="menu-item" data-view="balancing" title="Balanceamento de Backlog" data-permissao="ADMIN">
+                    <i class="fa-solid fa-scale-balanced"></i>
+                    <span>Balanceamento</span>
+                </li>
+                <li class="menu-item" data-view="automations" title="Quadro de Automações (RPA)">
+                    <i class="fa-solid fa-robot"></i>
+                    <span>Automações</span>
+                </li>
+
+                <!-- SEÇÃO: ADMINISTRAÇÃO -->
+                <li class="menu-section-label admin-only" title="Administração e Governança" data-permissao="ADMIN">Admin</li>
+                <li class="menu-item" data-view="access-control" data-permissao="ADMIN" title="Controle de Acesso e Perfis">
                     <i class="fa-solid fa-shield-halved"></i>
                     <span>Acesso</span>
                 </li>
@@ -1794,29 +2108,78 @@ body.light-theme input:-webkit-autofill:active {
         <div class="main-content">
             <!-- HEADER -->
             <header class="app-header">
-                <div class="header-info">
-                    <h2 class="app-title" id="app-view-title">Cadastro</h2>
-                </div>
-                <div class="header-actions">
-                    <div id="realtime-status-badge" style="display: flex; align-items: center; gap: 0.4rem; padding: 0.4rem 0.8rem; border-radius: 20px; font-size: 0.8rem; background: rgba(255,255,255,0.05); color: var(--text-muted);" title="Status da sincronização em tempo real (Supabase)">
-                        <span class="status-dot" style="width: 8px; height: 8px; border-radius: 50%; background: #eab308; display: inline-block;"></span>
-                        <span class="status-text">Conectando...</span>
+                <div class="header-top-row">
+                    <div class="header-info">
+                        <nav class="breadcrumb" id="app-breadcrumb">
+                            <span class="bc-app"><i class="fa-solid fa-chart-simple"></i> EmanaPay</span>
+                            <span class="bc-sep">›</span>
+                            <span class="bc-section" id="bc-section-title">Visão Geral</span>
+                            <span class="bc-sep">›</span>
+                            <span class="bc-page" id="bc-page-title">Dashboard</span>
+                        </nav>
+                        <h2 class="app-title" id="app-view-title">Dashboard</h2>
+                        <p class="view-subtitle" id="app-view-subtitle">Visão operacional de volumes mensais, FTEs requeridos e capacidade por equipe.</p>
                     </div>
-                    <button id="btn-reset-global-state" class="btn btn-secondary" data-permissao="ADMIN" title="Publicar sua visão atual como a base oficial para todos os usuários" onclick="forceResetGlobalState()">
-                        <i class="fa-solid fa-cloud-arrow-up"></i> Publicar para Todos
-                    </button>
-                    <button id="btn-export-csv" class="btn btn-primary-outline" title="Exportar CSV (Excel)">
-                        <i class="fa-solid fa-file-csv"></i> Exportar Excel
-                    </button>
-                    <button id="btn-print" class="btn btn-primary" title="Imprimir / PDF">
-                        <i class="fa-solid fa-print"></i> Imprimir / PDF
-                    </button>
+
+                    <!-- Integrated User Chip anchored at Top-Right with Realtime Status -->
+                    <div id="header-user-chip" class="user-chip-header">
+                        <i class="fa-solid fa-circle-user user-chip-avatar"></i>
+                        <div class="user-chip-details">
+                            <span id="userName" class="user-chip-name">Usuário</span>
+                            <div class="user-chip-badges">
+                                <span id="userRole" class="user-role-badge role-consulta">CONSULTA</span>
+                                <span id="userTeamBadge" style="display: none;"></span>
+                            </div>
+                            <div id="realtime-status-badge" class="realtime-status-inline" title="Status da sincronização em tempo real (Supabase)">
+                                <span class="status-dot"></span>
+                                <span class="status-text">Conectando...</span>
+                            </div>
+                        </div>
+                        <div class="user-chip-actions">
+                            <button id="btn-open-change-pass" onclick="openChangePasswordModal()" title="Alterar minha senha" class="btn-user-action">
+                                <i class="fa-solid fa-key"></i>
+                            </button>
+                            <button id="btn-logout" onclick="handleLogout()" title="Sair do sistema" class="btn-user-action btn-logout">
+                                <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="header-actions-row">
+                    <!-- Global Context Filters -->
+                    <div class="header-global-filters" id="header-global-filters">
+                        <div class="global-filter-group" title="Filtrar por Área / Equipe em todas as telas">
+                            <i class="fa-solid fa-layer-group filter-icon"></i>
+                            <select id="global-filter-area">
+                                <option value="all">Todas as Áreas</option>
+                            </select>
+                        </div>
+                        <div class="global-filter-group" title="Filtrar por Responsável em todas as telas">
+                            <i class="fa-solid fa-user filter-icon"></i>
+                            <select id="global-filter-resp">
+                                <option value="all">Todos os Responsáveis</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="header-action-buttons">
+                        <button id="btn-reset-global-state" class="btn btn-secondary" data-permissao="ADMIN" title="Publicar sua visão atual como a base oficial para todos os usuários" onclick="forceResetGlobalState()" style="display: none;">
+                            <i class="fa-solid fa-cloud-arrow-up"></i> Publicar para Todos
+                        </button>
+                        <button id="btn-export-csv" class="btn btn-primary-outline" title="Exportar CSV (Excel)">
+                            <i class="fa-solid fa-file-csv"></i> Exportar Excel
+                        </button>
+                        <button id="btn-print" class="btn btn-primary" title="Imprimir / PDF">
+                            <i class="fa-solid fa-print"></i> Imprimir / PDF
+                        </button>
+                    </div>
                 </div>
             </header>
 
             <main class="content-area">
                 <!-- VIEW 0: CADASTROS -->
-                <div id="view-cadastros" class="tab-view" style="display: block;">
+                <div id="view-cadastros" class="tab-view" style="display: none;">
                     <div class="grid-2-col" style="grid-template-columns: 300px 1fr; gap: 1.5rem;">
                         <!-- SIDEBAR: EQUIPES & RESPONSÁVEIS -->
                         <aside style="display: flex; flex-direction: column; gap: 1.5rem;">
@@ -1827,10 +2190,10 @@ body.light-theme input:-webkit-autofill:active {
                                         <i class="fa-solid fa-users"></i> Equipes (Áreas)
                                     </h2>
                                     <div style="display: flex; gap: 0.5rem; align-items: center;">
-                                        <button id="btn-view-organogram" class="btn btn-secondary" style="padding: 0.3rem 0.6rem; font-size: 0.75rem; opacity: 0.5; cursor: not-allowed; background: rgba(235, 92, 39, 0.05); border: 1px solid #eb5c27; color: #eb5c27;" title="Em breve" disabled>
+                                        <button id="btn-view-organogram" class="btn btn-secondary" style="padding: 0.3rem 0.65rem; font-size: 0.75rem;" title="Visualizar estrutura de Diretoria, Gerências e Equipes" onclick="openOrganogramModal()">
                                             <i class="fa-solid fa-sitemap"></i> Ver Fluxograma
                                         </button>
-                                        <button id="btn-open-new-team-modal" data-permissao="OPERADOR,ADMIN" onclick="openNewTeamModal()" class="btn btn-primary" style="padding: 0.3rem 0.75rem; font-size: 0.8rem;">
+                                        <button id="btn-open-new-team-modal" data-permissao="ADMIN" onclick="openNewTeamModal()" class="btn btn-primary" style="padding: 0.3rem 0.75rem; font-size: 0.8rem;">
                                             <i class="fa-solid fa-plus"></i> Nova Equipe
                                         </button>
                                     </div>
@@ -1846,7 +2209,7 @@ body.light-theme input:-webkit-autofill:active {
                                     <h2 class="panel-title" style="margin-bottom: 0; border-bottom: none; padding-bottom: 0; font-size: 1.1rem;">
                                         <i class="fa-solid fa-user-tie"></i> Responsáveis
                                     </h2>
-                                    <button id="btn-global-params" data-permissao="OPERADOR,ADMIN" class="btn btn-secondary" style="padding: 0.3rem 0.6rem; font-size: 0.75rem; background: rgba(235, 92, 39, 0.08); border: 1px solid #eb5c27; color: #eb5c27;" title="Configurar Parâmetros Padrão de Capacidade">
+                                    <button id="btn-global-params" data-permissao="ADMIN" class="btn btn-secondary" style="padding: 0.3rem 0.6rem; font-size: 0.75rem; background: rgba(235, 92, 39, 0.08); border: 1px solid #eb5c27; color: #eb5c27;" title="Configurar Parâmetros Padrão de Capacidade">
                                         <i class="fa-solid fa-sliders"></i> Padrão Global
                                     </button>
                                 </div>
@@ -1957,7 +2320,7 @@ body.light-theme input:-webkit-autofill:active {
                 </div>
 
                 <!-- VIEW 1: DASHBOARD -->
-                <div id="view-dashboard" class="tab-view" style="display: none;">
+                <div id="view-dashboard" class="tab-view" style="display: block;">
                     <div style="display: flex; flex-direction: column; gap: 1.5rem;">
                         <!-- DASHBOARD MAIN PANEL -->
                         <div class="dashboard-main" style="width: 100%;">
@@ -2697,27 +3060,6 @@ body.light-theme input:-webkit-autofill:active {
         </div>
     </div>
 
-    <!-- TOP RIGHT FIXED CONTROLS -->
-    <div id="top-right-fixed-controls" class="top-right-controls" style="position: fixed; top: 1.5rem; right: 1.5rem; z-index: 9999; display: flex; align-items: center; gap: 0.75rem;">
-        <!-- USER CHIP -->
-        <div id="header-user-chip" style="display: flex; align-items: center; gap: 0.6rem; padding: 0.3rem 0.75rem 0.3rem 0.5rem; border-radius: 999px; background: var(--bg-glass); border: 1px solid var(--border-color); box-shadow: var(--shadow-premium); cursor: default; user-select: none; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);">
-            <i class="fa-solid fa-circle-user" style="font-size: 1.4rem; color: var(--color-primary);"></i>
-            <div style="display: flex; flex-direction: column; line-height: 1.2;">
-                <span id="userName" style="font-size: 0.82rem; font-weight: 600; color: var(--text-primary); max-width: 140px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">Usuário</span>
-                <div style="display: flex; align-items: center; gap: 0.35rem; margin-top: 0.1rem; flex-wrap: wrap;">
-                    <span id="userRole" class="user-role-badge role-consulta" style="font-size: 0.68rem; padding: 0.05rem 0.4rem; width: fit-content;">CONSULTA</span>
-                    <span id="userTeamBadge" style="font-size: 0.68rem; padding: 0.05rem 0.4rem; border-radius: 4px; background: rgba(235,92,39,0.12); color: var(--color-primary); border: 1px solid rgba(235,92,39,0.25); display: none; font-weight: 500;"></span>
-                </div>
-            </div>
-            <button id="btn-open-change-pass" onclick="openChangePasswordModal()" title="Alterar minha senha" style="background: transparent; border: 1px solid var(--border-color); color: var(--text-secondary); border-radius: 6px; padding: 0.3rem 0.55rem; cursor: pointer; font-size: 0.78rem; display: flex; align-items: center; gap: 0.3rem; transition: all 0.2s;" onmouseover="this.style.borderColor='var(--color-primary)';this.style.color='var(--color-primary)'" onmouseout="this.style.borderColor='var(--border-color)';this.style.color='var(--text-secondary)'">
-                <i class="fa-solid fa-key"></i> Senha
-            </button>
-            <button id="btn-logout" onclick="handleLogout()" title="Sair do sistema" style="background: transparent; border: 1px solid var(--border-color); color: var(--text-secondary); border-radius: 6px; padding: 0.3rem 0.55rem; cursor: pointer; font-size: 0.78rem; display: flex; align-items: center; gap: 0.3rem; transition: all 0.2s; white-space: nowrap;" onmouseover="this.style.background='rgba(244,63,94,0.12)';this.style.color='#f43f5e';this.style.borderColor='rgba(244,63,94,0.3)'" onmouseout="this.style.background='transparent';this.style.color='var(--text-secondary)';this.style.borderColor='var(--border-color)'">
-                <i class="fa-solid fa-arrow-right-from-bracket"></i> Sair
-            </button>
-        </div>
-    </div>
-
     <!-- Hidden Printable Area for Clean PDF -->
     <div id="print-area" class="print-only"></div>
 
@@ -2845,6 +3187,8 @@ window.addEventListener('error', function(event) {
 const SUPABASE_URL = 'https://maguyzjhldcgpcvkvkqe.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1hZ3V5empobGRjZ3Bjdmt2a3FlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQ2NTU0MDMsImV4cCI6MjEwMDIzMTQwM30.Ow9xruE1qAFTX3mqELERxrY3CRBOdV_n4MoXXhtt3Y8';
 
+
+
 let supabaseClient = null;
 let realtimeChannel = null;
 if (window.supabase) {
@@ -2971,13 +3315,44 @@ function aplicarPerfilDeAcesso() {
     document.querySelectorAll('.col-acao-excluir').forEach(el => {
         el.style.display = isConsulta ? 'none' : '';
     });
-    document.querySelectorAll('.input-volume, .input-minutes, .input-qtd, .input-backlog-volume, .input-area-allocation, .select-review-status, .input-activity-name-cell, .select-activity-team-cell, .select-activity-resp-cell, .input-activity-product-cell, .select-activity-add-resp, .cadastros-row-checkbox, .cb-activity-rpa, .access-perfil-select, #history-month-input, #modal-input-horas-dia, #modal-input-absenteismo, #modal-input-dias-uteis, #modal-input-new-team, #modal-select-team-gerencia, #modal-select-team-diretoria').forEach(el => {
+
+    // Controla inputs estáticos de modais e painéis globais
+    document.querySelectorAll('#history-month-input, #modal-input-horas-dia, #modal-input-absenteismo, #modal-input-dias-uteis, #modal-input-new-team, #modal-select-team-gerencia, #modal-select-team-diretoria, .access-perfil-select').forEach(el => {
         el.disabled = isConsulta;
         el.style.opacity = isConsulta ? '0.5' : '1';
         el.style.pointerEvents = isConsulta ? 'none' : 'auto';
     });
+
+    // Controla inputs em linhas de atividades com base na área da atividade e perfil
+    document.querySelectorAll('tr[data-id]').forEach(tr => {
+        const procId = tr.dataset.id;
+        const proc = (state.processes || []).find(p => p.id === procId);
+        const areaName = proc ? proc.area : (tr.dataset.area || '');
+        const canEditThisArea = podeEditarArea(areaName);
+        const isRowDisabled = isConsulta || !canEditThisArea;
+
+        tr.querySelectorAll('.input-volume, .input-minutes, .input-qtd, .input-backlog-volume, .input-area-allocation, .select-review-status, .input-activity-name-cell, .select-activity-team-cell, .select-activity-resp-cell, .input-activity-product-cell, .select-activity-add-resp, .cadastros-row-checkbox, .cb-activity-rpa').forEach(el => {
+            el.disabled = isRowDisabled;
+            el.style.pointerEvents = isRowDisabled ? 'none' : 'auto';
+            el.style.opacity = isRowDisabled ? '0.6' : '1';
+        });
+
+        tr.querySelectorAll('.cb-activity-rpa').forEach(cb => {
+            const lbl = cb.closest('label');
+            if (lbl) {
+                lbl.style.pointerEvents = isRowDisabled ? 'none' : 'auto';
+                lbl.style.cursor = isRowDisabled ? 'not-allowed' : 'pointer';
+            }
+        });
+
+        tr.querySelectorAll('.remove-resp-btn, .btn-delete-activity-cell').forEach(el => {
+            el.style.pointerEvents = isRowDisabled ? 'none' : 'auto';
+            el.style.display = isRowDisabled ? 'none' : (el.classList.contains('remove-resp-btn') ? 'inline-flex' : 'inline-block');
+        });
+    });
+
     // Controla botões de ação e engrenagens na barra lateral e tabelas
-    document.querySelectorAll('.remove-resp-btn, .btn-config-resp-item').forEach(el => {
+    document.querySelectorAll('.btn-config-resp-item').forEach(el => {
         el.style.pointerEvents = isConsulta ? 'none' : 'auto';
         el.style.display = isConsulta ? 'none' : 'inline-block';
     });
@@ -3619,6 +3994,10 @@ async function setupUserSession(user) {
         refreshCurrentUserAssignedTeam();
         refreshAllViews();
         aplicarPerfilDeAcesso();
+        
+        const hashView = (window.location.hash || '').replace('#/', '').trim();
+        const targetView = (hashView && VIEW_META[hashView]) ? hashView : 'dashboard';
+        switchToView(targetView);
     } catch (err) {
         alert('[DIAGNÓSTICO] Erro em setupUserSession: ' + (err.message || err));
         console.error('Erro em setupUserSession:', err);
@@ -3727,6 +4106,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         } catch (sessionErr) {
             console.error('Erro ao recuperar sessão existente do Supabase:', sessionErr);
             try {
+                localStorage.removeItem('sb-maguyzjhldcgpcvkvkqe-auth-token');
                 const projName = SUPABASE_URL.split('//')[1]?.split('.')[0];
                 if (projName) {
                     localStorage.removeItem(`sb-${projName}-auth-token`);
@@ -3762,10 +4142,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     
     renderAreaFilterOptions();
     renderResponsavelFilterOptions();
-    renderCadastrosView();
-    renderTable();
-    renderBalancingTable();
-    renderReviewTable();
+    
+    const hashView = (window.location.hash || '').replace('#/', '').trim();
+    const targetView = (hashView && VIEW_META[hashView]) ? hashView : 'dashboard';
+    switchToView(targetView);
 });
 
 // TOAST NOTIFICATION SYSTEM
@@ -4025,70 +4405,6 @@ async function loadStateFromSupabase() {
 }
 
 // IMPORTAR BASE DE DADOS COMPLETA DE PRODUÇÃO (PRD) PARA HOMOLOGAÇÃO (HML)
-async function importPrdDataToHml() {
-    if (!verificarPermissao('OPERADOR')) {
-        alert('Acesso negado: Perfil OPERADOR ou ADMIN necessário.');
-        return;
-    }
-    
-    const client = getSupabase();
-    if (!client) {
-        alert('Erro: Supabase não conectado.');
-        return;
-    }
-    
-    const confirmMsg = 'Deseja realmente importar todas as informações de PRODUÇÃO (PRD) para este ambiente de HOMOLOGAÇÃO (HML)?\n\n' +
-                       '⚠️ Todos os processos, responsáveis e equipes de HML serão substituídos pelo cenário atual de Produção para que você possa executar testes com dados reais.';
-    
-    if (!confirm(confirmMsg)) {
-        return;
-    }
-    
-    try {
-        showToast('Buscando dados atuais de Produção (PRD)...', 'info', 4000);
-        
-        const { data, error } = await client
-            .from('board_state')
-            .select('data')
-            .eq('id', 'default')
-            .maybeSingle();
-            
-        if (error) {
-            console.error('[Import PRD Error]', error);
-            alert('Erro ao buscar dados de Produção no Supabase: ' + error.message);
-            return;
-        }
-        
-        if (!data || !data.data) {
-            alert('Nenhum dado encontrado no banco de Produção (PRD).');
-            return;
-        }
-        
-        // Clona e migra estado de Produção
-        state = JSON.parse(JSON.stringify(data.data));
-        applyStateMigrations();
-        
-        // Salva diretamente em HML (id: 'default')
-        saveState();
-        
-        refreshCurrentUserAssignedTeam();
-        aplicarPerfilDeAcesso();
-        renderAreaFilterOptions();
-        renderResponsavelFilterOptions();
-        renderCadastrosView();
-        renderTable();
-        renderBalancingTable();
-        renderReviewTable();
-        renderAutomationsView();
-        
-        showToast('Cenário de Produção (PRD) importado com sucesso para HML!', 'success', 6000);
-        alert('Sucesso! O cenário de Produção (PRD) foi copiado integralmente para este ambiente de Homologação (HML).');
-        
-    } catch (err) {
-        console.error('[Import PRD Exception]', err);
-        alert('Erro inesperado ao importar dados de Produção: ' + err.message);
-    }
-}
 
 function isRpaActivity(proc) {
     if (!proc) return false;
@@ -4341,6 +4657,7 @@ function populateTeamCoordenadorDatalist() {
 }
 
 function openNewTeamModal(teamToEdit = null) {
+    if (!verificarPermissao('ADMIN')) { alert('Acesso negado: Apenas administradores podem criar ou editar equipes.'); return; }
     const modal = document.getElementById('modal-new-team');
     const nameInput = document.getElementById('modal-input-new-team');
     const coordInput = document.getElementById('modal-input-team-coordenador');
@@ -4396,7 +4713,7 @@ function closeNewTeamModal() {
 }
 
 function saveNewTeamFromModal() {
-    if (!verificarPermissao('OPERADOR')) { alert('Acesso negado: Perfil OPERADOR necessário.'); return; }
+    if (!verificarPermissao('ADMIN')) { alert('Acesso negado: Apenas administradores podem cadastrar ou editar equipes.'); return; }
     const modal = document.getElementById('modal-new-team');
     const nameInput = document.getElementById('modal-input-new-team');
     const gerenciaSelect = document.getElementById('modal-select-team-gerencia');
@@ -4488,52 +4805,303 @@ function saveNewTeamFromModal() {
     renderReviewTable();
 }
 
+// ORGANOGRAM FLOWCHART MODAL
+function openOrganogramModal() {
+    const modal = document.getElementById('modal-organogram');
+    if (!modal) return;
+    renderOrganogramFlowchart();
+    modal.style.display = 'flex';
+}
+
+function closeOrganogramModal() {
+    const modal = document.getElementById('modal-organogram');
+    if (modal) modal.style.display = 'none';
+}
+
+function renderOrganogramFlowchart() {
+    const container = document.getElementById('organogram-flowchart-content');
+    if (!container) return;
+
+    const hierarchy = state.teamHierarchy || {};
+    const teams = state.teams || [];
+
+    const diretoriaName = 'Diretoria de Operações';
+    const gerenciasMap = {};
+
+    teams.forEach(team => {
+        const info = hierarchy[team] || { gerencia: 'Outras / Suporte', diretoria: 'Operações' };
+        const gerencia = info.gerencia || 'Geral';
+        if (!gerenciasMap[gerencia]) {
+            gerenciasMap[gerencia] = [];
+        }
+        gerenciasMap[gerencia].push({
+            team,
+            coordenador: info.coordenador || '',
+            coordenadorEmail: info.coordenadorEmail || ''
+        });
+    });
+
+    let html = `
+        <div class="tree-node-diretoria" style="margin-bottom: 2rem;">
+            <div style="font-size: 1.1rem; font-weight: 700; color: #fff;">
+                <i class="fa-solid fa-building-columns" style="color: var(--color-primary); margin-right: 0.5rem;"></i> ${escapeHtml(diretoriaName)}
+            </div>
+            <span class="tree-node-badge">Diretoria Executiva</span>
+        </div>
+        <div class="tree-gerencias-row">
+    `;
+
+    const gerenciaNames = Object.keys(gerenciasMap).sort();
+    gerenciaNames.forEach(gerName => {
+        const teamList = gerenciasMap[gerName];
+        html += `
+            <div class="tree-gerencia-block">
+                <div class="tree-node-gerencia">
+                    <div style="font-weight: 700; color: #fff; font-size: 0.95rem;">
+                        <i class="fa-solid fa-folder-tree" style="color: #60a5fa; margin-right: 0.4rem;"></i> ${escapeHtml(gerName)}
+                    </div>
+                    <span class="tree-node-badge" style="color: #93c5fd;">Gerência Operacional</span>
+                </div>
+                <div class="tree-teams-row">
+        `;
+
+        teamList.forEach(t => {
+            const teamMemberCount = (state.responsaveis || []).filter(r => r.area === t.team).length;
+            const teamProcessCount = (state.processes || []).filter(p => p.area === t.team).length;
+            html += `
+                <div class="tree-node-team">
+                    <div style="font-weight: 600; color: var(--text-primary); font-size: 0.88rem;">
+                        <i class="fa-solid fa-users" style="color: var(--color-primary); margin-right: 0.3rem;"></i> ${escapeHtml(t.team)}
+                    </div>
+                    ${t.coordenador ? `<div style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.2rem;"><i class="fa-solid fa-user-tie"></i> ${escapeHtml(t.coordenador)}</div>` : ''}
+                    <div style="display: flex; justify-content: center; gap: 0.6rem; font-size: 0.72rem; color: var(--text-muted); margin-top: 0.35rem;">
+                        <span><i class="fa-solid fa-user"></i> ${teamMemberCount} integrantes</span>
+                        <span>•</span>
+                        <span><i class="fa-solid fa-list-check"></i> ${teamProcessCount} demandas</span>
+                    </div>
+                </div>
+            `;
+        });
+
+        html += `
+                </div>
+            </div>
+        `;
+    });
+
+    html += `</div>`;
+    container.innerHTML = html;
+}
+
+// ============================================================
+// VIEW METADATA & BREADCRUMB / HEADER MANAGEMENT
+// ============================================================
+const VIEW_META = {
+    'dashboard': {
+        title: 'Dashboard',
+        section: 'Visão Geral',
+        subtitle: 'Visão operacional de volumes mensais, FTEs requeridos e capacidade por equipe.'
+    },
+    'history': {
+        title: 'Histórico',
+        section: 'Visão Geral',
+        subtitle: 'Snapshots mensais salvos e evolução temporal dos volumes operacionais.'
+    },
+    'cadastros': {
+        title: 'Cadastros',
+        section: 'Gestão',
+        subtitle: 'Estrutura organizacional, equipes, colaboradores responsáveis e catálogo de atividades.'
+    },
+    'balancing': {
+        title: 'Balanceamento',
+        section: 'Gestão',
+        subtitle: 'Planejamento diário de backlog e comparação de capacidade alocada vs. necessária.'
+    },
+    'automations': {
+        title: 'Automações (RPA)',
+        section: 'Gestão',
+        subtitle: 'Quadro analítico de processos robotizados, FTEs absorvidos e horas economizadas.'
+    },
+    'access-control': {
+        title: 'Controle de Acesso',
+        section: 'Administração',
+        subtitle: 'Gestão centralizada de usuários, atribuição de perfis (ADMIN/OPERADOR/CONSULTA) e vinculação de equipes.'
+    }
+};
+
+function updateViewHeader(view) {
+    const meta = VIEW_META[view] || { title: view, section: 'Visão Geral', subtitle: '' };
+    
+    const titleEl = document.getElementById('app-view-title');
+    const sectionEl = document.getElementById('bc-section-title');
+    const pageEl = document.getElementById('bc-page-title');
+    const subtitleEl = document.getElementById('app-view-subtitle');
+    
+    if (titleEl) titleEl.textContent = meta.title;
+    if (sectionEl) sectionEl.textContent = meta.section;
+    if (pageEl) pageEl.textContent = meta.title;
+    if (subtitleEl) subtitleEl.textContent = meta.subtitle;
+
+    // Control visibility of action buttons per view
+    const btnReset = document.getElementById('btn-reset-global-state');
+    const btnExport = document.getElementById('btn-export-csv');
+    const btnPrint = document.getElementById('btn-print');
+    
+    if (btnReset) btnReset.style.display = (view === 'cadastros' && currentUser.perfil === 'ADMIN') ? 'inline-flex' : 'none';
+    if (btnExport) btnExport.style.display = (view === 'dashboard' || view === 'cadastros' || view === 'balancing' || view === 'automations' || view === 'history') ? 'inline-flex' : 'none';
+    if (btnPrint) btnPrint.style.display = (view === 'dashboard' || view === 'cadastros' || view === 'balancing' || view === 'automations' || view === 'history') ? 'inline-flex' : 'none';
+}
+
+function switchToView(view) {
+    if (!view) view = 'dashboard';
+    const targetEl = document.getElementById(`view-${view}`);
+    if (!targetEl) view = 'dashboard';
+
+    // Verify RBAC access
+    const menuItem = document.querySelector(`.sidebar-menu .menu-item[data-view="${view}"]`);
+    if (menuItem && (menuItem.getAttribute('data-rbac-hidden') === 'true' || menuItem.style.display === 'none')) {
+        view = 'dashboard';
+    }
+
+    // Update active menu item
+    document.querySelectorAll('.sidebar-menu .menu-item').forEach(mi => {
+        if (mi.dataset.view === view) {
+            mi.classList.add('active');
+        } else {
+            mi.classList.remove('active');
+        }
+    });
+
+    // Show selected view
+    document.querySelectorAll('.tab-view').forEach(tv => tv.style.display = 'none');
+    const activeViewEl = document.getElementById(`view-${view}`);
+    if (activeViewEl) activeViewEl.style.display = 'block';
+
+    // Update Header and hash
+    updateViewHeader(view);
+    if (window.location.hash !== `#/${view}`) {
+        window.history.replaceState(null, '', `#/${view}`);
+    }
+
+    // Render view content
+    if (view === 'cadastros') {
+        renderCadastrosView();
+    } else if (view === 'dashboard') {
+        renderTable();
+    } else if (view === 'balancing') {
+        renderBalancingTable();
+    } else if (view === 'automations') {
+        renderAutomationsView();
+    } else if (view === 'history') {
+        initHistoryView();
+    } else if (view === 'access-control') {
+        renderAccessControlView();
+    }
+}
+
+// GLOBAL FILTER SYNCHRONIZATION
+let _isSyncingFilters = false;
+
+function applyGlobalFilter(areaVal, respVal) {
+    if (_isSyncingFilters) return;
+    _isSyncingFilters = true;
+
+    try {
+        // 1. Sync Dashboard filters
+        const fArea = document.getElementById('filter-area');
+        const fResp = document.getElementById('filter-responsavel');
+        if (fArea && areaVal !== undefined) fArea.value = areaVal;
+        if (fResp && respVal !== undefined) fResp.value = respVal;
+
+        // 2. Sync Balancing filters
+        const fAreaBal = document.getElementById('filter-area-balancing');
+        const fRespBal = document.getElementById('filter-responsavel-balancing');
+        if (fAreaBal && areaVal !== undefined) fAreaBal.value = areaVal;
+        if (fRespBal && respVal !== undefined) fRespBal.value = respVal;
+
+        // 3. Sync RPA filter
+        const fAreaRpa = document.getElementById('filter-area-rpa');
+        if (fAreaRpa && areaVal !== undefined) fAreaRpa.value = areaVal === 'all' ? '' : areaVal;
+
+        // 4. Sync Cadastros filter
+        const fAreaCad = document.getElementById('cadastros-filter-area');
+        const fRespCad = document.getElementById('cadastros-filter-resp');
+        if (fAreaCad && areaVal !== undefined) fAreaCad.value = areaVal === 'all' ? '' : areaVal;
+        if (fRespCad && respVal !== undefined) fRespCad.value = respVal === 'all' ? '' : respVal;
+
+        // 5. Trigger active view refresh
+        const activeView = document.querySelector('.tab-view[style*="block"]')?.id?.replace('view-', '') || 'dashboard';
+        if (activeView === 'dashboard') renderTable();
+        else if (activeView === 'balancing') renderBalancingTable();
+        else if (activeView === 'automations') renderAutomationsView();
+        else if (activeView === 'cadastros') renderCadastrosTable();
+    } finally {
+        _isSyncingFilters = false;
+    }
+}
+
+function syncGlobalFiltersToHeader(areaVal, respVal) {
+    if (_isSyncingFilters) return;
+    _isSyncingFilters = true;
+    try {
+        const gArea = document.getElementById('global-filter-area');
+        const gResp = document.getElementById('global-filter-resp');
+        if (gArea && areaVal !== undefined) gArea.value = areaVal;
+        if (gResp && respVal !== undefined) gResp.value = respVal;
+    } finally {
+        _isSyncingFilters = false;
+    }
+}
+
 // SETUP REGISTERED EVENT LISTENERS
 function setupEventListeners() {
-    // Menu Tab Switcher
+    // Menu Tab Switcher (Delegated to switchToView)
     document.querySelectorAll('.sidebar-menu .menu-item').forEach(item => {
         item.addEventListener('click', (e) => {
             const menuItem = e.currentTarget;
             if (menuItem.getAttribute('data-rbac-hidden') === 'true' || menuItem.style.display === 'none') return;
             const view = menuItem.dataset.view;
-            
-            // Update active menu tab
-            document.querySelectorAll('.sidebar-menu .menu-item').forEach(mi => mi.classList.remove('active'));
-            menuItem.classList.add('active');
-            
-            // Show/hide views
-            document.querySelectorAll('.tab-view').forEach(tv => tv.style.display = 'none');
-            document.getElementById(`view-${view}`).style.display = 'block';
-            
-            // Update header title & refresh tables
-            const headerTitle = document.getElementById('app-view-title');
-            if (view === 'cadastros') {
-                headerTitle.textContent = 'Cadastro';
-                renderCadastrosView();
-            } else if (view === 'dashboard') {
-                headerTitle.textContent = 'Processos e atividades';
-                renderTable();
-            } else if (view === 'balancing') {
-                headerTitle.textContent = 'Balanceamento de Backlog';
-                renderBalancingTable();
-            } else if (view === 'review') {
-                headerTitle.textContent = 'Revisão de Atividades';
-                renderReviewTable();
-            } else if (view === 'automations') {
-                headerTitle.textContent = 'Quadro de Automações (RPA)';
-                renderAutomationsView();
-            } else if (view === 'history') {
-                headerTitle.textContent = 'Histórico de Volumes';
-                initHistoryView();
-            } else if (view === 'access-control') {
-                headerTitle.textContent = 'Controle de Acesso';
-                renderAccessControlView();
-            }
+            switchToView(view);
         });
     });
 
+    // Hash change event (Back/Forward browser buttons)
+    window.addEventListener('hashchange', () => {
+        const hashView = (window.location.hash || '').replace('#/', '').trim();
+        if (hashView && VIEW_META[hashView]) {
+            switchToView(hashView);
+        }
+    });
+
+    // Global Header Filters
+    const gFilterArea = document.getElementById('global-filter-area');
+    if (gFilterArea) {
+        gFilterArea.addEventListener('change', (e) => {
+            applyGlobalFilter(e.target.value, undefined);
+        });
+    }
+
+    const gFilterResp = document.getElementById('global-filter-resp');
+    if (gFilterResp) {
+        gFilterResp.addEventListener('change', (e) => {
+            applyGlobalFilter(undefined, e.target.value);
+        });
+    }
+
     // Initialize Capacity Modal Listeners
     setupModalParametersListeners();
+
+    // Organogram Modal Listeners
+    const btnCloseOrganogram = document.getElementById('btn-close-organogram');
+    const btnCloseOrganogramFooter = document.getElementById('btn-close-organogram-footer');
+    const modalOrganogram = document.getElementById('modal-organogram');
+    if (btnCloseOrganogram) btnCloseOrganogram.addEventListener('click', closeOrganogramModal);
+    if (btnCloseOrganogramFooter) btnCloseOrganogramFooter.addEventListener('click', closeOrganogramModal);
+    if (modalOrganogram) {
+        modalOrganogram.addEventListener('click', (e) => {
+            if (e.target === modalOrganogram) closeOrganogramModal();
+        });
+    }
 
     // Global parameters button trigger
     const btnGlobalParams = document.getElementById('btn-global-params');
@@ -4600,10 +5168,11 @@ function setupEventListeners() {
         });
     }
 
-    // Área & Owner filter triggers
+    // Área & Owner filter triggers with 2-way sync to global header filters
     const filterAreaEl = document.getElementById('filter-area');
     if (filterAreaEl) {
         filterAreaEl.addEventListener('change', () => {
+            syncGlobalFiltersToHeader(filterAreaEl.value, undefined);
             renderTable();
         });
     }
@@ -4611,6 +5180,7 @@ function setupEventListeners() {
     const filterRespEl = document.getElementById('filter-responsavel');
     if (filterRespEl) {
         filterRespEl.addEventListener('change', () => {
+            syncGlobalFiltersToHeader(undefined, filterRespEl.value);
             renderTable();
         });
     }
@@ -4618,6 +5188,7 @@ function setupEventListeners() {
     const filterAreaBalEl = document.getElementById('filter-area-balancing');
     if (filterAreaBalEl) {
         filterAreaBalEl.addEventListener('change', () => {
+            syncGlobalFiltersToHeader(filterAreaBalEl.value, undefined);
             renderBalancingTable();
         });
     }
@@ -4625,6 +5196,7 @@ function setupEventListeners() {
     const filterRespBalEl = document.getElementById('filter-responsavel-balancing');
     if (filterRespBalEl) {
         filterRespBalEl.addEventListener('change', () => {
+            syncGlobalFiltersToHeader(undefined, filterRespBalEl.value);
             renderBalancingTable();
         });
     }
@@ -5365,7 +5937,8 @@ function updateBalancingCalculations() {
             if (isTempoFrequencia) {
                 // Tempo x Frequência: distributed evenly across working days
                 const qtdExec = parseFloat(proc.qtdExecucao) || 0;
-                totalHoursRow = (qtdExec * minutes) / 60 / respParams.diasUteis;
+                const dUteis = Math.max(1, respParams.diasUteis || state.params.diasUteis || 21);
+                totalHoursRow = (qtdExec * minutes) / 60 / dUteis;
             } else {
                 // Volume x Tempo: backlog to clear in the day
                 const hasBacklog = proc.backlogVolume !== undefined && proc.backlogVolume !== '';
@@ -5399,7 +5972,8 @@ function updateBalancingCalculations() {
         if (!isStopped) {
             if (isTempoFrequencia) {
                 const qtdExec = parseFloat(proc.qtdExecucao) || 0;
-                totalHoursRow = (qtdExec * minutes) / 60 / respParams.diasUteis;
+                const dUteis = Math.max(1, respParams.diasUteis || state.params.diasUteis || 21);
+                totalHoursRow = (qtdExec * minutes) / 60 / dUteis;
             } else {
                 const hasBacklog = proc.backlogVolume !== undefined && proc.backlogVolume !== '';
                 const backlogVol = hasBacklog ? parseFloat(proc.backlogVolume) : 0;
@@ -5502,7 +6076,7 @@ function renderAreaAllocations() {
             
             if (isTempoFrequencia) {
                 const qtdExec = parseFloat(proc.qtdExecucao) || 0;
-                areaDailyHours += (qtdExec * minutes) / 60 / diasUteis;
+                areaDailyHours += (qtdExec * minutes) / 60 / Math.max(1, diasUteis);
             } else {
                 const hasBacklog = proc.backlogVolume !== undefined && proc.backlogVolume !== '';
                 const backlogVol = hasBacklog ? parseFloat(proc.backlogVolume) : 0;
@@ -5581,9 +6155,13 @@ function renderAreaAllocations() {
 // NEW PROCESS MANAGEMENT
 function addNewProcess() {
     if (!verificarPermissao('OPERADOR')) { alert('Acesso negado: Perfil OPERADOR necessário.'); return; }
+    if (currentUser.perfil === 'OPERADOR' && !currentUser.assignedTeam) {
+        alert('Acesso negado: Seu usuário não possui uma equipe vinculada para cadastrar novas atividades.');
+        return;
+    }
     const newId = 'proc-' + Date.now();
     let defaultArea = state.teams.length > 0 ? state.teams[0] : '';
-    if (currentUser.perfil === 'OPERADOR' && currentUser.assignedTeam) {
+    if (currentUser.perfil === 'OPERADOR') {
         defaultArea = currentUser.assignedTeam;
     }
     
@@ -5734,6 +6312,7 @@ function renderCharts(totalFteRequired) {
         : state.processes.filter(p => p.area === filterValue);
 
     filteredList.forEach(p => {
+        if (p.reviewStatus === 'Parar') return;
         const hasVolume = p.volume !== null && p.volume !== '';
         const multiplier = hasVolume ? parseFloat(p.volume) : (p.qtdExecucao !== null && p.qtdExecucao !== '' ? parseFloat(p.qtdExecucao) : 0);
         const minutes = p.minutos !== null && p.minutos !== '' ? parseFloat(p.minutos) : 0;
@@ -5920,13 +6499,44 @@ function updateChartsTheme() {
 
 // EXPORT TO CSV (Excel Compatible - Exports active tab content)
 function exportToCSV() {
+    const activeMenuItem = document.querySelector('.sidebar-menu .menu-item.active');
+    const activeTab = activeMenuItem ? activeMenuItem.dataset.view : 'dashboard';
+
+    if (activeTab === 'history') {
+        if (!state.history || state.history.length === 0) {
+            alert("Não há registros de histórico ou snapshots salvos para exportar.");
+            return;
+        }
+
+        let csvContent = "data:text/csv;charset=utf-8,\uFEFF"; // Add BOM for Excel Portuguese encoding
+        csvContent += "RELATORIO DE HISTORICO DE DEMANDAS E VOLUMES MENSAIS\n";
+        csvContent += "MES / SNAPSHOT;PROCESSO / ATIVIDADE;AREA RESPONSAVEL;RESPONSAVEL;VOLUME MES\n";
+
+        state.history.forEach(snap => {
+            const monthFormatted = typeof formatMonth === 'function' ? formatMonth(snap.month) : snap.month;
+            (snap.data || []).forEach(item => {
+                const name = `"${(item.name || '').replace(/"/g, '""')}"`;
+                const area = `"${(item.area || 'Sem Equipe').replace(/"/g, '""')}"`;
+                const resp = `"${(item.responsavel || 'Sem Responsável').replace(/"/g, '""')}"`;
+                const vol = item.volume !== undefined && item.volume !== null ? item.volume : 0;
+                csvContent += `"${monthFormatted}";${name};${area};${resp};${vol}\n`;
+            });
+        });
+
+        const encodedUri = encodeURI(csvContent);
+        const link = document.createElement("a");
+        link.setAttribute("href", encodedUri);
+        link.setAttribute("download", `Capacity_FTE_Historico_${new Date().toISOString().slice(0,10)}.csv`);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        return;
+    }
+
     if (state.processes.length === 0) {
         alert("Não há dados para exportar.");
         return;
     }
-
-    const activeMenuItem = document.querySelector('.sidebar-menu .menu-item.active');
-    const activeTab = activeMenuItem ? activeMenuItem.dataset.view : 'dashboard';
 
     let csvContent = "data:text/csv;charset=utf-8,\uFEFF"; // Add BOM for Excel Portuguese encoding
     
@@ -6107,11 +6717,13 @@ function renderAreaFilterOptions() {
     const filterSelect = document.getElementById('filter-area');
     const filterSelectBalancing = document.getElementById('filter-area-balancing');
     const filterSelectReview = document.getElementById('filter-area-review');
+    const globalFilterArea = document.getElementById('global-filter-area');
     if (!filterSelect || !filterSelectBalancing || !filterSelectReview) return;
     
     const currentValue = filterSelect.value;
     const currentValueBalancing = filterSelectBalancing.value;
     const currentValueReview = filterSelectReview.value;
+    const currentValueGlobal = globalFilterArea ? globalFilterArea.value : 'all';
     
     const optionsHtml = '<option value="all">Todas as Áreas</option>' +
         (state.teams || []).map(area =>
@@ -6121,6 +6733,7 @@ function renderAreaFilterOptions() {
     filterSelect.innerHTML = optionsHtml;
     filterSelectBalancing.innerHTML = optionsHtml;
     filterSelectReview.innerHTML = optionsHtml;
+    if (globalFilterArea) globalFilterArea.innerHTML = optionsHtml;
     
     const allAreas = state.teams || [];
     
@@ -6140,6 +6753,14 @@ function renderAreaFilterOptions() {
         filterSelectReview.value = currentValueReview;
     } else {
         filterSelectReview.value = 'all';
+    }
+
+    if (globalFilterArea) {
+        if (allAreas.includes(currentValueGlobal)) {
+            globalFilterArea.value = currentValueGlobal;
+        } else {
+            globalFilterArea.value = 'all';
+        }
     }
 }
 
@@ -6265,11 +6886,13 @@ function renderResponsavelFilterOptions() {
     const filterSelect = document.getElementById('filter-responsavel');
     const filterSelectBalancing = document.getElementById('filter-responsavel-balancing');
     const filterSelectReview = document.getElementById('filter-responsavel-review');
+    const globalFilterResp = document.getElementById('global-filter-resp');
     if (!filterSelect || !filterSelectBalancing || !filterSelectReview) return;
     
     const currentValue = filterSelect.value;
     const currentValueBalancing = filterSelectBalancing.value;
     const currentValueReview = filterSelectReview.value;
+    const currentValueGlobal = globalFilterResp ? globalFilterResp.value : 'all';
     
     // Get all registered responsaveis
     const uniqueResponsaveis = state.responsaveis || [];
@@ -6283,6 +6906,7 @@ function renderResponsavelFilterOptions() {
     filterSelect.innerHTML = optionsHtml;
     filterSelectBalancing.innerHTML = optionsHtml;
     filterSelectReview.innerHTML = optionsHtml;
+    if (globalFilterResp) globalFilterResp.innerHTML = optionsHtml;
     
     if (names.includes(currentValue)) {
         filterSelect.value = currentValue;
@@ -6300,6 +6924,14 @@ function renderResponsavelFilterOptions() {
         filterSelectReview.value = currentValueReview;
     } else {
         filterSelectReview.value = 'all';
+    }
+
+    if (globalFilterResp) {
+        if (names.includes(currentValueGlobal)) {
+            globalFilterResp.value = currentValueGlobal;
+        } else {
+            globalFilterResp.value = 'all';
+        }
     }
 }
 
@@ -6843,7 +7475,7 @@ function renderCadastrosView() {
                             ${coordHtml}
                         </div>
                         <div style="display: flex; gap: 0.35rem; align-items: center;">
-                            <button class="btn-edit-team-item" data-permissao="OPERADOR,ADMIN" data-team="${escapeHtml(team)}" style="background: transparent; border: none; color: var(--text-secondary); cursor: pointer; font-size: 0.8rem; padding: 0.2rem;" title="Editar Equipe">
+                            <button class="btn-edit-team-item" data-permissao="ADMIN" data-team="${escapeHtml(team)}" style="background: transparent; border: none; color: var(--text-secondary); cursor: pointer; font-size: 0.8rem; padding: 0.2rem;" title="Editar Equipe">
                                 <i class="fa-solid fa-pen-to-square"></i>
                             </button>
                             <button class="btn-delete-team-item" data-permissao="ADMIN" data-team="${escapeHtml(team)}" style="background: transparent; border: none; color: var(--color-danger); cursor: pointer; font-size: 0.8rem; padding: 0.2rem;" title="Excluir Equipe">
@@ -6857,7 +7489,7 @@ function renderCadastrosView() {
             teamsList.querySelectorAll('.btn-edit-team-item').forEach(btn => {
                 btn.addEventListener('click', (e) => {
                     e.stopPropagation();
-                    if (!verificarPermissao('OPERADOR')) { alert('Acesso negado: Perfil OPERADOR necessário.'); return; }
+                    if (!verificarPermissao('ADMIN')) { alert('Acesso negado: Apenas administradores podem editar equipes.'); return; }
                     const team = btn.getAttribute('data-team');
                     openNewTeamModal(team);
                 });
@@ -7228,6 +7860,7 @@ function renderCadastrosView() {
                 tr.className = rowClass;
                 tr.style.display = isExpanded ? 'table-row' : 'none';
                 tr.dataset.id = proc.id;
+                tr.dataset.area = proc.area || '';
                 
                 const canEditThisArea = podeEditarArea(proc.area);
                 const isConsulta = currentUser.perfil === 'CONSULTA';
@@ -7290,9 +7923,9 @@ function renderCadastrosView() {
                         <input type="text" class="input-activity-product-cell" value="${escapeHtml(proc.produto || '')}" placeholder="Produto (Opcional)" ${isRowDisabled ? 'readonly style="width: 100%; border: none; background: transparent; color: var(--text-primary); outline: none; padding: 0.3rem 0.5rem; border-radius: 4px; opacity: 0.7; pointer-events: none;"' : 'style="width: 100%; border: none; background: transparent; color: var(--text-primary); outline: none; padding: 0.3rem 0.5rem; border-radius: 4px;"'}>
                     </td>
                     <td style="text-align: center;">
-                        <label style="display: inline-flex; align-items: center; gap: 0.35rem; cursor: ${isRowDisabled ? 'default' : 'pointer'}; font-size: 0.8rem; user-select: none;">
-                            <input type="checkbox" class="cb-activity-rpa" ${isRpa ? 'checked' : ''} ${isRowDisabled ? 'disabled' : ''}>
-                            <span class="label-rpa-text" style="${isRpa ? 'color: #a78bfa; font-weight: 600;' : 'color: var(--text-muted);'}">🤖 RPA</span>
+                        <label style="display: inline-flex; align-items: center; gap: 0.35rem; cursor: ${isRowDisabled ? 'not-allowed' : 'pointer'}; font-size: 0.8rem; user-select: none; ${isRowDisabled ? 'pointer-events: none;' : ''}">
+                            <input type="checkbox" class="cb-activity-rpa" ${isRpa ? 'checked' : ''} ${isRowDisabled ? 'disabled style="pointer-events: none; opacity: 0.4;"' : ''}>
+                            <span class="label-rpa-text" style="${isRpa ? 'color: #a78bfa; font-weight: 600;' : 'color: var(--text-muted);'} ${isRowDisabled ? 'opacity: 0.6;' : ''}">🤖 RPA</span>
                         </label>
                     </td>
                     <td class="col-acao-excluir" style="text-align: center; ${isConsulta ? 'display: none;' : ''}">
@@ -7306,7 +7939,7 @@ function renderCadastrosView() {
                 const rowCheckbox = tr.querySelector('.cadastros-row-checkbox');
                 if (rowCheckbox && !isRowDisabled) {
                     rowCheckbox.addEventListener('change', () => {
-                        if (!verificarPermissao('OPERADOR')) return;
+                        if (!verificarPermissao('ADMIN')) return;
                         updateBulkDeleteState();
                     });
                 }
@@ -7315,7 +7948,11 @@ function renderCadastrosView() {
                 if (rpaCheckbox && !isRowDisabled) {
                     rpaCheckbox.addEventListener('change', (e) => {
                         if (!verificarPermissao('OPERADOR')) return;
-                        if (!podeEditarArea(proc.area)) return;
+                        if (!podeEditarArea(proc.area)) {
+                            alert(`Acesso negado: Você não pode alterar o status RPA de atividades de outra equipe.`);
+                            e.target.checked = !e.target.checked;
+                            return;
+                        }
                         proc.isRpa = e.target.checked;
                         saveState();
                         renderTable();
@@ -7361,6 +7998,11 @@ function renderCadastrosView() {
                         if (!verificarPermissao('OPERADOR')) return;
                         if (!podeEditarArea(proc.area)) return;
                         const newTeam = e.target.value;
+                        if (currentUser.perfil === 'OPERADOR' && newTeam !== currentUser.assignedTeam) {
+                            alert(`Acesso negado: Operadores só podem manter atividades na sua própria equipe (${currentUser.assignedTeam}).`);
+                            renderCadastrosView();
+                            return;
+                        }
                         proc.area = newTeam;
                         setProcessResponsaveis(proc, []);
                         saveState();
@@ -7556,6 +8198,10 @@ function setupModalParametersListeners() {
             if (respName) {
                 const resp = state.responsaveis.find(r => r.name === respName);
                 if (resp) {
+                    if (!podeEditarArea(resp.area)) {
+                        alert(`Acesso negado: Você só pode restaurar parâmetros de responsáveis da sua equipe (${currentUser.assignedTeam}).`);
+                        return;
+                    }
                     resp.horasDia = null;
                     resp.absenteismo = null;
                     resp.diasUteis = null;
@@ -7572,7 +8218,6 @@ function setupModalParametersListeners() {
     
     if (saveBtn) {
         saveBtn.addEventListener('click', () => {
-            if (!verificarPermissao('OPERADOR')) { alert('Acesso negado: Perfil OPERADOR necessário.'); return; }
             const respName = document.getElementById('modal-param-target-resp').value;
             const hDia = parseFloat(inputHoras.value);
             const abs = parseFloat(inputAbs.value);
@@ -7581,14 +8226,23 @@ function setupModalParametersListeners() {
             const respEmail = respEmailInput ? respEmailInput.value.trim() : '';
             
             if (!respName) {
-                // Editing global defaults
+                // Editing global defaults - ADMIN ONLY
+                if (!verificarPermissao('ADMIN')) {
+                    alert('Acesso negado: Apenas administradores podem alterar os parâmetros padrão globais.');
+                    return;
+                }
                 state.params.horasDia = hDia;
                 state.params.absenteismo = abs;
                 state.params.diasUteis = dUteis;
             } else {
                 // Editing responsible overrides
+                if (!verificarPermissao('OPERADOR')) { alert('Acesso negado: Perfil OPERADOR ou ADMIN necessário.'); return; }
                 const resp = state.responsaveis.find(r => r.name === respName);
                 if (resp) {
+                    if (!podeEditarArea(resp.area)) {
+                        alert(`Acesso negado: Você só pode configurar a capacidade de responsáveis da sua equipe (${currentUser.assignedTeam}).`);
+                        return;
+                    }
                     resp.horasDia = hDia;
                     resp.absenteismo = abs;
                     resp.diasUteis = dUteis;
@@ -7611,6 +8265,19 @@ function setupModalParametersListeners() {
 function openCapacityModal(respName = '') {
     const modal = document.getElementById('modal-parameters');
     if (!modal) return;
+    
+    if (!respName) {
+        if (!verificarPermissao('ADMIN')) {
+            alert('Acesso negado: Apenas administradores podem configurar os parâmetros padrão globais.');
+            return;
+        }
+    } else {
+        const resp = state.responsaveis.find(r => r.name === respName);
+        if (resp && !podeEditarArea(resp.area)) {
+            alert(`Acesso negado: Você só pode configurar a capacidade de responsáveis da sua equipe (${currentUser.assignedTeam}).`);
+            return;
+        }
+    }
     
     const title = document.getElementById('modal-param-title');
     const clearBtn = document.getElementById('btn-modal-param-clear');
@@ -7698,49 +8365,170 @@ function openCapacityModal(respName = '') {
 // ACCESS CONTROL VIEW - GESTÃO DE PERFIS DE USUÁRIO
 // ============================================================
 
-const SETUP_SQL = `-- Execute no SQL Editor do Supabase:
+const SETUP_SQL = `-- ============================================================
+-- SCRIPT DE CONFIGURAÇÃO DE SEGURANÇA E RLS NO SUPABASE (POSTGRESQL)
+-- Execute no SQL Editor do Supabase para aplicar as regras de banco:
+-- ============================================================
 
-CREATE TABLE public.profiles (
+-- 1. TABELA DE PERFIS DE USUÁRIO (PROFILES)
+CREATE TABLE IF NOT EXISTS public.profiles (
   id UUID REFERENCES auth.users(id) ON DELETE CASCADE PRIMARY KEY,
-  email TEXT,
+  email TEXT UNIQUE,
   nome TEXT,
   perfil TEXT DEFAULT 'CONSULTA' CHECK (perfil IN ('ADMIN', 'OPERADOR', 'CONSULTA')),
-  created_at TIMESTAMPTZ DEFAULT now()
+  assigned_team TEXT,
+  created_at TIMESTAMPTZ DEFAULT now(),
+  updated_at TIMESTAMPTZ DEFAULT now()
 );
 
 ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
 
-CREATE POLICY "Perfis visíveis para autenticados"
+-- Funções auxiliares de checagem de permissão
+CREATE OR REPLACE FUNCTION public.is_admin()
+RETURNS BOOLEAN AS $
+BEGIN
+  RETURN EXISTS (
+    SELECT 1 FROM public.profiles
+    WHERE id = auth.uid() AND perfil = 'ADMIN'
+  );
+END;
+$ LANGUAGE plpgsql SECURITY DEFINER;
+
+CREATE OR REPLACE FUNCTION public.get_user_assigned_team()
+RETURNS TEXT AS $
+DECLARE
+  v_team TEXT;
+BEGIN
+  SELECT assigned_team INTO v_team FROM public.profiles WHERE id = auth.uid();
+  RETURN v_team;
+END;
+$ LANGUAGE plpgsql SECURITY DEFINER;
+
+-- Políticas para public.profiles
+CREATE POLICY "Perfis visíveis para todos os autenticados"
   ON public.profiles FOR SELECT
   USING (auth.role() = 'authenticated');
 
-CREATE POLICY "Admins podem atualizar perfis"
+CREATE POLICY "Admins e o próprio usuário podem atualizar perfis"
   ON public.profiles FOR UPDATE
   USING (
     auth.uid() = id
-    OR EXISTS (
-      SELECT 1 FROM public.profiles
-      WHERE id = auth.uid() AND perfil = 'ADMIN'
-    )
+    OR public.is_admin()
   );
 
+-- Trigger para registrar perfil ao criar usuário no Supabase Auth
 CREATE OR REPLACE FUNCTION public.handle_new_user()
 RETURNS TRIGGER AS $
 BEGIN
-  INSERT INTO public.profiles (id, email, nome, perfil)
+  INSERT INTO public.profiles (id, email, nome, perfil, assigned_team)
   VALUES (
     NEW.id,
     NEW.email,
     COALESCE(NEW.raw_user_meta_data->>'nome', split_part(NEW.email, '@', 1)),
-    COALESCE(NEW.raw_user_meta_data->>'perfil', 'CONSULTA')
-  );
+    COALESCE(NEW.raw_user_meta_data->>'perfil', 'CONSULTA'),
+    NEW.raw_user_meta_data->>'assigned_team'
+  )
+  ON CONFLICT (id) DO UPDATE
+  SET email = EXCLUDED.email;
   RETURN NEW;
 END;
 $ LANGUAGE plpgsql SECURITY DEFINER;
 
+DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
 CREATE TRIGGER on_auth_user_created
   AFTER INSERT ON auth.users
-  FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();`;
+  FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();
+
+-- ============================================================
+-- 2. POLÍTICAS RLS PARA TABELAS RELACIONAIS (EQUIPES, RESPONSÁVEIS, ATIVIDADES)
+-- ============================================================
+
+-- A) TABELA DE EQUIPES: Apenas ADMIN pode criar/editar/excluir
+CREATE TABLE IF NOT EXISTS public.equipes (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  nome TEXT UNIQUE NOT NULL,
+  gerencia TEXT,
+  diretoria TEXT,
+  coordenador TEXT,
+  coordenador_email TEXT,
+  created_at TIMESTAMPTZ DEFAULT now()
+);
+ALTER TABLE public.equipes ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "equipes_select_policy" ON public.equipes FOR SELECT USING (auth.role() = 'authenticated');
+CREATE POLICY "equipes_insert_policy" ON public.equipes FOR INSERT WITH CHECK (public.is_admin());
+CREATE POLICY "equipes_update_policy" ON public.equipes FOR UPDATE USING (public.is_admin());
+CREATE POLICY "equipes_delete_policy" ON public.equipes FOR DELETE USING (public.is_admin());
+
+-- B) TABELA DE RESPONSÁVEIS: OPERADOR só pode alterar sua própria equipe
+CREATE TABLE IF NOT EXISTS public.responsaveis (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  nome TEXT NOT NULL,
+  email TEXT,
+  area_name TEXT NOT NULL,
+  horas_dia NUMERIC(4,2),
+  absenteismo NUMERIC(5,2),
+  dias_uteis INTEGER,
+  created_at TIMESTAMPTZ DEFAULT now()
+);
+ALTER TABLE public.responsaveis ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "responsaveis_select_policy" ON public.responsaveis FOR SELECT USING (auth.role() = 'authenticated');
+CREATE POLICY "responsaveis_insert_policy" ON public.responsaveis FOR INSERT WITH CHECK (
+  public.is_admin() OR (
+    EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND perfil = 'OPERADOR')
+    AND area_name = public.get_user_assigned_team()
+  )
+);
+CREATE POLICY "responsaveis_update_policy" ON public.responsaveis FOR UPDATE USING (
+  public.is_admin() OR (
+    EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND perfil = 'OPERADOR')
+    AND area_name = public.get_user_assigned_team()
+  )
+);
+CREATE POLICY "responsaveis_delete_policy" ON public.responsaveis FOR DELETE USING (
+  public.is_admin() OR (
+    EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND perfil = 'OPERADOR')
+    AND area_name = public.get_user_assigned_team()
+  )
+);
+
+-- C) TABELA DE ATIVIDADES: OPERADOR só pode inserir/editar/deletar atividades da sua equipe
+CREATE TABLE IF NOT EXISTS public.atividades (
+  id TEXT PRIMARY KEY,
+  name TEXT NOT NULL,
+  area_name TEXT NOT NULL,
+  responsavel TEXT,
+  produto TEXT,
+  is_rpa BOOLEAN DEFAULT false,
+  volume NUMERIC(10,2),
+  minutos NUMERIC(10,2) DEFAULT 0,
+  qtd_execucao NUMERIC(10,2),
+  backlog_volume NUMERIC(10,2),
+  review_status TEXT DEFAULT 'Manter',
+  created_at TIMESTAMPTZ DEFAULT now()
+);
+ALTER TABLE public.atividades ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "atividades_select_policy" ON public.atividades FOR SELECT USING (auth.role() = 'authenticated');
+CREATE POLICY "atividades_insert_policy" ON public.atividades FOR INSERT WITH CHECK (
+  public.is_admin() OR (
+    EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND perfil = 'OPERADOR')
+    AND area_name = public.get_user_assigned_team()
+  )
+);
+CREATE POLICY "atividades_update_policy" ON public.atividades FOR UPDATE USING (
+  public.is_admin() OR (
+    EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND perfil = 'OPERADOR')
+    AND area_name = public.get_user_assigned_team()
+  )
+);
+CREATE POLICY "atividades_delete_policy" ON public.atividades FOR DELETE USING (
+  public.is_admin() OR (
+    EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND perfil = 'OPERADOR')
+    AND area_name = public.get_user_assigned_team()
+  )
+);`;
 
 async function renderAccessControlView() {
     const client = getSupabase();
