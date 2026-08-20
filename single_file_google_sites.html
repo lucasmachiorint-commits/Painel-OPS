@@ -577,6 +577,30 @@ body.light-theme .readonly-group {
     box-shadow: 0 0 15px rgba(139, 92, 246, 0.25);
 }
 
+/* Unified RPA Indicators Cluster */
+.rpa-cluster-card {
+    border: 1px solid rgba(139, 92, 246, 0.25) !important;
+    background: linear-gradient(145deg, rgba(139, 92, 246, 0.06) 0%, rgba(255, 255, 255, 0.02) 100%) !important;
+    position: relative;
+    transition: all var(--transition-normal);
+}
+
+.rpa-cluster-card:hover {
+    border-color: rgba(139, 92, 246, 0.5) !important;
+    box-shadow: 0 8px 24px rgba(139, 92, 246, 0.15) !important;
+    transform: translateY(-2px);
+}
+
+body.light-theme .rpa-cluster-card {
+    background: linear-gradient(145deg, rgba(139, 92, 246, 0.08) 0%, #ffffff 100%) !important;
+    border-color: rgba(139, 92, 246, 0.3) !important;
+}
+
+body.light-theme .rpa-cluster-card:hover {
+    border-color: rgba(139, 92, 246, 0.6) !important;
+    box-shadow: 0 8px 24px rgba(139, 92, 246, 0.18) !important;
+}
+
 .widget-info h3 {
     font-size: 0.85rem;
     font-weight: 500;
@@ -2357,25 +2381,25 @@ body.light-theme .user-chip-header {
                                     </div>
                                 </div>
 
-                                <div class="widget-card glass-panel count-card">
+                                <div class="widget-card glass-panel count-card rpa-cluster-card">
                                     <div class="widget-icon robot-glow">
                                         <i class="fa-solid fa-robot"></i>
                                     </div>
                                     <div class="widget-info">
-                                        <h3>Atividades em RPA</h3>
+                                        <h3>RPA • Atividades</h3>
                                         <p class="widget-value" id="widget-rpa-count">0</p>
                                         <span class="widget-sub" id="widget-rpa-count-sub">0.0% das atividades</span>
                                     </div>
                                 </div>
 
-                                <div class="widget-card glass-panel count-card admin-only">
-                                    <div class="widget-icon cyan-glow">
+                                <div class="widget-card glass-panel count-card rpa-cluster-card admin-only">
+                                    <div class="widget-icon robot-glow">
                                         <i class="fa-solid fa-microchip"></i>
                                     </div>
                                     <div class="widget-info">
-                                        <h3>Capacity RPA (FTEs)</h3>
+                                        <h3>RPA • Capacity Absorvido</h3>
                                         <p class="widget-value" id="widget-rpa-fte">0.00</p>
-                                        <span class="widget-sub" id="widget-rpa-fte-sub">0.0% do capacity total</span>
+                                        <span class="widget-sub" id="widget-rpa-fte-sub">0.0% de ganho em FTEs</span>
                                     </div>
                                 </div>
                             </section>
@@ -6138,7 +6162,7 @@ function updateCalculations() {
     if (elRpaFte) elRpaFte.textContent = targetRpaFteDecAccum.toFixed(2);
 
     const elRpaFteSub = document.getElementById('widget-rpa-fte-sub');
-    if (elRpaFteSub) elRpaFteSub.textContent = `${pctRpaFte.toFixed(1)}% do capacity`;
+    if (elRpaFteSub) elRpaFteSub.textContent = `${pctRpaFte.toFixed(1)}% de ganho em FTEs`;
 
     // Update placeholders for responsible overrides inputs in-place to avoid re-rendering layout
     const horasInputs = document.querySelectorAll('.override-horas');

@@ -2979,7 +2979,7 @@ function updateCalculations() {
     if (elRpaFte) elRpaFte.textContent = targetRpaFteDecAccum.toFixed(2);
 
     const elRpaFteSub = document.getElementById('widget-rpa-fte-sub');
-    if (elRpaFteSub) elRpaFteSub.textContent = `${pctRpaFte.toFixed(1)}% do capacity`;
+    if (elRpaFteSub) elRpaFteSub.textContent = `${pctRpaFte.toFixed(1)}% de ganho em FTEs`;
 
     // Update placeholders for responsible overrides inputs in-place to avoid re-rendering layout
     const horasInputs = document.querySelectorAll('.override-horas');
