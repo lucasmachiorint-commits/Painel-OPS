@@ -577,6 +577,30 @@ body.light-theme .readonly-group {
     box-shadow: 0 0 15px rgba(139, 92, 246, 0.25);
 }
 
+/* Unified RPA Indicators Cluster */
+.rpa-cluster-card {
+    border: 1px solid rgba(139, 92, 246, 0.25) !important;
+    background: linear-gradient(145deg, rgba(139, 92, 246, 0.06) 0%, rgba(255, 255, 255, 0.02) 100%) !important;
+    position: relative;
+    transition: all var(--transition-normal);
+}
+
+.rpa-cluster-card:hover {
+    border-color: rgba(139, 92, 246, 0.5) !important;
+    box-shadow: 0 8px 24px rgba(139, 92, 246, 0.15) !important;
+    transform: translateY(-2px);
+}
+
+body.light-theme .rpa-cluster-card {
+    background: linear-gradient(145deg, rgba(139, 92, 246, 0.08) 0%, #ffffff 100%) !important;
+    border-color: rgba(139, 92, 246, 0.3) !important;
+}
+
+body.light-theme .rpa-cluster-card:hover {
+    border-color: rgba(139, 92, 246, 0.6) !important;
+    box-shadow: 0 8px 24px rgba(139, 92, 246, 0.18) !important;
+}
+
 .widget-info h3 {
     font-size: 0.85rem;
     font-weight: 500;
@@ -1916,7 +1940,9 @@ body.light-theme .global-filter-group {
     font-weight: 600;
     outline: none;
     cursor: pointer;
-    max-width: 140px;
+    max-width: 220px;
+    white-space: nowrap;
+    text-overflow: ellipsis;
 }
 
 .global-filter-group select option {
@@ -2348,25 +2374,25 @@ body.light-theme .user-chip-header {
                                     </div>
                                 </div>
 
-                                <div class="widget-card glass-panel count-card">
+                                <div class="widget-card glass-panel count-card rpa-cluster-card">
                                     <div class="widget-icon robot-glow">
                                         <i class="fa-solid fa-robot"></i>
                                     </div>
                                     <div class="widget-info">
-                                        <h3>Atividades em RPA</h3>
+                                        <h3>RPA • Atividades</h3>
                                         <p class="widget-value" id="widget-rpa-count">0</p>
                                         <span class="widget-sub" id="widget-rpa-count-sub">0.0% das atividades</span>
                                     </div>
                                 </div>
 
-                                <div class="widget-card glass-panel count-card admin-only">
-                                    <div class="widget-icon cyan-glow">
+                                <div class="widget-card glass-panel count-card rpa-cluster-card admin-only">
+                                    <div class="widget-icon robot-glow">
                                         <i class="fa-solid fa-microchip"></i>
                                     </div>
                                     <div class="widget-info">
-                                        <h3>Capacity RPA (FTEs)</h3>
+                                        <h3>RPA • Capacity Absorvido</h3>
                                         <p class="widget-value" id="widget-rpa-fte">0.00</p>
-                                        <span class="widget-sub" id="widget-rpa-fte-sub">0.0% do capacity total</span>
+                                        <span class="widget-sub" id="widget-rpa-fte-sub">0.0% do capacity</span>
                                     </div>
                                 </div>
                             </section>
@@ -2458,7 +2484,7 @@ body.light-theme .user-chip-header {
                                     </div>
                                 </div>
                                 <div class="panel glass-panel chart-container admin-only">
-                                    <h3 class="panel-title"><i class="fa-solid fa-chart-bar"></i> Balanço de Capacidade (FTE)</h3>
+                                    <h3 class="panel-title" id="chart-bar-title"><i class="fa-solid fa-chart-bar"></i> Balanço de Capacidade (FTE)</h3>
                                     <div class="canvas-wrapper">
                                         <canvas id="chart-bar"></canvas>
                                     </div>
@@ -3187,7 +3213,9 @@ window.addEventListener('error', function(event) {
 const SUPABASE_URL = 'https://maguyzjhldcgpcvkvkqe.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1hZ3V5empobGRjZ3Bjdmt2a3FlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQ2NTU0MDMsImV4cCI6MjEwMDIzMTQwM30.Ow9xruE1qAFTX3mqELERxrY3CRBOdV_n4MoXXhtt3Y8';
 
-
+// Configuração isolada de autenticação para Homologação (HML)
+const 'sb-maguyzjhldcgpcvkvkqe-auth-token' = 'sb-painel-ops-hml-auth-token';
+const 'painel_ops_last_activity' = 'painel_ops_hml_last_activity';
 
 let supabaseClient = null;
 let realtimeChannel = null;
@@ -5007,34 +5035,46 @@ function applyGlobalFilter(areaVal, respVal) {
     _isSyncingFilters = true;
 
     try {
-        // 1. Sync Dashboard filters
+        // 1. If area is changing, re-render the Responsáveis dropdowns filtered by the new area
+        if (areaVal !== undefined) {
+            renderResponsavelFilterOptions(areaVal);
+        }
+
+        // 2. Sync Dashboard filters
         const fArea = document.getElementById('filter-area');
         const fResp = document.getElementById('filter-responsavel');
         if (fArea && areaVal !== undefined) fArea.value = areaVal;
         if (fResp && respVal !== undefined) fResp.value = respVal;
 
-        // 2. Sync Balancing filters
+        // 3. Sync Balancing filters
         const fAreaBal = document.getElementById('filter-area-balancing');
         const fRespBal = document.getElementById('filter-responsavel-balancing');
         if (fAreaBal && areaVal !== undefined) fAreaBal.value = areaVal;
         if (fRespBal && respVal !== undefined) fRespBal.value = respVal;
 
-        // 3. Sync RPA filter
+        // 4. Sync Review filters
+        const fAreaRev = document.getElementById('filter-area-review');
+        const fRespRev = document.getElementById('filter-responsavel-review');
+        if (fAreaRev && areaVal !== undefined) fAreaRev.value = areaVal;
+        if (fRespRev && respVal !== undefined) fRespRev.value = respVal;
+
+        // 5. Sync RPA filter
         const fAreaRpa = document.getElementById('filter-area-rpa');
         if (fAreaRpa && areaVal !== undefined) fAreaRpa.value = areaVal === 'all' ? '' : areaVal;
 
-        // 4. Sync Cadastros filter
+        // 6. Sync Cadastros filter
         const fAreaCad = document.getElementById('cadastros-filter-area');
         const fRespCad = document.getElementById('cadastros-filter-resp');
         if (fAreaCad && areaVal !== undefined) fAreaCad.value = areaVal === 'all' ? '' : areaVal;
         if (fRespCad && respVal !== undefined) fRespCad.value = respVal === 'all' ? '' : respVal;
 
-        // 5. Trigger active view refresh
+        // 7. Trigger active view refresh
         const activeView = document.querySelector('.tab-view[style*="block"]')?.id?.replace('view-', '') || 'dashboard';
         if (activeView === 'dashboard') renderTable();
         else if (activeView === 'balancing') renderBalancingTable();
         else if (activeView === 'automations') renderAutomationsView();
         else if (activeView === 'cadastros') renderCadastrosTable();
+        else if (activeView === 'review') renderReviewTable();
     } finally {
         _isSyncingFilters = false;
     }
@@ -5044,6 +5084,9 @@ function syncGlobalFiltersToHeader(areaVal, respVal) {
     if (_isSyncingFilters) return;
     _isSyncingFilters = true;
     try {
+        if (areaVal !== undefined) {
+            renderResponsavelFilterOptions(areaVal);
+        }
         const gArea = document.getElementById('global-filter-area');
         const gResp = document.getElementById('global-filter-resp');
         if (gArea && areaVal !== undefined) gArea.value = areaVal;
@@ -5785,10 +5828,26 @@ function updateCalculations() {
         const totalMinutes = multiplier * minutes;
         const totalHours = totalMinutes / 60;
         
-        const respParams = getResponsibleParams(proc.responsavel);
-        const pHorasRealDia = respParams.horasDia * (1 - respParams.absenteismo / 100);
-        const pHorasTrabalhoMes = pHorasRealDia * respParams.diasUteis;
-        const ftePct = pHorasTrabalhoMes > 0 ? (totalHours / pHorasTrabalhoMes) * 100 : 0;
+        const resps = getProcessResponsaveis(proc);
+        const respCount = resps.length > 0 ? resps.length : 1;
+        const hoursPerResp = totalHours / respCount;
+        let ftePct = 0;
+
+        if (resps.length > 0) {
+            resps.forEach(r => {
+                const respParams = getResponsibleParams(r);
+                const pHorasRealDia = respParams.horasDia * (1 - respParams.absenteismo / 100);
+                const pHorasTrabalhoMes = pHorasRealDia * respParams.diasUteis;
+                if (pHorasTrabalhoMes > 0) {
+                    ftePct += (hoursPerResp / pHorasTrabalhoMes) * 100;
+                }
+            });
+        } else {
+            const respParams = getResponsibleParams('');
+            const pHorasRealDia = respParams.horasDia * (1 - respParams.absenteismo / 100);
+            const pHorasTrabalhoMes = pHorasRealDia * respParams.diasUteis;
+            ftePct = pHorasTrabalhoMes > 0 ? (totalHours / pHorasTrabalhoMes) * 100 : 0;
+        }
 
         targetHoursAccum += totalHours;
         targetFtePctAccum += ftePct;
@@ -5809,10 +5868,26 @@ function updateCalculations() {
         const totalMinutes = multiplier * minutes;
         const totalHours = totalMinutes / 60;
         
-        const respParams = getResponsibleParams(proc.responsavel);
-        const pHorasRealDia = respParams.horasDia * (1 - respParams.absenteismo / 100);
-        const pHorasTrabalhoMes = pHorasRealDia * respParams.diasUteis;
-        const ftePct = pHorasTrabalhoMes > 0 ? (totalHours / pHorasTrabalhoMes) * 100 : 0;
+        const resps = getProcessResponsaveis(proc);
+        const respCount = resps.length > 0 ? resps.length : 1;
+        const hoursPerResp = totalHours / respCount;
+        let ftePct = 0;
+
+        if (resps.length > 0) {
+            resps.forEach(r => {
+                const respParams = getResponsibleParams(r);
+                const pHorasRealDia = respParams.horasDia * (1 - respParams.absenteismo / 100);
+                const pHorasTrabalhoMes = pHorasRealDia * respParams.diasUteis;
+                if (pHorasTrabalhoMes > 0) {
+                    ftePct += (hoursPerResp / pHorasTrabalhoMes) * 100;
+                }
+            });
+        } else {
+            const respParams = getResponsibleParams('');
+            const pHorasRealDia = respParams.horasDia * (1 - respParams.absenteismo / 100);
+            const pHorasTrabalhoMes = pHorasRealDia * respParams.diasUteis;
+            ftePct = pHorasTrabalhoMes > 0 ? (totalHours / pHorasTrabalhoMes) * 100 : 0;
+        }
 
         totalHoursAccum += totalHours;
         totalFtePctAccum += ftePct;
@@ -5823,7 +5898,37 @@ function updateCalculations() {
     const targetRpaFteDecAccum = targetRpaFtePctAccum / 100;
     const totalCount = targetProcesses.length;
     const pctRpaCount = totalCount > 0 ? (targetRpaCount / totalCount * 100) : 0;
-    const pctRpaFte = targetFtePctAccum > 0 ? (targetRpaFtePctAccum / targetFtePctAccum * 100) : 0;
+
+    // Calculate available capacity (total resources / FTEs) for the selected area or overall
+    let targetCapacity = 0;
+    if (isFiltered && currentFilterValue !== 'all') {
+        const allocatedVal = state.areaAllocations && state.areaAllocations[currentFilterValue] !== undefined && state.areaAllocations[currentFilterValue] !== '' ? parseFloat(state.areaAllocations[currentFilterValue]) : 0;
+        const teamMembersCount = (state.responsaveis || []).filter(r => (typeof r === 'object' && r && r.area === currentFilterValue)).length;
+        if (allocatedVal > 0) {
+            targetCapacity = allocatedVal;
+        } else if (teamMembersCount > 0) {
+            targetCapacity = teamMembersCount;
+        } else {
+            targetCapacity = state.params.teamSize || 0;
+        }
+    } else {
+        let totalAllocatedSum = 0;
+        if (state.areaAllocations) {
+            Object.values(state.areaAllocations).forEach(val => {
+                const num = parseFloat(val);
+                if (!isNaN(num) && num > 0) totalAllocatedSum += num;
+            });
+        }
+        if (totalAllocatedSum > 0) {
+            targetCapacity = totalAllocatedSum;
+        } else if ((state.responsaveis || []).length > 0) {
+            targetCapacity = (state.responsaveis || []).length;
+        } else {
+            targetCapacity = state.params.teamSize || 0;
+        }
+    }
+
+    const pctRpaFte = targetCapacity > 0 ? (targetRpaFteDecAccum / targetCapacity * 100) : 0;
 
     // Render Totals Rows in table footer
     document.getElementById('total-hours').textContent = totalHoursAccum.toFixed(1) + 'h';
@@ -5860,7 +5965,7 @@ function updateCalculations() {
         } else {
             elFteReq.textContent = targetFteDecAccum.toFixed(2);
             if (elFteReqSub) {
-                elFteReqSub.textContent = 'Recursos necessários';
+                elFteReqSub.textContent = isFiltered && currentFilterValue !== 'all' ? `Demanda em ${currentFilterValue}` : 'Recursos necessários';
                 elFteReqSub.style.color = '';
             }
         }
@@ -5898,7 +6003,7 @@ function updateCalculations() {
     });
 
     saveState();
-    renderCharts(totalFteDecAccum);
+    renderCharts(targetFteDecAccum);
 
     // Propagate changes to balancing calculations if elements are loaded
     if (document.getElementById('balancing-table-body')) {
@@ -6421,18 +6526,42 @@ function renderCharts(totalFteRequired) {
 
     // 2. Bar Chart (Capacity vs Demand)
     const barCanvas = document.getElementById('chart-bar');
+    const chartBarTitle = document.getElementById('chart-bar-title');
     if (!barCanvas) return;
 
     if (barChartInstance) {
         barChartInstance.destroy();
     }
 
-    const availableFte = state.params.teamSize;
+    let availableFte = state.params.teamSize;
+    let capacityLabel = 'Capacidade Global';
+    let demandLabel = 'Demanda Requerida';
+
+    if (filterValue && filterValue !== 'all') {
+        capacityLabel = `Capacidade (${filterValue})`;
+        demandLabel = `Demanda (${filterValue})`;
+        if (chartBarTitle) {
+            chartBarTitle.innerHTML = `<i class="fa-solid fa-chart-bar"></i> Balanço de Capacidade — ${escapeHtml(filterValue)}`;
+        }
+
+        const allocatedVal = state.areaAllocations && state.areaAllocations[filterValue] !== undefined && state.areaAllocations[filterValue] !== '' ? parseFloat(state.areaAllocations[filterValue]) : 0;
+        const teamMembersCount = (state.responsaveis || []).filter(r => (typeof r === 'object' && r && r.area === filterValue)).length;
+
+        if (allocatedVal > 0) {
+            availableFte = allocatedVal;
+        } else if (teamMembersCount > 0) {
+            availableFte = teamMembersCount;
+        }
+    } else {
+        if (chartBarTitle) {
+            chartBarTitle.innerHTML = '<i class="fa-solid fa-chart-bar"></i> Balanço de Capacidade (FTE)';
+        }
+    }
 
     barChartInstance = new Chart(barCanvas, {
         type: 'bar',
         data: {
-            labels: ['Capacidade do Time', 'Demanda Requerida'],
+            labels: [capacityLabel, demandLabel],
             datasets: [{
                 label: 'FTEs',
                 data: [availableFte, totalFteRequired],
@@ -6881,56 +7010,98 @@ function renderReviewTable() {
     });
 }
 
+// HELPER: GET RESPONSÁVEIS FILTERED BY AREA/TEAM
+function getResponsaveisForArea(areaName) {
+    if (!areaName || areaName === 'all' || areaName === '') {
+        const uniqueResps = (state.responsaveis || [])
+            .map(r => (typeof r === 'object' && r ? r.name : r))
+            .filter(name => name && typeof name === 'string' && name.trim() !== '' && name.trim() !== 'Sem Responsável');
+        return [...new Set(uniqueResps)].sort((a, b) => a.localeCompare(b, 'pt-BR', { sensitivity: 'base' }));
+    }
+    
+    const matched = new Set();
+    const targetAreaLower = areaName.toLowerCase().trim();
+
+    // 1. Match from state.responsaveis where r.area === areaName
+    (state.responsaveis || []).forEach(r => {
+        if (typeof r === 'object' && r && r.name && r.area) {
+            if (r.area.toLowerCase().trim() === targetAreaLower) {
+                matched.add(r.name.trim());
+            }
+        }
+    });
+    
+    // 2. Also match from state.processes where proc.area === areaName
+    (state.processes || []).forEach(p => {
+        if (p && p.area && p.area.toLowerCase().trim() === targetAreaLower) {
+            const resps = getProcessResponsaveis(p);
+            resps.forEach(r => {
+                if (r && r.trim() && r !== 'Sem Responsável') {
+                    matched.add(r.trim());
+                }
+            });
+        }
+    });
+    
+    return [...matched].sort((a, b) => a.localeCompare(b, 'pt-BR', { sensitivity: 'base' }));
+}
+
+function updateSingleRespSelect(selectEl, areaValue, preferredVal) {
+    if (!selectEl) return;
+    const currentVal = (preferredVal !== undefined) ? preferredVal : selectEl.value;
+    const names = getResponsaveisForArea(areaValue);
+    
+    let html = `<option value="all">Todos os Responsáveis${areaValue && areaValue !== 'all' ? ` (${names.length})` : ''}</option>`;
+    names.forEach(name => {
+        html += `<option value="${escapeHtml(name)}">${escapeHtml(name)}</option>`;
+    });
+    selectEl.innerHTML = html;
+    
+    if (currentVal && currentVal !== 'all' && names.includes(currentVal)) {
+        selectEl.value = currentVal;
+    } else {
+        selectEl.value = 'all';
+    }
+}
+
 // DYNAMICALLY RENDER THE FILTER OPTIONS FOR OWNER/RESPONSIBLE (ALL TABLES)
-function renderResponsavelFilterOptions() {
+function renderResponsavelFilterOptions(targetArea) {
     const filterSelect = document.getElementById('filter-responsavel');
     const filterSelectBalancing = document.getElementById('filter-responsavel-balancing');
     const filterSelectReview = document.getElementById('filter-responsavel-review');
     const globalFilterResp = document.getElementById('global-filter-resp');
-    if (!filterSelect || !filterSelectBalancing || !filterSelectReview) return;
-    
-    const currentValue = filterSelect.value;
-    const currentValueBalancing = filterSelectBalancing.value;
-    const currentValueReview = filterSelectReview.value;
-    const currentValueGlobal = globalFilterResp ? globalFilterResp.value : 'all';
-    
-    // Get all registered responsaveis
-    const uniqueResponsaveis = state.responsaveis || [];
-    const names = uniqueResponsaveis.map(r => r.name);
-    
-    const optionsHtml = '<option value="all">Todos os Responsáveis</option>' +
-        names.map(name =>
-            `<option value="${escapeHtml(name)}">${escapeHtml(name)}</option>`
-        ).join('');
-        
-    filterSelect.innerHTML = optionsHtml;
-    filterSelectBalancing.innerHTML = optionsHtml;
-    filterSelectReview.innerHTML = optionsHtml;
-    if (globalFilterResp) globalFilterResp.innerHTML = optionsHtml;
-    
-    if (names.includes(currentValue)) {
-        filterSelect.value = currentValue;
-    } else {
-        filterSelect.value = 'all';
-    }
-    
-    if (names.includes(currentValueBalancing)) {
-        filterSelectBalancing.value = currentValueBalancing;
-    } else {
-        filterSelectBalancing.value = 'all';
-    }
+    const globalFilterArea = document.getElementById('global-filter-area');
+    const filterArea = document.getElementById('filter-area');
+    const filterAreaBalancing = document.getElementById('filter-area-balancing');
+    const filterAreaReview = document.getElementById('filter-area-review');
 
-    if (names.includes(currentValueReview)) {
-        filterSelectReview.value = currentValueReview;
-    } else {
-        filterSelectReview.value = 'all';
-    }
+    // Use passed targetArea or read from each select/global filter
+    const activeAreaDashboard = targetArea !== undefined ? targetArea : (filterArea ? filterArea.value : (globalFilterArea ? globalFilterArea.value : 'all'));
+    const activeAreaBalancing = targetArea !== undefined ? targetArea : (filterAreaBalancing ? filterAreaBalancing.value : (globalFilterArea ? globalFilterArea.value : 'all'));
+    const activeAreaReview = targetArea !== undefined ? targetArea : (filterAreaReview ? filterAreaReview.value : (globalFilterArea ? globalFilterArea.value : 'all'));
+    const activeAreaGlobal = targetArea !== undefined ? targetArea : (globalFilterArea ? globalFilterArea.value : (filterArea ? filterArea.value : 'all'));
 
-    if (globalFilterResp) {
-        if (names.includes(currentValueGlobal)) {
-            globalFilterResp.value = currentValueGlobal;
+    if (filterSelect) updateSingleRespSelect(filterSelect, activeAreaDashboard);
+    if (filterSelectBalancing) updateSingleRespSelect(filterSelectBalancing, activeAreaBalancing);
+    if (filterSelectReview) updateSingleRespSelect(filterSelectReview, activeAreaReview);
+    if (globalFilterResp) updateSingleRespSelect(globalFilterResp, activeAreaGlobal);
+
+    // Also update cadastros filter if exists
+    const cadFilterArea = document.getElementById('cadastros-filter-area');
+    const cadFilterResp = document.getElementById('cadastros-filter-resp');
+    if (cadFilterResp) {
+        const cadArea = targetArea !== undefined ? targetArea : (cadFilterArea ? cadFilterArea.value : '');
+        const names = getResponsaveisForArea(cadArea);
+        const curVal = cadFilterResp.value;
+        let html = '<option value="">Todos os Responsáveis</option>';
+        names.forEach(name => {
+            html += `<option value="${escapeHtml(name)}">${escapeHtml(name)}</option>`;
+        });
+        cadFilterResp.innerHTML = html;
+        if (curVal && names.includes(curVal)) {
+            cadFilterResp.value = curVal;
         } else {
-            globalFilterResp.value = 'all';
+            cadFilterResp.value = '';
         }
     }
 }

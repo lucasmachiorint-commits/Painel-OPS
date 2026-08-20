@@ -559,6 +559,30 @@ body.light-theme .readonly-group {
     box-shadow: 0 0 15px rgba(139, 92, 246, 0.25);
 }
 
+/* Unified RPA Indicators Cluster */
+.rpa-cluster-card {
+    border: 1px solid rgba(139, 92, 246, 0.25) !important;
+    background: linear-gradient(145deg, rgba(139, 92, 246, 0.06) 0%, rgba(255, 255, 255, 0.02) 100%) !important;
+    position: relative;
+    transition: all var(--transition-normal);
+}
+
+.rpa-cluster-card:hover {
+    border-color: rgba(139, 92, 246, 0.5) !important;
+    box-shadow: 0 8px 24px rgba(139, 92, 246, 0.15) !important;
+    transform: translateY(-2px);
+}
+
+body.light-theme .rpa-cluster-card {
+    background: linear-gradient(145deg, rgba(139, 92, 246, 0.08) 0%, #ffffff 100%) !important;
+    border-color: rgba(139, 92, 246, 0.3) !important;
+}
+
+body.light-theme .rpa-cluster-card:hover {
+    border-color: rgba(139, 92, 246, 0.6) !important;
+    box-shadow: 0 8px 24px rgba(139, 92, 246, 0.18) !important;
+}
+
 .widget-info h3 {
     font-size: 0.85rem;
     font-weight: 500;
@@ -1898,7 +1922,9 @@ body.light-theme .global-filter-group {
     font-weight: 600;
     outline: none;
     cursor: pointer;
-    max-width: 140px;
+    max-width: 220px;
+    white-space: nowrap;
+    text-overflow: ellipsis;
 }
 
 .global-filter-group select option {
