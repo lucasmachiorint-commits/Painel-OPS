@@ -1708,9 +1708,9 @@ body.light-theme input:-webkit-autofill:active {
 
 /* Menu Section Labels in Sidebar */
 .menu-section-label {
-    font-size: 0.62rem;
+    font-size: 0.60rem;
     font-weight: 800;
-    letter-spacing: 1.2px;
+    letter-spacing: 1px;
     text-transform: uppercase;
     color: var(--text-muted);
     opacity: 0.7;
@@ -1721,6 +1721,10 @@ body.light-theme input:-webkit-autofill:active {
     border-top: 1px solid rgba(255, 255, 255, 0.05);
     margin-top: 0.35rem;
     list-style: none;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
 }
 
 .menu-section-label:first-child {
