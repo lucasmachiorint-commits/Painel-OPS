@@ -60,9 +60,31 @@ test.describe('Multi-Country & Localization E2E Tests', () => {
         // Check breadcrumb and title
         await expect(page.locator('#app-view-title')).toHaveText('Tablero');
         await expect(page.locator('#bc-section-title')).toHaveText('General');
+        await expect(page.locator('#app-view-subtitle')).toContainText('Visión operacional');
     });
 
-    test('4. Should load Hispana activities with Valeria Sotes in Registros view', async ({ page }) => {
+    test('4. Should translate KPI cards, filter options, and table headers on Hispana', async ({ page }) => {
+        await page.locator('#btn-country-active').click();
+        await page.locator('.country-dropdown-option[data-country="HISPANA"]').click();
+
+        // Filter options
+        await expect(page.locator('#filter-area option[value="all"]')).toHaveText('Todas las Áreas');
+        await expect(page.locator('#filter-responsavel option[value="all"]')).toContainText('Todos los Responsables');
+
+        // KPI card titles
+        await expect(page.locator('h3[data-i18n="kpi_total_activities"]')).toHaveText('Total de Actividades');
+        await expect(page.locator('h3[data-i18n="kpi_rpa_capacity"]')).toHaveText('RPA • Capacidad Absorbida');
+
+        // Table headers
+        await expect(page.locator('#fte-table th[data-i18n="th_activity"]')).toHaveText('Proceso / Actividad');
+        await expect(page.locator('#fte-table th[data-i18n="th_area"]')).toHaveText('Área Responsable');
+        await expect(page.locator('#fte-table th[data-i18n="th_responsavel"]')).toHaveText('Responsable');
+        await expect(page.locator('#fte-table th[data-i18n="th_volume"]')).toHaveText('Volumen / Cant. Mes');
+        await expect(page.locator('#fte-table th[data-i18n="th_time"]')).toHaveText('Tiempo (Minutos)');
+        await expect(page.locator('#fte-table th[data-i18n="th_freq"]')).toHaveText('Frec. Ejecución Mes');
+    });
+
+    test('5. Should load Hispana activities with Valeria Sotes in Registros view', async ({ page }) => {
         await page.locator('#btn-country-active').click();
         await page.locator('.country-dropdown-option[data-country="HISPANA"]').click();
 
@@ -75,7 +97,7 @@ test.describe('Multi-Country & Localization E2E Tests', () => {
         expect(bodyText).toContain('Valeria Sotes');
     });
 
-    test('5. Should switch back to Brasil and restore Portuguese labels', async ({ page }) => {
+    test('6. Should switch back to Brasil and restore Portuguese labels', async ({ page }) => {
         // Switch to Hispana first
         await page.locator('#btn-country-active').click();
         await page.locator('.country-dropdown-option[data-country="HISPANA"]').click();
