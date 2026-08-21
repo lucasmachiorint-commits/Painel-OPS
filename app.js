@@ -4024,9 +4024,7 @@ function openAddActivityModal() {
                 optionsHtml += `<option value="${escapeHtml(team)}">${escapeHtml(team)}</option>`;
             });
             areaSelect.innerHTML = optionsHtml;
-            if (availableTeams.length > 0) {
-                areaSelect.value = availableTeams[0];
-            }
+            areaSelect.value = '';
         }
     }
 
@@ -4088,8 +4086,10 @@ function submitAddActivityModal() {
     if (currentUser.perfil === 'OPERADOR' && currentUser.assignedTeam) {
         area = currentUser.assignedTeam;
     }
-    if (!area && state.teams && state.teams.length > 0) {
-        area = state.teams[0];
+    if (!area) {
+        alert(t('val_area_required', 'Por favor, selecione uma equipe / área.'));
+        if (areaSelect) areaSelect.focus();
+        return;
     }
 
     const resp = (respSelect ? respSelect.value : '').trim();

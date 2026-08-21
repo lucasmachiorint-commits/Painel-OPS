@@ -144,9 +144,14 @@ test.describe('Multi-Country & Localization E2E Tests', () => {
         await expect(modal.locator('[data-i18n="modal_title_new_activity"]')).toHaveText('Nova Atividade');
         await expect(modal.locator('#modal-add-rpa-container')).toBeVisible();
 
+        // Verify default area is empty/prompt
+        const areaVal = await modal.locator('#modal-add-area').inputValue();
+        expect(areaVal).toBe('');
+
         // Fill form
         const testActName = 'Teste Automatizado Modal ' + Date.now();
         await modal.locator('#modal-add-name').fill(testActName);
+        await modal.locator('#modal-add-area').selectOption({ index: 1 });
         await modal.locator('#modal-add-product').fill('Produto Teste');
         await modal.locator('.modal-toggle-switch').click();
 
