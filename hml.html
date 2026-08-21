@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
@@ -2352,6 +2352,50 @@ body.light-theme .main-content {
     background: var(--color-primary);
 }
 
+/* ============================================================
+   MODAL NOVA ATIVIDADE & TOGGLE SWITCH STYLES
+   ============================================================ */
+.modal-toggle-switch input:checked + .modal-toggle-slider {
+    background-color: #8b5cf6 !important;
+}
+
+.modal-toggle-slider:before {
+    position: absolute;
+    content: "";
+    height: 18px;
+    width: 18px;
+    left: 3px;
+    bottom: 3px;
+    background-color: white;
+    transition: .3s cubic-bezier(0.4, 0, 0.2, 1);
+    border-radius: 50%;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.modal-toggle-switch input:checked + .modal-toggle-slider:before {
+    transform: translateX(20px);
+}
+
+body.light-theme #modal-add-activity .modal-content {
+    background: #ffffff;
+    border-color: #e2e8f0;
+}
+
+body.light-theme #modal-add-name,
+body.light-theme #modal-add-product {
+    background: #f8fafc;
+    border-color: #cbd5e1;
+    color: #0f172a;
+}
+
+body.light-theme #modal-add-area,
+body.light-theme #modal-add-resp {
+    background: #f8fafc;
+    border-color: #cbd5e1;
+    color: #0f172a;
+}
+
+
 
 
 
@@ -3450,6 +3494,84 @@ body.light-theme .main-content {
 
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     
+    <!-- MODAL NOVA ATIVIDADE -->
+    <div id="modal-add-activity" class="modal-overlay" style="display: none;" onclick="if(event.target === this) closeAddActivityModal()">
+        <div class="modal-content glass-panel" style="max-width: 500px; width: 92%; padding: 1.75rem; border-radius: 16px; border: 1px solid var(--border-color); box-shadow: 0 20px 50px rgba(0,0,0,0.5);">
+            <div class="modal-header" style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 0.85rem; margin-bottom: 1.25rem;">
+                <div style="display: flex; align-items: center; gap: 0.6rem;">
+                    <div style="width: 32px; height: 32px; border-radius: 50%; background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.35); display: flex; align-items: center; justify-content: center; color: #10b981; font-size: 0.95rem;">
+                        <i class="fa-solid fa-plus"></i>
+                    </div>
+                    <h3 style="font-size: 1.15rem; font-weight: 700; color: var(--text-primary); margin: 0;" data-i18n="modal_title_new_activity">Nova Atividade</h3>
+                </div>
+                <button class="modal-close" onclick="closeAddActivityModal()" style="background: transparent; border: none; color: var(--text-secondary); font-size: 1.4rem; cursor: pointer; line-height: 1; transition: color 0.2s;" title="Fechar">&times;</button>
+            </div>
+            
+            <form id="form-modal-add-activity" onsubmit="event.preventDefault(); submitAddActivityModal();" style="display: flex; flex-direction: column; gap: 1rem;">
+                <!-- 1. Nome da Atividade -->
+                <div>
+                    <label style="display: block; font-size: 0.82rem; font-weight: 600; color: var(--text-secondary); margin-bottom: 0.35rem;" data-i18n="modal_lbl_activity_name">
+                        Nome da Atividade / Demanda <span style="color: #f43f5e;">*</span>
+                    </label>
+                    <input type="text" id="modal-add-name" required placeholder="Ex: Abertura de chamados..." data-i18n-placeholder="modal_ph_activity_name" style="width: 100%; padding: 0.65rem 0.85rem; border-radius: 8px; border: 1px solid var(--border-color); background: rgba(255,255,255,0.05); color: var(--text-primary); font-size: 0.9rem; outline: none; transition: border-color 0.2s;">
+                </div>
+
+                <!-- 2. Equipe / Área Responsável -->
+                <div>
+                    <label style="display: block; font-size: 0.82rem; font-weight: 600; color: var(--text-secondary); margin-bottom: 0.35rem;" data-i18n="modal_lbl_area">
+                        Equipe / Área Responsável <span style="color: #f43f5e;">*</span>
+                    </label>
+                    <select id="modal-add-area" required onchange="handleModalAreaChange()" style="width: 100%; padding: 0.65rem 0.85rem; border-radius: 8px; border: 1px solid var(--border-color); background: var(--bg-secondary, #0c1527); color: var(--text-primary); font-size: 0.9rem; outline: none; cursor: pointer; transition: border-color 0.2s;">
+                        <!-- Dinamicamente preenchido -->
+                    </select>
+                </div>
+
+                <!-- 3. Responsável -->
+                <div>
+                    <label style="display: block; font-size: 0.82rem; font-weight: 600; color: var(--text-secondary); margin-bottom: 0.35rem;" data-i18n="modal_lbl_resp">
+                        Responsável
+                    </label>
+                    <select id="modal-add-resp" style="width: 100%; padding: 0.65rem 0.85rem; border-radius: 8px; border: 1px solid var(--border-color); background: var(--bg-secondary, #0c1527); color: var(--text-primary); font-size: 0.9rem; outline: none; cursor: pointer; transition: border-color 0.2s;">
+                        <!-- Dinamicamente preenchido conforme a área -->
+                    </select>
+                </div>
+
+                <!-- 4. Produto -->
+                <div>
+                    <label style="display: block; font-size: 0.82rem; font-weight: 600; color: var(--text-secondary); margin-bottom: 0.35rem;" data-i18n="modal_lbl_product">
+                        Produto (Opcional)
+                    </label>
+                    <input type="text" id="modal-add-product" placeholder="Ex: PEP/Mandala" data-i18n-placeholder="modal_ph_product" style="width: 100%; padding: 0.65rem 0.85rem; border-radius: 8px; border: 1px solid var(--border-color); background: rgba(255,255,255,0.05); color: var(--text-primary); font-size: 0.9rem; outline: none; transition: border-color 0.2s;">
+                </div>
+
+                <!-- 5. Automação RPA (Oculto dinamicamente em Hispana) -->
+                <div id="modal-add-rpa-container" style="display: flex; align-items: center; justify-content: space-between; padding: 0.75rem 1rem; border-radius: 10px; background: rgba(139, 92, 246, 0.08); border: 1px solid rgba(139, 92, 246, 0.25);">
+                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                        <span style="font-size: 1.1rem;">🤖</span>
+                        <div>
+                            <div style="font-size: 0.85rem; font-weight: 700; color: #a78bfa;" data-i18n="modal_lbl_rpa">Automação (RPA)</div>
+                            <div style="font-size: 0.72rem; color: var(--text-muted);" data-i18n="modal_sub_rpa">Marque se esta atividade for executada por robô</div>
+                        </div>
+                    </div>
+                    <label class="modal-toggle-switch" style="position: relative; display: inline-block; width: 44px; height: 24px; margin: 0; cursor: pointer;">
+                        <input type="checkbox" id="modal-add-rpa" style="opacity: 0; width: 0; height: 0;">
+                        <span class="modal-toggle-slider" style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(255,255,255,0.2); transition: .3s; border-radius: 24px;"></span>
+                    </label>
+                </div>
+
+                <!-- Ações do Modal -->
+                <div style="display: flex; justify-content: flex-end; align-items: center; gap: 0.75rem; margin-top: 0.5rem; border-top: 1px solid var(--border-color); padding-top: 1rem;">
+                    <button type="button" class="btn btn-secondary" onclick="closeAddActivityModal()" data-i18n="modal_btn_cancel" style="padding: 0.55rem 1.15rem; font-size: 0.85rem;">
+                        Cancelar
+                    </button>
+                    <button type="submit" id="btn-modal-submit-activity" class="btn btn-primary" data-i18n="modal_btn_add" style="padding: 0.55rem 1.35rem; font-size: 0.85rem; background: #10b981; border-color: #10b981; display: inline-flex; align-items: center; gap: 0.4rem;">
+                        <i class="fa-solid fa-plus"></i> <span data-i18n="modal_btn_add">Adicionar Atividade</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <!-- MODAL ALTERAR SENHA (USUÁRIO LOGADO) -->
     <div id="modal-change-password" class="modal-overlay" style="display: none;">
         <div class="modal-container" style="max-width: 380px; padding: 1.8rem;">
@@ -3803,7 +3925,13 @@ function applyCountryRpaVisibility() {
         rpaHeader.style.display = isHsp ? 'none' : '';
     }
 
-    // 7. Se o usuário estiver em uma tela desativada para Hispana e trocar de país, redireciona para Dashboard
+    // 7. Campo RPA no Modal Nova Atividade
+    const modalRpaContainer = document.getElementById('modal-add-rpa-container');
+    if (modalRpaContainer) {
+        modalRpaContainer.style.display = isHsp ? 'none' : 'flex';
+    }
+
+    // 8. Se o usuário estiver em uma tela desativada para Hispana e trocar de país, redireciona para Dashboard
     const currentHash = (window.location.hash || '').replace('#/', '').trim();
     if (isHsp && (currentHash === 'automations' || currentHash === 'history' || currentHash === 'balancing')) {
         switchToView('dashboard');
@@ -3999,7 +4127,23 @@ const I18N = {
         review_keep: 'Manter',
         review_stop: 'Parar',
         review_start: 'Começar',
-        toast_country_switched: '🇧🇷 Ambiente alternado para Brasil (Português)'
+        toast_country_switched: '🇧🇷 Ambiente alternado para Brasil (Português)',
+        modal_title_new_activity: 'Nova Atividade',
+        modal_lbl_activity_name: 'Nome da Atividade / Demanda',
+        modal_lbl_area: 'Equipe / Área Responsável',
+        modal_lbl_resp: 'Responsável',
+        modal_lbl_product: 'Produto (Opcional)',
+        modal_lbl_rpa: 'Automação (RPA)',
+        modal_sub_rpa: 'Marque se esta atividade for executada por robô',
+        modal_ph_activity_name: 'Ex: Abertura de chamados...',
+        modal_ph_select_area: 'Selecione a área...',
+        modal_ph_select_resp: 'Selecione o responsável...',
+        modal_ph_product: 'Ex: PEP/Mandala',
+        modal_btn_add: 'Adicionar Atividade',
+        modal_btn_cancel: 'Cancelar',
+        toast_activity_added: 'Atividade adicionada com sucesso!',
+        val_activity_name_required: 'Por favor, informe o nome da atividade.',
+        val_area_required: 'Por favor, selecione uma equipe / área.'
     },
     'es-LatAm': {
         section_overview: 'General',
@@ -4163,7 +4307,23 @@ const I18N = {
         review_keep: 'Mantener',
         review_stop: 'Detener',
         review_start: 'Comenzar',
-        toast_country_switched: '🌐 Ambiente cambiado a Hispana (Español)'
+        toast_country_switched: '🌐 Ambiente cambiado a Hispana (Español)',
+        modal_title_new_activity: 'Nueva Actividad',
+        modal_lbl_activity_name: 'Nombre de la Actividad / Demanda',
+        modal_lbl_area: 'Equipo / Área Responsable',
+        modal_lbl_resp: 'Responsable',
+        modal_lbl_product: 'Producto (Opcional)',
+        modal_lbl_rpa: 'Automatización (RPA)',
+        modal_sub_rpa: 'Marque si esta actividad es ejecutada por robot',
+        modal_ph_activity_name: 'Ej: Apertura de reclamos...',
+        modal_ph_select_area: 'Seleccione el área...',
+        modal_ph_select_resp: 'Seleccione el responsable...',
+        modal_ph_product: 'Ej: PEP/Mandala',
+        modal_btn_add: 'Agregar Actividad',
+        modal_btn_cancel: 'Cancelar',
+        toast_activity_added: '¡Actividad agregada con éxito!',
+        val_activity_name_required: 'Por favor, ingrese el nombre de la actividad.',
+        val_area_required: 'Por favor, seleccione un equipo / área.'
     }
 };
 
@@ -6558,9 +6718,9 @@ function setupEventListeners() {
         if (el) el.addEventListener(event, handler);
     };
 
-    // Cadastros - Add Activity row
+    // Cadastros - Add Activity row (opens modal)
     safeAddListener('btn-cadastros-add-row', 'click', () => {
-        addNewProcess();
+        openAddActivityModal();
     });
 
     // Cadastros - Import Excel buttons
@@ -7470,7 +7630,170 @@ function renderAreaAllocations() {
     });
 }
 
-// NEW PROCESS MANAGEMENT
+// ============================================================
+// MODAL NOVA ATIVIDADE MANAGEMENT
+// ============================================================
+function openAddActivityModal() {
+    if (!verificarPermissao('OPERADOR')) {
+        alert('Acesso negado: Perfil OPERADOR necessário.');
+        return;
+    }
+    if (currentUser.perfil === 'OPERADOR' && !currentUser.assignedTeam) {
+        alert('Acesso negado: Seu usuário não possui uma equipe vinculada para cadastrar novas atividades.');
+        return;
+    }
+
+    const modal = document.getElementById('modal-add-activity');
+    if (!modal) {
+        addNewProcess();
+        return;
+    }
+
+    // Reset inputs
+    const nameInput = document.getElementById('modal-add-name');
+    const areaSelect = document.getElementById('modal-add-area');
+    const respSelect = document.getElementById('modal-add-resp');
+    const productInput = document.getElementById('modal-add-product');
+    const rpaCheckbox = document.getElementById('modal-add-rpa');
+    const rpaContainer = document.getElementById('modal-add-rpa-container');
+
+    if (nameInput) nameInput.value = '';
+    if (productInput) productInput.value = '';
+    if (rpaCheckbox) rpaCheckbox.checked = false;
+
+    // Handle RPA visibility for Hispana
+    if (rpaContainer) {
+        rpaContainer.style.display = (currentCountry === 'HISPANA') ? 'none' : 'flex';
+    }
+
+    // Populate Area dropdown
+    if (areaSelect) {
+        areaSelect.innerHTML = '';
+        let availableTeams = [...(state.teams || [])];
+        
+        if (currentUser.perfil === 'OPERADOR' && currentUser.assignedTeam) {
+            areaSelect.innerHTML = `<option value="${escapeHtml(currentUser.assignedTeam)}" selected>${escapeHtml(currentUser.assignedTeam)}</option>`;
+            areaSelect.disabled = true;
+        } else {
+            areaSelect.disabled = false;
+            let optionsHtml = `<option value="" disabled selected>-- ${t('modal_ph_select_area', 'Selecione a área...')} --</option>`;
+            availableTeams.forEach(team => {
+                optionsHtml += `<option value="${escapeHtml(team)}">${escapeHtml(team)}</option>`;
+            });
+            areaSelect.innerHTML = optionsHtml;
+            if (availableTeams.length > 0) {
+                areaSelect.value = availableTeams[0];
+            }
+        }
+    }
+
+    // Populate Responsáveis based on selected Area
+    handleModalAreaChange();
+
+    modal.style.display = 'flex';
+    if (nameInput) {
+        setTimeout(() => nameInput.focus(), 60);
+    }
+}
+
+function closeAddActivityModal() {
+    const modal = document.getElementById('modal-add-activity');
+    if (modal) {
+        modal.style.display = 'none';
+    }
+}
+
+function handleModalAreaChange() {
+    const areaSelect = document.getElementById('modal-add-area');
+    const respSelect = document.getElementById('modal-add-resp');
+    if (!areaSelect || !respSelect) return;
+
+    const selectedArea = areaSelect.value;
+    respSelect.innerHTML = `<option value="">-- ${t('modal_ph_select_resp', 'Selecione o responsável...')} --</option>`;
+
+    if (!selectedArea) return;
+
+    const names = typeof getResponsaveisForArea === 'function'
+        ? getResponsaveisForArea(selectedArea)
+        : [];
+
+    names.forEach(name => {
+        respSelect.innerHTML += `<option value="${escapeHtml(name)}">${escapeHtml(name)}</option>`;
+    });
+}
+
+function submitAddActivityModal() {
+    if (!verificarPermissao('OPERADOR')) {
+        alert('Acesso negado: Perfil OPERADOR necessário.');
+        return;
+    }
+
+    const nameInput = document.getElementById('modal-add-name');
+    const areaSelect = document.getElementById('modal-add-area');
+    const respSelect = document.getElementById('modal-add-resp');
+    const productInput = document.getElementById('modal-add-product');
+    const rpaCheckbox = document.getElementById('modal-add-rpa');
+
+    const name = (nameInput ? nameInput.value : '').trim();
+    if (!name) {
+        alert(t('val_activity_name_required', 'Por favor, informe o nome da atividade.'));
+        if (nameInput) nameInput.focus();
+        return;
+    }
+
+    let area = (areaSelect ? areaSelect.value : '').trim();
+    if (currentUser.perfil === 'OPERADOR' && currentUser.assignedTeam) {
+        area = currentUser.assignedTeam;
+    }
+    if (!area && state.teams && state.teams.length > 0) {
+        area = state.teams[0];
+    }
+
+    const resp = (respSelect ? respSelect.value : '').trim();
+    const product = (productInput ? productInput.value : '').trim();
+    const isRpa = (currentCountry !== 'HISPANA' && rpaCheckbox) ? !!rpaCheckbox.checked : false;
+
+    const newId = 'proc-' + Date.now();
+    const newProcess = {
+        id: newId,
+        name: name,
+        area: area || 'Outros / Sem Equipe',
+        responsavel: resp,
+        responsaveis: resp ? [resp] : [],
+        produto: product,
+        isRpa: isRpa,
+        volume: '',
+        minutos: 0,
+        qtdExecucao: '',
+        backlogVolume: '',
+        allocatedResource: '',
+        reviewStatus: 'Manter'
+    };
+
+    if (!Array.isArray(state.processes)) {
+        state.processes = [];
+    }
+    state.processes.push(newProcess);
+
+    if (typeof expandedCadastrosTableTeams !== 'undefined') {
+        expandedCadastrosTableTeams[area || 'Outros / Sem Equipe'] = true;
+    }
+
+    saveState();
+    closeAddActivityModal();
+
+    renderCadastrosView();
+    renderTable();
+    renderBalancingTable();
+    renderReviewTable();
+    if (typeof renderAutomationsView === 'function') {
+        renderAutomationsView();
+    }
+
+    showToast(`✅ ${t('toast_activity_added', 'Atividade adicionada com sucesso!')}`, 'success', 3500);
+}
+
+// NEW PROCESS MANAGEMENT (FALLBACK)
 function addNewProcess() {
     if (!verificarPermissao('OPERADOR')) { alert('Acesso negado: Perfil OPERADOR necessário.'); return; }
     if (currentUser.perfil === 'OPERADOR' && !currentUser.assignedTeam) {
