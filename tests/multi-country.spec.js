@@ -129,4 +129,60 @@ test.describe('Multi-Country & Localization E2E Tests', () => {
         await expect(page.locator('.menu-item[data-view="balancing"]')).toBeVisible();
         await expect(page.locator('.menu-item[data-view="automations"]')).toBeVisible();
     });
+
+    test('7. Should open Nova Atividade modal in Brasil, fill fields, submit and verify in table', async ({ page }) => {
+        // Navigate to Cadastros
+        await page.locator('.menu-item[data-view="cadastros"]').click();
+        await expect(page.locator('#view-cadastros')).toBeVisible();
+
+        // Click "+ Adicionar Atividade"
+        await page.locator('#btn-cadastros-add-row').click();
+
+        // Modal must be visible
+        const modal = page.locator('#modal-add-activity');
+        await expect(modal).toBeVisible();
+        await expect(modal.locator('[data-i18n="modal_title_new_activity"]')).toHaveText('Nova Atividade');
+        await expect(modal.locator('#modal-add-rpa-container')).toBeVisible();
+
+        // Fill form
+        const testActName = 'Teste Automatizado Modal ' + Date.now();
+        await modal.locator('#modal-add-name').fill(testActName);
+        await modal.locator('#modal-add-product').fill('Produto Teste');
+        await modal.locator('.modal-toggle-switch').click();
+
+        // Submit
+        await modal.locator('#btn-modal-submit-activity').click();
+
+        // Modal closes
+        await expect(modal).toBeHidden();
+
+        // Check if new activity input appears in table
+        const nameInput = page.locator(`input.input-activity-name-cell[value="${testActName}"]`);
+        await expect(nameInput).toBeAttached();
+    });
+
+    test('8. Should open Nueva Actividad modal in Hispana with Spanish labels and hidden RPA field', async ({ page }) => {
+        // Switch to Hispana
+        await page.locator('#btn-country-active').click();
+        await page.locator('.country-dropdown-option[data-country="HISPANA"]').click();
+
+        // Navigate to Registros
+        await page.locator('.menu-item[data-view="cadastros"]').click();
+
+        // Click "+ Agregar Actividad"
+        await page.locator('#btn-cadastros-add-row').click();
+
+        // Modal must be visible with Spanish labels
+        const modal = page.locator('#modal-add-activity');
+        await expect(modal).toBeVisible();
+        await expect(modal.locator('[data-i18n="modal_title_new_activity"]')).toHaveText('Nueva Actividad');
+
+        // RPA container must be HIDDEN in Hispana
+        await expect(modal.locator('#modal-add-rpa-container')).toBeHidden();
+
+        // Close modal
+        await modal.locator('.modal-close').click();
+        await expect(modal).toBeHidden();
+    });
 });
+
