@@ -257,7 +257,13 @@ function applyCountryRpaVisibility() {
         rpaHeader.style.display = isHsp ? 'none' : '';
     }
 
-    // 7. Se o usuário estiver em uma tela desativada para Hispana e trocar de país, redireciona para Dashboard
+    // 7. Campo RPA no Modal Nova Atividade
+    const modalRpaContainer = document.getElementById('modal-add-rpa-container');
+    if (modalRpaContainer) {
+        modalRpaContainer.style.display = isHsp ? 'none' : 'flex';
+    }
+
+    // 8. Se o usuário estiver em uma tela desativada para Hispana e trocar de país, redireciona para Dashboard
     const currentHash = (window.location.hash || '').replace('#/', '').trim();
     if (isHsp && (currentHash === 'automations' || currentHash === 'history' || currentHash === 'balancing')) {
         switchToView('dashboard');
@@ -453,7 +459,23 @@ const I18N = {
         review_keep: 'Manter',
         review_stop: 'Parar',
         review_start: 'Começar',
-        toast_country_switched: '🇧🇷 Ambiente alternado para Brasil (Português)'
+        toast_country_switched: '🇧🇷 Ambiente alternado para Brasil (Português)',
+        modal_title_new_activity: 'Nova Atividade',
+        modal_lbl_activity_name: 'Nome da Atividade / Demanda',
+        modal_lbl_area: 'Equipe / Área Responsável',
+        modal_lbl_resp: 'Responsável',
+        modal_lbl_product: 'Produto (Opcional)',
+        modal_lbl_rpa: 'Automação (RPA)',
+        modal_sub_rpa: 'Marque se esta atividade for executada por robô',
+        modal_ph_activity_name: 'Ex: Abertura de chamados...',
+        modal_ph_select_area: 'Selecione a área...',
+        modal_ph_select_resp: 'Selecione o responsável...',
+        modal_ph_product: 'Ex: PEP/Mandala',
+        modal_btn_add: 'Adicionar Atividade',
+        modal_btn_cancel: 'Cancelar',
+        toast_activity_added: 'Atividade adicionada com sucesso!',
+        val_activity_name_required: 'Por favor, informe o nome da atividade.',
+        val_area_required: 'Por favor, selecione uma equipe / área.'
     },
     'es-LatAm': {
         section_overview: 'General',
@@ -617,7 +639,23 @@ const I18N = {
         review_keep: 'Mantener',
         review_stop: 'Detener',
         review_start: 'Comenzar',
-        toast_country_switched: '🌐 Ambiente cambiado a Hispana (Español)'
+        toast_country_switched: '🌐 Ambiente cambiado a Hispana (Español)',
+        modal_title_new_activity: 'Nueva Actividad',
+        modal_lbl_activity_name: 'Nombre de la Actividad / Demanda',
+        modal_lbl_area: 'Equipo / Área Responsable',
+        modal_lbl_resp: 'Responsable',
+        modal_lbl_product: 'Producto (Opcional)',
+        modal_lbl_rpa: 'Automatización (RPA)',
+        modal_sub_rpa: 'Marque si esta actividad es ejecutada por robot',
+        modal_ph_activity_name: 'Ej: Apertura de reclamos...',
+        modal_ph_select_area: 'Seleccione el área...',
+        modal_ph_select_resp: 'Seleccione el responsable...',
+        modal_ph_product: 'Ej: PEP/Mandala',
+        modal_btn_add: 'Agregar Actividad',
+        modal_btn_cancel: 'Cancelar',
+        toast_activity_added: '¡Actividad agregada con éxito!',
+        val_activity_name_required: 'Por favor, ingrese el nombre de la actividad.',
+        val_area_required: 'Por favor, seleccione un equipo / área.'
     }
 };
 
@@ -2940,9 +2978,9 @@ function setupEventListeners() {
         if (el) el.addEventListener(event, handler);
     };
 
-    // Cadastros - Add Activity row
+    // Cadastros - Add Activity row (opens modal)
     safeAddListener('btn-cadastros-add-row', 'click', () => {
-        addNewProcess();
+        openAddActivityModal();
     });
 
     // Cadastros - Import Excel buttons
@@ -3852,7 +3890,170 @@ function renderAreaAllocations() {
     });
 }
 
-// NEW PROCESS MANAGEMENT
+// ============================================================
+// MODAL NOVA ATIVIDADE MANAGEMENT
+// ============================================================
+function openAddActivityModal() {
+    if (!verificarPermissao('OPERADOR')) {
+        alert('Acesso negado: Perfil OPERADOR necessário.');
+        return;
+    }
+    if (currentUser.perfil === 'OPERADOR' && !currentUser.assignedTeam) {
+        alert('Acesso negado: Seu usuário não possui uma equipe vinculada para cadastrar novas atividades.');
+        return;
+    }
+
+    const modal = document.getElementById('modal-add-activity');
+    if (!modal) {
+        addNewProcess();
+        return;
+    }
+
+    // Reset inputs
+    const nameInput = document.getElementById('modal-add-name');
+    const areaSelect = document.getElementById('modal-add-area');
+    const respSelect = document.getElementById('modal-add-resp');
+    const productInput = document.getElementById('modal-add-product');
+    const rpaCheckbox = document.getElementById('modal-add-rpa');
+    const rpaContainer = document.getElementById('modal-add-rpa-container');
+
+    if (nameInput) nameInput.value = '';
+    if (productInput) productInput.value = '';
+    if (rpaCheckbox) rpaCheckbox.checked = false;
+
+    // Handle RPA visibility for Hispana
+    if (rpaContainer) {
+        rpaContainer.style.display = (currentCountry === 'HISPANA') ? 'none' : 'flex';
+    }
+
+    // Populate Area dropdown
+    if (areaSelect) {
+        areaSelect.innerHTML = '';
+        let availableTeams = [...(state.teams || [])];
+        
+        if (currentUser.perfil === 'OPERADOR' && currentUser.assignedTeam) {
+            areaSelect.innerHTML = `<option value="${escapeHtml(currentUser.assignedTeam)}" selected>${escapeHtml(currentUser.assignedTeam)}</option>`;
+            areaSelect.disabled = true;
+        } else {
+            areaSelect.disabled = false;
+            let optionsHtml = `<option value="" disabled selected>-- ${t('modal_ph_select_area', 'Selecione a área...')} --</option>`;
+            availableTeams.forEach(team => {
+                optionsHtml += `<option value="${escapeHtml(team)}">${escapeHtml(team)}</option>`;
+            });
+            areaSelect.innerHTML = optionsHtml;
+            areaSelect.value = '';
+        }
+    }
+
+    // Populate Responsáveis based on selected Area
+    handleModalAreaChange();
+
+    modal.style.display = 'flex';
+    if (nameInput) {
+        setTimeout(() => nameInput.focus(), 60);
+    }
+}
+
+function closeAddActivityModal() {
+    const modal = document.getElementById('modal-add-activity');
+    if (modal) {
+        modal.style.display = 'none';
+    }
+}
+
+function handleModalAreaChange() {
+    const areaSelect = document.getElementById('modal-add-area');
+    const respSelect = document.getElementById('modal-add-resp');
+    if (!areaSelect || !respSelect) return;
+
+    const selectedArea = areaSelect.value;
+    respSelect.innerHTML = `<option value="">-- ${t('modal_ph_select_resp', 'Selecione o responsável...')} --</option>`;
+
+    if (!selectedArea) return;
+
+    const names = typeof getResponsaveisForArea === 'function'
+        ? getResponsaveisForArea(selectedArea)
+        : [];
+
+    names.forEach(name => {
+        respSelect.innerHTML += `<option value="${escapeHtml(name)}">${escapeHtml(name)}</option>`;
+    });
+}
+
+function submitAddActivityModal() {
+    if (!verificarPermissao('OPERADOR')) {
+        alert('Acesso negado: Perfil OPERADOR necessário.');
+        return;
+    }
+
+    const nameInput = document.getElementById('modal-add-name');
+    const areaSelect = document.getElementById('modal-add-area');
+    const respSelect = document.getElementById('modal-add-resp');
+    const productInput = document.getElementById('modal-add-product');
+    const rpaCheckbox = document.getElementById('modal-add-rpa');
+
+    const name = (nameInput ? nameInput.value : '').trim();
+    if (!name) {
+        alert(t('val_activity_name_required', 'Por favor, informe o nome da atividade.'));
+        if (nameInput) nameInput.focus();
+        return;
+    }
+
+    let area = (areaSelect ? areaSelect.value : '').trim();
+    if (currentUser.perfil === 'OPERADOR' && currentUser.assignedTeam) {
+        area = currentUser.assignedTeam;
+    }
+    if (!area) {
+        alert(t('val_area_required', 'Por favor, selecione uma equipe / área.'));
+        if (areaSelect) areaSelect.focus();
+        return;
+    }
+
+    const resp = (respSelect ? respSelect.value : '').trim();
+    const product = (productInput ? productInput.value : '').trim();
+    const isRpa = (currentCountry !== 'HISPANA' && rpaCheckbox) ? !!rpaCheckbox.checked : false;
+
+    const newId = 'proc-' + Date.now();
+    const newProcess = {
+        id: newId,
+        name: name,
+        area: area || 'Outros / Sem Equipe',
+        responsavel: resp,
+        responsaveis: resp ? [resp] : [],
+        produto: product,
+        isRpa: isRpa,
+        volume: '',
+        minutos: 0,
+        qtdExecucao: '',
+        backlogVolume: '',
+        allocatedResource: '',
+        reviewStatus: 'Manter'
+    };
+
+    if (!Array.isArray(state.processes)) {
+        state.processes = [];
+    }
+    state.processes.push(newProcess);
+
+    if (typeof expandedCadastrosTableTeams !== 'undefined') {
+        expandedCadastrosTableTeams[area || 'Outros / Sem Equipe'] = true;
+    }
+
+    saveState();
+    closeAddActivityModal();
+
+    renderCadastrosView();
+    renderTable();
+    renderBalancingTable();
+    renderReviewTable();
+    if (typeof renderAutomationsView === 'function') {
+        renderAutomationsView();
+    }
+
+    showToast(`✅ ${t('toast_activity_added', 'Atividade adicionada com sucesso!')}`, 'success', 3500);
+}
+
+// NEW PROCESS MANAGEMENT (FALLBACK)
 function addNewProcess() {
     if (!verificarPermissao('OPERADOR')) { alert('Acesso negado: Perfil OPERADOR necessário.'); return; }
     if (currentUser.perfil === 'OPERADOR' && !currentUser.assignedTeam) {
