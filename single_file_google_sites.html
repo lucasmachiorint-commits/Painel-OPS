@@ -8563,34 +8563,103 @@ function importExcelFile(file) {
             
             let importCount = 0;
             const importedProcesses = [];
-            const newTeams = new Set(state.teams);
-            const newResps = new Set((state.responsaveis || []).map(r => typeof r === 'object' ? r.name : r));
+            const newTeams = new Set(state.teams || []);
+            const newRespsMap = new Map(); // name -> area
+
+            // Helper: normalize string for fuzzy keyword comparison
+            const normalizeHeaderStr = (str) => {
+                if (!str) return '';
+                return String(str)
+                    .normalize('NFD')
+                    .replace(/[\u0300-\u036f]/g, '') // remove all accents
+                    .toLowerCase()
+                    .replace(/[^a-z0-9]/g, ' ')      // replace special chars with space
+                    .trim();
+            };
+
+            // Helper: split multi-responsible strings
+            const splitResponsibles = (rawStr) => {
+                if (!rawStr) return [];
+                return String(rawStr)
+                    .split(/[,;\/|]|\s+e\s+/i)
+                    .map(s => s.trim())
+                    .filter(s => s.length > 0 && s.toLowerCase() !== 'sem responsavel' && s.toLowerCase() !== 'sem responsável');
+            };
             
             workbook.SheetNames.forEach(sheetName => {
                 const sheet = workbook.Sheets[sheetName];
                 const rows = XLSX.utils.sheet_to_json(sheet, { header: 1 });
                 
-                if (rows.length < 2) return;
+                if (!rows || rows.length < 2) return;
                 
-                const headers = rows[0].map(h => String(h || '').trim().toLowerCase());
+                // 1. Detect actual header row (scores rows 0 to 5 for keyword matches)
+                let headerRowIdx = 0;
+                let maxHeaderScore = 0;
+                const maxScanRows = Math.min(6, rows.length);
+
+                for (let r = 0; r < maxScanRows; r++) {
+                    const candidateHeaders = (rows[r] || []).map(h => normalizeHeaderStr(h));
+                    let score = 0;
+                    candidateHeaders.forEach(h => {
+                        if (h.includes('ativid') || h.includes('process') || h.includes('demand') || h.includes('taref') || h.includes('descricao')) score += 3;
+                        if (h.includes('respons') || h.includes('recurs') || h.includes('colaborad') || h.includes('execut') || h.includes('dono') || h.includes('owner') || h.includes('focal') || h.includes('analist')) score += 3;
+                        if (h.includes('equip') || h.includes('area') || h.includes('time') || h.includes('setor') || h.includes('gerenc')) score += 2;
+                        if (h.includes('volum') || h.includes('quant') || h.includes('qtd')) score += 2;
+                        if (h.includes('tempo') || h.includes('minut') || h.includes('durac') || h.includes('hora')) score += 2;
+                        if (h.includes('produt') || h.includes('item') || h.includes('servic')) score += 1;
+                    });
+                    if (score > maxHeaderScore) {
+                        maxHeaderScore = score;
+                        headerRowIdx = r;
+                    }
+                }
+
+                const rawHeaders = rows[headerRowIdx] || [];
+                const headers = rawHeaders.map(h => normalizeHeaderStr(h));
                 
-                let activityIdx = headers.findIndex(h => h.includes('atividade') || h.includes('nome') || h.includes('processo') || h.includes('demanda') || h.includes('descrição') || h.includes('descricao'));
-                let teamIdx = headers.findIndex(h => h.includes('equipe') || h.includes('área') || h.includes('area') || h.includes('grupo') || h.includes('setor') || h.includes('time'));
-                let respIdx = headers.findIndex(h => h.includes('responsável') || h.includes('responsavel') || h.includes('dono') || h.includes('colaborador') || h.includes('owner') || h.includes('analista'));
-                let productIdx = headers.findIndex(h => h.includes('produto') || h.includes('produtos') || h.includes('product') || h.includes('products') || h.includes('prod') || h.includes('serviço') || h.includes('servico') || h.includes('item'));
-                let volIdx = headers.findIndex(h => h.includes('volume') || h.includes('qtd. mês') || h.includes('qtd. mes') || h.includes('quantidade') || h.includes('vol'));
-                let minIdx = headers.findIndex(h => h.includes('tempo') || h.includes('minuto') || h.includes('minutos') || h.includes('duração') || h.includes('duracao'));
-                let freqIdx = headers.findIndex(h => h.includes('freq') || h.includes('execução') || h.includes('execucao'));
+                // Sequential column claiming: each finder skips already-claimed columns
+                const usedCols = new Set();
                 
-                // Track claimed column indices to avoid positional fallback collisions
-                const claimed = new Set([activityIdx, teamIdx, respIdx, productIdx, volIdx, minIdx, freqIdx].filter(i => i !== -1));
+                const findCol = (matchFn) => {
+                    const idx = headers.findIndex((h, i) => !usedCols.has(i) && matchFn(h));
+                    if (idx !== -1) usedCols.add(idx);
+                    return idx;
+                };
                 
-                if (activityIdx === -1 && !claimed.has(0) && headers.length > 0) { activityIdx = 0; claimed.add(0); }
-                if (teamIdx === -1 && !claimed.has(1) && headers.length > 1) { teamIdx = 1; claimed.add(1); }
-                if (respIdx === -1 && !claimed.has(2) && headers.length > 2) { respIdx = 2; claimed.add(2); }
-                if (productIdx === -1 && !claimed.has(3) && headers.length > 3) { productIdx = 3; claimed.add(3); }
+                // Priority order: Activity first, then Team (which often has compound names like "Equipe / Área Responsável"), then Responsible, etc.
+                let activityIdx = findCol(h => h.includes('ativid') || h.includes('nome') || h.includes('process') || h.includes('demand') || h.includes('descric') || h.includes('taref'));
+                let teamIdx = findCol(h => h.includes('equip') || h.includes('area') || h.includes('grupo') || h.includes('setor') || h.includes('time') || h.includes('gerenc') || h.includes('diretor'));
+                let respIdx = findCol(h => h.includes('respons') || h.includes('recurs') || h.includes('colaborad') || h.includes('execut') || h.includes('dono') || h.includes('owner') || h.includes('analist') || h.includes('focal') || h.includes('membro') || h.includes('integrant') || h.includes('pesso') || h.includes('operad') || h.includes('atendent'));
+                let productIdx = findCol(h => h.includes('produt') || h.includes('product') || h.includes('prod') || h.includes('servic') || h.includes('sistem') || h.includes('plataform'));
+                let volIdx = findCol(h => h.includes('volum') || h.includes('qtd') || h.includes('quant'));
+                let minIdx = findCol(h => h.includes('tempo') || h.includes('minut') || h.includes('durac') || h.includes('tma') || h.includes('lead'));
+                let freqIdx = findCol(h => h.includes('freq') || h.includes('execuc') || h.includes('periodic'));
                 
-                for (let i = 1; i < rows.length; i++) {
+                // Positional fallback for unclaimed columns
+                if (activityIdx === -1 && !usedCols.has(0) && headers.length > 0) { activityIdx = 0; usedCols.add(0); }
+                if (teamIdx === -1 && !usedCols.has(1) && headers.length > 1) { teamIdx = 1; usedCols.add(1); }
+                if (respIdx === -1 && !usedCols.has(2) && headers.length > 2) { respIdx = 2; usedCols.add(2); }
+                if (productIdx === -1 && !usedCols.has(3) && headers.length > 3) { productIdx = 3; usedCols.add(3); }
+
+                // DIAGNOSTIC: Log detected header mapping
+                const diagHeaders = rawHeaders.map((h, idx) => `[${idx}] "${h}"`).join(' | ');
+                const diagMapping = `Atividade=${activityIdx}, Equipe=${teamIdx}, Responsável=${respIdx}, Produto=${productIdx}, Volume=${volIdx}, Minutos=${minIdx}, Freq=${freqIdx}`;
+                console.log(`[ImportDiag] Sheet: "${sheetName}" | Header Row: ${headerRowIdx} | Headers: ${diagHeaders}`);
+                console.log(`[ImportDiag] Column Mapping: ${diagMapping}`);
+
+                // DIAGNOSTIC: Show first 3 data rows for inspection
+                const diagSampleRows = [];
+                for (let s = headerRowIdx + 1; s < Math.min(headerRowIdx + 4, rows.length); s++) {
+                    const sRow = rows[s];
+                    if (!sRow) continue;
+                    const respVal = respIdx !== -1 && sRow[respIdx] !== undefined ? String(sRow[respIdx]) : '(EMPTY)';
+                    const actVal = activityIdx !== -1 && sRow[activityIdx] !== undefined ? String(sRow[activityIdx]) : '(EMPTY)';
+                    const teamVal = teamIdx !== -1 && sRow[teamIdx] !== undefined ? String(sRow[teamIdx]) : '(EMPTY)';
+                    diagSampleRows.push(`Row ${s}: Atividade="${actVal}" | Equipe="${teamVal}" | Resp="${respVal}"`);
+                }
+                console.log('[ImportDiag] Sample rows:\n' + diagSampleRows.join('\n'));
+                
+                for (let i = headerRowIdx + 1; i < rows.length; i++) {
                     const row = rows[i];
                     if (!row || row.length === 0) continue;
                     
@@ -8598,7 +8667,7 @@ function importExcelFile(file) {
                     if (!activityName) continue;
                     
                     const teamName = teamIdx !== -1 && row[teamIdx] !== undefined && row[teamIdx] !== null ? String(row[teamIdx]).trim() : '';
-                    const respName = respIdx !== -1 && row[respIdx] !== undefined && row[respIdx] !== null ? String(row[respIdx]).trim() : '';
+                    const respRaw = respIdx !== -1 && row[respIdx] !== undefined && row[respIdx] !== null ? String(row[respIdx]).trim() : '';
                     const productName = productIdx !== -1 && row[productIdx] !== undefined && row[productIdx] !== null ? String(row[productIdx]).trim() : '';
                     
                     let volumeVal = '';
@@ -8619,7 +8688,7 @@ function importExcelFile(file) {
                         if (isNaN(freqVal)) freqVal = '';
                     }
                     
-                    let targetArea = teamName || (state.teams.length > 0 ? state.teams[0] : '');
+                    let targetArea = teamName || (state.teams.length > 0 ? state.teams[0] : 'Governança');
                     if (currentUser.perfil === 'OPERADOR' && currentUser.assignedTeam) {
                         targetArea = currentUser.assignedTeam;
                     }
@@ -8627,15 +8696,21 @@ function importExcelFile(file) {
                     if (targetArea && !newTeams.has(targetArea)) {
                         newTeams.add(targetArea);
                     }
-                    if (respName && !newResps.has(respName)) {
-                        newResps.add(respName);
-                    }
+
+                    // Parse multi-responsibles
+                    const respsList = splitResponsibles(respRaw);
+                    respsList.forEach(rName => {
+                        if (rName) {
+                            newRespsMap.set(rName, targetArea);
+                        }
+                    });
                     
                     importedProcesses.push({
                         id: 'proc-' + Date.now() + '-' + Math.floor(Math.random() * 1000) + '-' + importCount,
                         name: activityName,
                         area: targetArea,
-                        responsavel: respName,
+                        responsavel: respsList.join(', '),
+                        responsaveis: respsList,
                         produto: productName,
                         volume: volumeVal,
                         minutos: minutesVal,
@@ -8651,21 +8726,25 @@ function importExcelFile(file) {
             if (importedProcesses.length > 0) {
                 state.teams = [...newTeams];
                 const existingResps = state.responsaveis || [];
-                state.responsaveis = [...newResps].sort().map(name => {
+                const allRespNames = new Set([
+                    ...existingResps.map(r => (typeof r === 'object' ? r.name : r)).filter(Boolean),
+                    ...newRespsMap.keys()
+                ]);
+
+                state.responsaveis = [...allRespNames].sort((a, b) => a.localeCompare(b, 'pt-BR', { sensitivity: 'base' })).map(name => {
                     const existing = existingResps.find(r => (typeof r === 'object' ? r.name : r) === name);
-                    const importedAct = importedProcesses.find(ip => ip.responsavel === name);
-                    const importedArea = importedAct ? importedAct.area : '';
+                    const assignedArea = newRespsMap.get(name) || (existing && typeof existing === 'object' ? existing.area : '');
                     
                     if (existing && typeof existing === 'object') {
-                        if (!existing.area) {
-                            existing.area = importedArea;
+                        if (newRespsMap.has(name)) {
+                            existing.area = newRespsMap.get(name);
                         }
                         if (existing.email === undefined) {
                             existing.email = '';
                         }
                         return existing;
                     }
-                    return { name, email: '', area: importedArea, horasDia: null, absenteismo: null, diasUteis: null };
+                    return { name, email: '', area: assignedArea, horasDia: null, absenteismo: null, diasUteis: null };
                 });
                 
                 // Always append imported processes (Strictly non-destructive import)
