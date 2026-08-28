@@ -8707,21 +8707,29 @@ function importExcelFile(file) {
                 const rawHeaders = rows[headerRowIdx] || [];
                 const headers = rawHeaders.map(h => normalizeHeaderStr(h));
                 
-                let activityIdx = headers.findIndex(h => h.includes('ativid') || h.includes('nome') || h.includes('process') || h.includes('demand') || h.includes('descric') || h.includes('taref') || h.includes('item'));
-                let teamIdx = headers.findIndex(h => h.includes('equip') || h.includes('area') || h.includes('grupo') || h.includes('setor') || h.includes('time') || h.includes('gerenc') || h.includes('diretor'));
-                let respIdx = headers.findIndex(h => h.includes('respons') || h.includes('recurs') || h.includes('colaborad') || h.includes('execut') || h.includes('dono') || h.includes('owner') || h.includes('analist') || h.includes('focal') || h.includes('membro') || h.includes('integrant') || h.includes('pesso') || h.includes('operad') || h.includes('atendent'));
-                let productIdx = headers.findIndex(h => h.includes('produt') || h.includes('product') || h.includes('prod') || h.includes('servic') || h.includes('sistem') || h.includes('plataform'));
-                let volIdx = headers.findIndex(h => h.includes('volum') || h.includes('qtd') || h.includes('quant') || h.includes('vol'));
-                let minIdx = headers.findIndex(h => h.includes('tempo') || h.includes('minut') || h.includes('durac') || h.includes('tma') || h.includes('lead') || h.includes('hora'));
-                let freqIdx = headers.findIndex(h => h.includes('freq') || h.includes('execuc') || h.includes('periodic'));
+                // Sequential column claiming: each finder skips already-claimed columns
+                const usedCols = new Set();
                 
-                // Track claimed column indices to avoid positional fallback collisions
-                const claimed = new Set([activityIdx, teamIdx, respIdx, productIdx, volIdx, minIdx, freqIdx].filter(i => i !== -1));
+                const findCol = (matchFn) => {
+                    const idx = headers.findIndex((h, i) => !usedCols.has(i) && matchFn(h));
+                    if (idx !== -1) usedCols.add(idx);
+                    return idx;
+                };
                 
-                if (activityIdx === -1 && !claimed.has(0) && headers.length > 0) { activityIdx = 0; claimed.add(0); }
-                if (teamIdx === -1 && !claimed.has(1) && headers.length > 1) { teamIdx = 1; claimed.add(1); }
-                if (respIdx === -1 && !claimed.has(2) && headers.length > 2) { respIdx = 2; claimed.add(2); }
-                if (productIdx === -1 && !claimed.has(3) && headers.length > 3) { productIdx = 3; claimed.add(3); }
+                // Priority order: Activity first, then Team (which often has compound names like "Equipe / Área Responsável"), then Responsible, etc.
+                let activityIdx = findCol(h => h.includes('ativid') || h.includes('nome') || h.includes('process') || h.includes('demand') || h.includes('descric') || h.includes('taref'));
+                let teamIdx = findCol(h => h.includes('equip') || h.includes('area') || h.includes('grupo') || h.includes('setor') || h.includes('time') || h.includes('gerenc') || h.includes('diretor'));
+                let respIdx = findCol(h => h.includes('respons') || h.includes('recurs') || h.includes('colaborad') || h.includes('execut') || h.includes('dono') || h.includes('owner') || h.includes('analist') || h.includes('focal') || h.includes('membro') || h.includes('integrant') || h.includes('pesso') || h.includes('operad') || h.includes('atendent'));
+                let productIdx = findCol(h => h.includes('produt') || h.includes('product') || h.includes('prod') || h.includes('servic') || h.includes('sistem') || h.includes('plataform'));
+                let volIdx = findCol(h => h.includes('volum') || h.includes('qtd') || h.includes('quant'));
+                let minIdx = findCol(h => h.includes('tempo') || h.includes('minut') || h.includes('durac') || h.includes('tma') || h.includes('lead'));
+                let freqIdx = findCol(h => h.includes('freq') || h.includes('execuc') || h.includes('periodic'));
+                
+                // Positional fallback for unclaimed columns
+                if (activityIdx === -1 && !usedCols.has(0) && headers.length > 0) { activityIdx = 0; usedCols.add(0); }
+                if (teamIdx === -1 && !usedCols.has(1) && headers.length > 1) { teamIdx = 1; usedCols.add(1); }
+                if (respIdx === -1 && !usedCols.has(2) && headers.length > 2) { respIdx = 2; usedCols.add(2); }
+                if (productIdx === -1 && !usedCols.has(3) && headers.length > 3) { productIdx = 3; usedCols.add(3); }
 
                 // DIAGNOSTIC: Log detected header mapping
                 const diagHeaders = rawHeaders.map((h, idx) => `[${idx}] "${h}"`).join(' | ');
