@@ -5065,6 +5065,40 @@ function importExcelFile(file) {
                 if (teamIdx === -1 && !claimed.has(1) && headers.length > 1) { teamIdx = 1; claimed.add(1); }
                 if (respIdx === -1 && !claimed.has(2) && headers.length > 2) { respIdx = 2; claimed.add(2); }
                 if (productIdx === -1 && !claimed.has(3) && headers.length > 3) { productIdx = 3; claimed.add(3); }
+
+                // DIAGNOSTIC: Log detected header mapping
+                const diagHeaders = rawHeaders.map((h, idx) => `[${idx}] "${h}"`).join(' | ');
+                const diagMapping = `Atividade=${activityIdx}, Equipe=${teamIdx}, Responsável=${respIdx}, Produto=${productIdx}, Volume=${volIdx}, Minutos=${minIdx}, Freq=${freqIdx}`;
+                console.log(`[ImportDiag] Sheet: "${sheetName}" | Header Row: ${headerRowIdx} | Headers: ${diagHeaders}`);
+                console.log(`[ImportDiag] Column Mapping: ${diagMapping}`);
+
+                // DIAGNOSTIC: Show first 3 data rows for inspection
+                const diagSampleRows = [];
+                for (let s = headerRowIdx + 1; s < Math.min(headerRowIdx + 4, rows.length); s++) {
+                    const sRow = rows[s];
+                    if (!sRow) continue;
+                    const respVal = respIdx !== -1 && sRow[respIdx] !== undefined ? String(sRow[respIdx]) : '(EMPTY)';
+                    const actVal = activityIdx !== -1 && sRow[activityIdx] !== undefined ? String(sRow[activityIdx]) : '(EMPTY)';
+                    const teamVal = teamIdx !== -1 && sRow[teamIdx] !== undefined ? String(sRow[teamIdx]) : '(EMPTY)';
+                    diagSampleRows.push(`Row ${s}: Atividade="${actVal}" | Equipe="${teamVal}" | Resp="${respVal}"`);
+                }
+                console.log('[ImportDiag] Sample rows:\n' + diagSampleRows.join('\n'));
+
+                // Show diagnostic alert to user
+                const diagMsg = `📊 DIAGNÓSTICO DE IMPORTAÇÃO\n\n` +
+                    `Planilha: "${sheetName}"\n` +
+                    `Linha de cabeçalho detectada: ${headerRowIdx + 1}\n` +
+                    `Cabeçalhos: ${rawHeaders.map((h, i) => `[${i}]"${h}"`).join(', ')}\n\n` +
+                    `Mapeamento de colunas:\n` +
+                    `  Atividade → col ${activityIdx >= 0 ? activityIdx : 'NÃO ENCONTRADA'}\n` +
+                    `  Equipe/Área → col ${teamIdx >= 0 ? teamIdx : 'NÃO ENCONTRADA'}\n` +
+                    `  Responsável → col ${respIdx >= 0 ? respIdx : 'NÃO ENCONTRADA'}\n` +
+                    `  Produto → col ${productIdx >= 0 ? productIdx : 'NÃO ENCONTRADA'}\n` +
+                    `  Volume → col ${volIdx >= 0 ? volIdx : 'NÃO ENCONTRADA'}\n` +
+                    `  Tempo/Minutos → col ${minIdx >= 0 ? minIdx : 'NÃO ENCONTRADA'}\n` +
+                    `  Frequência → col ${freqIdx >= 0 ? freqIdx : 'NÃO ENCONTRADA'}\n\n` +
+                    `Amostras:\n${diagSampleRows.join('\n')}`;
+                alert(diagMsg);
                 
                 for (let i = headerRowIdx + 1; i < rows.length; i++) {
                     const row = rows[i];
