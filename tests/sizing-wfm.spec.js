@@ -1,4 +1,4 @@
-﻿// @ts-check
+// @ts-check
 const { test, expect } = require('@playwright/test');
 const path = require('path');
 
@@ -140,16 +140,21 @@ test.describe('Painel OPS - Redimensionamento (WFM & Erlang C) E2E', () => {
     await expect(bufferPill).toHaveText('+5 PAs extras');
   });
 
-  test('6. Perfil CONSULTA nao deve ver o menu Redimensionamento', async ({ page }) => {
+  test('6. Perfil CONSULTA pode ver a view mas os botoes de acao ficam restritos', async ({ page }) => {
     await page.evaluate(() => {
       // @ts-ignore
       currentUser = { nome: 'Visitante', email: '', perfil: 'CONSULTA', assignedTeam: '' };
       // @ts-ignore
       aplicarPerfilDeAcesso();
+      // @ts-ignore
+      switchToView('sizing');
     });
 
     const sizingMenuItem = page.locator('.sidebar-menu .menu-item[data-view="sizing"]');
-    await expect(sizingMenuItem).toBeHidden();
+    await expect(sizingMenuItem).toBeVisible();
+
+    const btnImport = page.locator('#btn-sizing-import-excel');
+    await expect(btnImport).toBeHidden();
   });
 
   test('7. Acordeao de detalhamento tecnico abre e fecha corretamente', async ({ page }) => {
