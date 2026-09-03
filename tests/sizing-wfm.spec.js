@@ -57,36 +57,30 @@ test.describe('Painel OPS - Redimensionamento (WFM & Erlang C) E2E', () => {
     const boText = await widgetBO.innerText();
     const totalText = await widgetTotal.innerText();
 
-    expect(parseInt(vozText)).toBeGreaterThan(10);
-    expect(parseInt(boText)).toBe(23);
+    expect(parseInt(vozText)).toBe(29);
+    expect(parseInt(boText)).toBe(8);
     expect(parseInt(totalText)).toBeGreaterThanOrEqual(parseInt(vozText) + parseInt(boText));
   });
 
-  test('3. Alternancia entre abas de parametros (Voz, Chat, Backoffice, Governanca)', async ({ page }) => {
+  test('3. Formato planilha dual-panel: Voz/Chat e BKO visiveis lado a lado com campos editaveis', async ({ page }) => {
     await page.evaluate(() => {
       // @ts-ignore
       switchToView('sizing');
     });
 
-    const tabVozContent = page.locator('#sizing-tab-content-voz');
-    const tabChatContent = page.locator('#sizing-tab-content-chat');
-    const tabBOContent = page.locator('#sizing-tab-content-bo');
-    const tabGovContent = page.locator('#sizing-tab-content-gov');
+    const tableVoz = page.locator('#sizing-table-voz');
+    const tableBO = page.locator('#sizing-table-bo');
 
-    await expect(tabVozContent).toBeVisible();
-    await expect(tabChatContent).toBeHidden();
+    await expect(tableVoz).toBeVisible();
+    await expect(tableBO).toBeVisible();
 
-    await page.locator('#btn-sizing-tab-chat').click();
-    await expect(tabChatContent).toBeVisible();
-    await expect(tabVozContent).toBeHidden();
-
-    await page.locator('#btn-sizing-tab-bo').click();
-    await expect(tabBOContent).toBeVisible();
-    await expect(tabChatContent).toBeHidden();
-
-    await page.locator('#btn-sizing-tab-gov').click();
-    await expect(tabGovContent).toBeVisible();
-    await expect(tabBOContent).toBeHidden();
+    // Verify key fields match the spreadsheet
+    await expect(page.locator('#input-sizing-vol-voz')).toHaveValue('19912');
+    await expect(page.locator('#input-sizing-vol-bo')).toHaveValue('10270');
+    await expect(page.locator('#input-sizing-dias-uteis-bo')).toHaveValue('30');
+    await expect(page.locator('#input-sizing-pas-bo')).toHaveValue('8');
+    await expect(page.locator('#input-sizing-tma-real-min')).toHaveValue('00:10:00');
+    await expect(page.locator('#input-sizing-nr17-bo-pct')).toHaveValue('10.53');
   });
 
   test('4. Campo Aumento % Chamadas deve recalcular volumes efetivos e PAs com multiplicador', async ({ page }) => {
@@ -94,8 +88,6 @@ test.describe('Painel OPS - Redimensionamento (WFM & Erlang C) E2E', () => {
       // @ts-ignore
       switchToView('sizing');
     });
-
-    await page.locator('#btn-sizing-tab-gov').click();
 
     const inputAumento = page.locator('#input-sizing-aumento-pct');
     await expect(inputAumento).toBeVisible();
@@ -120,8 +112,6 @@ test.describe('Painel OPS - Redimensionamento (WFM & Erlang C) E2E', () => {
       switchToView('sizing');
     });
 
-    await page.locator('#btn-sizing-tab-gov').click();
-
     const initialTotal = parseInt(await page.locator('#widget-sizing-total-pas').innerText());
 
     await page.evaluate(() => {
@@ -140,7 +130,50 @@ test.describe('Painel OPS - Redimensionamento (WFM & Erlang C) E2E', () => {
     await expect(bufferPill).toHaveText('+5 PAs extras');
   });
 
-  test('6. Perfil CONSULTA pode ver a view mas os botoes de acao ficam restritos', async ({ page }) => {
+  test('6. Campo Ajuste manual deve alterar PA Contratada diretamente', async ({ page }) => {
+    await page.evaluate(() => {
+      // @ts-ignore
+      switchToView('sizing');
+    });
+
+    const inputAjusteBo = page.locator('#input-sizing-ajuste-bo');
+    await inputAjusteBo.fill('3');
+    await inputAjusteBo.dispatchEvent('input');
+    await page.waitForTimeout(300);
+
+    // PA Contratada should be 8 + 3 = 11
+    await expect(page.locator('#input-sizing-pa-contratada-bo')).toHaveValue('11');
+    await expect(page.locator('#widget-sizing-pas-bo')).toHaveText('11');
+  });
+
+  test('7. Versionamento mensal e travamento de meses passados', async ({ page }) => {
+    await page.evaluate(() => {
+      // @ts-ignore
+      switchToView('sizing');
+      // @ts-ignore
+      onSizingMonthSelect('2026-08'); // Month in the past
+    });
+    await page.waitForTimeout(300);
+
+    const lockBadge = page.locator('#sizing-lock-badge');
+    await expect(lockBadge).toContainText('Mês encerrado');
+
+    // Inputs inside sheet tables should be disabled
+    const volVozInput = page.locator('#input-sizing-vol-voz');
+    await expect(volVozInput).toBeDisabled();
+
+    // Switch back to future/projected month
+    await page.evaluate(() => {
+      // @ts-ignore
+      onSizingMonthSelect('2026-11');
+    });
+    await page.waitForTimeout(300);
+
+    await expect(lockBadge).toContainText('Aberto para edição');
+    await expect(volVozInput).toBeEnabled();
+  });
+
+  test('8. Perfil CONSULTA pode ver a view mas os botoes de acao ficam restritos', async ({ page }) => {
     await page.evaluate(() => {
       // @ts-ignore
       currentUser = { nome: 'Visitante', email: '', perfil: 'CONSULTA', assignedTeam: '' };
@@ -155,21 +188,5 @@ test.describe('Painel OPS - Redimensionamento (WFM & Erlang C) E2E', () => {
 
     const btnImport = page.locator('#btn-sizing-import-excel');
     await expect(btnImport).toBeHidden();
-  });
-
-  test('7. Acordeao de detalhamento tecnico abre e fecha corretamente', async ({ page }) => {
-    await page.evaluate(() => {
-      // @ts-ignore
-      switchToView('sizing');
-    });
-
-    const bodyVoz = page.locator('#body-acc-voz');
-    await expect(bodyVoz).toBeVisible();
-
-    const bodyChat = page.locator('#body-acc-chat');
-    await expect(bodyChat).toBeHidden();
-
-    await page.locator('.sizing-acc-header:has-text("N1 Chat")').click();
-    await expect(bodyChat).toBeVisible();
   });
 });
