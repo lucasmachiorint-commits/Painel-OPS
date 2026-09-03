@@ -322,6 +322,8 @@ const I18N = {
         menu_balancing_title: 'Balanceamento de Backlog',
         menu_automations: 'Automações',
         menu_automations_title: 'Quadro de Automações (RPA)',
+        menu_sizing: 'Redimensionamento',
+        menu_sizing_title: 'Redimensionamento de Capacidade',
         menu_access: 'Acesso',
         menu_access_title: 'Controle de Acesso e Perfis',
         view_title_dashboard: 'Dashboard',
@@ -334,8 +336,35 @@ const I18N = {
         view_sub_balancing: 'Planejamento diário de backlog e comparação de capacidade alocada vs. necessária.',
         view_title_automations: 'Automações (RPA)',
         view_sub_automations: 'Quadro analítico de processos robotizados, FTEs absorvidos e horas economizadas.',
+        view_title_sizing: 'Redimensionamento de Capacidade',
+        view_sub_sizing: 'Dimensionamento de workforce (WFM) com Erlang C, premissas NR17 e governança contratual.',
         view_title_access: 'Controle de Acesso',
         view_sub_access: 'Gestão centralizada de usuários, atribuição de perfis (ADMIN/OPERADOR/CONSULTA) e vinculação de equipes.',
+        sizing_import_volumes: 'Importar Volumes (Excel)',
+        sizing_recalc: 'Recalcular',
+        sizing_restore_defaults: 'Padrões',
+        sizing_kpi_pas_voz: 'PAs N1 Voz',
+        sizing_kpi_pas_chat: 'PAs N1 Chat',
+        sizing_kpi_pas_bo: 'PAs N2 Backoffice',
+        sizing_kpi_total_pas: 'Total PAs Requeridas',
+        sizing_tab_voz: '1. N1 Voz (Erlang C)',
+        sizing_tab_chat: '2. N1 Chat (Paralelo)',
+        sizing_tab_bo: '3. N2 Backoffice (Linear)',
+        sizing_tab_gov: '4. Governança & Alertas',
+        sizing_lbl_vol_voz: 'Volume Mensal (Voz)',
+        sizing_lbl_tma_voz: 'TMA - Tempo Médio Atendimento',
+        sizing_lbl_sla_meta: 'Meta de Nível de Serviço (SLA)',
+        sizing_lbl_tme_max: 'TME Máximo Tolerado',
+        sizing_lbl_dmm: 'DMM (% Dia Maior Movimento)',
+        sizing_lbl_hmm: 'HMM (% Hora Maior Movimento)',
+        sizing_lbl_vol_chat: 'Volume Mensal (Chat)',
+        sizing_lbl_tma_chat: 'TMA Chat',
+        sizing_lbl_vol_bo: 'Volume Mensal (Backoffice)',
+        sizing_lbl_tma_bo: 'TMA Backoffice',
+        sizing_lbl_dias_uteis: 'Dias Úteis no Mês',
+        sizing_lbl_aumento_pct: 'Aumento % sobre Chamadas / Demanda',
+        sizing_lbl_vol_planejado: 'Volume Planejado Contratual',
+        sizing_lbl_mes_ref: 'Mês de Referência da Demanda',
         filter_area_title: 'Filtrar por Área / Equipe em todas as telas',
         filter_resp_title: 'Filtrar por Responsável em todas as telas',
         opt_all_areas: 'Todas as Áreas',
@@ -502,6 +531,8 @@ const I18N = {
         menu_balancing_title: 'Balanceo de Backlog',
         menu_automations: 'Automatizaciones',
         menu_automations_title: 'Panel de Automatizaciones (RPA)',
+        menu_sizing: 'Redimensionamiento',
+        menu_sizing_title: 'Redimensionamiento de Capacidad',
         menu_access: 'Acceso',
         menu_access_title: 'Control de Acceso y Perfiles',
         view_title_dashboard: 'Tablero',
@@ -514,8 +545,35 @@ const I18N = {
         view_sub_balancing: 'Planificación diaria de backlog y comparación de capacidad asignada vs. requerida.',
         view_title_automations: 'Automatizaciones (RPA)',
         view_sub_automations: 'Panel analítico de procesos robotizados, FTEs absorbidos y horas ahorradas.',
+        view_title_sizing: 'Redimensionamiento de Capacidad',
+        view_sub_sizing: 'Dimensionamiento de workforce (WFM) con Erlang C, premisas NR17 y gobernanza contractual.',
         view_title_access: 'Control de Acceso',
         view_sub_access: 'Gestión centralizada de usuarios, perfiles (ADMIN/OPERADOR/CONSULTA) y vinculación de equipos.',
+        sizing_import_volumes: 'Importar Volúmenes (Excel)',
+        sizing_recalc: 'Recalcular',
+        sizing_restore_defaults: 'Valores Predeterminados',
+        sizing_kpi_pas_voz: 'PAs N1 Voz',
+        sizing_kpi_pas_chat: 'PAs N1 Chat',
+        sizing_kpi_pas_bo: 'PAs N2 Backoffice',
+        sizing_kpi_total_pas: 'Total PAs Requeridas',
+        sizing_tab_voz: '1. N1 Voz (Erlang C)',
+        sizing_tab_chat: '2. N1 Chat (Paralelo)',
+        sizing_tab_bo: '3. N2 Backoffice (Lineal)',
+        sizing_tab_gov: '4. Gobernanza y Alertas',
+        sizing_lbl_vol_voz: 'Volumen Mensual (Voz)',
+        sizing_lbl_tma_voz: 'TMA - Tiempo Medio Atención',
+        sizing_lbl_sla_meta: 'Meta de Nivel de Servicio (SLA)',
+        sizing_lbl_tme_max: 'TME Máximo Tolerado',
+        sizing_lbl_dmm: 'DMM (% Día Mayor Movimiento)',
+        sizing_lbl_hmm: 'HMM (% Hora Mayor Movimiento)',
+        sizing_lbl_vol_chat: 'Volumen Mensual (Chat)',
+        sizing_lbl_tma_chat: 'TMA Chat',
+        sizing_lbl_vol_bo: 'Volumen Mensual (Backoffice)',
+        sizing_lbl_tma_bo: 'TMA Backoffice',
+        sizing_lbl_dias_uteis: 'Días Hábiles en el Mes',
+        sizing_lbl_aumento_pct: 'Aumento % sobre Llamadas / Demanda',
+        sizing_lbl_vol_planejado: 'Volumen Planificado Contractual',
+        sizing_lbl_mes_ref: 'Mes de Referencia de la Demanda',
         filter_area_title: 'Filtrar por Área / Equipo en todas las vistas',
         filter_resp_title: 'Filtrar por Responsable en todas las vistas',
         opt_all_areas: 'Todas las Áreas',
@@ -834,6 +892,11 @@ function applyI18n(locale) {
                 VIEW_META['access-control'].section = dict.section_admin;
                 VIEW_META['access-control'].subtitle = dict.view_sub_access;
             }
+            if (VIEW_META['sizing']) {
+                VIEW_META['sizing'].title = dict.view_title_sizing || 'Redimensionamiento de Capacidad';
+                VIEW_META['sizing'].section = dict.section_management || 'Gestión';
+                VIEW_META['sizing'].subtitle = dict.view_sub_sizing || 'Dimensionamiento de workforce (WFM) con Erlang C, premisas NR17 y gobernanza contractual.';
+            }
         } else {
             if (VIEW_META['dashboard']) {
                 VIEW_META['dashboard'].title = 'Dashboard';
@@ -859,6 +922,11 @@ function applyI18n(locale) {
                 VIEW_META['automations'].title = 'Automações (RPA)';
                 VIEW_META['automations'].section = 'Gestão';
                 VIEW_META['automations'].subtitle = 'Quadro analítico de processos robotizados, FTEs absorvidos e horas economizadas.';
+            }
+            if (VIEW_META['sizing']) {
+                VIEW_META['sizing'].title = 'Redimensionamento de Capacidade';
+                VIEW_META['sizing'].section = 'Gestão';
+                VIEW_META['sizing'].subtitle = 'Dimensionamento de workforce (WFM) com Erlang C, premissas NR17 e governança contratual.';
             }
             if (VIEW_META['access-control']) {
                 VIEW_META['access-control'].title = 'Controle de Acesso';
@@ -2232,6 +2300,45 @@ function applyStateMigrations() {
     } else {
         state.responsaveis = [];
     }
+
+    // Migration for Sizing / WFM parameters
+    const defaultSizingParams = {
+        aumentoPctChamadas: 0,
+        volumeMensalVoz: 19912,
+        tmaVoz: 480,
+        slaMeta: 80,
+        tmeMax: 20,
+        abandonoMax: 3.5,
+        dmmPercent: 5.62,
+        hmmPercent: 9.7,
+        shrinkageLanche: 10.5,
+        shrinkageTreinamento: 4.0,
+        shrinkageFeedback: 1.5,
+        shrinkageNR17: 17.0,
+        volumeMensalChat: 0,
+        tmaChat: 480,
+        telasSimultaneas: 2,
+        volumeMensalBO: 10270,
+        tmaBO: 600,
+        diasUteis: 21,
+        cargaHorariaNominal: 380,
+        pausasNR17Min: 40,
+        treinFeedbackMin: 22,
+        eficienciaOcupacao: 70.0,
+        safetyBuffer: 0,
+        volumePlanejado: 19912,
+        mesReferencia: ''
+    };
+
+    if (!state.sizingParams || typeof state.sizingParams !== 'object') {
+        state.sizingParams = Object.assign({}, defaultSizingParams);
+    } else {
+        for (const [k, v] of Object.entries(defaultSizingParams)) {
+            if (state.sizingParams[k] === undefined || state.sizingParams[k] === null) {
+                state.sizingParams[k] = v;
+            }
+        }
+    }
 }
 
 // LOAD STATE FROM LOCALSTORAGE WITH AREA & BACKLOG MIGRATION
@@ -2649,6 +2756,11 @@ const VIEW_META = {
         title: 'Controle de Acesso',
         section: 'Administração',
         subtitle: 'Gestão centralizada de usuários, atribuição de perfis (ADMIN/OPERADOR/CONSULTA) e vinculação de equipes.'
+    },
+    'sizing': {
+        title: 'Redimensionamento de Capacidade',
+        section: 'Gestão',
+        subtitle: 'Dimensionamento de workforce (WFM) com Erlang C, premissas NR17 e governança contratual.'
     }
 };
 
@@ -2671,8 +2783,8 @@ function updateViewHeader(view) {
     const btnPrint = document.getElementById('btn-print');
     
     if (btnReset) btnReset.style.display = (view === 'cadastros' && currentUser.perfil === 'ADMIN') ? 'inline-flex' : 'none';
-    if (btnExport) btnExport.style.display = (view === 'dashboard' || view === 'cadastros' || view === 'balancing' || view === 'automations' || view === 'history') ? 'inline-flex' : 'none';
-    if (btnPrint) btnPrint.style.display = (view === 'dashboard' || view === 'cadastros' || view === 'balancing' || view === 'automations' || view === 'history') ? 'inline-flex' : 'none';
+    if (btnExport) btnExport.style.display = (view === 'dashboard' || view === 'cadastros' || view === 'balancing' || view === 'automations' || view === 'history' || view === 'sizing') ? 'inline-flex' : 'none';
+    if (btnPrint) btnPrint.style.display = (view === 'dashboard' || view === 'cadastros' || view === 'balancing' || view === 'automations' || view === 'history' || view === 'sizing') ? 'inline-flex' : 'none';
 }
 
 function switchToView(view) {
@@ -2719,6 +2831,8 @@ function switchToView(view) {
         initHistoryView();
     } else if (view === 'access-control') {
         renderAccessControlView();
+    } else if (view === 'sizing') {
+        renderSizingView();
     }
 }
 
@@ -6937,3 +7051,795 @@ function renderAutomationsView() {
         tableBody.appendChild(tr);
     });
 }
+
+// ============================================================
+// REDIMENSIONAMENTO / WFM CAPACITY ENGINE
+// ============================================================
+
+// ERLANG B FORMULA (Loss Probability)
+function erlangB(m, A) {
+    if (A <= 0 || m <= 0) return 1.0;
+    let invB = 1.0;
+    for (let i = 1; i <= m; i++) {
+        invB = 1.0 + (i / A) * invB;
+    }
+    return 1.0 / invB;
+}
+
+// ERLANG C FORMULA (Waiting Probability Pw)
+function erlangCPw(m, A) {
+    if (A <= 0) return 0.0;
+    if (m <= A) return 1.0; // Instability: traffic exceeds server count
+    const B = erlangB(m, A);
+    const denom = m - A * (1.0 - B);
+    if (denom <= 0) return 1.0;
+    const pw = (m * B) / denom;
+    return Math.min(1.0, Math.max(0.0, pw));
+}
+
+// ERLANG C SERVICE LEVEL (Fraction of calls answered within targetWait seconds)
+function erlangCServiceLevel(m, A, targetWait, tma) {
+    if (A <= 0) return 1.0;
+    if (m <= A) return 0.0;
+    const pw = erlangCPw(m, A);
+    const exponent = - (m - A) * (targetWait / tma);
+    return Math.max(0.0, Math.min(1.0, 1.0 - pw * Math.exp(exponent)));
+}
+
+// FIND MINIMUM AGENTS LOGGED TO MEET SLA ITERATIVELY
+function findMinAgentsErlangC(A, targetSL, targetWait, tma) {
+    if (A <= 0) return 0;
+    const target = (targetSL || 80) / 100.0;
+    const minM = Math.max(1, Math.ceil(A));
+    const maxM = Math.max(minM + 150, Math.ceil(A * 3) + 20);
+    
+    for (let m = minM; m <= maxM; m++) {
+        const sl = erlangCServiceLevel(m, A, targetWait, tma);
+        if (sl >= target) {
+            return m;
+        }
+    }
+    return maxM;
+}
+
+// MOTOR 1: N1 VOZ
+function calcSizingN1Voz(p) {
+    const aumentoFactor = 1.0 + ((parseFloat(p.aumentoPctChamadas) || 0) / 100.0);
+    const volBase = Math.max(0, parseFloat(p.volumeMensalVoz) || 0);
+    const volEfetivo = Math.round(volBase * aumentoFactor);
+    
+    const dmmPct = (parseFloat(p.dmmPercent) || 5.62) / 100.0;
+    const hmmPct = (parseFloat(p.hmmPercent) || 9.70) / 100.0;
+    const volDMM = Math.round(volEfetivo * dmmPct);
+    const volHMM = Math.round(volEfetivo * dmmPct * hmmPct);
+    
+    const tma = Math.max(1, parseFloat(p.tmaVoz) || 480);
+    const lambda = volHMM / 3600.0;
+    const A = lambda * tma;
+    
+    const targetSL = parseFloat(p.slaMeta) || 80;
+    const targetWait = parseFloat(p.tmeMax) || 20;
+    
+    let m = 0;
+    let achievedSL = 1.0;
+    let pw = 0.0;
+    
+    if (volHMM > 0 && A > 0) {
+        m = findMinAgentsErlangC(A, targetSL, targetWait, tma);
+        achievedSL = erlangCServiceLevel(m, A, targetWait, tma);
+        pw = erlangCPw(m, A);
+    }
+    
+    const sLanche = parseFloat(p.shrinkageLanche) || 10.5;
+    const sTreino = parseFloat(p.shrinkageTreinamento) || 4.0;
+    const sFb = parseFloat(p.shrinkageFeedback) || 1.5;
+    const sNR17 = parseFloat(p.shrinkageNR17) || 17.0;
+    const totalShrinkPct = sLanche + sTreino + sFb + sNR17;
+    const dispEfetiva = Math.max(0.01, 1.0 - (totalShrinkPct / 100.0));
+    
+    const pas = Math.ceil(m / dispEfetiva);
+    
+    return {
+        volBase,
+        volEfetivo,
+        volDMM,
+        volHMM,
+        lambda,
+        A,
+        m,
+        achievedSL: achievedSL * 100,
+        pw: pw * 100,
+        sLanche,
+        sTreino,
+        sFb,
+        sNR17,
+        totalShrinkPct,
+        dispEfetiva: dispEfetiva * 100,
+        pas
+    };
+}
+
+// MOTOR 2: N1 CHAT
+function calcSizingN1Chat(p) {
+    const aumentoFactor = 1.0 + ((parseFloat(p.aumentoPctChamadas) || 0) / 100.0);
+    const volBase = Math.max(0, parseFloat(p.volumeMensalChat) || 0);
+    const volEfetivo = Math.round(volBase * aumentoFactor);
+    
+    const dmmPct = (parseFloat(p.dmmPercent) || 5.62) / 100.0;
+    const hmmPct = (parseFloat(p.hmmPercent) || 9.70) / 100.0;
+    const volDMM = Math.round(volEfetivo * dmmPct);
+    const volHMM = Math.round(volEfetivo * dmmPct * hmmPct);
+    
+    const tma = Math.max(1, parseFloat(p.tmaChat) || 480);
+    const lambda = volHMM / 3600.0;
+    const A = lambda * tma;
+    
+    const targetSL = parseFloat(p.slaMeta) || 80;
+    const targetWait = parseFloat(p.tmeMax) || 20;
+    
+    let m = 0;
+    let achievedSL = 1.0;
+    let pw = 0.0;
+    
+    if (volHMM > 0 && A > 0) {
+        m = findMinAgentsErlangC(A, targetSL, targetWait, tma);
+        achievedSL = erlangCServiceLevel(m, A, targetWait, tma);
+        pw = erlangCPw(m, A);
+    }
+    
+    const telas = Math.max(1, parseFloat(p.telasSimultaneas) || 2);
+    const shrinkPct = parseFloat(p.shrinkageChat) || 33.0;
+    const dispEfetiva = Math.max(0.01, 1.0 - (shrinkPct / 100.0));
+    
+    const pas = Math.ceil((m / telas) / dispEfetiva);
+    
+    return {
+        volBase,
+        volEfetivo,
+        volDMM,
+        volHMM,
+        lambda,
+        A,
+        m,
+        telas,
+        achievedSL: achievedSL * 100,
+        pw: pw * 100,
+        totalShrinkPct: shrinkPct,
+        dispEfetiva: dispEfetiva * 100,
+        pas
+    };
+}
+
+// MOTOR 3: N2 BACKOFFICE (OFFLINE)
+function calcSizingN2Backoffice(p) {
+    const aumentoFactor = 1.0 + ((parseFloat(p.aumentoPctChamadas) || 0) / 100.0);
+    const volBase = Math.max(0, parseFloat(p.volumeMensalBO) || 0);
+    const volEfetivo = Math.round(volBase * aumentoFactor);
+    
+    const diasUteis = Math.max(1, parseFloat(p.diasUteis) || 21);
+    const volDiario = volEfetivo / diasUteis;
+    
+    const tma = Math.max(1, parseFloat(p.tmaBO) || 600);
+    const chNominal = parseFloat(p.cargaHorariaNominal) || 380;
+    const pausasNR17 = parseFloat(p.pausasNR17Min) || 40;
+    const chSemPausas = Math.max(0, chNominal - pausasNR17);
+    const treinFb = parseFloat(p.treinFeedbackMin) || 22;
+    const horasProdutivasMin = Math.max(0, chSemPausas - treinFb);
+    
+    const eficienciaPct = (parseFloat(p.eficienciaOcupacao) || 70.0) / 100.0;
+    const chEfetivaMin = horasProdutivasMin * eficienciaPct;
+    const chEfetivaSeg = chEfetivaMin * 60;
+    
+    const capacidadeDia = Math.floor(chEfetivaSeg / tma);
+    
+    let pas = 0;
+    if (capacidadeDia > 0 && volDiario > 0) {
+        pas = Math.ceil(volDiario / capacidadeDia);
+    }
+    
+    return {
+        volBase,
+        volEfetivo,
+        diasUteis,
+        volDiario,
+        tma,
+        chNominal,
+        pausasNR17,
+        chSemPausas,
+        treinFb,
+        horasProdutivasMin,
+        eficienciaPct: eficienciaPct * 100,
+        chEfetivaMin,
+        chEfetivaSeg,
+        capacidadeDia,
+        pas
+    };
+}
+
+// TAB SWITCHER FOR SIZING VIEW
+function switchSizingTab(tabKey) {
+    const tabs = ['voz', 'chat', 'bo', 'gov'];
+    tabs.forEach(t => {
+        const btn = document.getElementById(`btn-sizing-tab-${t}`);
+        const content = document.getElementById(`sizing-tab-content-${t}`);
+        if (btn) {
+            if (t === tabKey) btn.classList.add('active');
+            else btn.classList.remove('active');
+        }
+        if (content) {
+            content.style.display = (t === tabKey) ? 'block' : 'none';
+        }
+    });
+}
+
+// ACCORDION TOGGLER FOR SIZING TECHNICAL BREAKDOWN
+function toggleSizingAccordion(accId) {
+    const body = document.getElementById(`body-${accId}`);
+    const arrow = document.getElementById(`arrow-${accId}`);
+    if (!body) return;
+    const isHidden = body.style.display === 'none';
+    body.style.display = isHidden ? 'block' : 'none';
+    if (arrow) {
+        if (isHidden) arrow.classList.add('open');
+        else arrow.classList.remove('open');
+    }
+}
+
+// RESTORE DEFAULT PARAMETERS
+function resetSizingDefaults() {
+    if (!confirm('Deseja realmente restaurar todos os parâmetros de dimensionamento para os valores padrão de referência?')) {
+        return;
+    }
+    
+    state.sizingParams = {
+        aumentoPctChamadas: 0,
+        volumeMensalVoz: 19912,
+        tmaVoz: 480,
+        slaMeta: 80,
+        tmeMax: 20,
+        abandonoMax: 3.5,
+        dmmPercent: 5.62,
+        hmmPercent: 9.7,
+        shrinkageLanche: 10.5,
+        shrinkageTreinamento: 4.0,
+        shrinkageFeedback: 1.5,
+        shrinkageNR17: 17.0,
+        volumeMensalChat: 0,
+        tmaChat: 480,
+        telasSimultaneas: 2,
+        volumeMensalBO: 10270,
+        tmaBO: 600,
+        diasUteis: 21,
+        cargaHorariaNominal: 380,
+        pausasNR17Min: 40,
+        treinFeedbackMin: 22,
+        eficienciaOcupacao: 70.0,
+        safetyBuffer: 0,
+        volumePlanejado: 19912,
+        mesReferencia: ''
+    };
+    
+    renderSizingView();
+    showToast('Parâmetros de dimensionamento restaurados para o padrão!', 'info');
+}
+
+// RECALCULATE & UPDATE ALL SIZING RESULTS
+let _sizingDebounceTimer = null;
+
+function recalcSizing(fromInputs = true) {
+    if (!state.sizingParams) state.sizingParams = {};
+    const p = state.sizingParams;
+    
+    // Read from inputs if user edited form
+    if (fromInputs) {
+        const getNum = (id, fallback) => {
+            const el = document.getElementById(id);
+            if (!el) return fallback;
+            const val = parseFloat(el.value);
+            return isNaN(val) ? fallback : val;
+        };
+        
+        p.volumeMensalVoz = getNum('input-sizing-vol-voz', p.volumeMensalVoz || 19912);
+        p.tmaVoz = getNum('input-sizing-tma-voz', p.tmaVoz || 480);
+        p.slaMeta = getNum('input-sizing-sla-meta', p.slaMeta || 80);
+        p.tmeMax = getNum('input-sizing-tme-max', p.tmeMax || 20);
+        p.abandonoMax = getNum('input-sizing-abandono-max', p.abandonoMax || 3.5);
+        p.dmmPercent = getNum('input-sizing-dmm', p.dmmPercent || 5.62);
+        p.hmmPercent = getNum('input-sizing-hmm', p.hmmPercent || 9.7);
+        p.shrinkageLanche = getNum('input-sizing-shrink-lanche', p.shrinkageLanche || 10.5);
+        p.shrinkageTreinamento = getNum('input-sizing-shrink-treino', p.shrinkageTreinamento || 4.0);
+        p.shrinkageFeedback = getNum('input-sizing-shrink-fb', p.shrinkageFeedback || 1.5);
+        p.shrinkageNR17 = getNum('input-sizing-shrink-nr17', p.shrinkageNR17 || 17.0);
+        
+        p.volumeMensalChat = getNum('input-sizing-vol-chat', p.volumeMensalChat || 0);
+        p.tmaChat = getNum('input-sizing-tma-chat', p.tmaChat || 480);
+        p.telasSimultaneas = getNum('input-sizing-telas-chat', p.telasSimultaneas || 2);
+        p.shrinkageChat = getNum('input-sizing-shrink-chat', p.shrinkageChat || 33.0);
+        
+        p.volumeMensalBO = getNum('input-sizing-vol-bo', p.volumeMensalBO || 10270);
+        p.tmaBO = getNum('input-sizing-tma-bo', p.tmaBO || 600);
+        p.diasUteis = getNum('input-sizing-dias-uteis-bo', p.diasUteis || 21);
+        p.cargaHorariaNominal = getNum('input-sizing-ch-nominal', p.cargaHorariaNominal || 380);
+        p.pausasNR17Min = getNum('input-sizing-pausas-nr17', p.pausasNR17Min || 40);
+        p.treinFeedbackMin = getNum('input-sizing-trein-fb', p.treinFeedbackMin || 22);
+        p.eficienciaOcupacao = getNum('input-sizing-eficiencia', p.eficienciaOcupacao || 70.0);
+        
+        p.aumentoPctChamadas = getNum('input-sizing-aumento-pct', p.aumentoPctChamadas || 0);
+        p.volumePlanejado = getNum('input-sizing-vol-planejado', p.volumePlanejado || 19912);
+        p.safetyBuffer = getNum('input-sizing-safety-buffer', p.safetyBuffer || 0);
+        
+        const elMes = document.getElementById('input-sizing-mes-ref');
+        if (elMes && elMes.value) p.mesReferencia = elMes.value;
+    }
+    
+    // Execute all 3 calculation engines
+    const resVoz = calcSizingN1Voz(p);
+    const resChat = calcSizingN1Chat(p);
+    const resBO = calcSizingN2Backoffice(p);
+    
+    const safetyBuffer = Math.max(0, parseInt(p.safetyBuffer) || 0);
+    const totalPAs = resVoz.pas + resChat.pas + resBO.pas + safetyBuffer;
+    
+    // 1. Update KPI widgets
+    const elPasVoz = document.getElementById('widget-sizing-pas-voz');
+    const elSubVoz = document.getElementById('widget-sizing-sub-voz');
+    if (elPasVoz) elPasVoz.textContent = resVoz.pas;
+    if (elSubVoz) elSubVoz.textContent = `${resVoz.m} agentes logados (HMM: ${resVoz.volHMM} cham/h)`;
+    
+    const elPasChat = document.getElementById('widget-sizing-pas-chat');
+    const elSubChat = document.getElementById('widget-sizing-sub-chat');
+    if (elPasChat) elPasChat.textContent = resChat.pas;
+    if (elSubChat) elSubChat.textContent = `${resChat.m} agentes (${resChat.telas} telas simul.)`;
+    
+    const elPasBO = document.getElementById('widget-sizing-pas-bo');
+    const elSubBO = document.getElementById('widget-sizing-sub-bo');
+    if (elPasBO) elPasBO.textContent = resBO.pas;
+    if (elSubBO) elSubBO.textContent = `${resBO.capacidadeDia} atend./dia por operador (${resBO.diasUteis}d úteis)`;
+    
+    const elTotalPas = document.getElementById('widget-sizing-total-pas');
+    const elTotalSub = document.getElementById('widget-sizing-total-sub');
+    if (elTotalPas) elTotalPas.textContent = totalPAs;
+    if (elTotalSub) elTotalSub.textContent = `Buffer: +${safetyBuffer} PAs (Base: ${resVoz.pas + resChat.pas + resBO.pas})`;
+    
+    // 2. Update Total Shrinkage badge for N1 Voz
+    const elShrinkVoz = document.getElementById('sizing-total-shrink-voz');
+    if (elShrinkVoz) {
+        elShrinkVoz.textContent = `Shrinkage: ${resVoz.totalShrinkPct.toFixed(1)}% | Disp. Efetiva: ${resVoz.dispEfetiva.toFixed(1)}%`;
+    }
+    
+    // 3. Update Safety buffer slider value display
+    const elValBuffer = document.getElementById('sizing-val-safety-buffer');
+    if (elValBuffer) elValBuffer.textContent = `+${safetyBuffer} PAs extras`;
+    
+    // 4. Update Aumento % Chamadas banner and live preview
+    const aumentoPct = parseFloat(p.aumentoPctChamadas) || 0;
+    const elBanner = document.getElementById('sizing-aumento-banner');
+    if (elBanner) {
+        if (aumentoPct !== 0) {
+            elBanner.style.display = 'flex';
+            elBanner.innerHTML = `
+                <i class="fa-solid fa-arrow-trend-up" style="font-size: 1.25rem;"></i>
+                <div>
+                    <span><strong>Aumento de ${aumentoPct > 0 ? '+' : ''}${aumentoPct}% aplicado sobre os volumes base:</strong></span>
+                    <div style="font-size: 0.8rem; margin-top: 0.2rem; opacity: 0.95;">
+                        📞 Voz: ${resVoz.volBase.toLocaleString('pt-BR')} &rarr; <strong>${resVoz.volEfetivo.toLocaleString('pt-BR')}</strong> &bull;
+                        💬 Chat: ${resChat.volBase.toLocaleString('pt-BR')} &rarr; <strong>${resChat.volEfetivo.toLocaleString('pt-BR')}</strong> &bull;
+                        📋 Backoffice: ${resBO.volBase.toLocaleString('pt-BR')} &rarr; <strong>${resBO.volEfetivo.toLocaleString('pt-BR')}</strong>
+                    </div>
+                </div>
+            `;
+        } else {
+            elBanner.style.display = 'none';
+        }
+    }
+    
+    const elLivePrev = document.getElementById('sizing-aumento-live-preview');
+    if (elLivePrev) {
+        elLivePrev.innerHTML = `
+            <strong>Volumes Efetivos Calculados (${aumentoPct > 0 ? '+' : ''}${aumentoPct}%):</strong><br>
+            &bull; N1 Voz: <strong>${resVoz.volEfetivo.toLocaleString('pt-BR')}</strong> (base: ${resVoz.volBase.toLocaleString('pt-BR')})<br>
+            &bull; N1 Chat: <strong>${resChat.volEfetivo.toLocaleString('pt-BR')}</strong> (base: ${resChat.volBase.toLocaleString('pt-BR')})<br>
+            &bull; N2 Backoffice: <strong>${resBO.volEfetivo.toLocaleString('pt-BR')}</strong> (base: ${resBO.volBase.toLocaleString('pt-BR')})
+        `;
+    }
+    
+    // 5. Update Contractual & Governance Alerts
+    const alertsContainer = document.getElementById('sizing-alerts-container');
+    if (alertsContainer) {
+        alertsContainer.innerHTML = '';
+        
+        // Alert 1: Desvio Contratual (Threshold 5%)
+        const volPlan = parseFloat(p.volumePlanejado) || 19912;
+        const diffVol = resVoz.volEfetivo - volPlan;
+        const diffPct = volPlan > 0 ? (diffVol / volPlan) * 100 : 0;
+        
+        let desvioCardHtml = '';
+        if (diffPct > 5.0) {
+            desvioCardHtml = `
+                <div class="sizing-alert-card sizing-alert-warning">
+                    <div class="sizing-alert-icon"><i class="fa-solid fa-triangle-exclamation"></i></div>
+                    <div class="sizing-alert-content">
+                        <h4>Alerta de Desvio Contratual Crítico (+${diffPct.toFixed(1)}%)</h4>
+                        <p>
+                            O volume efetivo de <strong>${resVoz.volEfetivo.toLocaleString('pt-BR')} chamadas</strong> excede a meta planejada contratual de <strong>${volPlan.toLocaleString('pt-BR')}</strong> em <strong>+${diffPct.toFixed(1)}% (+${diffVol.toLocaleString('pt-BR')} chamadas)</strong>.
+                            <br><span style="color: #fbbf24; font-weight: 600;">Ação recomendada:</span> Acionar plano de contingência e renegociar aditivo contratual com os parceiros.
+                        </p>
+                    </div>
+                </div>
+            `;
+        } else if (diffPct < -5.0) {
+            desvioCardHtml = `
+                <div class="sizing-alert-card sizing-alert-info">
+                    <div class="sizing-alert-icon"><i class="fa-solid fa-circle-info"></i></div>
+                    <div class="sizing-alert-content">
+                        <h4>Volume Abaixo do Planejado (${diffPct.toFixed(1)}%)</h4>
+                        <p>
+                            O volume de <strong>${resVoz.volEfetivo.toLocaleString('pt-BR')} chamadas</strong> está <strong>${Math.abs(diffPct).toFixed(1)}% abaixo</strong> do teto planejado (${volPlan.toLocaleString('pt-BR')}).
+                            <br>Oportunidade para rebalanceamento ou remanejamento de capacidade ociosa.
+                        </p>
+                    </div>
+                </div>
+            `;
+        } else {
+            desvioCardHtml = `
+                <div class="sizing-alert-card sizing-alert-success">
+                    <div class="sizing-alert-icon"><i class="fa-solid fa-circle-check"></i></div>
+                    <div class="sizing-alert-content">
+                        <h4>Volume Dentro da Tolerância Contratual (&plusmn;5%)</h4>
+                        <p>
+                            O volume de <strong>${resVoz.volEfetivo.toLocaleString('pt-BR')} chamadas</strong> apresenta desvio de <strong>${diffPct >= 0 ? '+' : ''}${diffPct.toFixed(1)}%</strong> em relação ao planejado (${volPlan.toLocaleString('pt-BR')}), operando em conformidade com o SLA.
+                        </p>
+                    </div>
+                </div>
+            `;
+        }
+        
+        // Alert 2: Janela de Contratação e Treinamento (45 dias / M-2)
+        let contrataCardHtml = '';
+        if (p.mesReferencia && /^\d{4}-\d{2}$/.test(p.mesReferencia)) {
+            const parts = p.mesReferencia.split('-');
+            const year = parseInt(parts[0], 10);
+            const month = parseInt(parts[1], 10); // 1 to 12
+            
+            // Calculate 2 months prior (M-2)
+            let prevMonth = month - 2;
+            let prevYear = year;
+            if (prevMonth <= 0) {
+                prevMonth += 12;
+                prevYear -= 1;
+            }
+            const strMesRef = `${String(month).padStart(2, '0')}/${year}`;
+            const strMesM2 = `${String(prevMonth).padStart(2, '0')}/${prevYear}`;
+            
+            contrataCardHtml = `
+                <div class="sizing-alert-card sizing-alert-info">
+                    <div class="sizing-alert-icon"><i class="fa-solid fa-calendar-check"></i></div>
+                    <div class="sizing-alert-content">
+                        <h4>Cronograma de Contratação (Janela de 45 dias)</h4>
+                        <p>
+                            Para atender a demanda de <strong>${strMesRef}</strong> com <strong>${totalPAs} PAs dimensionadas</strong>, o processo seletivo e treinamento deve ser iniciado impreterivelmente até <strong>${strMesM2} (M-2)</strong> para garantir a curva de aprendizagem regulamentar NR17.
+                        </p>
+                    </div>
+                </div>
+            `;
+        } else {
+            contrataCardHtml = `
+                <div class="sizing-alert-card sizing-alert-info">
+                    <div class="sizing-alert-icon"><i class="fa-solid fa-calendar-days"></i></div>
+                    <div class="sizing-alert-content">
+                        <h4>Cronograma de Contratação & Treinamento</h4>
+                        <p>
+                            Defina o <em>Mês de Referência</em> na aba Governança para gerar automaticamente o cronograma de contratação preventiva com antecedência mínima de 45 dias (M-2).
+                        </p>
+                    </div>
+                </div>
+            `;
+        }
+        
+        alertsContainer.innerHTML = desvioCardHtml + contrataCardHtml;
+    }
+    
+    // 6. Update Technical Detail Accordions
+    const elDetailVoz = document.getElementById('sizing-calc-detail-voz');
+    if (elDetailVoz) {
+        elDetailVoz.innerHTML = `
+            <table class="sizing-calc-table">
+                <tr><td class="calc-label">Volume Mensal Base</td><td class="calc-formula">Vol_Base</td><td class="calc-val">${resVoz.volBase.toLocaleString('pt-BR')} chamadas</td></tr>
+                <tr><td class="calc-label">Multiplicador de Aumento</td><td class="calc-formula">&times; (1 + ${aumentoPct}%)</td><td class="calc-val">${aumentoPct > 0 ? `+${aumentoPct}%` : '0%'}</td></tr>
+                <tr><td class="calc-label">Volume Mensal Efetivo</td><td class="calc-formula">Vol_Efetivo</td><td class="calc-val">${resVoz.volEfetivo.toLocaleString('pt-BR')} chamadas</td></tr>
+                <tr><td class="calc-label">Volume DMM (Dia Maior Movimento)</td><td class="calc-formula">Vol_Efetivo &times; ${p.dmmPercent}%</td><td class="calc-val">${resVoz.volDMM.toLocaleString('pt-BR')} chamadas</td></tr>
+                <tr><td class="calc-label">Volume HMM (Hora Maior Movimento)</td><td class="calc-formula">Vol_DMM &times; ${p.hmmPercent}%</td><td class="calc-val">${resVoz.volHMM.toLocaleString('pt-BR')} chamadas/hora</td></tr>
+                <tr><td class="calc-label">Taxa de Chegada (&lambda;)</td><td class="calc-formula">Vol_HMM / 3600s</td><td class="calc-val">${resVoz.lambda.toFixed(4)} cham/s</td></tr>
+                <tr><td class="calc-label">Intensidade de Tráfego (A)</td><td class="calc-formula">&lambda; &times; TMA (${p.tmaVoz}s)</td><td class="calc-val">${resVoz.A.toFixed(2)} Erlangs</td></tr>
+                <tr><td class="calc-label">Agentes Logados Teóricos (m)</td><td class="calc-formula">Erlang C (SL &ge; ${p.slaMeta}%)</td><td class="calc-val" style="color: var(--color-primary);">${resVoz.m} operadores</td></tr>
+                <tr><td class="calc-label">Nível de Serviço Atingido (SL)</td><td class="calc-formula">1 - Pw &times; e^(-(m-A)&times;TME/TMA)</td><td class="calc-val">${resVoz.achievedSL.toFixed(2)}%</td></tr>
+                <tr><td class="calc-label">Probabilidade de Espera (Pw)</td><td class="calc-formula">Pw(m, A)</td><td class="calc-val">${resVoz.pw.toFixed(2)}%</td></tr>
+                <tr><td class="calc-label">Fator de Shrinkage Total</td><td class="calc-formula">Lanche + Treino + FB + NR17</td><td class="calc-val">${resVoz.totalShrinkPct.toFixed(1)}% (Disp: ${resVoz.dispEfetiva.toFixed(1)}%)</td></tr>
+                <tr style="background: rgba(235, 92, 39, 0.08);"><td class="calc-label" style="font-weight: 700; color: #fff;">PAs Físicas Necessárias N1 Voz</td><td class="calc-formula" style="color: #fff;">&lceil; m / Disponibilidade &rceil;</td><td class="calc-val" style="color: var(--color-primary); font-size: 1.1rem;">${resVoz.pas} PAs</td></tr>
+            </table>
+        `;
+    }
+    
+    const elDetailChat = document.getElementById('sizing-calc-detail-chat');
+    if (elDetailChat) {
+        elDetailChat.innerHTML = `
+            <table class="sizing-calc-table">
+                <tr><td class="calc-label">Volume Mensal Chat Efetivo</td><td class="calc-formula">Vol_Base &times; (1 + ${aumentoPct}%)</td><td class="calc-val">${resChat.volEfetivo.toLocaleString('pt-BR')} atendimentos</td></tr>
+                <tr><td class="calc-label">Volume HMM (Hora Maior Movimento)</td><td class="calc-formula">Vol &times; ${p.dmmPercent}% &times; ${p.hmmPercent}%</td><td class="calc-val">${resChat.volHMM.toLocaleString('pt-BR')} atend./hora</td></tr>
+                <tr><td class="calc-label">Intensidade de Tráfego (A)</td><td class="calc-formula">&lambda; &times; TMA (${p.tmaChat}s)</td><td class="calc-val">${resChat.A.toFixed(2)} Erlangs</td></tr>
+                <tr><td class="calc-label">Agentes Erlang C (Fila Pura)</td><td class="calc-formula">Erlang C (SL &ge; ${p.slaMeta}%)</td><td class="calc-val">${resChat.m} operadores</td></tr>
+                <tr><td class="calc-label">Limitador de Telas Simultâneas</td><td class="calc-formula">Capacidade Paralela</td><td class="calc-val">${resChat.telas} telas por operador</td></tr>
+                <tr><td class="calc-label">Agentes Ajustados para Telas</td><td class="calc-formula">m / ${resChat.telas}</td><td class="calc-val">${(resChat.m / resChat.telas).toFixed(1)} operadores</td></tr>
+                <tr><td class="calc-label">Disponibilidade Efetiva</td><td class="calc-formula">100% - ${resChat.totalShrinkPct}%</td><td class="calc-val">${resChat.dispEfetiva.toFixed(1)}%</td></tr>
+                <tr style="background: rgba(6, 182, 212, 0.08);"><td class="calc-label" style="font-weight: 700; color: #fff;">PAs Físicas Necessárias N1 Chat</td><td class="calc-formula" style="color: #fff;">&lceil; (m / Telas) / Disp &rceil;</td><td class="calc-val" style="color: #06b6d4; font-size: 1.1rem;">${resChat.pas} PAs</td></tr>
+            </table>
+        `;
+    }
+    
+    const elDetailBO = document.getElementById('sizing-calc-detail-bo');
+    if (elDetailBO) {
+        elDetailBO.innerHTML = `
+            <table class="sizing-calc-table">
+                <tr><td class="calc-label">Volume Mensal Backoffice Efetivo</td><td class="calc-formula">Vol_Base &times; (1 + ${aumentoPct}%)</td><td class="calc-val">${resBO.volEfetivo.toLocaleString('pt-BR')} demandas</td></tr>
+                <tr><td class="calc-label">Dias Úteis no Mês</td><td class="calc-formula">Dias_Uteis</td><td class="calc-val">${resBO.diasUteis} dias</td></tr>
+                <tr><td class="calc-label">Volume Diário a Produzir</td><td class="calc-formula">Vol_Efetivo / Dias_Uteis</td><td class="calc-val">${resBO.volDiario.toFixed(1)} demandas/dia</td></tr>
+                <tr><td class="calc-label">Carga Horária Nominal</td><td class="calc-formula">Jornada Contratual</td><td class="calc-val">${resBO.chNominal} min (06:20:00)</td></tr>
+                <tr><td class="calc-label">Pausas NR17 (Lanche + Descanso)</td><td class="calc-formula">20min lanche + 2&times;10min</td><td class="calc-val">${resBO.pausasNR17} minutos</td></tr>
+                <tr><td class="calc-label">Treinamento + Feedback</td><td class="calc-formula">6,47% sobre jornada líq.</td><td class="calc-val">${resBO.treinFb} minutos</td></tr>
+                <tr><td class="calc-label">Horas Produtivas Disponíveis</td><td class="calc-formula">Nominal - Pausas - Treino</td><td class="calc-val">${resBO.horasProdutivasMin} min (05:18:00)</td></tr>
+                <tr><td class="calc-label">Eficiência / Ocupação Produtiva</td><td class="calc-formula">Padrão Operacional</td><td class="calc-val">${resBO.eficienciaPct.toFixed(1)}%</td></tr>
+                <tr><td class="calc-label">Tempo de Trabalho Efetivo</td><td class="calc-formula">Horas_Produtivas &times; Eficiência</td><td class="calc-val">${resBO.chEfetivaMin.toFixed(1)} min (${resBO.chEfetivaSeg} segundos)</td></tr>
+                <tr><td class="calc-label">Capacidade Diária por Operador</td><td class="calc-formula">&lfloor; Tempo_Efetivo_Seg / TMA (${resBO.tma}s) &rfloor;</td><td class="calc-val" style="color: var(--color-secondary);">${resBO.capacidadeDia} atend./dia</td></tr>
+                <tr style="background: rgba(229, 95, 145, 0.08);"><td class="calc-label" style="font-weight: 700; color: #fff;">PAs Físicas Necessárias N2 Backoffice</td><td class="calc-formula" style="color: #fff;">&lceil; Vol_Diario / Capacidade_Dia &rceil;</td><td class="calc-val" style="color: var(--color-secondary); font-size: 1.1rem;">${resBO.pas} PAs</td></tr>
+            </table>
+        `;
+    }
+    
+    // Save to persistent storage
+    saveState();
+}
+
+// RENDER SIZING VIEW (INITIAL POPULATION & EVENT HOOKING)
+function renderSizingView() {
+    if (!state.sizingParams) {
+        state.sizingParams = {
+            aumentoPctChamadas: 0,
+            volumeMensalVoz: 19912,
+            tmaVoz: 480,
+            slaMeta: 80,
+            tmeMax: 20,
+            abandonoMax: 3.5,
+            dmmPercent: 5.62,
+            hmmPercent: 9.7,
+            shrinkageLanche: 10.5,
+            shrinkageTreinamento: 4.0,
+            shrinkageFeedback: 1.5,
+            shrinkageNR17: 17.0,
+            volumeMensalChat: 0,
+            tmaChat: 480,
+            telasSimultaneas: 2,
+            volumeMensalBO: 10270,
+            tmaBO: 600,
+            diasUteis: 21,
+            cargaHorariaNominal: 380,
+            pausasNR17Min: 40,
+            treinFeedbackMin: 22,
+            eficienciaOcupacao: 70.0,
+            safetyBuffer: 0,
+            volumePlanejado: 19912,
+            mesReferencia: ''
+        };
+    }
+    const p = state.sizingParams;
+    
+    const setVal = (id, val) => {
+        const el = document.getElementById(id);
+        if (el && val !== undefined && val !== null) el.value = val;
+    };
+    
+    setVal('input-sizing-vol-voz', p.volumeMensalVoz);
+    setVal('input-sizing-tma-voz', p.tmaVoz);
+    setVal('input-sizing-sla-meta', p.slaMeta);
+    setVal('input-sizing-tme-max', p.tmeMax);
+    setVal('input-sizing-abandono-max', p.abandonoMax);
+    setVal('input-sizing-dmm', p.dmmPercent);
+    setVal('input-sizing-hmm', p.hmmPercent);
+    setVal('input-sizing-shrink-lanche', p.shrinkageLanche);
+    setVal('input-sizing-shrink-treino', p.shrinkageTreinamento);
+    setVal('input-sizing-shrink-fb', p.shrinkageFeedback);
+    setVal('input-sizing-shrink-nr17', p.shrinkageNR17);
+    
+    setVal('input-sizing-vol-chat', p.volumeMensalChat);
+    setVal('input-sizing-tma-chat', p.tmaChat);
+    setVal('input-sizing-telas-chat', p.telasSimultaneas);
+    setVal('input-sizing-shrink-chat', p.shrinkageChat);
+    
+    setVal('input-sizing-vol-bo', p.volumeMensalBO);
+    setVal('input-sizing-tma-bo', p.tmaBO);
+    setVal('input-sizing-dias-uteis-bo', p.diasUteis);
+    setVal('input-sizing-ch-nominal', p.cargaHorariaNominal);
+    setVal('input-sizing-pausas-nr17', p.pausasNR17Min);
+    setVal('input-sizing-trein-fb', p.treinFeedbackMin);
+    setVal('input-sizing-eficiencia', p.eficienciaOcupacao);
+    
+    setVal('input-sizing-aumento-pct', p.aumentoPctChamadas);
+    setVal('input-sizing-vol-planejado', p.volumePlanejado);
+    setVal('input-sizing-safety-buffer', p.safetyBuffer);
+    
+    // Set default month reference to current month if not set
+    const elMes = document.getElementById('input-sizing-mes-ref');
+    if (elMes) {
+        if (p.mesReferencia) {
+            elMes.value = p.mesReferencia;
+        } else {
+            const now = new Date();
+            const defMes = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+            elMes.value = defMes;
+            p.mesReferencia = defMes;
+        }
+    }
+    
+    // Setup event listeners if not already bound
+    setupSizingEventListeners();
+    
+    // Calculate and render all outputs
+    recalcSizing(false);
+}
+
+// SETUP EVENT LISTENERS FOR SIZING INPUTS & ACTIONS
+let _sizingListenersBound = false;
+
+function setupSizingEventListeners() {
+    if (_sizingListenersBound) return;
+    _sizingListenersBound = true;
+    
+    // Recalculate on any input change (debounced 150ms)
+    const container = document.getElementById('view-sizing');
+    if (container) {
+        container.querySelectorAll('input').forEach(input => {
+            input.addEventListener('input', () => {
+                if (_sizingDebounceTimer) clearTimeout(_sizingDebounceTimer);
+                _sizingDebounceTimer = setTimeout(() => {
+                    recalcSizing(true);
+                }, 150);
+            });
+        });
+    }
+    
+    // Buttons
+    const btnImport = document.getElementById('btn-sizing-import-excel');
+    const fileInput = document.getElementById('sizing-file-input');
+    if (btnImport && fileInput) {
+        btnImport.addEventListener('click', () => {
+            fileInput.value = '';
+            fileInput.click();
+        });
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files && e.target.files[0]) {
+                importSizingVolumes(e.target.files[0]);
+            }
+        });
+    }
+    
+    const btnRecalc = document.getElementById('btn-sizing-recalc');
+    if (btnRecalc) {
+        btnRecalc.addEventListener('click', () => {
+            recalcSizing(true);
+            showToast('Dimensionamento recalculado!', 'success', 2500);
+        });
+    }
+    
+    const btnReset = document.getElementById('btn-sizing-reset-defaults');
+    if (btnReset) {
+        btnReset.addEventListener('click', resetSizingDefaults);
+    }
+}
+
+// EXCEL / CSV IMPORTER FOR SIZING VOLUMES
+function importSizingVolumes(file) {
+    if (!verificarPermissao('OPERADOR')) {
+        alert('Acesso negado: Perfil OPERADOR ou ADMIN necessário.');
+        return;
+    }
+    if (!file) return;
+    
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        try {
+            const data = new Uint8Array(e.target.result);
+            const workbook = XLSX.read(data, { type: 'array' });
+            if (!workbook.SheetNames || workbook.SheetNames.length === 0) {
+                showToast('Erro: Nenhuma planilha encontrada no arquivo.', 'error');
+                return;
+            }
+            
+            const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+            const rows = XLSX.utils.sheet_to_json(firstSheet, { header: 1 });
+            if (!rows || rows.length < 2) {
+                showToast('Erro: A planilha deve conter cabeçalho e pelo menos uma linha de dados.', 'error');
+                return;
+            }
+            
+            // Find header row (rows 0 to 5)
+            let headerRowIdx = 0;
+            const normalize = s => String(s || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
+            
+            for (let r = 0; r < Math.min(6, rows.length); r++) {
+                const rCols = (rows[r] || []).map(normalize);
+                if (rCols.some(c => c.includes('voz') || c.includes('chat') || c.includes('backoffice') || c.includes('volume') || c.includes('demanda'))) {
+                    headerRowIdx = r;
+                    break;
+                }
+            }
+            
+            const headers = (rows[headerRowIdx] || []).map(normalize);
+            const dataRow = rows[headerRowIdx + 1] || [];
+            
+            let updatedCount = 0;
+            const summary = [];
+            
+            headers.forEach((h, idx) => {
+                const val = dataRow[idx];
+                if (val === undefined || val === null || val === '') return;
+                const numVal = parseFloat(val);
+                
+                if (h.includes('voz') || (h.includes('volume') && h.includes('voz')) || h.includes('voice') || h.includes('telefone')) {
+                    if (!isNaN(numVal) && numVal >= 0) {
+                        state.sizingParams.volumeMensalVoz = Math.round(numVal);
+                        updatedCount++;
+                        summary.push(`Voz: ${Math.round(numVal).toLocaleString('pt-BR')}`);
+                    }
+                } else if (h.includes('chat') || (h.includes('volume') && h.includes('chat')) || h.includes('mensagem')) {
+                    if (!isNaN(numVal) && numVal >= 0) {
+                        state.sizingParams.volumeMensalChat = Math.round(numVal);
+                        updatedCount++;
+                        summary.push(`Chat: ${Math.round(numVal).toLocaleString('pt-BR')}`);
+                    }
+                } else if (h.includes('backoffice') || h.includes('bo') || h.includes('n2') || h.includes('retaguarda') || h.includes('offline')) {
+                    if (!isNaN(numVal) && numVal >= 0) {
+                        state.sizingParams.volumeMensalBO = Math.round(numVal);
+                        updatedCount++;
+                        summary.push(`BO: ${Math.round(numVal).toLocaleString('pt-BR')}`);
+                    }
+                } else if (h.includes('dias') || h.includes('uteis') || h.includes('dias uteis')) {
+                    if (!isNaN(numVal) && numVal > 0 && numVal <= 31) {
+                        state.sizingParams.diasUteis = Math.round(numVal);
+                        updatedCount++;
+                        summary.push(`Dias Úteis: ${Math.round(numVal)}`);
+                    }
+                } else if (h.includes('planej') || h.includes('meta') || h.includes('contrat')) {
+                    if (!isNaN(numVal) && numVal >= 0) {
+                        state.sizingParams.volumePlanejado = Math.round(numVal);
+                        updatedCount++;
+                        summary.push(`Planejado: ${Math.round(numVal).toLocaleString('pt-BR')}`);
+                    }
+                } else if (h.includes('aument') || h.includes('cresc') || h.includes('variac') || h.includes('delta')) {
+                    if (!isNaN(numVal)) {
+                        state.sizingParams.aumentoPctChamadas = numVal;
+                        updatedCount++;
+                        summary.push(`Aumento %: ${numVal}%`);
+                    }
+                } else if (h.includes('mes') || h.includes('periodo') || h.includes('referencia')) {
+                    const strVal = String(val).trim();
+                    if (/^\d{4}-\d{2}$/.test(strVal)) {
+                        state.sizingParams.mesReferencia = strVal;
+                        updatedCount++;
+                        summary.push(`Mês: ${strVal}`);
+                    }
+                }
+            });
+            
+            if (updatedCount > 0) {
+                renderSizingView();
+                showToast(`✅ ${updatedCount} parâmetros importados da planilha! (${summary.join(', ')})`, 'success', 6000);
+            } else {
+                showToast('Aviso: Nenhuma coluna correspondente identificada na planilha (ex: Volume Voz, Volume Chat, Backoffice, Dias Úteis).', 'warning', 8000);
+            }
+        } catch (err) {
+            console.error('[Import Sizing Error]', err);
+            showToast('Erro ao processar planilha: ' + err.message, 'error');
+        }
+    };
+    reader.readAsArrayBuffer(file);
+}
+

@@ -74,6 +74,10 @@
                     <i class="fa-solid fa-robot"></i>
                     <span data-i18n="menu_automations">Automações</span>
                 </li>
+                <li class="menu-item" data-view="sizing" data-permissao="OPERADOR,ADMIN" data-i18n-title="menu_sizing_title" title="Redimensionamento de Capacidade">
+                    <i class="fa-solid fa-calculator"></i>
+                    <span data-i18n="menu_sizing">Redimensionamento</span>
+                </li>
 
                 <!-- SEÇÃO: ADMINISTRAÇÃO -->
                 <li class="menu-section-label admin-only" data-i18n="section_admin" title="Administração e Governança" data-permissao="ADMIN">Admin</li>
@@ -794,6 +798,434 @@
                             <p style="color: var(--text-muted); font-size: 0.9rem; max-width: 500px; margin: 0 auto;" data-i18n="empty_rpa_desc">
                                 Para adicionar uma atividade ao quadro de Automações, marque a opção <strong>🤖 RPA</strong> no menu <strong>Cadastro</strong> ou inclua <strong>RPA / Robô</strong> no nome da atividade.
                             </p>
+                        </div>
+                    </section>
+                </div>
+
+                <!-- SIZING VIEW (REDIMENSIONAMENTO) -->
+                <div id="view-sizing" class="tab-view" style="display: none;">
+                    <!-- TOP ACTIONS & CONTROLS -->
+                    <section class="panel glass-panel" style="margin-bottom: 1.5rem; padding: 1.25rem 1.5rem;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+                            <div>
+                                <h2 class="panel-title" style="margin-bottom: 0.25rem;">
+                                    <i class="fa-solid fa-calculator" style="color: var(--color-primary);"></i>
+                                    <span data-i18n="view_title_sizing">Redimensionamento de Capacidade</span>
+                                </h2>
+                                <p style="font-size: 0.85rem; color: var(--text-secondary); margin: 0;" data-i18n="view_sub_sizing">
+                                    Dimensionamento de workforce (WFM) com Erlang C, premissas NR17 e regras contratuais.
+                                </p>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
+                                <input type="file" id="sizing-file-input" accept=".xlsx,.xls,.csv" style="display: none;">
+                                <button id="btn-sizing-import-excel" data-permissao="OPERADOR,ADMIN" class="btn btn-secondary" title="Importar planilha de volumes para atualizar campos automaticamente">
+                                    <i class="fa-solid fa-file-excel" style="color: #10b981;"></i>
+                                    <span data-i18n="sizing_import_volumes">Importar Volumes (Excel)</span>
+                                </button>
+                                <button id="btn-sizing-recalc" data-permissao="OPERADOR,ADMIN" class="btn btn-primary" title="Recalcular todos os motores de dimensionamento">
+                                    <i class="fa-solid fa-rotate"></i>
+                                    <span data-i18n="sizing_recalc">Recalcular</span>
+                                </button>
+                                <button id="btn-sizing-reset-defaults" data-permissao="OPERADOR,ADMIN" class="btn btn-secondary" style="font-size: 0.8rem;" title="Restaurar parâmetros padrão de dimensionamento">
+                                    <i class="fa-solid fa-arrow-rotate-left"></i>
+                                    <span data-i18n="sizing_restore_defaults">Padrões</span>
+                                </button>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- KPI RESULT CARDS -->
+                    <section class="dashboard-widgets">
+                        <!-- N1 VOZ -->
+                        <div class="widget-card glass-panel count-card">
+                            <div class="widget-icon primary-glow">
+                                <i class="fa-solid fa-headset"></i>
+                            </div>
+                            <div class="widget-info">
+                                <h3 data-i18n="sizing_kpi_pas_voz">PAs N1 Voz</h3>
+                                <p class="widget-value" id="widget-sizing-pas-voz">0</p>
+                                <span class="widget-sub" id="widget-sizing-sub-voz">0 agentes logados (HMM)</span>
+                            </div>
+                        </div>
+
+                        <!-- N1 CHAT -->
+                        <div class="widget-card glass-panel count-card">
+                            <div class="widget-icon cyan-glow">
+                                <i class="fa-solid fa-comments"></i>
+                            </div>
+                            <div class="widget-info">
+                                <h3 data-i18n="sizing_kpi_pas_chat">PAs N1 Chat</h3>
+                                <p class="widget-value" id="widget-sizing-pas-chat">0</p>
+                                <span class="widget-sub" id="widget-sizing-sub-chat">0 agentes (2 telas)</span>
+                            </div>
+                        </div>
+
+                        <!-- N2 BACKOFFICE -->
+                        <div class="widget-card glass-panel count-card">
+                            <div class="widget-icon secondary-glow">
+                                <i class="fa-solid fa-briefcase"></i>
+                            </div>
+                            <div class="widget-info">
+                                <h3 data-i18n="sizing_kpi_pas_bo">PAs N2 Backoffice</h3>
+                                <p class="widget-value" id="widget-sizing-pas-bo">0</p>
+                                <span class="widget-sub" id="widget-sizing-sub-bo">0 atend./dia por operador</span>
+                            </div>
+                        </div>
+
+                        <!-- TOTAL REQUERIDO -->
+                        <div class="widget-card glass-panel count-card">
+                            <div class="widget-icon success-glow">
+                                <i class="fa-solid fa-users"></i>
+                            </div>
+                            <div class="widget-info">
+                                <h3 data-i18n="sizing_kpi_total_pas">Total PAs Requeridas</h3>
+                                <p class="widget-value" id="widget-sizing-total-pas" style="color: var(--color-success);">0</p>
+                                <span class="widget-sub" id="widget-sizing-total-sub">Buffer: +0 PAs</span>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- LIVE AUMENTO % BANNER -->
+                    <div id="sizing-aumento-banner" class="sizing-aumento-banner" style="display: none;"></div>
+
+                    <!-- PARAMETERS SECTION WITH TABS -->
+                    <section class="panel glass-panel" style="margin-bottom: 1.5rem; padding: 1.5rem;">
+                        <div class="sizing-tab-header">
+                            <div class="sizing-tabs">
+                                <button type="button" class="sizing-tab-btn active" id="btn-sizing-tab-voz" onclick="switchSizingTab('voz')">
+                                    <i class="fa-solid fa-headset"></i> <span data-i18n="sizing_tab_voz">1. N1 Voz (Erlang C)</span>
+                                </button>
+                                <button type="button" class="sizing-tab-btn" id="btn-sizing-tab-chat" onclick="switchSizingTab('chat')">
+                                    <i class="fa-solid fa-comments"></i> <span data-i18n="sizing_tab_chat">2. N1 Chat (Paralelo)</span>
+                                </button>
+                                <button type="button" class="sizing-tab-btn" id="btn-sizing-tab-bo" onclick="switchSizingTab('bo')">
+                                    <i class="fa-solid fa-briefcase"></i> <span data-i18n="sizing_tab_bo">3. N2 Backoffice (Linear)</span>
+                                </button>
+                                <button type="button" class="sizing-tab-btn" id="btn-sizing-tab-gov" onclick="switchSizingTab('gov')">
+                                    <i class="fa-solid fa-shield-halved"></i> <span data-i18n="sizing_tab_gov">4. Governança & Alertas</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- TAB CONTENT 1: N1 VOZ -->
+                        <div id="sizing-tab-content-voz" class="sizing-tab-content">
+                            <div class="sizing-params-grid">
+                                <div class="sizing-field-group">
+                                    <label for="input-sizing-vol-voz" data-i18n="sizing_lbl_vol_voz">Volume Mensal (Voz)</label>
+                                    <div class="sizing-input-wrap">
+                                        <input type="number" id="input-sizing-vol-voz" min="0" step="1" value="19912">
+                                        <span class="sizing-unit">chamadas</span>
+                                    </div>
+                                    <span class="sizing-field-tip">Demanda mensal total recebida no canal Voz</span>
+                                </div>
+
+                                <div class="sizing-field-group">
+                                    <label for="input-sizing-tma-voz" data-i18n="sizing_lbl_tma_voz">TMA - Tempo Médio Atendimento</label>
+                                    <div class="sizing-input-wrap">
+                                        <input type="number" id="input-sizing-tma-voz" min="10" step="10" value="480">
+                                        <span class="sizing-unit">segundos</span>
+                                    </div>
+                                    <span class="sizing-field-tip">Padrão contratual: 480s (8 minutos)</span>
+                                </div>
+
+                                <div class="sizing-field-group">
+                                    <label for="input-sizing-sla-meta" data-i18n="sizing_lbl_sla_meta">Meta de Nível de Serviço (SLA)</label>
+                                    <div class="sizing-input-wrap">
+                                        <input type="number" id="input-sizing-sla-meta" min="1" max="100" step="1" value="80">
+                                        <span class="sizing-unit">%</span>
+                                    </div>
+                                    <span class="sizing-field-tip">Meta contratual: 80% das chamadas</span>
+                                </div>
+
+                                <div class="sizing-field-group">
+                                    <label for="input-sizing-tme-max" data-i18n="sizing_lbl_tme_max">TME Máximo Tolerado</label>
+                                    <div class="sizing-input-wrap">
+                                        <input type="number" id="input-sizing-tme-max" min="1" step="1" value="20">
+                                        <span class="sizing-unit">segundos</span>
+                                    </div>
+                                    <span class="sizing-field-tip">Meta 80/20: resposta em até 20 segundos</span>
+                                </div>
+
+                                <div class="sizing-field-group">
+                                    <label for="input-sizing-dmm" data-i18n="sizing_lbl_dmm">DMM (% Dia Maior Movimento)</label>
+                                    <div class="sizing-input-wrap">
+                                        <input type="number" id="input-sizing-dmm" min="0.1" max="100" step="0.01" value="5.62">
+                                        <span class="sizing-unit">%</span>
+                                    </div>
+                                    <span class="sizing-field-tip">Representa 5,62% do volume mensal total</span>
+                                </div>
+
+                                <div class="sizing-field-group">
+                                    <label for="input-sizing-hmm" data-i18n="sizing_lbl_hmm">HMM (% Hora Maior Movimento)</label>
+                                    <div class="sizing-input-wrap">
+                                        <input type="number" id="input-sizing-hmm" min="0.1" max="100" step="0.01" value="9.70">
+                                        <span class="sizing-unit">%</span>
+                                    </div>
+                                    <span class="sizing-field-tip">Representa 9,70% do volume do DMM</span>
+                                </div>
+                            </div>
+
+                            <!-- SHRINKAGE VOZ SUB-PANEL -->
+                            <div class="sizing-subpanel">
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.5rem;">
+                                    <h4 style="margin: 0; font-size: 0.95rem; font-weight: 700; color: var(--text-primary);">
+                                        <i class="fa-solid fa-clock-rotate-left" style="color: var(--color-warning);"></i> Fatores de Indisponibilidade (Shrinkage N1 Voz)
+                                    </h4>
+                                    <span class="sizing-badge-pill" id="sizing-total-shrink-voz">Shrinkage: 33.0% | Disp.: 67.0%</span>
+                                </div>
+                                <div class="sizing-params-grid" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));">
+                                    <div class="sizing-field-group">
+                                        <label for="input-sizing-shrink-lanche">Lanche / Descanso</label>
+                                        <div class="sizing-input-wrap">
+                                            <input type="number" id="input-sizing-shrink-lanche" min="0" max="50" step="0.1" value="10.5">
+                                            <span class="sizing-unit">%</span>
+                                        </div>
+                                    </div>
+                                    <div class="sizing-field-group">
+                                        <label for="input-sizing-shrink-treino">Treinamento</label>
+                                        <div class="sizing-input-wrap">
+                                            <input type="number" id="input-sizing-shrink-treino" min="0" max="50" step="0.1" value="4.0">
+                                            <span class="sizing-unit">%</span>
+                                        </div>
+                                    </div>
+                                    <div class="sizing-field-group">
+                                        <label for="input-sizing-shrink-fb">Feedback</label>
+                                        <div class="sizing-input-wrap">
+                                            <input type="number" id="input-sizing-shrink-fb" min="0" max="50" step="0.1" value="1.5">
+                                            <span class="sizing-unit">%</span>
+                                        </div>
+                                    </div>
+                                    <div class="sizing-field-group">
+                                        <label for="input-sizing-shrink-nr17">NR17 (Pausas HMM)</label>
+                                        <div class="sizing-input-wrap">
+                                            <input type="number" id="input-sizing-shrink-nr17" min="0" max="50" step="0.1" value="17.0">
+                                            <span class="sizing-unit">%</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- TAB CONTENT 2: N1 CHAT -->
+                        <div id="sizing-tab-content-chat" class="sizing-tab-content" style="display: none;">
+                            <div class="sizing-params-grid">
+                                <div class="sizing-field-group">
+                                    <label for="input-sizing-vol-chat" data-i18n="sizing_lbl_vol_chat">Volume Mensal (Chat)</label>
+                                    <div class="sizing-input-wrap">
+                                        <input type="number" id="input-sizing-vol-chat" min="0" step="1" value="0">
+                                        <span class="sizing-unit">mensagens</span>
+                                    </div>
+                                    <span class="sizing-field-tip">Demanda mensal total de atendimentos via Chat</span>
+                                </div>
+
+                                <div class="sizing-field-group">
+                                    <label for="input-sizing-tma-chat" data-i18n="sizing_lbl_tma_chat">TMA Chat</label>
+                                    <div class="sizing-input-wrap">
+                                        <input type="number" id="input-sizing-tma-chat" min="10" step="10" value="480">
+                                        <span class="sizing-unit">segundos</span>
+                                    </div>
+                                    <span class="sizing-field-tip">Tempo médio de atendimento do canal Chat</span>
+                                </div>
+
+                                <div class="sizing-field-group">
+                                    <label for="input-sizing-telas-chat">Limitador de Telas Simultâneas</label>
+                                    <div class="sizing-input-wrap">
+                                        <input type="number" id="input-sizing-telas-chat" min="1" max="4" step="1" value="2">
+                                        <span class="sizing-unit">telas/op.</span>
+                                    </div>
+                                    <span class="sizing-field-tip">Rígido: máximo 2 telas por atendente para evitar erros</span>
+                                </div>
+
+                                <div class="sizing-field-group">
+                                    <label for="input-sizing-shrink-chat">Shrinkage Chat</label>
+                                    <div class="sizing-input-wrap">
+                                        <input type="number" id="input-sizing-shrink-chat" min="0" max="60" step="0.5" value="33.0">
+                                        <span class="sizing-unit">%</span>
+                                    </div>
+                                    <span class="sizing-field-tip">Fator de disponibilidade efetiva = 67%</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- TAB CONTENT 3: N2 BACKOFFICE -->
+                        <div id="sizing-tab-content-bo" class="sizing-tab-content" style="display: none;">
+                            <div class="sizing-params-grid">
+                                <div class="sizing-field-group">
+                                    <label for="input-sizing-vol-bo" data-i18n="sizing_lbl_vol_bo">Volume Mensal (Backoffice)</label>
+                                    <div class="sizing-input-wrap">
+                                        <input type="number" id="input-sizing-vol-bo" min="0" step="1" value="10270">
+                                        <span class="sizing-unit">demandas</span>
+                                    </div>
+                                    <span class="sizing-field-tip">Volume mensal de tarefas offline N2</span>
+                                </div>
+
+                                <div class="sizing-field-group">
+                                    <label for="input-sizing-tma-bo" data-i18n="sizing_lbl_tma_bo">TMA Backoffice</label>
+                                    <div class="sizing-input-wrap">
+                                        <input type="number" id="input-sizing-tma-bo" min="10" step="10" value="600">
+                                        <span class="sizing-unit">segundos</span>
+                                    </div>
+                                    <span class="sizing-field-tip">Padrão: 600s (10 minutos por demanda)</span>
+                                </div>
+
+                                <div class="sizing-field-group">
+                                    <label for="input-sizing-dias-uteis-bo" data-i18n="sizing_lbl_dias_uteis">Dias Úteis no Mês</label>
+                                    <div class="sizing-input-wrap">
+                                        <input type="number" id="input-sizing-dias-uteis-bo" min="10" max="31" step="1" value="21">
+                                        <span class="sizing-unit">dias</span>
+                                    </div>
+                                    <span class="sizing-field-tip">Dias úteis para distribuição diária do volume</span>
+                                </div>
+
+                                <div class="sizing-field-group">
+                                    <label for="input-sizing-ch-nominal">Carga Horária Nominal</label>
+                                    <div class="sizing-input-wrap">
+                                        <input type="number" id="input-sizing-ch-nominal" min="120" max="600" step="5" value="380">
+                                        <span class="sizing-unit">minutos</span>
+                                    </div>
+                                    <span class="sizing-field-tip">Jornada padrão: 380 min (06:20:00)</span>
+                                </div>
+
+                                <div class="sizing-field-group">
+                                    <label for="input-sizing-pausas-nr17">Pausas NR17 (Lanche + Descanso)</label>
+                                    <div class="sizing-input-wrap">
+                                        <input type="number" id="input-sizing-pausas-nr17" min="0" max="120" step="5" value="40">
+                                        <span class="sizing-unit">minutos</span>
+                                    </div>
+                                    <span class="sizing-field-tip">20 min lanche + 2 pausas de 10 min = 40 min</span>
+                                </div>
+
+                                <div class="sizing-field-group">
+                                    <label for="input-sizing-trein-fb">Treinamento + Feedback</label>
+                                    <div class="sizing-input-wrap">
+                                        <input type="number" id="input-sizing-trein-fb" min="0" max="120" step="1" value="22">
+                                        <span class="sizing-unit">minutos</span>
+                                    </div>
+                                    <span class="sizing-field-tip">6,47% calculados sobre jornada líquida = 22 min</span>
+                                </div>
+
+                                <div class="sizing-field-group">
+                                    <label for="input-sizing-eficiencia">Eficiência / Ocupação</label>
+                                    <div class="sizing-input-wrap">
+                                        <input type="number" id="input-sizing-eficiencia" min="10" max="100" step="1" value="70.0">
+                                        <span class="sizing-unit">%</span>
+                                    </div>
+                                    <span class="sizing-field-tip">Padrão operacional de mercado: 70%</span>
+                                </div>
+                            </div>
+
+                            <div class="sizing-subpanel" style="margin-top: 1rem;">
+                                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
+                                    <span style="font-size: 0.85rem; color: var(--text-secondary);">Indicadores de Capacidade Diária (N2):</span>
+                                    <span class="sizing-badge-pill" id="sizing-bo-efetivo-info">Tempo Efetivo: 222.6 min (13.356s) | Cap.: 22 atend./dia</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- TAB CONTENT 4: GOVERNANÇA & ALERTAS -->
+                        <div id="sizing-tab-content-gov" class="sizing-tab-content" style="display: none;">
+                            <!-- AUMENTO % CHAMADAS HIGHLIGHT CARD -->
+                            <div class="sizing-increase-card">
+                                <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem;">
+                                    <div>
+                                        <label for="input-sizing-aumento-pct" style="font-size: 1rem; font-weight: 700; color: #f59e0b; display: flex; align-items: center; gap: 0.5rem;">
+                                            <i class="fa-solid fa-arrow-trend-up"></i> <span data-i18n="sizing_lbl_aumento_pct">Aumento % sobre Chamadas / Demanda</span>
+                                        </label>
+                                        <p style="font-size: 0.8rem; color: var(--text-secondary); margin: 0.25rem 0 0 0;">
+                                            Multiplicador global que ajusta todos os volumes (Voz, Chat, Backoffice) e redimensiona as PAs de forma estruturada.
+                                        </p>
+                                    </div>
+                                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                        <input type="number" id="input-sizing-aumento-pct" min="-50" max="200" step="0.5" value="0" class="sizing-increase-input">
+                                        <span style="font-size: 1.25rem; font-weight: 800; color: #f59e0b;">%</span>
+                                    </div>
+                                </div>
+                                <div id="sizing-aumento-live-preview" class="sizing-live-preview" style="margin-top: 1rem;"></div>
+                            </div>
+
+                            <div class="sizing-params-grid" style="margin-top: 1.5rem;">
+                                <div class="sizing-field-group">
+                                    <label for="input-sizing-vol-planejado" data-i18n="sizing_lbl_vol_planejado">Volume Planejado Contratual</label>
+                                    <div class="sizing-input-wrap">
+                                        <input type="number" id="input-sizing-vol-planejado" min="0" step="1" value="19912">
+                                        <span class="sizing-unit">chamadas</span>
+                                    </div>
+                                    <span class="sizing-field-tip">Base de comparação para o Alerta de Desvio Contratual (&gt; 5%)</span>
+                                </div>
+
+                                <div class="sizing-field-group">
+                                    <label for="input-sizing-mes-ref" data-i18n="sizing_lbl_mes_ref">Mês de Referência da Demanda</label>
+                                    <div class="sizing-input-wrap">
+                                        <input type="month" id="input-sizing-mes-ref" style="font-family: inherit;">
+                                    </div>
+                                    <span class="sizing-field-tip">Usado para calcular a janela de contratação (M-2 / 45 dias)</span>
+                                </div>
+                            </div>
+
+                            <!-- SAFETY BUFFER SLIDER -->
+                            <div class="sizing-subpanel" style="margin-top: 1.5rem;">
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+                                    <label for="input-sizing-safety-buffer" style="font-weight: 700; color: var(--text-primary); font-size: 0.95rem;">
+                                        <i class="fa-solid fa-shield-cat" style="color: var(--color-success);"></i> Safety Buffer (Margem de Segurança)
+                                    </label>
+                                    <span class="sizing-badge-pill" id="sizing-val-safety-buffer">+0 PAs extras</span>
+                                </div>
+                                <input type="range" id="input-sizing-safety-buffer" min="0" max="20" step="1" value="0" style="width: 100%;">
+                                <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.5rem; margin-bottom: 0;">
+                                    Permite parametrizar um ajuste adicional para absorver variações bruscas de tráfego antes da contratação final.
+                                </p>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- CONTRACTUAL & GOVERNANCE ALERTS -->
+                    <section class="panel glass-panel" style="margin-bottom: 1.5rem; padding: 1.5rem;">
+                        <h3 class="panel-title" style="margin-bottom: 1rem;">
+                            <i class="fa-solid fa-triangle-exclamation" style="color: var(--color-warning);"></i> Alertas Contratuais & Governança
+                        </h3>
+                        <div id="sizing-alerts-container" class="sizing-alerts-grid">
+                            <!-- Populated dynamically via recalcSizing() -->
+                        </div>
+                    </section>
+
+                    <!-- TECHNICAL BREAKDOWN (ACCORDION) -->
+                    <section class="panel glass-panel" style="margin-bottom: 1.5rem; padding: 1.5rem;">
+                        <h3 class="panel-title" style="margin-bottom: 1rem;">
+                            <i class="fa-solid fa-code-branch" style="color: var(--color-secondary);"></i> Memória de Cálculo & Detalhamento Técnico
+                        </h3>
+                        <div class="sizing-accordion">
+                            <!-- ACCORDION N1 VOZ -->
+                            <div class="sizing-acc-item">
+                                <button type="button" class="sizing-acc-header" onclick="toggleSizingAccordion('acc-voz')">
+                                    <span><i class="fa-solid fa-headset"></i> Memória N1 Voz (Erlang C com Shrinkage)</span>
+                                    <i class="fa-solid fa-chevron-down sizing-acc-arrow" id="arrow-acc-voz"></i>
+                                </button>
+                                <div class="sizing-acc-body" id="body-acc-voz" style="display: block;">
+                                    <div id="sizing-calc-detail-voz" class="sizing-calc-detail"></div>
+                                </div>
+                            </div>
+
+                            <!-- ACCORDION N1 CHAT -->
+                            <div class="sizing-acc-item">
+                                <button type="button" class="sizing-acc-header" onclick="toggleSizingAccordion('acc-chat')">
+                                    <span><i class="fa-solid fa-comments"></i> Memória N1 Chat (Atendimento Paralelo)</span>
+                                    <i class="fa-solid fa-chevron-down sizing-acc-arrow" id="arrow-acc-chat"></i>
+                                </button>
+                                <div class="sizing-acc-body" id="body-acc-chat" style="display: none;">
+                                    <div id="sizing-calc-detail-chat" class="sizing-calc-detail"></div>
+                                </div>
+                            </div>
+
+                            <!-- ACCORDION N2 BACKOFFICE -->
+                            <div class="sizing-acc-item">
+                                <button type="button" class="sizing-acc-header" onclick="toggleSizingAccordion('acc-bo')">
+                                    <span><i class="fa-solid fa-briefcase"></i> Memória N2 Backoffice (Capacidade Linear)</span>
+                                    <i class="fa-solid fa-chevron-down sizing-acc-arrow" id="arrow-acc-bo"></i>
+                                </button>
+                                <div class="sizing-acc-body" id="body-acc-bo" style="display: none;">
+                                    <div id="sizing-calc-detail-bo" class="sizing-calc-detail"></div>
+                                </div>
+                            </div>
                         </div>
                     </section>
                 </div>
