@@ -2481,173 +2481,209 @@ body.light-theme #modal-add-resp {
     opacity: 0.65;
 }
 
-/* SPREADSHEET DUAL PANEL (SIDE-BY-SIDE) */
-.sizing-dual-panel {
+/* SPREADSHEET TRIPLE PANEL (VOZ, CHAT, BKO SIDE-BY-SIDE) */
+.sizing-triple-panel {
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 1.5rem;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.25rem;
     margin-bottom: 1.5rem;
+    align-items: start;
 }
 
-@media (max-width: 960px) {
-    .sizing-dual-panel {
+@media (max-width: 1100px) {
+    .sizing-triple-panel {
         grid-template-columns: 1fr;
     }
 }
 
 .sizing-sheet-card {
-    background: rgba(15, 23, 42, 0.6);
-    border: 1px solid var(--border-color);
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
     border-radius: var(--radius-md);
     overflow: hidden;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
-    backdrop-filter: blur(16px);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
 }
 
 .sizing-sheet-header {
     background: #f59e0b;
-    color: #090d16;
+    color: #000000;
     font-weight: 900;
-    font-size: 1.05rem;
+    font-size: 1rem;
     text-align: center;
-    padding: 0.6rem 1rem;
+    padding: 0.55rem 1rem;
     letter-spacing: 0.5px;
     text-transform: uppercase;
-    box-shadow: 0 2px 10px rgba(245, 158, 11, 0.2);
 }
 
 .sizing-sheet-table {
     display: flex;
     flex-direction: column;
     width: 100%;
+    background: #ffffff;
 }
 
 .sizing-sheet-row {
-    display: flex;
-    justify-content: space-between;
+    display: grid;
+    grid-template-columns: 1fr auto;
     align-items: center;
-    padding: 0.32rem 0.9rem;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-    min-height: 35px;
+    padding: 0.22rem 0.65rem;
+    border-bottom: 1px solid #f1f5f9;
+    min-height: 29px;
+    background: #ffffff;
     transition: background var(--transition-fast);
 }
 
 .sizing-sheet-row:hover {
-    background: rgba(255, 255, 255, 0.02);
+    background: #f8fafc;
 }
 
 .sizing-sheet-row.row-black-header {
-    background: #000000;
+    background: #0f172a;
     color: #ffffff;
     font-weight: 800;
-    border-bottom: 2px solid #222222;
+    border-bottom: 1px solid #0f172a;
+}
+
+.sizing-sheet-row.row-black-header .sheet-label {
+    color: #ffffff;
 }
 
 .sizing-sheet-row.row-section-divider {
-    border-top: 2px solid #000000;
-    background: rgba(0, 0, 0, 0.25);
+    border-top: 2px solid #0f172a;
+    background: #f8fafc;
 }
 
 .sizing-sheet-row.row-indented .sheet-label {
-    padding-left: 1.25rem;
+    padding-left: 1.1rem;
 }
 
 .sizing-sheet-row.row-highlight-text {
-    background: rgba(255, 255, 255, 0.03);
+    background: #fbfcfe;
 }
 
 .sizing-sheet-row.row-result-gold {
-    background: rgba(253, 230, 138, 0.18);
+    background: #fef3c7;
     border-top: 1.5px solid #f59e0b;
     border-bottom: 1.5px solid #f59e0b;
 }
 
+.sizing-sheet-row.row-result-gold .sheet-label {
+    color: #92400e !important;
+    font-weight: 800;
+}
+
 .sizing-sheet-row.row-result-amber {
-    background: rgba(245, 158, 11, 0.12);
+    background: #fffbeb;
     border-bottom: 1.5px solid #f59e0b;
 }
 
+.sizing-sheet-row.row-result-amber .sheet-label {
+    color: #b45309 !important;
+    font-weight: 800;
+    font-style: italic;
+}
+
 .sheet-label {
-    font-size: 0.84rem;
+    font-size: 0.81rem;
     font-weight: 600;
-    color: var(--text-primary);
+    color: #334155;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    padding-right: 0.5rem;
+    padding-right: 0.4rem;
 }
 
 .sheet-cell {
     display: flex;
     align-items: center;
     justify-content: flex-end;
-    gap: 0.25rem;
-    min-width: 120px;
+    gap: 0.2rem;
+    min-width: 95px;
 }
 
 .sizing-cell-input {
-    background: transparent;
-    border: 1px solid transparent;
-    color: var(--text-primary);
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    color: #0f172a;
     font-family: inherit;
-    font-size: 0.86rem;
+    font-size: 0.84rem;
     text-align: right;
-    width: 105px;
-    padding: 3px 6px;
+    width: 82px;
+    padding: 2px 5px;
     border-radius: 4px;
     transition: all var(--transition-fast);
     outline: none;
-    font-weight: 500;
+    font-weight: 600;
+    /* Remove browser spin buttons */
+    -moz-appearance: textfield;
+    appearance: textfield;
+}
+
+.sizing-cell-input::-webkit-outer-spin-button,
+.sizing-cell-input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
 }
 
 .sizing-cell-input:hover:not(:disabled) {
-    border-color: rgba(255, 255, 255, 0.2);
-    background: rgba(255, 255, 255, 0.04);
+    border-color: #cbd5e1;
+    background: #ffffff;
 }
 
 .sizing-cell-input:focus:not(:disabled) {
     border-color: #f59e0b;
-    background: rgba(245, 158, 11, 0.1);
+    background: #fffbeb;
     box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.2);
 }
 
 .sizing-cell-input:disabled {
-    opacity: 0.65;
+    background: #f1f5f9;
+    color: #94a3b8;
+    border-color: #e2e8f0;
     cursor: not-allowed;
-    color: var(--text-muted);
 }
 
 .cell-peach {
-    background: rgba(254, 215, 170, 0.2);
+    background: #ffedd5;
+    border: 1px solid #fed7aa;
     border-radius: 4px;
     padding: 1px 4px;
 }
 
 .cell-peach .sizing-cell-input {
-    color: #ea580c !important;
+    color: #c2410c !important;
     font-weight: 800 !important;
+    background: transparent;
+    border: none;
 }
 
 .cell-gold-input {
-    color: #fbbf24 !important;
-    font-size: 1.05rem !important;
+    color: #b45309 !important;
+    font-size: 1rem !important;
     font-weight: 900 !important;
+    background: transparent !important;
+    border: none !important;
 }
 
 .cell-amber-input {
-    color: #f59e0b !important;
-    font-size: 1.05rem !important;
+    color: #b45309 !important;
+    font-size: 1rem !important;
     font-weight: 900 !important;
+    font-style: italic !important;
+    background: transparent !important;
+    border: none !important;
 }
 
 .cell-header-input {
     color: #ffffff !important;
     font-weight: 800 !important;
+    background: transparent !important;
+    border: none !important;
 }
 
 .sheet-unit {
-    font-size: 0.8rem;
-    color: var(--text-muted);
+    font-size: 0.78rem;
+    color: #64748b;
     padding-left: 2px;
 }
 
@@ -3832,12 +3868,12 @@ body.light-theme .sizing-acc-body {
                         </div>
                     </section>
 
-                    <!-- SPREADSHEET DUAL PANEL (VOZ / CHAT & BKO) -->
-                    <div class="sizing-dual-panel" id="sizing-dual-panel-container">
-                        <!-- PAINEL ESQUERDO: VOZ / CHAT -->
+                    <!-- SPREADSHEET TRIPLE PANEL (VOZ, CHAT & BKO) -->
+                    <div class="sizing-triple-panel" id="sizing-triple-panel-container">
+                        <!-- QUADRO 1: VOZ -->
                         <div class="sizing-sheet-card">
                             <div class="sizing-sheet-header">
-                                <span>Voz / Chat</span>
+                                <span>Voz</span>
                             </div>
                             <div class="sizing-sheet-table" id="sizing-table-voz">
                                 <!-- Row 1: Mês (Header Row) -->
@@ -3852,7 +3888,7 @@ body.light-theme .sizing-acc-body {
                                 <div class="sizing-sheet-row">
                                     <span class="sheet-label">NS Mês</span>
                                     <div class="sheet-cell">
-                                        <input type="number" id="input-sizing-sla-meta" min="1" max="100" step="1" value="80" class="sizing-cell-input">
+                                        <input type="number" id="input-sizing-sla-meta" min="1" max="100" step="1" value="80" class="sizing-cell-input" inputmode="decimal">
                                         <span class="sheet-unit">%</span>
                                     </div>
                                 </div>
@@ -3861,7 +3897,7 @@ body.light-theme .sizing-acc-body {
                                 <div class="sizing-sheet-row">
                                     <span class="sheet-label">NS Mínimo</span>
                                     <div class="sheet-cell">
-                                        <input type="number" id="input-sizing-ns-minimo" min="1" max="100" step="1" value="60" class="sizing-cell-input">
+                                        <input type="number" id="input-sizing-ns-minimo" min="1" max="100" step="1" value="60" class="sizing-cell-input" inputmode="decimal">
                                         <span class="sheet-unit">%</span>
                                     </div>
                                 </div>
@@ -3870,7 +3906,7 @@ body.light-theme .sizing-acc-body {
                                 <div class="sizing-sheet-row">
                                     <span class="sheet-label">TME (seg)</span>
                                     <div class="sheet-cell">
-                                        <input type="number" id="input-sizing-tme-max" min="1" step="1" value="20" class="sizing-cell-input font-bold">
+                                        <input type="number" id="input-sizing-tme-max" min="1" step="1" value="20" class="sizing-cell-input font-bold" inputmode="numeric">
                                     </div>
                                 </div>
 
@@ -3878,7 +3914,192 @@ body.light-theme .sizing-acc-body {
                                 <div class="sizing-sheet-row">
                                     <span class="sheet-label">Taxa de Abandono</span>
                                     <div class="sheet-cell">
-                                        <input type="number" id="input-sizing-abandono-max" min="0" max="100" step="0.1" value="3.5" class="sizing-cell-input">
+                                        <input type="number" id="input-sizing-abandono-max" min="0" max="100" step="0.1" value="3.5" class="sizing-cell-input" inputmode="decimal">
+                                        <span class="sheet-unit">%</span>
+                                    </div>
+                                </div>
+
+                                <!-- Row 6: TMA Mês -->
+                                <div class="sizing-sheet-row">
+                                    <span class="sheet-label">TMA Mês</span>
+                                    <div class="sheet-cell">
+                                        <input type="number" id="input-sizing-tma-voz" min="10" step="10" value="480" class="sizing-cell-input font-bold" inputmode="numeric">
+                                    </div>
+                                </div>
+
+                                <!-- Row 7: % HMM -->
+                                <div class="sizing-sheet-row">
+                                    <span class="sheet-label">% HMM</span>
+                                    <div class="sheet-cell">
+                                        <input type="number" id="input-sizing-hmm" min="0.1" max="100" step="0.01" value="9.7" class="sizing-cell-input font-bold" inputmode="decimal">
+                                        <span class="sheet-unit">%</span>
+                                    </div>
+                                </div>
+
+                                <!-- Row 8: Lanche (Italic indented) -->
+                                <div class="sizing-sheet-row row-indented">
+                                    <span class="sheet-label font-italic text-muted">Lanche</span>
+                                    <div class="sheet-cell">
+                                        <input type="number" id="input-sizing-shrink-lanche" min="0" max="50" step="0.1" value="10.5" class="sizing-cell-input font-italic text-muted" inputmode="decimal">
+                                        <span class="sheet-unit font-italic text-muted">%</span>
+                                    </div>
+                                </div>
+
+                                <!-- Row 9: Treinamento (Italic indented) -->
+                                <div class="sizing-sheet-row row-indented">
+                                    <span class="sheet-label font-italic text-muted">Treinamento</span>
+                                    <div class="sheet-cell">
+                                        <input type="number" id="input-sizing-shrink-treino" min="0" max="50" step="0.1" value="4.0" class="sizing-cell-input font-italic text-muted" inputmode="decimal">
+                                        <span class="sheet-unit font-italic text-muted">%</span>
+                                    </div>
+                                </div>
+
+                                <!-- Row 10: Feedback (Italic indented) -->
+                                <div class="sizing-sheet-row row-indented">
+                                    <span class="sheet-label font-italic text-muted">Feedback</span>
+                                    <div class="sheet-cell">
+                                        <input type="number" id="input-sizing-shrink-fb" min="0" max="50" step="0.1" value="1.5" class="sizing-cell-input font-italic text-muted" inputmode="decimal">
+                                        <span class="sheet-unit font-italic text-muted">%</span>
+                                    </div>
+                                </div>
+
+                                <!-- Row 11: NR 17 (HMM) -->
+                                <div class="sizing-sheet-row">
+                                    <span class="sheet-label font-bold">NR 17 (HMM)</span>
+                                    <div class="sheet-cell">
+                                        <input type="number" id="input-sizing-shrink-nr17" min="0" max="50" step="0.1" value="17.0" class="sizing-cell-input font-bold" inputmode="decimal">
+                                        <span class="sheet-unit font-bold">%</span>
+                                    </div>
+                                </div>
+
+                                <!-- Row 12: Volume Mês -->
+                                <div class="sizing-sheet-row row-highlight-text">
+                                    <span class="sheet-label font-bold">Volume Mês</span>
+                                    <div class="sheet-cell">
+                                        <input type="number" id="input-sizing-vol-voz" min="0" step="1" value="19912" class="sizing-cell-input font-bold" style="font-size: 0.95rem;" inputmode="numeric">
+                                    </div>
+                                </div>
+
+                                <!-- Row 13: Volume Atendidas -->
+                                <div class="sizing-sheet-row">
+                                    <span class="sheet-label">Volume Atendidas</span>
+                                    <div class="sheet-cell">
+                                        <input type="number" id="input-sizing-vol-atendidas" min="0" step="1" value="19215" class="sizing-cell-input" inputmode="numeric">
+                                    </div>
+                                </div>
+
+                                <!-- Row 14: DMM (MÉDIA 5) - Separator bar -->
+                                <div class="sizing-sheet-row row-section-divider">
+                                    <span class="sheet-label font-bold">DMM (MÉDIA 5)</span>
+                                    <div class="sheet-cell">
+                                        <input type="number" id="input-sizing-dmm" min="0.1" max="100" step="0.01" value="5.62" class="sizing-cell-input font-bold" inputmode="decimal">
+                                        <span class="sheet-unit font-bold">%</span>
+                                    </div>
+                                </div>
+
+                                <!-- Row 15: Volume DMM -->
+                                <div class="sizing-sheet-row row-indented">
+                                    <span class="sheet-label text-muted">Volume DMM</span>
+                                    <div class="sheet-cell">
+                                        <input type="number" id="input-sizing-vol-dmm" min="0" step="1" value="1118" class="sizing-cell-input text-muted" inputmode="numeric">
+                                    </div>
+                                </div>
+
+                                <!-- Row 16: Volume HMM -->
+                                <div class="sizing-sheet-row row-indented">
+                                    <span class="sheet-label text-muted">Volume HMM</span>
+                                    <div class="sheet-cell">
+                                        <input type="number" id="input-sizing-vol-hmm" min="0" step="1" value="108" class="sizing-cell-input text-muted" inputmode="numeric">
+                                    </div>
+                                </div>
+
+                                <!-- Row 17: Erlang -->
+                                <div class="sizing-sheet-row row-indented">
+                                    <span class="sheet-label text-muted">Erlang</span>
+                                    <div class="sheet-cell">
+                                        <input type="number" id="input-sizing-erlang" min="0" step="1" value="14" class="sizing-cell-input text-muted font-bold" inputmode="numeric">
+                                    </div>
+                                </div>
+
+                                <!-- Row 18: PA's Necessárias (Gold Highlight) -->
+                                <div class="sizing-sheet-row row-result-gold">
+                                    <span class="sheet-label font-bold" style="color: #92400e;">PA's Necessárias</span>
+                                    <div class="sheet-cell">
+                                        <input type="number" id="input-sizing-pas-voz" min="0" step="1" value="29" class="sizing-cell-input font-bold cell-gold-input" inputmode="numeric">
+                                    </div>
+                                </div>
+
+                                <!-- Row 19: Ajuste (Italic) -->
+                                <div class="sizing-sheet-row">
+                                    <span class="sheet-label font-italic text-muted">Ajuste</span>
+                                    <div class="sheet-cell">
+                                        <input type="number" id="input-sizing-ajuste-voz" step="1" value="0" class="sizing-cell-input font-italic" inputmode="numeric">
+                                    </div>
+                                </div>
+
+                                <!-- Row 20: PA CONTRATADA (Bold Italic) -->
+                                <div class="sizing-sheet-row row-result-amber">
+                                    <span class="sheet-label font-bold font-italic" style="color: #b45309;">PA CONTRATADA</span>
+                                    <div class="sheet-cell">
+                                        <input type="number" id="input-sizing-pa-contratada-voz" min="0" step="1" value="29" class="sizing-cell-input font-bold font-italic cell-amber-input" inputmode="numeric">
+                                    </div>
+                                </div>
+
+                                <!-- Row 21: CHAMADAS / OPERADOR (Italic) -->
+                                <div class="sizing-sheet-row">
+                                    <span class="sheet-label font-italic text-muted">CHAMADAS / OPERADOR</span>
+                                    <div class="sheet-cell">
+                                        <input type="number" id="input-sizing-chamadas-op-voz" min="0" step="1" value="687" class="sizing-cell-input font-italic text-muted font-bold" inputmode="numeric">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- QUADRO 2: CHAT -->
+                        <div class="sizing-sheet-card">
+                            <div class="sizing-sheet-header">
+                                <span>Chat</span>
+                            </div>
+                            <div class="sizing-sheet-table" id="sizing-table-chat">
+                                <!-- Row 1: Mês (Header Row) -->
+                                <div class="sizing-sheet-row row-black-header">
+                                    <span class="sheet-label">Mês</span>
+                                    <div class="sheet-cell">
+                                        <input type="text" id="input-sizing-mes-label-chat" class="sizing-cell-input cell-header-input" value="Jan" readonly>
+                                    </div>
+                                </div>
+
+                                <!-- Row 2: NS Mês -->
+                                <div class="sizing-sheet-row">
+                                    <span class="sheet-label">NS Mês</span>
+                                    <div class="sheet-cell">
+                                        <input type="number" id="input-sizing-sla-meta-chat" min="1" max="100" step="1" value="80" class="sizing-cell-input" inputmode="decimal">
+                                        <span class="sheet-unit">%</span>
+                                    </div>
+                                </div>
+
+                                <!-- Row 3: NS Mínimo -->
+                                <div class="sizing-sheet-row">
+                                    <span class="sheet-label">NS Mínimo</span>
+                                    <div class="sheet-cell">
+                                        <input type="number" id="input-sizing-ns-minimo-chat" min="1" max="100" step="1" value="60" class="sizing-cell-input" inputmode="decimal">
+                                        <span class="sheet-unit">%</span>
+                                    </div>
+                                </div>
+
+                                <!-- Row 4: TME (seg) -->
+                                <div class="sizing-sheet-row">
+                                    <span class="sheet-label">TME (seg)</span>
+                                    <div class="sheet-cell">
+                                        <input type="number" id="input-sizing-tme-max-chat" min="1" step="1" value="20" class="sizing-cell-input font-bold" inputmode="numeric">
+                                    </div>
+                                </div>
+
+                                <!-- Row 5: Taxa de Abandono -->
+                                <div class="sizing-sheet-row">
+                                    <span class="sheet-label">Taxa de Abandono</span>
+                                    <div class="sheet-cell">
+                                        <input type="number" id="input-sizing-abandono-max-chat" min="0" max="100" step="0.1" value="3.5" class="sizing-cell-input" inputmode="decimal">
                                         <span class="sheet-unit">%</span>
                                     </div>
                                 </div>
@@ -3887,7 +4108,7 @@ body.light-theme .sizing-acc-body {
                                 <div class="sizing-sheet-row">
                                     <span class="sheet-label">Telas Simultâneas</span>
                                     <div class="sheet-cell cell-peach">
-                                        <input type="number" id="input-sizing-telas-chat" min="1" max="5" step="0.5" value="1.0" class="sizing-cell-input font-bold">
+                                        <input type="number" id="input-sizing-telas-chat" min="1" max="5" step="0.5" value="2.0" class="sizing-cell-input font-bold" inputmode="decimal">
                                     </div>
                                 </div>
 
@@ -3895,7 +4116,7 @@ body.light-theme .sizing-acc-body {
                                 <div class="sizing-sheet-row">
                                     <span class="sheet-label">TMA Mês</span>
                                     <div class="sheet-cell">
-                                        <input type="number" id="input-sizing-tma-voz" min="10" step="10" value="480" class="sizing-cell-input font-bold">
+                                        <input type="number" id="input-sizing-tma-chat" min="10" step="10" value="480" class="sizing-cell-input font-bold" inputmode="numeric">
                                     </div>
                                 </div>
 
@@ -3903,7 +4124,7 @@ body.light-theme .sizing-acc-body {
                                 <div class="sizing-sheet-row">
                                     <span class="sheet-label">% HMM</span>
                                     <div class="sheet-cell">
-                                        <input type="number" id="input-sizing-hmm" min="0.1" max="100" step="0.01" value="9.7" class="sizing-cell-input font-bold">
+                                        <input type="number" id="input-sizing-hmm-chat" min="0.1" max="100" step="0.01" value="9.7" class="sizing-cell-input font-bold" inputmode="decimal">
                                         <span class="sheet-unit">%</span>
                                     </div>
                                 </div>
@@ -3912,7 +4133,7 @@ body.light-theme .sizing-acc-body {
                                 <div class="sizing-sheet-row row-indented">
                                     <span class="sheet-label font-italic text-muted">Lanche</span>
                                     <div class="sheet-cell">
-                                        <input type="number" id="input-sizing-shrink-lanche" min="0" max="50" step="0.1" value="10.5" class="sizing-cell-input font-italic text-muted">
+                                        <input type="number" id="input-sizing-shrink-lanche-chat" min="0" max="50" step="0.1" value="10.5" class="sizing-cell-input font-italic text-muted" inputmode="decimal">
                                         <span class="sheet-unit font-italic text-muted">%</span>
                                     </div>
                                 </div>
@@ -3921,7 +4142,7 @@ body.light-theme .sizing-acc-body {
                                 <div class="sizing-sheet-row row-indented">
                                     <span class="sheet-label font-italic text-muted">Treinamento</span>
                                     <div class="sheet-cell">
-                                        <input type="number" id="input-sizing-shrink-treino" min="0" max="50" step="0.1" value="4.0" class="sizing-cell-input font-italic text-muted">
+                                        <input type="number" id="input-sizing-shrink-treino-chat" min="0" max="50" step="0.1" value="4.0" class="sizing-cell-input font-italic text-muted" inputmode="decimal">
                                         <span class="sheet-unit font-italic text-muted">%</span>
                                     </div>
                                 </div>
@@ -3930,7 +4151,7 @@ body.light-theme .sizing-acc-body {
                                 <div class="sizing-sheet-row row-indented">
                                     <span class="sheet-label font-italic text-muted">Feedback</span>
                                     <div class="sheet-cell">
-                                        <input type="number" id="input-sizing-shrink-fb" min="0" max="50" step="0.1" value="1.5" class="sizing-cell-input font-italic text-muted">
+                                        <input type="number" id="input-sizing-shrink-fb-chat" min="0" max="50" step="0.1" value="1.5" class="sizing-cell-input font-italic text-muted" inputmode="decimal">
                                         <span class="sheet-unit font-italic text-muted">%</span>
                                     </div>
                                 </div>
@@ -3939,7 +4160,7 @@ body.light-theme .sizing-acc-body {
                                 <div class="sizing-sheet-row">
                                     <span class="sheet-label font-bold">NR 17 (HMM)</span>
                                     <div class="sheet-cell">
-                                        <input type="number" id="input-sizing-shrink-nr17" min="0" max="50" step="0.1" value="17.0" class="sizing-cell-input font-bold">
+                                        <input type="number" id="input-sizing-shrink-nr17-chat" min="0" max="50" step="0.1" value="17.0" class="sizing-cell-input font-bold" inputmode="decimal">
                                         <span class="sheet-unit font-bold">%</span>
                                     </div>
                                 </div>
@@ -3948,7 +4169,7 @@ body.light-theme .sizing-acc-body {
                                 <div class="sizing-sheet-row row-highlight-text">
                                     <span class="sheet-label font-bold">Volume Mês</span>
                                     <div class="sheet-cell">
-                                        <input type="number" id="input-sizing-vol-voz" min="0" step="1" value="19912" class="sizing-cell-input font-bold" style="font-size: 1rem;">
+                                        <input type="number" id="input-sizing-vol-chat" min="0" step="1" value="0" class="sizing-cell-input font-bold" style="font-size: 0.95rem;" inputmode="numeric">
                                     </div>
                                 </div>
 
@@ -3956,7 +4177,7 @@ body.light-theme .sizing-acc-body {
                                 <div class="sizing-sheet-row">
                                     <span class="sheet-label">Volume Atendidas</span>
                                     <div class="sheet-cell">
-                                        <input type="number" id="input-sizing-vol-atendidas" min="0" step="1" value="19215" class="sizing-cell-input">
+                                        <input type="number" id="input-sizing-vol-atendidas-chat" min="0" step="1" value="0" class="sizing-cell-input" inputmode="numeric">
                                     </div>
                                 </div>
 
@@ -3964,7 +4185,7 @@ body.light-theme .sizing-acc-body {
                                 <div class="sizing-sheet-row row-section-divider">
                                     <span class="sheet-label font-bold">DMM (MÉDIA 5)</span>
                                     <div class="sheet-cell">
-                                        <input type="number" id="input-sizing-dmm" min="0.1" max="100" step="0.01" value="5.62" class="sizing-cell-input font-bold">
+                                        <input type="number" id="input-sizing-dmm-chat" min="0.1" max="100" step="0.01" value="5.62" class="sizing-cell-input font-bold" inputmode="decimal">
                                         <span class="sheet-unit font-bold">%</span>
                                     </div>
                                 </div>
@@ -3973,7 +4194,7 @@ body.light-theme .sizing-acc-body {
                                 <div class="sizing-sheet-row row-indented">
                                     <span class="sheet-label text-muted">Volume DMM</span>
                                     <div class="sheet-cell">
-                                        <input type="number" id="input-sizing-vol-dmm" min="0" step="1" value="1118" class="sizing-cell-input text-muted">
+                                        <input type="number" id="input-sizing-vol-dmm-chat" min="0" step="1" value="0" class="sizing-cell-input text-muted" inputmode="numeric">
                                     </div>
                                 </div>
 
@@ -3981,7 +4202,7 @@ body.light-theme .sizing-acc-body {
                                 <div class="sizing-sheet-row row-indented">
                                     <span class="sheet-label text-muted">Volume HMM</span>
                                     <div class="sheet-cell">
-                                        <input type="number" id="input-sizing-vol-hmm" min="0" step="1" value="108" class="sizing-cell-input text-muted">
+                                        <input type="number" id="input-sizing-vol-hmm-chat" min="0" step="1" value="0" class="sizing-cell-input text-muted" inputmode="numeric">
                                     </div>
                                 </div>
 
@@ -3989,7 +4210,7 @@ body.light-theme .sizing-acc-body {
                                 <div class="sizing-sheet-row row-indented">
                                     <span class="sheet-label text-muted">Erlang</span>
                                     <div class="sheet-cell">
-                                        <input type="number" id="input-sizing-erlang" min="0" step="1" value="14" class="sizing-cell-input text-muted font-bold">
+                                        <input type="number" id="input-sizing-erlang-chat" min="0" step="1" value="0" class="sizing-cell-input text-muted font-bold" inputmode="numeric">
                                     </div>
                                 </div>
 
@@ -3997,7 +4218,7 @@ body.light-theme .sizing-acc-body {
                                 <div class="sizing-sheet-row row-result-gold">
                                     <span class="sheet-label font-bold" style="color: #92400e;">PA's Necessárias</span>
                                     <div class="sheet-cell">
-                                        <input type="number" id="input-sizing-pas-voz" min="0" step="1" value="29" class="sizing-cell-input font-bold cell-gold-input">
+                                        <input type="number" id="input-sizing-pas-chat" min="0" step="1" value="0" class="sizing-cell-input font-bold cell-gold-input" inputmode="numeric">
                                     </div>
                                 </div>
 
@@ -4005,7 +4226,7 @@ body.light-theme .sizing-acc-body {
                                 <div class="sizing-sheet-row">
                                     <span class="sheet-label font-italic text-muted">Ajuste</span>
                                     <div class="sheet-cell">
-                                        <input type="number" id="input-sizing-ajuste-voz" step="1" value="0" class="sizing-cell-input font-italic">
+                                        <input type="number" id="input-sizing-ajuste-chat" step="1" value="0" class="sizing-cell-input font-italic" inputmode="numeric">
                                     </div>
                                 </div>
 
@@ -4013,21 +4234,21 @@ body.light-theme .sizing-acc-body {
                                 <div class="sizing-sheet-row row-result-amber">
                                     <span class="sheet-label font-bold font-italic" style="color: #b45309;">PA CONTRATADA</span>
                                     <div class="sheet-cell">
-                                        <input type="number" id="input-sizing-pa-contratada-voz" min="0" step="1" value="29" class="sizing-cell-input font-bold font-italic cell-amber-input">
+                                        <input type="number" id="input-sizing-pa-contratada-chat" min="0" step="1" value="0" class="sizing-cell-input font-bold font-italic cell-amber-input" inputmode="numeric">
                                     </div>
                                 </div>
 
-                                <!-- Row 22: CHAMADAS / OPERADOR (Italic) -->
+                                <!-- Row 22: ATENDIMENTOS / OPERADOR (Italic) -->
                                 <div class="sizing-sheet-row">
-                                    <span class="sheet-label font-italic text-muted">CHAMADAS / OPERADOR</span>
+                                    <span class="sheet-label font-italic text-muted">ATENDIMENTOS / OPERADOR</span>
                                     <div class="sheet-cell">
-                                        <input type="number" id="input-sizing-chamadas-op-voz" min="0" step="1" value="687" class="sizing-cell-input font-italic text-muted font-bold">
+                                        <input type="number" id="input-sizing-chamadas-op-chat" min="0" step="1" value="0" class="sizing-cell-input font-italic text-muted font-bold" inputmode="numeric">
                                     </div>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- PAINEL DIREITO: BKO -->
+                        <!-- QUADRO 3: BKO -->
                         <div class="sizing-sheet-card">
                             <div class="sizing-sheet-header">
                                 <span>BKO</span>
@@ -4045,7 +4266,7 @@ body.light-theme .sizing-acc-body {
                                 <div class="sizing-sheet-row row-highlight-text">
                                     <span class="sheet-label font-bold">Volume Mês</span>
                                     <div class="sheet-cell">
-                                        <input type="number" id="input-sizing-vol-bo" min="0" step="1" value="10270" class="sizing-cell-input font-bold" style="font-size: 1rem;">
+                                        <input type="number" id="input-sizing-vol-bo" min="0" step="1" value="10270" class="sizing-cell-input font-bold" style="font-size: 0.95rem;" inputmode="numeric">
                                     </div>
                                 </div>
 
@@ -4053,7 +4274,7 @@ body.light-theme .sizing-acc-body {
                                 <div class="sizing-sheet-row">
                                     <span class="sheet-label">Dias Úteis</span>
                                     <div class="sheet-cell">
-                                        <input type="number" id="input-sizing-dias-uteis-bo" min="1" max="31" step="1" value="30" class="sizing-cell-input font-bold">
+                                        <input type="number" id="input-sizing-dias-uteis-bo" min="1" max="31" step="1" value="30" class="sizing-cell-input font-bold" inputmode="numeric">
                                     </div>
                                 </div>
 
@@ -4061,7 +4282,7 @@ body.light-theme .sizing-acc-body {
                                 <div class="sizing-sheet-row">
                                     <span class="sheet-label">Volume Dia</span>
                                     <div class="sheet-cell">
-                                        <input type="number" id="input-sizing-vol-dia-bo" min="0" step="1" value="342" class="sizing-cell-input">
+                                        <input type="number" id="input-sizing-vol-dia-bo" min="0" step="1" value="342" class="sizing-cell-input" inputmode="numeric">
                                     </div>
                                 </div>
 
@@ -4069,7 +4290,7 @@ body.light-theme .sizing-acc-body {
                                 <div class="sizing-sheet-row">
                                     <span class="sheet-label">Prod. Máx. Operador/Dia</span>
                                     <div class="sheet-cell">
-                                        <input type="number" id="input-sizing-prod-max-dia" min="0" step="1" value="22" class="sizing-cell-input font-bold">
+                                        <input type="number" id="input-sizing-prod-max-dia" min="0" step="1" value="22" class="sizing-cell-input font-bold" inputmode="numeric">
                                     </div>
                                 </div>
 
@@ -4077,7 +4298,7 @@ body.light-theme .sizing-acc-body {
                                 <div class="sizing-sheet-row row-result-gold">
                                     <span class="sheet-label font-bold" style="color: #92400e;">PA's Necessárias</span>
                                     <div class="sheet-cell">
-                                        <input type="number" id="input-sizing-pas-bo" min="0" step="1" value="8" class="sizing-cell-input font-bold cell-gold-input">
+                                        <input type="number" id="input-sizing-pas-bo" min="0" step="1" value="8" class="sizing-cell-input font-bold cell-gold-input" inputmode="numeric">
                                     </div>
                                 </div>
 
@@ -4085,7 +4306,7 @@ body.light-theme .sizing-acc-body {
                                 <div class="sizing-sheet-row">
                                     <span class="sheet-label font-italic text-muted">Ajuste</span>
                                     <div class="sheet-cell">
-                                        <input type="number" id="input-sizing-ajuste-bo" step="1" value="0" class="sizing-cell-input font-italic">
+                                        <input type="number" id="input-sizing-ajuste-bo" step="1" value="0" class="sizing-cell-input font-italic" inputmode="numeric">
                                     </div>
                                 </div>
 
@@ -4093,7 +4314,7 @@ body.light-theme .sizing-acc-body {
                                 <div class="sizing-sheet-row row-result-amber">
                                     <span class="sheet-label font-bold font-italic" style="color: #b45309;">PA CONTRATADA</span>
                                     <div class="sheet-cell">
-                                        <input type="number" id="input-sizing-pa-contratada-bo" min="0" step="1" value="8" class="sizing-cell-input font-bold font-italic cell-amber-input">
+                                        <input type="number" id="input-sizing-pa-contratada-bo" min="0" step="1" value="8" class="sizing-cell-input font-bold font-italic cell-amber-input" inputmode="numeric">
                                     </div>
                                 </div>
 
@@ -4101,7 +4322,7 @@ body.light-theme .sizing-acc-body {
                                 <div class="sizing-sheet-row">
                                     <span class="sheet-label font-bold">CHAMADAS / OPERADOR</span>
                                     <div class="sheet-cell">
-                                        <input type="number" id="input-sizing-chamadas-op-bo" min="0" step="1" value="21" class="sizing-cell-input font-bold">
+                                        <input type="number" id="input-sizing-chamadas-op-bo" min="0" step="1" value="21" class="sizing-cell-input font-bold" inputmode="numeric">
                                     </div>
                                 </div>
 
@@ -4117,7 +4338,7 @@ body.light-theme .sizing-acc-body {
                                 <div class="sizing-sheet-row">
                                     <span class="sheet-label font-bold">TMA em Segundos</span>
                                     <div class="sheet-cell">
-                                        <input type="number" id="input-sizing-tma-bo" min="10" step="10" value="600" class="sizing-cell-input font-bold">
+                                        <input type="number" id="input-sizing-tma-bo" min="10" step="10" value="600" class="sizing-cell-input font-bold" inputmode="numeric">
                                     </div>
                                 </div>
 
@@ -4125,7 +4346,7 @@ body.light-theme .sizing-acc-body {
                                 <div class="sizing-sheet-row">
                                     <span class="sheet-label font-italic text-muted">Dias de Atendimento</span>
                                     <div class="sheet-cell">
-                                        <input type="number" id="input-sizing-dias-atend" min="1" max="31" step="1" value="30" class="sizing-cell-input font-italic text-muted">
+                                        <input type="number" id="input-sizing-dias-atend" min="1" max="31" step="1" value="30" class="sizing-cell-input font-italic text-muted" inputmode="numeric">
                                     </div>
                                 </div>
 
@@ -4141,7 +4362,7 @@ body.light-theme .sizing-acc-body {
                                 <div class="sizing-sheet-row">
                                     <span class="sheet-label font-italic text-muted">NR 17</span>
                                     <div class="sheet-cell">
-                                        <input type="number" id="input-sizing-nr17-bo-pct" min="0" max="50" step="0.01" value="10.53" class="sizing-cell-input font-italic text-muted">
+                                        <input type="number" id="input-sizing-nr17-bo-pct" min="0" max="50" step="0.01" value="10.53" class="sizing-cell-input font-italic text-muted" inputmode="decimal">
                                         <span class="sheet-unit font-italic text-muted">%</span>
                                     </div>
                                 </div>
@@ -4166,7 +4387,7 @@ body.light-theme .sizing-acc-body {
                                 <div class="sizing-sheet-row">
                                     <span class="sheet-label font-italic text-muted">Treinamento+FeedBack</span>
                                     <div class="sheet-cell">
-                                        <input type="number" id="input-sizing-trein-fb-pct" min="0" max="50" step="0.01" value="6.47" class="sizing-cell-input font-italic text-muted">
+                                        <input type="number" id="input-sizing-trein-fb-pct" min="0" max="50" step="0.01" value="6.47" class="sizing-cell-input font-italic text-muted" inputmode="decimal">
                                         <span class="sheet-unit font-italic text-muted">%</span>
                                     </div>
                                 </div>
@@ -4181,9 +4402,9 @@ body.light-theme .sizing-acc-body {
 
                                 <!-- Row 19: % deste tempo falando -->
                                 <div class="sizing-sheet-row">
-                                    <span class="sheet-label font-italic text-muted" style="font-size: 0.8rem;">% deste tempo falando (padrão de mercado)</span>
+                                    <span class="sheet-label font-italic text-muted" style="font-size: 0.78rem;">% deste tempo falando (mercado)</span>
                                     <div class="sheet-cell">
-                                        <input type="number" id="input-sizing-eficiencia" min="10" max="100" step="1" value="70.0" class="sizing-cell-input font-italic text-muted">
+                                        <input type="number" id="input-sizing-eficiencia" min="10" max="100" step="1" value="70.0" class="sizing-cell-input font-italic text-muted" inputmode="decimal">
                                         <span class="sheet-unit font-italic text-muted">%</span>
                                     </div>
                                 </div>
@@ -7102,10 +7323,22 @@ function applyStateMigrations() {
         shrinkageTreinamento: 4.0,
         shrinkageFeedback: 1.5,
         shrinkageNR17: 17.0,
-        telasSimultaneas: 1.0,
+        telasSimultaneas: 2.0,
         ajusteVoz: 0,
         volumeMensalChat: 0,
+        volAtendidasChat: 0,
         tmaChat: 480,
+        slaMetaChat: 80,
+        nsMinimoChat: 60,
+        tmeMaxChat: 20,
+        abandonoMaxChat: 3.5,
+        dmmPercentChat: 5.62,
+        hmmPercentChat: 9.7,
+        shrinkageLancheChat: 10.5,
+        shrinkageTreinamentoChat: 4.0,
+        shrinkageFeedbackChat: 1.5,
+        shrinkageNR17Chat: 17.0,
+        ajusteChat: 0,
         volumeMensalBO: 10270,
         tmaBO: 600,
         diasUteis: 30,
@@ -11978,17 +12211,23 @@ function calcSizingN1Chat(p) {
     const volBase = Math.max(0, parseFloat(p.volumeMensalChat) || 0);
     const volEfetivo = Math.round(volBase * aumentoFactor);
     
-    const dmmPct = (parseFloat(p.dmmPercent) || 5.62) / 100.0;
-    const hmmPct = (parseFloat(p.hmmPercent) || 9.70) / 100.0;
+    const abandonoMax = parseFloat(p.abandonoMaxChat !== undefined ? p.abandonoMaxChat : p.abandonoMax) || 3.5;
+    const volAtendidas = (p.volAtendidasChat !== undefined && p.volAtendidasChat !== null && p.volAtendidasChat !== '')
+        ? Math.round(parseFloat(p.volAtendidasChat))
+        : Math.round(volEfetivo * (1.0 - (abandonoMax / 100.0)));
+    
+    const dmmPct = (parseFloat(p.dmmPercentChat !== undefined ? p.dmmPercentChat : p.dmmPercent) || 5.62) / 100.0;
+    const hmmPct = (parseFloat(p.hmmPercentChat !== undefined ? p.hmmPercentChat : p.hmmPercent) || 9.70) / 100.0;
     const volDMM = Math.round(volEfetivo * dmmPct);
-    const volHMM = Math.round(volEfetivo * dmmPct * hmmPct);
+    const volHMM = Math.round(volDMM * hmmPct);
     
     const tma = Math.max(1, parseFloat(p.tmaChat) || 480);
     const lambda = volHMM / 3600.0;
     const A = lambda * tma;
+    const erlang = Math.round(A);
     
-    const targetSL = parseFloat(p.slaMeta) || 80;
-    const targetWait = parseFloat(p.tmeMax) || 20;
+    const targetSL = parseFloat(p.slaMetaChat !== undefined ? p.slaMetaChat : p.slaMeta) || 80;
+    const targetWait = parseFloat(p.tmeMaxChat !== undefined ? p.tmeMaxChat : p.tmeMax) || 20;
     
     let m = 0;
     let achievedSL = 1.0;
@@ -12000,26 +12239,44 @@ function calcSizingN1Chat(p) {
         pw = erlangCPw(m, A);
     }
     
-    const telas = Math.max(1, parseFloat(p.telasSimultaneas) || 1.0);
-    const shrinkPct = parseFloat(p.shrinkageChat) || 33.0;
-    const dispEfetiva = Math.max(0.01, 1.0 - (shrinkPct / 100.0));
+    const telas = Math.max(0.1, parseFloat(p.telasSimultaneas) || 2.0);
+    const sLanche = parseFloat(p.shrinkageLancheChat !== undefined ? p.shrinkageLancheChat : p.shrinkageLanche) || 10.5;
+    const sTreino = parseFloat(p.shrinkageTreinamentoChat !== undefined ? p.shrinkageTreinamentoChat : p.shrinkageTreinamento) || 4.0;
+    const sFb = parseFloat(p.shrinkageFeedbackChat !== undefined ? p.shrinkageFeedbackChat : p.shrinkageFeedback) || 1.5;
+    const sNR17 = parseFloat(p.shrinkageNR17Chat !== undefined ? p.shrinkageNR17Chat : p.shrinkageNR17) || 17.0;
+    const totalShrinkPct = sLanche + sTreino + sFb + sNR17;
+    const dispEfetiva = Math.max(0.01, 1.0 - (totalShrinkPct / 100.0));
     
     const pas = Math.ceil((m / telas) / dispEfetiva);
+    const ajuste = parseFloat(p.ajusteChat) || 0;
+    const paContratada = Math.max(0, pas + ajuste);
+    const chamadasOp = paContratada > 0 ? Math.round(volEfetivo / paContratada) : 0;
     
     return {
         volBase,
         volEfetivo,
+        volAtendidas,
+        dmmPct: dmmPct * 100,
+        hmmPct: hmmPct * 100,
         volDMM,
         volHMM,
+        erlang,
         lambda,
         A,
         m,
         telas,
         achievedSL: achievedSL * 100,
         pw: pw * 100,
-        totalShrinkPct: shrinkPct,
+        sLanche,
+        sTreino,
+        sFb,
+        sNR17,
+        totalShrinkPct,
         dispEfetiva: dispEfetiva * 100,
-        pas
+        pas,
+        ajuste,
+        paContratada,
+        chamadasOp
     };
 }
 
@@ -12208,10 +12465,22 @@ function resetSizingDefaults() {
         shrinkageTreinamento: 4.0,
         shrinkageFeedback: 1.5,
         shrinkageNR17: 17.0,
-        telasSimultaneas: 1.0,
         ajusteVoz: 0,
         volumeMensalChat: 0,
+        volAtendidasChat: 0,
         tmaChat: 480,
+        slaMetaChat: 80,
+        nsMinimoChat: 60,
+        tmeMaxChat: 20,
+        abandonoMaxChat: 3.5,
+        telasSimultaneas: 2.0,
+        dmmPercentChat: 5.62,
+        hmmPercentChat: 9.7,
+        shrinkageLancheChat: 10.5,
+        shrinkageTreinamentoChat: 4.0,
+        shrinkageFeedbackChat: 1.5,
+        shrinkageNR17Chat: 17.0,
+        ajusteChat: 0,
         volumeMensalBO: 10270,
         tmaBO: 600,
         diasUteis: 30,
@@ -12246,6 +12515,7 @@ function recalcSizing(fromInputs = true) {
             return isNaN(val) ? fallback : val;
         };
         
+        // QUADRO 1: VOZ
         p.volumeMensalVoz = getNum('input-sizing-vol-voz', p.volumeMensalVoz || 19912);
         p.volAtendidas = getNum('input-sizing-vol-atendidas', p.volAtendidas || 19215);
         p.tmaVoz = getNum('input-sizing-tma-voz', p.tmaVoz || 480);
@@ -12253,7 +12523,6 @@ function recalcSizing(fromInputs = true) {
         p.nsMinimo = getNum('input-sizing-ns-minimo', p.nsMinimo || 60);
         p.tmeMax = getNum('input-sizing-tme-max', p.tmeMax || 20);
         p.abandonoMax = getNum('input-sizing-abandono-max', p.abandonoMax || 3.5);
-        p.telasSimultaneas = getNum('input-sizing-telas-chat', p.telasSimultaneas || 1.0);
         p.dmmPercent = getNum('input-sizing-dmm', p.dmmPercent || 5.62);
         p.hmmPercent = getNum('input-sizing-hmm', p.hmmPercent || 9.7);
         p.shrinkageLanche = getNum('input-sizing-shrink-lanche', p.shrinkageLanche || 10.5);
@@ -12262,6 +12531,24 @@ function recalcSizing(fromInputs = true) {
         p.shrinkageNR17 = getNum('input-sizing-shrink-nr17', p.shrinkageNR17 || 17.0);
         p.ajusteVoz = getNum('input-sizing-ajuste-voz', p.ajusteVoz || 0);
         
+        // QUADRO 2: CHAT
+        p.volumeMensalChat = getNum('input-sizing-vol-chat', p.volumeMensalChat || 0);
+        p.volAtendidasChat = getNum('input-sizing-vol-atendidas-chat', p.volAtendidasChat || 0);
+        p.tmaChat = getNum('input-sizing-tma-chat', p.tmaChat || 480);
+        p.slaMetaChat = getNum('input-sizing-sla-meta-chat', p.slaMetaChat || 80);
+        p.nsMinimoChat = getNum('input-sizing-ns-minimo-chat', p.nsMinimoChat || 60);
+        p.tmeMaxChat = getNum('input-sizing-tme-max-chat', p.tmeMaxChat || 20);
+        p.abandonoMaxChat = getNum('input-sizing-abandono-max-chat', p.abandonoMaxChat || 3.5);
+        p.telasSimultaneas = getNum('input-sizing-telas-chat', p.telasSimultaneas || 2.0);
+        p.dmmPercentChat = getNum('input-sizing-dmm-chat', p.dmmPercentChat || 5.62);
+        p.hmmPercentChat = getNum('input-sizing-hmm-chat', p.hmmPercentChat || 9.7);
+        p.shrinkageLancheChat = getNum('input-sizing-shrink-lanche-chat', p.shrinkageLancheChat || 10.5);
+        p.shrinkageTreinamentoChat = getNum('input-sizing-shrink-treino-chat', p.shrinkageTreinamentoChat || 4.0);
+        p.shrinkageFeedbackChat = getNum('input-sizing-shrink-fb-chat', p.shrinkageFeedbackChat || 1.5);
+        p.shrinkageNR17Chat = getNum('input-sizing-shrink-nr17-chat', p.shrinkageNR17Chat || 17.0);
+        p.ajusteChat = getNum('input-sizing-ajuste-chat', p.ajusteChat || 0);
+        
+        // QUADRO 3: BKO
         p.volumeMensalBO = getNum('input-sizing-vol-bo', p.volumeMensalBO || 10270);
         p.diasUteis = getNum('input-sizing-dias-uteis-bo', p.diasUteis || 30);
         p.ajusteBo = getNum('input-sizing-ajuste-bo', p.ajusteBo || 0);
@@ -12288,15 +12575,16 @@ function recalcSizing(fromInputs = true) {
     const resBO = calcSizingN2Backoffice(p);
     
     const safetyBuffer = Math.max(0, parseInt(p.safetyBuffer) || 0);
-    const totalPAs = resVoz.paContratada + resChat.pas + resBO.paContratada + safetyBuffer;
+    const totalPAs = resVoz.paContratada + resChat.paContratada + resBO.paContratada + safetyBuffer;
     
-    // Update calculated cells in Left Panel (Voz / Chat)
     const setInputVal = (id, val) => {
         const el = document.getElementById(id);
         if (el && val !== undefined && val !== null) el.value = val;
     };
     
     const mesLabel = getMonthOnly(state.sizingCurrentMonth || p.mesReferencia || '2026-11');
+    
+    // Update calculated cells in Quadro 1 (Voz)
     setInputVal('input-sizing-mes-label-voz', mesLabel);
     setInputVal('input-sizing-vol-dmm', resVoz.volDMM);
     setInputVal('input-sizing-vol-hmm', resVoz.volHMM);
@@ -12305,7 +12593,16 @@ function recalcSizing(fromInputs = true) {
     setInputVal('input-sizing-pa-contratada-voz', resVoz.paContratada);
     setInputVal('input-sizing-chamadas-op-voz', resVoz.chamadasOp);
     
-    // Update calculated cells in Right Panel (BKO)
+    // Update calculated cells in Quadro 2 (Chat)
+    setInputVal('input-sizing-mes-label-chat', mesLabel);
+    setInputVal('input-sizing-vol-dmm-chat', resChat.volDMM);
+    setInputVal('input-sizing-vol-hmm-chat', resChat.volHMM);
+    setInputVal('input-sizing-erlang-chat', resChat.erlang);
+    setInputVal('input-sizing-pas-chat', resChat.pas);
+    setInputVal('input-sizing-pa-contratada-chat', resChat.paContratada);
+    setInputVal('input-sizing-chamadas-op-chat', resChat.chamadasOp);
+    
+    // Update calculated cells in Quadro 3 (BKO)
     setInputVal('input-sizing-mes-label-bo', mesLabel);
     setInputVal('input-sizing-vol-dia-bo', resBO.volDia);
     setInputVal('input-sizing-prod-max-dia', resBO.prodMaxDia);
@@ -12327,8 +12624,8 @@ function recalcSizing(fromInputs = true) {
     
     const elPasChat = document.getElementById('widget-sizing-pas-chat');
     const elSubChat = document.getElementById('widget-sizing-sub-chat');
-    if (elPasChat) elPasChat.textContent = resChat.pas;
-    if (elSubChat) elSubChat.textContent = `${resChat.m} agentes (${p.telasSimultaneas || 1} telas simul.)`;
+    if (elPasChat) elPasChat.textContent = resChat.paContratada;
+    if (elSubChat) elSubChat.textContent = `${resChat.m} agentes (${p.telasSimultaneas || 2} telas simul.)`;
     
     const elPasBO = document.getElementById('widget-sizing-pas-bo');
     const elSubBO = document.getElementById('widget-sizing-sub-bo');
@@ -12338,7 +12635,7 @@ function recalcSizing(fromInputs = true) {
     const elTotalPas = document.getElementById('widget-sizing-total-pas');
     const elTotalSub = document.getElementById('widget-sizing-total-sub');
     if (elTotalPas) elTotalPas.textContent = totalPAs;
-    if (elTotalSub) elTotalSub.textContent = `Buffer: +${safetyBuffer} PAs (Base: ${resVoz.paContratada + resChat.pas + resBO.paContratada})`;
+    if (elTotalSub) elTotalSub.textContent = `Buffer: +${safetyBuffer} PAs (Base: ${resVoz.paContratada + resChat.paContratada + resBO.paContratada})`;
     
     // 2. Update Safety buffer slider value display
     const elValBuffer = document.getElementById('sizing-val-safety-buffer');
@@ -12600,6 +12897,7 @@ function renderSizingView() {
         if (el && val !== undefined && val !== null) el.value = val;
     };
     
+    // QUADRO 1: VOZ
     setVal('input-sizing-vol-voz', p.volumeMensalVoz);
     setVal('input-sizing-vol-atendidas', p.volAtendidas);
     setVal('input-sizing-tma-voz', p.tmaVoz);
@@ -12613,9 +12911,26 @@ function renderSizingView() {
     setVal('input-sizing-shrink-treino', p.shrinkageTreinamento);
     setVal('input-sizing-shrink-fb', p.shrinkageFeedback);
     setVal('input-sizing-shrink-nr17', p.shrinkageNR17);
-    setVal('input-sizing-telas-chat', p.telasSimultaneas);
     setVal('input-sizing-ajuste-voz', p.ajusteVoz);
     
+    // QUADRO 2: CHAT
+    setVal('input-sizing-vol-chat', p.volumeMensalChat);
+    setVal('input-sizing-vol-atendidas-chat', p.volAtendidasChat);
+    setVal('input-sizing-tma-chat', p.tmaChat);
+    setVal('input-sizing-sla-meta-chat', p.slaMetaChat);
+    setVal('input-sizing-ns-minimo-chat', p.nsMinimoChat);
+    setVal('input-sizing-tme-max-chat', p.tmeMaxChat);
+    setVal('input-sizing-abandono-max-chat', p.abandonoMaxChat);
+    setVal('input-sizing-telas-chat', p.telasSimultaneas);
+    setVal('input-sizing-dmm-chat', p.dmmPercentChat);
+    setVal('input-sizing-hmm-chat', p.hmmPercentChat);
+    setVal('input-sizing-shrink-lanche-chat', p.shrinkageLancheChat);
+    setVal('input-sizing-shrink-treino-chat', p.shrinkageTreinamentoChat);
+    setVal('input-sizing-shrink-fb-chat', p.shrinkageFeedbackChat);
+    setVal('input-sizing-shrink-nr17-chat', p.shrinkageNR17Chat);
+    setVal('input-sizing-ajuste-chat', p.ajusteChat);
+    
+    // QUADRO 3: BKO
     setVal('input-sizing-vol-bo', p.volumeMensalBO);
     setVal('input-sizing-dias-uteis-bo', p.diasUteis);
     setVal('input-sizing-tma-bo', p.tmaBO);
