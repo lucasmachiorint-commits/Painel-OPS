@@ -193,4 +193,75 @@ test.describe('Painel OPS - Redimensionamento (WFM & Erlang C) E2E', () => {
     const btnImport = page.locator('#btn-sizing-import-excel');
     await expect(btnImport).toBeHidden();
   });
+
+  test('9. Campos editaveis permitem alteracao e campos calculados recalculam em tempo real', async ({ page }) => {
+    await page.evaluate(() => {
+      // @ts-ignore
+      switchToView('sizing');
+    });
+
+    // 1. Verify calculated fields have readonly and cell-calculated class
+    const volAtendidasVoz = page.locator('#input-sizing-vol-atendidas');
+    await expect(volAtendidasVoz).toHaveAttribute('readonly', '');
+    await expect(volAtendidasVoz).toHaveClass(/cell-calculated/);
+
+    const erlangVoz = page.locator('#input-sizing-erlang');
+    await expect(erlangVoz).toHaveAttribute('readonly', '');
+    await expect(erlangVoz).toHaveClass(/cell-calculated/);
+
+    const pasBo = page.locator('#input-sizing-pas-bo');
+    await expect(pasBo).toHaveAttribute('readonly', '');
+    await expect(pasBo).toHaveClass(/cell-calculated/);
+
+    // 2. Change Volume Mês Voz to 50000
+    const volVoz = page.locator('#input-sizing-vol-voz');
+    await expect(volVoz).not.toHaveAttribute('readonly', '');
+    await volVoz.fill('50000');
+    await volVoz.dispatchEvent('input');
+    await page.waitForTimeout(300);
+
+    // Volume Atendidas Voz should recalculate to 50000 * (1 - 0.035) = 48250
+    await expect(volAtendidasVoz).toHaveValue('48250');
+    
+    // Volume DMM should recalculate to 50000 * 0.0562 = 2810
+    await expect(page.locator('#input-sizing-vol-dmm')).toHaveValue('2810');
+
+    // PA's Necessárias Voz should have increased
+    const pasVozVal = parseInt(await page.locator('#input-sizing-pas-voz').inputValue(), 10);
+    expect(pasVozVal).toBeGreaterThan(29);
+
+    // 3. Change Volume Mês Chat to 20000
+    const volChat = page.locator('#input-sizing-vol-chat');
+    await expect(volChat).not.toHaveAttribute('readonly', '');
+    await volChat.fill('20000');
+    await volChat.dispatchEvent('input');
+    await page.waitForTimeout(300);
+
+    // Volume Atendidas Chat should recalculate to 20000 * (1 - 0.035) = 19300
+    await expect(page.locator('#input-sizing-vol-atendidas-chat')).toHaveValue('19300');
+    const pasChatVal = parseInt(await page.locator('#input-sizing-pas-chat').inputValue(), 10);
+    expect(pasChatVal).toBeGreaterThan(0);
+  });
+
+  test('10. Alterar parametros de BKO (TMA e Dias Uteis) recalcula produtividade e PAs', async ({ page }) => {
+    await page.evaluate(() => {
+      // @ts-ignore
+      switchToView('sizing');
+    });
+
+    const initialProd = parseInt(await page.locator('#input-sizing-prod-max-dia').inputValue(), 10);
+    expect(initialProd).toBe(22);
+
+    // Change TMA BO to 300 seconds (half of 600s) -> prod per day should double
+    const tmaBo = page.locator('#input-sizing-tma-bo');
+    await tmaBo.fill('300');
+    await tmaBo.dispatchEvent('input');
+    await page.waitForTimeout(300);
+
+    const newProd = parseInt(await page.locator('#input-sizing-prod-max-dia').inputValue(), 10);
+    expect(newProd).toBeGreaterThan(initialProd);
+
+    // TMA real em minutos should update to 00:05:00
+    await expect(page.locator('#input-sizing-tma-real-min')).toHaveValue('00:05:00');
+  });
 });

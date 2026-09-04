@@ -7135,9 +7135,7 @@ function calcSizingN1Voz(p) {
     const volEfetivo = Math.round(volBase * aumentoFactor);
     
     const abandonoMax = parseFloat(p.abandonoMax) || 3.5;
-    const volAtendidas = (p.volAtendidas !== undefined && p.volAtendidas !== null && p.volAtendidas !== '')
-        ? Math.round(parseFloat(p.volAtendidas))
-        : Math.round(volEfetivo * (1.0 - (abandonoMax / 100.0)));
+    const volAtendidas = Math.round(volEfetivo * (1.0 - (abandonoMax / 100.0)));
     
     const dmmPct = (parseFloat(p.dmmPercent) || 5.62) / 100.0;
     const hmmPct = (parseFloat(p.hmmPercent) || 9.70) / 100.0;
@@ -7210,9 +7208,7 @@ function calcSizingN1Chat(p) {
     const volEfetivo = Math.round(volBase * aumentoFactor);
     
     const abandonoMax = parseFloat(p.abandonoMaxChat !== undefined ? p.abandonoMaxChat : p.abandonoMax) || 3.5;
-    const volAtendidas = (p.volAtendidasChat !== undefined && p.volAtendidasChat !== null && p.volAtendidasChat !== '')
-        ? Math.round(parseFloat(p.volAtendidasChat))
-        : Math.round(volEfetivo * (1.0 - (abandonoMax / 100.0)));
+    const volAtendidas = Math.round(volEfetivo * (1.0 - (abandonoMax / 100.0)));
     
     const dmmPct = (parseFloat(p.dmmPercentChat !== undefined ? p.dmmPercentChat : p.dmmPercent) || 5.62) / 100.0;
     const hmmPct = (parseFloat(p.hmmPercentChat !== undefined ? p.hmmPercentChat : p.hmmPercent) || 9.70) / 100.0;
@@ -7517,7 +7513,6 @@ function recalcSizing(fromInputs = true) {
         
         // QUADRO 1: VOZ
         p.volumeMensalVoz = getNum('input-sizing-vol-voz', p.volumeMensalVoz || 19912);
-        p.volAtendidas = getNum('input-sizing-vol-atendidas', p.volAtendidas || 19215);
         p.tmaVoz = getNum('input-sizing-tma-voz', p.tmaVoz || 480);
         p.slaMeta = getNum('input-sizing-sla-meta', p.slaMeta || 80);
         p.nsMinimo = getNum('input-sizing-ns-minimo', p.nsMinimo || 60);
@@ -7534,7 +7529,6 @@ function recalcSizing(fromInputs = true) {
         
         // QUADRO 2: CHAT
         p.volumeMensalChat = getNum('input-sizing-vol-chat', p.volumeMensalChat || 0);
-        p.volAtendidasChat = getNum('input-sizing-vol-atendidas-chat', p.volAtendidasChat || 0);
         p.tmaChat = getNum('input-sizing-tma-chat', p.tmaChat || 480);
         p.slaMetaChat = getNum('input-sizing-sla-meta-chat', p.slaMetaChat || 80);
         p.nsMinimoChat = getNum('input-sizing-ns-minimo-chat', p.nsMinimoChat || 60);
@@ -7575,6 +7569,10 @@ function recalcSizing(fromInputs = true) {
     const resChat = calcSizingN1Chat(p);
     const resBO = calcSizingN2Backoffice(p);
     
+    // Update calculated results back in params object
+    p.volAtendidas = resVoz.volAtendidas;
+    p.volAtendidasChat = resChat.volAtendidas;
+    
     const safetyBuffer = Math.max(0, parseInt(p.safetyBuffer) || 0);
     const totalPAs = resVoz.paContratada + resChat.paContratada + resBO.paContratada + safetyBuffer;
     
@@ -7587,6 +7585,7 @@ function recalcSizing(fromInputs = true) {
     
     // Update calculated cells in Quadro 1 (Voz)
     setInputVal('input-sizing-mes-label-voz', mesLabel);
+    setInputVal('input-sizing-vol-atendidas', resVoz.volAtendidas);
     setInputVal('input-sizing-vol-dmm', resVoz.volDMM);
     setInputVal('input-sizing-vol-hmm', resVoz.volHMM);
     setInputVal('input-sizing-erlang', resVoz.erlang);
@@ -7596,6 +7595,7 @@ function recalcSizing(fromInputs = true) {
     
     // Update calculated cells in Quadro 2 (Chat)
     setInputVal('input-sizing-mes-label-chat', mesLabel);
+    setInputVal('input-sizing-vol-atendidas-chat', resChat.volAtendidas);
     setInputVal('input-sizing-vol-dmm-chat', resChat.volDMM);
     setInputVal('input-sizing-vol-hmm-chat', resChat.volHMM);
     setInputVal('input-sizing-erlang-chat', resChat.erlang);
@@ -7967,16 +7967,18 @@ function setupSizingEventListeners() {
     if (_sizingListenersBound) return;
     _sizingListenersBound = true;
     
-    // Recalculate on any input change (debounced 150ms)
+    // Recalculate on any input or change event (debounced 80ms)
     const container = document.getElementById('view-sizing');
     if (container) {
-        container.querySelectorAll('input').forEach(input => {
-            input.addEventListener('input', () => {
+        container.querySelectorAll('input:not([readonly])').forEach(input => {
+            const triggerRecalc = () => {
                 if (_sizingDebounceTimer) clearTimeout(_sizingDebounceTimer);
                 _sizingDebounceTimer = setTimeout(() => {
                     recalcSizing(true);
-                }, 150);
-            });
+                }, 80);
+            };
+            input.addEventListener('input', triggerRecalc);
+            input.addEventListener('change', triggerRecalc);
         });
     }
     

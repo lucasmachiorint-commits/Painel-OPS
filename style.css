@@ -2607,15 +2607,44 @@ body.light-theme #modal-add-resp {
     margin: 0;
 }
 
-.sizing-cell-input:hover:not(:disabled) {
-    border-color: #cbd5e1;
+/* Editable inputs styling */
+.sizing-sheet-table input.sizing-cell-input:not(.cell-calculated):not([readonly]) {
     background: #ffffff;
+    border: 1px solid #cbd5e1;
+    color: #0f172a;
+    cursor: text;
 }
 
-.sizing-cell-input:focus:not(:disabled) {
+.sizing-sheet-table input.sizing-cell-input:not(.cell-calculated):not([readonly]):hover:not(:disabled) {
     border-color: #f59e0b;
+    background: #fffdf5;
+}
+
+.sizing-sheet-table input.sizing-cell-input:not(.cell-calculated):not([readonly]):focus:not(:disabled) {
+    border-color: #d97706;
     background: #fffbeb;
-    box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.2);
+    box-shadow: 0 0 0 2px rgba(217, 119, 6, 0.25);
+}
+
+/* Calculated / Read-only formula cells */
+.sizing-cell-input.cell-calculated {
+    background: #f8fafc;
+    border: 1px dashed #cbd5e1;
+    color: #475569;
+    cursor: default;
+    user-select: all;
+}
+
+.sizing-cell-input.cell-calculated:hover {
+    border-color: #cbd5e1;
+    background: #f8fafc;
+}
+
+.sizing-cell-input.cell-calculated:focus {
+    outline: none;
+    border-color: #94a3b8;
+    background: #f1f5f9;
+    box-shadow: none;
 }
 
 .sizing-cell-input:disabled {
