@@ -78,6 +78,7 @@ test.describe('Painel OPS - Redimensionamento (WFM & Erlang C) E2E', () => {
 
     // Verify key fields match the spreadsheet
     await expect(page.locator('#input-sizing-vol-voz')).toHaveValue('19912');
+    await expect(page.locator('#input-sizing-telas-voz')).toHaveValue(/^(1|1\.0)$/);
     await expect(page.locator('#input-sizing-telas-chat')).toHaveValue(/^(1|1\.0|2|2\.0)$/);
     await expect(page.locator('#input-sizing-vol-bo')).toHaveValue('10270');
     await expect(page.locator('#input-sizing-dias-uteis-bo')).toHaveValue('30');

@@ -2317,7 +2317,7 @@ function applyStateMigrations() {
         shrinkageTreinamento: 4.0,
         shrinkageFeedback: 1.5,
         shrinkageNR17: 17.0,
-        telasSimultaneas: 2.0,
+        telasVoz: 1.0,
         ajusteVoz: 0,
         volumeMensalChat: 0,
         volAtendidasChat: 0,
@@ -2326,6 +2326,8 @@ function applyStateMigrations() {
         nsMinimoChat: 60,
         tmeMaxChat: 20,
         abandonoMaxChat: 3.5,
+        telasSimultaneas: 2.0,
+        telasChat: 2.0,
         dmmPercentChat: 5.62,
         hmmPercentChat: 9.7,
         shrinkageLancheChat: 10.5,
@@ -7167,7 +7169,8 @@ function calcSizingN1Voz(p) {
     const totalShrinkPct = sLanche + sTreino + sFb + sNR17;
     const dispEfetiva = Math.max(0.01, 1.0 - (totalShrinkPct / 100.0));
     
-    const pas = Math.ceil(m / dispEfetiva);
+    const telas = Math.max(0.1, parseFloat(p.telasVoz !== undefined ? p.telasVoz : 1.0) || 1.0);
+    const pas = Math.ceil((m / telas) / dispEfetiva);
     const ajuste = parseFloat(p.ajusteVoz) || 0;
     const paContratada = Math.max(0, pas + ajuste);
     const chamadasOp = paContratada > 0 ? Math.round(volEfetivo / paContratada) : 0;
@@ -7184,6 +7187,7 @@ function calcSizingN1Voz(p) {
         lambda,
         A,
         m,
+        telas,
         achievedSL: achievedSL * 100,
         pw: pw * 100,
         sLanche,
@@ -7459,6 +7463,7 @@ function resetSizingDefaults() {
         shrinkageTreinamento: 4.0,
         shrinkageFeedback: 1.5,
         shrinkageNR17: 17.0,
+        telasVoz: 1.0,
         ajusteVoz: 0,
         volumeMensalChat: 0,
         volAtendidasChat: 0,
@@ -7468,6 +7473,7 @@ function resetSizingDefaults() {
         tmeMaxChat: 20,
         abandonoMaxChat: 3.5,
         telasSimultaneas: 2.0,
+        telasChat: 2.0,
         dmmPercentChat: 5.62,
         hmmPercentChat: 9.7,
         shrinkageLancheChat: 10.5,
@@ -7517,6 +7523,7 @@ function recalcSizing(fromInputs = true) {
         p.nsMinimo = getNum('input-sizing-ns-minimo', p.nsMinimo || 60);
         p.tmeMax = getNum('input-sizing-tme-max', p.tmeMax || 20);
         p.abandonoMax = getNum('input-sizing-abandono-max', p.abandonoMax || 3.5);
+        p.telasVoz = getNum('input-sizing-telas-voz', p.telasVoz || 1.0);
         p.dmmPercent = getNum('input-sizing-dmm', p.dmmPercent || 5.62);
         p.hmmPercent = getNum('input-sizing-hmm', p.hmmPercent || 9.7);
         p.shrinkageLanche = getNum('input-sizing-shrink-lanche', p.shrinkageLanche || 10.5);
@@ -7899,6 +7906,7 @@ function renderSizingView() {
     setVal('input-sizing-ns-minimo', p.nsMinimo);
     setVal('input-sizing-tme-max', p.tmeMax);
     setVal('input-sizing-abandono-max', p.abandonoMax);
+    setVal('input-sizing-telas-voz', p.telasVoz !== undefined ? p.telasVoz : 1.0);
     setVal('input-sizing-dmm', p.dmmPercent);
     setVal('input-sizing-hmm', p.hmmPercent);
     setVal('input-sizing-shrink-lanche', p.shrinkageLanche);
