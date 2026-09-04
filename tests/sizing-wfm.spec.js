@@ -57,7 +57,7 @@ test.describe('Painel OPS - Redimensionamento (WFM & Erlang C) E2E', () => {
     const boText = await widgetBO.innerText();
     const totalText = await widgetTotal.innerText();
 
-    expect(parseInt(vozText)).toBe(29);
+    expect(parseInt(vozText)).toBe(23);
     expect(parseInt(boText)).toBe(8);
     expect(parseInt(totalText)).toBeGreaterThanOrEqual(parseInt(vozText) + parseInt(boText));
   });
@@ -228,7 +228,7 @@ test.describe('Painel OPS - Redimensionamento (WFM & Erlang C) E2E', () => {
 
     // PA's Necessárias Voz should have increased
     const pasVozVal = parseInt(await page.locator('#input-sizing-pas-voz').inputValue(), 10);
-    expect(pasVozVal).toBeGreaterThan(29);
+    expect(pasVozVal).toBeGreaterThan(23);
 
     // 3. Change Volume Mês Chat to 20000
     const volChat = page.locator('#input-sizing-vol-chat');
@@ -263,5 +263,33 @@ test.describe('Painel OPS - Redimensionamento (WFM & Erlang C) E2E', () => {
 
     // TMA real em minutos should update to 00:05:00
     await expect(page.locator('#input-sizing-tma-real-min')).toHaveValue('00:05:00');
+  });
+
+  test('11. Caso de referencia da planilha: Volume 3000 gera exatamente 7 PAs e 10 chamadas/operador', async ({ page }) => {
+    await page.evaluate(() => {
+      // @ts-ignore
+      switchToView('sizing');
+    });
+
+    const volVoz = page.locator('#input-sizing-vol-voz');
+    await volVoz.fill('3000');
+    await volVoz.dispatchEvent('input');
+    await page.waitForTimeout(300);
+
+    // Matches spreadsheet exactly:
+    // Volume Atendidas = 2895
+    // Volume DMM = 168
+    // Volume HMM = 16
+    // Erlang = 2
+    // PA's Necessárias = 7
+    // PA Contratada = 7
+    // Chamadas / Operador = 10
+    await expect(page.locator('#input-sizing-vol-atendidas')).toHaveValue('2895');
+    await expect(page.locator('#input-sizing-vol-dmm')).toHaveValue('168');
+    await expect(page.locator('#input-sizing-vol-hmm')).toHaveValue('16');
+    await expect(page.locator('#input-sizing-erlang')).toHaveValue('2');
+    await expect(page.locator('#input-sizing-pas-voz')).toHaveValue('7');
+    await expect(page.locator('#input-sizing-pa-contratada-voz')).toHaveValue('7');
+    await expect(page.locator('#input-sizing-chamadas-op-voz')).toHaveValue('10');
   });
 });

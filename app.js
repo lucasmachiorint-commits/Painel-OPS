@@ -7139,11 +7139,13 @@ function calcSizingN1Voz(p) {
     
     const dmmPct = (parseFloat(p.dmmPercent) || 5.62) / 100.0;
     const hmmPct = (parseFloat(p.hmmPercent) || 9.70) / 100.0;
-    const volDMM = Math.round(volEfetivo * dmmPct);
-    const volHMM = Math.round(volDMM * hmmPct);
+    const rawVolDMM = volEfetivo * dmmPct;
+    const volDMM = Math.floor(rawVolDMM);
+    const rawVolHMM = rawVolDMM * hmmPct;
+    const volHMM = Math.round(rawVolHMM);
     
     const tma = Math.max(1, parseFloat(p.tmaVoz) || 480);
-    const lambda = volHMM / 3600.0;
+    const lambda = rawVolHMM / 3600.0;
     const A = lambda * tma;
     const erlang = Math.round(A);
     
@@ -7154,7 +7156,7 @@ function calcSizingN1Voz(p) {
     let achievedSL = 1.0;
     let pw = 0.0;
     
-    if (volHMM > 0 && A > 0) {
+    if (rawVolHMM > 0 && A > 0) {
         m = findMinAgentsErlangC(A, targetSL, targetWait, tma);
         achievedSL = erlangCServiceLevel(m, A, targetWait, tma);
         pw = erlangCPw(m, A);
@@ -7165,13 +7167,16 @@ function calcSizingN1Voz(p) {
     const sFb = parseFloat(p.shrinkageFeedback) || 1.5;
     const sNR17 = parseFloat(p.shrinkageNR17) || 17.0;
     const totalShrinkPct = sLanche + sTreino + sFb + sNR17;
-    const dispEfetiva = Math.max(0.01, 1.0 - (totalShrinkPct / 100.0));
+    // Planilha original: divisor de PA's utiliza APENAS NR17: (1 - SOMA(B16))
+    const dispEfetiva = Math.max(0.01, 1.0 - (sNR17 / 100.0));
     
     const telas = Math.max(0.1, parseFloat(p.telasVoz !== undefined ? p.telasVoz : 1.0) || 1.0);
     const pas = Math.ceil((m / telas) / dispEfetiva);
     const ajuste = parseFloat(p.ajusteVoz) || 0;
     const paContratada = Math.max(0, pas + ajuste);
-    const chamadasOp = paContratada > 0 ? Math.round(volEfetivo / paContratada) : 0;
+    // Planilha original: =(VolMês * (1 - Abandono) / (PA_CONTRATADA * 2)) / 21
+    const factorAtend = 1.0 - (abandonoMax / 100.0);
+    const chamadasOp = paContratada > 0 ? Math.round((volEfetivo * factorAtend) / (paContratada * 2) / 21) : 0;
     
     return {
         volBase,
@@ -7212,11 +7217,13 @@ function calcSizingN1Chat(p) {
     
     const dmmPct = (parseFloat(p.dmmPercentChat !== undefined ? p.dmmPercentChat : p.dmmPercent) || 5.62) / 100.0;
     const hmmPct = (parseFloat(p.hmmPercentChat !== undefined ? p.hmmPercentChat : p.hmmPercent) || 9.70) / 100.0;
-    const volDMM = Math.round(volEfetivo * dmmPct);
-    const volHMM = Math.round(volDMM * hmmPct);
+    const rawVolDMM = volEfetivo * dmmPct;
+    const volDMM = Math.floor(rawVolDMM);
+    const rawVolHMM = rawVolDMM * hmmPct;
+    const volHMM = Math.round(rawVolHMM);
     
     const tma = Math.max(1, parseFloat(p.tmaChat) || 480);
-    const lambda = volHMM / 3600.0;
+    const lambda = rawVolHMM / 3600.0;
     const A = lambda * tma;
     const erlang = Math.round(A);
     
@@ -7227,24 +7234,27 @@ function calcSizingN1Chat(p) {
     let achievedSL = 1.0;
     let pw = 0.0;
     
-    if (volHMM > 0 && A > 0) {
+    if (rawVolHMM > 0 && A > 0) {
         m = findMinAgentsErlangC(A, targetSL, targetWait, tma);
         achievedSL = erlangCServiceLevel(m, A, targetWait, tma);
         pw = erlangCPw(m, A);
     }
     
-    const telas = Math.max(0.1, parseFloat(p.telasSimultaneas) || 2.0);
+    const telas = Math.max(0.1, parseFloat(p.telasChat !== undefined ? p.telasChat : (p.telasSimultaneas || 1.0)) || 1.0);
     const sLanche = parseFloat(p.shrinkageLancheChat !== undefined ? p.shrinkageLancheChat : p.shrinkageLanche) || 10.5;
     const sTreino = parseFloat(p.shrinkageTreinamentoChat !== undefined ? p.shrinkageTreinamentoChat : p.shrinkageTreinamento) || 4.0;
     const sFb = parseFloat(p.shrinkageFeedbackChat !== undefined ? p.shrinkageFeedbackChat : p.shrinkageFeedback) || 1.5;
     const sNR17 = parseFloat(p.shrinkageNR17Chat !== undefined ? p.shrinkageNR17Chat : p.shrinkageNR17) || 17.0;
     const totalShrinkPct = sLanche + sTreino + sFb + sNR17;
-    const dispEfetiva = Math.max(0.01, 1.0 - (totalShrinkPct / 100.0));
+    // Planilha original: divisor de PA's utiliza APENAS NR17: (1 - SOMA(B16))
+    const dispEfetiva = Math.max(0.01, 1.0 - (sNR17 / 100.0));
     
     const pas = Math.ceil((m / telas) / dispEfetiva);
     const ajuste = parseFloat(p.ajusteChat) || 0;
     const paContratada = Math.max(0, pas + ajuste);
-    const chamadasOp = paContratada > 0 ? Math.round(volEfetivo / paContratada) : 0;
+    // Planilha original: =(VolMês * (1 - Abandono) / (PA_CONTRATADA * 2)) / 21
+    const factorAtend = 1.0 - (abandonoMax / 100.0);
+    const chamadasOp = paContratada > 0 ? Math.round((volEfetivo * factorAtend) / (paContratada * 2) / 21) : 0;
     
     return {
         volBase,
@@ -7770,8 +7780,8 @@ function recalcSizing(fromInputs = true) {
                 <tr><td class="calc-label">Intensidade de Tráfego (A)</td><td class="calc-formula">&lambda; &times; TMA (${p.tmaVoz}s)</td><td class="calc-val">${resVoz.A.toFixed(2)} Erlangs</td></tr>
                 <tr><td class="calc-label">Agentes Logados Teóricos (m)</td><td class="calc-formula">Erlang C (SL &ge; ${p.slaMeta}%)</td><td class="calc-val" style="color: var(--color-primary);">${resVoz.m} operadores</td></tr>
                 <tr><td class="calc-label">Nível de Serviço Atingido (SL)</td><td class="calc-formula">1 - Pw &times; e^(-(m-A)&times;TME/TMA)</td><td class="calc-val">${resVoz.achievedSL.toFixed(2)}%</td></tr>
-                <tr><td class="calc-label">Fator de Shrinkage Total</td><td class="calc-formula">Lanche + Treino + FB + NR17</td><td class="calc-val">${resVoz.totalShrinkPct.toFixed(1)}% (Disp: ${resVoz.dispEfetiva.toFixed(1)}%)</td></tr>
-                <tr><td class="calc-label">PA's Necessárias</td><td class="calc-formula">&lceil; m / Disponibilidade &rceil;</td><td class="calc-val" style="color: var(--color-primary); font-size: 1.05rem;">${resVoz.pas} PAs</td></tr>
+                <tr><td class="calc-label">Fator de Shrinkage</td><td class="calc-formula">NR17 (Disp: 1 - ${resVoz.sNR17}%)</td><td class="calc-val">${resVoz.dispEfetiva.toFixed(1)}% (Total ref: ${resVoz.totalShrinkPct.toFixed(1)}%)</td></tr>
+                <tr><td class="calc-label">PA's Necessárias</td><td class="calc-formula">&lceil; (m / Telas) / Disp_NR17 &rceil;</td><td class="calc-val" style="color: var(--color-primary); font-size: 1.05rem;">${resVoz.pas} PAs</td></tr>
                 <tr><td class="calc-label">Ajuste Manual</td><td class="calc-formula">Ajuste</td><td class="calc-val">${resVoz.ajuste} PAs</td></tr>
                 <tr style="background: rgba(235, 92, 39, 0.08);"><td class="calc-label" style="font-weight: 700; color: #fff;">PA CONTRATADA (Voz)</td><td class="calc-formula" style="color: #fff;">PA's Necessárias + Ajuste</td><td class="calc-val" style="color: var(--color-primary); font-size: 1.15rem;">${resVoz.paContratada} PAs</td></tr>
             </table>
