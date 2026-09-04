@@ -2443,9 +2443,16 @@ body.light-theme #modal-add-resp {
     border: 1px solid rgba(244, 63, 94, 0.35);
 }
 
+.sizing-lock-badge.badge-reopened {
+    background: rgba(245, 158, 11, 0.18);
+    color: #f59e0b;
+    border: 1px solid rgba(245, 158, 11, 0.45);
+}
+
 .sizing-history-banner {
     display: flex;
     align-items: center;
+    justify-content: space-between;
     gap: 0.85rem;
     padding: 0.75rem 1.25rem;
     background: rgba(245, 158, 11, 0.1);
@@ -2458,8 +2465,48 @@ body.light-theme #modal-add-resp {
     animation: fadeIn 0.2s ease-in-out;
 }
 
+.sizing-banner-action-btn {
+    font-size: 0.8rem !important;
+    padding: 0.35rem 0.8rem !important;
+    font-weight: 700 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 0.4rem !important;
+    border-radius: 6px !important;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.btn-danger-subtle {
+    background: rgba(244, 63, 94, 0.08);
+    border: 1px solid rgba(244, 63, 94, 0.3);
+    color: #f43f5e;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.btn-danger-subtle:hover {
+    background: rgba(244, 63, 94, 0.2);
+    border-color: #f43f5e;
+    color: #f43f5e;
+}
+
+body.light-theme .btn-danger-subtle {
+    background: #fff1f2;
+    border: 1px solid #fecdd3;
+    color: #e11d48;
+}
+
+body.light-theme .btn-danger-subtle:hover {
+    background: #ffe4e6;
+    border-color: #fda4af;
+    color: #be123c;
+}
+
 /* Sizing Modal Styling (Solid opaque background and high contrast) */
-#modal-new-sizing-projection.modal-overlay {
+#modal-new-sizing-projection.modal-overlay,
+#modal-confirm-discard-sizing.modal-overlay {
     background: rgba(0, 0, 0, 0.65) !important;
     backdrop-filter: blur(6px) !important;
 }
@@ -4025,6 +4072,9 @@ body.light-theme .sizing-acc-body {
                                 </span>
                             </div>
                             <div style="display: flex; align-items: center; gap: 0.75rem;">
+                                <button id="btn-sizing-discard-month" type="button" class="btn btn-danger-subtle" style="font-size: 0.85rem; padding: 0.5rem 0.9rem; font-weight: 700; display: none; align-items: center; gap: 0.45rem;" onclick="openConfirmDiscardModal()" title="Descartar esta projeção e reabrir o mês anterior">
+                                    <i class="fa-solid fa-trash-can"></i> Descartar Projeção
+                                </button>
                                 <button id="btn-sizing-new-month" type="button" class="btn btn-secondary" style="font-size: 0.85rem; padding: 0.5rem 1rem; font-weight: 700; display: inline-flex; align-items: center; gap: 0.5rem;" onclick="openNewSizingModal()" title="Criar nova projeção para o mês subsequente (M-2 / 45 dias de antecedência)">
                                     <i class="fa-solid fa-calendar-plus" style="color: #f59e0b;"></i> Nova Projeção
                                 </button>
@@ -4037,6 +4087,14 @@ body.light-theme .sizing-acc-body {
                         <i class="fa-solid fa-clock-rotate-left" style="font-size: 1.15rem;"></i>
                         <div id="sizing-history-banner-text" style="flex: 1;">
                             Visualizando projeção histórica de <strong>Novembro/2026</strong> (Somente Leitura).
+                        </div>
+                        <div id="sizing-history-banner-actions" style="display: flex; align-items: center; gap: 0.5rem;">
+                            <button id="btn-sizing-unlock-history" type="button" class="btn btn-secondary sizing-banner-action-btn" onclick="unlockCurrentHistoricalMonth()">
+                                <i class="fa-solid fa-lock-open" style="color: #10b981;"></i> Desbloquear para Ajustes
+                            </button>
+                            <button id="btn-sizing-relock-history" type="button" class="btn btn-secondary sizing-banner-action-btn" style="display: none;" onclick="relockCurrentHistoricalMonth()">
+                                <i class="fa-solid fa-lock" style="color: #f59e0b;"></i> Concluir e Bloquear
+                            </button>
                         </div>
                     </div>
 
@@ -5150,6 +5208,31 @@ body.light-theme .sizing-acc-body {
                 <button type="button" class="btn btn-secondary" onclick="closeNewSizingModal()">Cancelar</button>
                 <button type="button" class="btn btn-primary btn-confirm-sizing" id="btn-confirm-new-sizing-month" onclick="confirmNewSizingMonth()">
                     <i class="fa-solid fa-check"></i> Criar Projeção
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL CONFIRMAR DESCARTE DE PROJEÇÃO -->
+    <div id="modal-confirm-discard-sizing" class="modal-overlay" style="display: none;" onclick="if(event.target === this) closeConfirmDiscardModal()">
+        <div class="modal-content sizing-modal-box" style="max-width: 440px;">
+            <div class="modal-header">
+                <h3>
+                    <i class="fa-solid fa-triangle-exclamation" style="color: #f43f5e;"></i> Descartar Projeção
+                </h3>
+                <button type="button" class="modal-close" onclick="closeConfirmDiscardModal()">&times;</button>
+            </div>
+            <p id="modal-discard-desc" class="sizing-modal-desc">
+                Deseja realmente descartar esta projeção? Esta ação removerá os dados deste período e reabrirá a projeção anterior para edição.
+            </p>
+            <div class="sizing-modal-callout" style="background: rgba(244, 63, 94, 0.08); border-color: rgba(244, 63, 94, 0.25); color: #f43f5e;">
+                <i class="fa-solid fa-circle-exclamation"></i>
+                <span id="modal-discard-tip">A projeção anterior voltará a ser a projeção vigente editável.</span>
+            </div>
+            <div class="sizing-modal-actions">
+                <button type="button" class="btn btn-secondary" onclick="closeConfirmDiscardModal()">Cancelar</button>
+                <button type="button" class="btn btn-danger" id="btn-confirm-discard-sizing" onclick="confirmDiscardSizingProjection()" style="background: #f43f5e; border-color: #f43f5e; color: #fff; font-weight: 700; display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.55rem 1.25rem; border-radius: 8px;">
+                    <i class="fa-solid fa-trash-can"></i> Sim, Descartar
                 </button>
             </div>
         </div>
@@ -12593,8 +12676,16 @@ function minToHHMMSS(min) {
 // MONTH LOCK & VERSIONING
 function isSizingMonthLocked(mesKey) {
     if (!mesKey || !/^\d{4}-\d{2}$/.test(mesKey)) return false;
-    const allMonths = Object.keys(state.sizingHistory || {});
-    if (state.sizingCurrentMonth) allMonths.push(state.sizingCurrentMonth);
+    
+    // Se o mês estiver explicitamente desbloqueado para ajustes pelo usuário, não está travado
+    if (state.sizingUnlockedMonths && state.sizingUnlockedMonths[mesKey]) {
+        return false;
+    }
+    
+    const allMonths = Object.keys(state.sizingHistory || {}).filter(m => m >= '2026-11');
+    if (state.sizingCurrentMonth && state.sizingCurrentMonth >= '2026-11') {
+        allMonths.push(state.sizingCurrentMonth);
+    }
     const validMonths = Array.from(new Set(allMonths.filter(m => /^\d{4}-\d{2}$/.test(m)))).sort();
     if (validMonths.length === 0) return false;
     const latestMonth = validMonths[validMonths.length - 1];
@@ -12721,6 +12812,91 @@ function confirmNewSizingMonth() {
 
 function promptNewSizingMonth() {
     openNewSizingModal();
+}
+
+// ROLLBACK: DESCARTAR PROJEÇÃO VIGENTE (SE CRIADA POR ENGANO)
+function openConfirmDiscardModal() {
+    const curMonth = state.sizingCurrentMonth || '2026-11';
+    if (curMonth <= '2026-11') {
+        showToast('A projeção base de Novembro/2026 não pode ser descartada!', 'warning', 3000);
+        return;
+    }
+    
+    const allMonths = Object.keys(state.sizingHistory || {}).filter(m => m >= '2026-11');
+    allMonths.push(curMonth);
+    const sorted = Array.from(new Set(allMonths.filter(m => /^\d{4}-\d{2}$/.test(m)))).sort();
+    const prevMonth = sorted.filter(m => m < curMonth).pop() || '2026-11';
+    
+    const descEl = document.getElementById('modal-discard-desc');
+    if (descEl) {
+        descEl.innerHTML = `Deseja realmente descartar a projeção de <strong>${formatMonthName(curMonth)}</strong>? Esta ação removerá os dados deste período.`;
+    }
+    const tipEl = document.getElementById('modal-discard-tip');
+    if (tipEl) {
+        tipEl.innerHTML = `A projeção de <strong>${formatMonthName(prevMonth)}</strong> voltará a ser a projeção vigente e será reaberta para edição.`;
+    }
+    
+    const modal = document.getElementById('modal-confirm-discard-sizing');
+    if (modal) modal.style.display = 'flex';
+}
+
+function closeConfirmDiscardModal() {
+    const modal = document.getElementById('modal-confirm-discard-sizing');
+    if (modal) modal.style.display = 'none';
+}
+
+function confirmDiscardSizingProjection() {
+    const curMonth = state.sizingCurrentMonth || '2026-11';
+    if (curMonth <= '2026-11') {
+        closeConfirmDiscardModal();
+        return;
+    }
+    
+    // Remove do histórico e do rastreio de desbloqueio
+    if (state.sizingHistory) {
+        delete state.sizingHistory[curMonth];
+    }
+    if (state.sizingUnlockedMonths) {
+        delete state.sizingUnlockedMonths[curMonth];
+    }
+    
+    // Identifica o novo mês vigente (último restante)
+    const remaining = Object.keys(state.sizingHistory || {}).filter(m => m >= '2026-11').sort();
+    const newActiveMonth = remaining.length > 0 ? remaining[remaining.length - 1] : '2026-11';
+    
+    state.sizingCurrentMonth = newActiveMonth;
+    if (state.sizingHistory && state.sizingHistory[newActiveMonth]) {
+        state.sizingParams = Object.assign({}, state.sizingHistory[newActiveMonth]);
+    } else {
+        state.sizingParams.mesReferencia = newActiveMonth;
+    }
+    saveState();
+    
+    closeConfirmDiscardModal();
+    renderSizingView();
+    showToast(`Projeção de ${formatMonthName(curMonth)} descartada. ${formatMonthName(newActiveMonth)} reaberto como vigente!`, 'success', 3500);
+}
+
+// DESBLOQUEIO CONTROLADO DE HISTÓRICO PARA AJUSTES
+function unlockCurrentHistoricalMonth() {
+    const curMonth = state.sizingCurrentMonth || '2026-11';
+    if (!state.sizingUnlockedMonths) state.sizingUnlockedMonths = {};
+    state.sizingUnlockedMonths[curMonth] = true;
+    
+    renderSizingView();
+    showToast(`Projeção de ${formatMonthName(curMonth)} desbloqueada para ajustes!`, 'warning', 3000);
+}
+
+function relockCurrentHistoricalMonth() {
+    const curMonth = state.sizingCurrentMonth || '2026-11';
+    if (state.sizingUnlockedMonths) {
+        delete state.sizingUnlockedMonths[curMonth];
+    }
+    // Salva o snapshot com os novos ajustes realizados
+    saveCurrentSizingMonthSnapshot();
+    
+    renderSizingView();
+    showToast(`Ajustes em ${formatMonthName(curMonth)} concluídos e protegidos!`, 'success', 3000);
 }
 
 // ACCORDION TOGGLER FOR SIZING TECHNICAL BREAKDOWN
@@ -13141,24 +13317,34 @@ function renderSizingView() {
         state.sizingCurrentMonth = '2026-11';
     }
     
-    const curMonth = state.sizingCurrentMonth;
-    const isLocked = isSizingMonthLocked(curMonth);
+    const curMonth = state.sizingCurrentMonth || '2026-11';
+    
+    // Coleta apenas meses a partir de Nov/2026 (sem histórico anterior a isso)
+    const monthSet = new Set(Object.keys(state.sizingHistory || {}).filter(m => m >= '2026-11'));
+    monthSet.add(curMonth);
+    monthSet.add('2026-11');
+    
+    const sortedMonths = Array.from(monthSet).filter(m => /^\d{4}-\d{2}$/.test(m)).sort();
+    const latestMonth = sortedMonths[sortedMonths.length - 1];
+    const isLatestMonth = (curMonth === latestMonth);
+    const isTemporarilyUnlocked = !!(state.sizingUnlockedMonths && state.sizingUnlockedMonths[curMonth]);
+    const isLocked = !isLatestMonth && !isTemporarilyUnlocked;
     
     // 1. Render Month Selector & Status
     const elSelect = document.getElementById('sizing-mes-select');
     if (elSelect) {
-        // Coleta apenas meses a partir de Nov/2026 (sem histórico anterior a isso)
-        const monthSet = new Set(Object.keys(state.sizingHistory || {}).filter(m => m >= '2026-11'));
-        monthSet.add(curMonth);
-        monthSet.add('2026-11');
-        
-        const sortedMonths = Array.from(monthSet).filter(m => /^\d{4}-\d{2}$/.test(m)).sort();
-        const latestMonth = sortedMonths[sortedMonths.length - 1];
-        
         elSelect.innerHTML = sortedMonths.map(m => {
-            const locked = (m < latestMonth);
-            const icon = locked ? '🔒 ' : '📝 ';
-            const statusTag = locked ? 'Histórico' : 'Vigente';
+            const isLatest = (m === latestMonth);
+            const isUnl = !!(state.sizingUnlockedMonths && state.sizingUnlockedMonths[m]);
+            let icon = '🔒 ';
+            let statusTag = 'Histórico';
+            if (isLatest) {
+                icon = '📝 ';
+                statusTag = 'Vigente';
+            } else if (isUnl) {
+                icon = '⚠️ ';
+                statusTag = 'Reaberto';
+            }
             const selected = (m === curMonth) ? 'selected' : '';
             return `<option value="${m}" ${selected}>${icon}${formatMonthName(m)} (${statusTag})</option>`;
         }).join('');
@@ -13167,7 +13353,10 @@ function renderSizingView() {
     // 2. Render Lock Status Badge
     const elLockBadge = document.getElementById('sizing-lock-badge');
     if (elLockBadge) {
-        if (isLocked) {
+        if (isTemporarilyUnlocked) {
+            elLockBadge.className = 'sizing-lock-badge badge-reopened';
+            elLockBadge.innerHTML = '<i class="fa-solid fa-lock-open"></i> Reaberto para Ajustes (Histórico)';
+        } else if (isLocked) {
             elLockBadge.className = 'sizing-lock-badge badge-locked';
             elLockBadge.innerHTML = '<i class="fa-solid fa-lock"></i> Somente Visualização (Histórico)';
         } else {
@@ -13176,14 +13365,37 @@ function renderSizingView() {
         }
     }
     
-    // 3. Render History Banner
+    // 3. Render Discard Button (visible only on latest month when curMonth > 2026-11)
+    const btnDiscard = document.getElementById('btn-sizing-discard-month');
+    if (btnDiscard) {
+        if (isLatestMonth && curMonth > '2026-11') {
+            btnDiscard.style.display = 'inline-flex';
+        } else {
+            btnDiscard.style.display = 'none';
+        }
+    }
+    
+    // 4. Render History Banner and Action Buttons
     const elHistoryBanner = document.getElementById('sizing-history-banner');
     const elHistoryText = document.getElementById('sizing-history-banner-text');
+    const btnUnlock = document.getElementById('btn-sizing-unlock-history');
+    const btnRelock = document.getElementById('btn-sizing-relock-history');
+    
     if (elHistoryBanner) {
-        if (isLocked) {
+        if (!isLatestMonth) {
             elHistoryBanner.style.display = 'flex';
-            if (elHistoryText) {
-                elHistoryText.innerHTML = `Visualizando projeção histórica de <strong>${formatMonthName(curMonth)}</strong> (Somente Leitura). Para editar ou planejar novo período, selecione o mês vigente na lista ou clique em <strong>Nova Projeção</strong>.`;
+            if (isTemporarilyUnlocked) {
+                if (elHistoryText) {
+                    elHistoryText.innerHTML = `⚠️ Projeção histórica de <strong>${formatMonthName(curMonth)}</strong> <strong>reaberta para edição</strong>. As alterações salvas atualizarão este período.`;
+                }
+                if (btnUnlock) btnUnlock.style.display = 'none';
+                if (btnRelock) btnRelock.style.display = 'inline-flex';
+            } else {
+                if (elHistoryText) {
+                    elHistoryText.innerHTML = `Visualizando projeção histórica de <strong>${formatMonthName(curMonth)}</strong> (Somente Leitura).`;
+                }
+                if (btnUnlock) btnUnlock.style.display = 'inline-flex';
+                if (btnRelock) btnRelock.style.display = 'none';
             }
         } else {
             elHistoryBanner.style.display = 'none';
