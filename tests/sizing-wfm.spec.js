@@ -160,7 +160,8 @@ test.describe('Painel OPS - Redimensionamento (WFM & Erlang C) E2E', () => {
     await page.waitForTimeout(300);
 
     const lockBadge = page.locator('#sizing-lock-badge');
-    await expect(lockBadge).toContainText('Mês encerrado');
+    await expect(lockBadge).toContainText('Somente Visualização');
+    await expect(page.locator('#sizing-history-banner')).toBeVisible();
 
     // Inputs inside sheet tables should be disabled
     const volVozInput = page.locator('#input-sizing-vol-voz');
@@ -174,6 +175,7 @@ test.describe('Painel OPS - Redimensionamento (WFM & Erlang C) E2E', () => {
     await page.waitForTimeout(300);
 
     await expect(lockBadge).toContainText('Aberto para edição');
+    await expect(page.locator('#sizing-history-banner')).toBeHidden();
     await expect(volVozInput).toBeEnabled();
   });
 
@@ -291,5 +293,51 @@ test.describe('Painel OPS - Redimensionamento (WFM & Erlang C) E2E', () => {
     await expect(page.locator('#input-sizing-pas-voz')).toHaveValue('7');
     await expect(page.locator('#input-sizing-pa-contratada-voz')).toHaveValue('7');
     await expect(page.locator('#input-sizing-chamadas-op-voz')).toHaveValue('10');
+  });
+
+  test('12. Modal de Nova Projecao cria mes subsequente e trava o anterior como historico', async ({ page }) => {
+    await page.evaluate(() => {
+      // @ts-ignore
+      switchToView('sizing');
+    });
+
+    const btnNew = page.locator('#btn-sizing-new-month');
+    await expect(btnNew).toBeVisible();
+    await btnNew.click();
+
+    const modal = page.locator('#modal-new-sizing-projection');
+    await expect(modal).toBeVisible();
+
+    // Suggested next month should be 2026-12 (after 2026-11)
+    const inputMonth = page.locator('#modal-input-new-sizing-month');
+    await expect(inputMonth).toHaveValue('2026-12');
+
+    // Confirm creation
+    const btnConfirm = page.locator('#btn-confirm-new-sizing-month');
+    await btnConfirm.click();
+
+    // Modal should close
+    await expect(modal).toBeHidden();
+
+    // New active month is 2026-12 and open for edition
+    await expect(page.locator('#sizing-lock-badge')).toContainText('Aberto para edição');
+    await expect(page.locator('#sizing-mes-select')).toHaveValue('2026-12');
+
+    // Switch back to 2026-11 via select dropdown
+    const selectMes = page.locator('#sizing-mes-select');
+    await selectMes.selectOption('2026-11');
+    await page.waitForTimeout(300);
+
+    // 2026-11 should now be locked (Somente Visualização / Histórico)
+    await expect(page.locator('#sizing-lock-badge')).toContainText('Somente Visualização');
+    await expect(page.locator('#sizing-history-banner')).toBeVisible();
+    await expect(page.locator('#input-sizing-vol-voz')).toBeDisabled();
+
+    // Switch back to 2026-12
+    await selectMes.selectOption('2026-12');
+    await page.waitForTimeout(300);
+    await expect(page.locator('#sizing-lock-badge')).toContainText('Aberto para edição');
+    await expect(page.locator('#sizing-history-banner')).toBeHidden();
+    await expect(page.locator('#input-sizing-vol-voz')).toBeEnabled();
   });
 });

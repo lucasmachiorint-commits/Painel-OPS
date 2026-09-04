@@ -7364,12 +7364,13 @@ function minToHHMMSS(min) {
 // MONTH LOCK & VERSIONING
 function isSizingMonthLocked(mesKey) {
     if (!mesKey || !/^\d{4}-\d{2}$/.test(mesKey)) return false;
-    const parts = mesKey.split('-');
-    const year = parseInt(parts[0], 10);
-    const month = parseInt(parts[1], 10);
-    // End of the month (last day, 23:59:59.999)
-    const endOfMonth = new Date(year, month, 0, 23, 59, 59, 999);
-    return new Date() > endOfMonth;
+    const allMonths = Object.keys(state.sizingHistory || {});
+    if (state.sizingCurrentMonth) allMonths.push(state.sizingCurrentMonth);
+    const validMonths = Array.from(new Set(allMonths.filter(m => /^\d{4}-\d{2}$/.test(m)))).sort();
+    if (validMonths.length === 0) return false;
+    const latestMonth = validMonths[validMonths.length - 1];
+    // Qualquer mês anterior ao mês mais recente projetado fica travado como histórico
+    return mesKey < latestMonth;
 }
 
 const MONTH_NAMES_SHORT = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
@@ -7386,7 +7387,11 @@ function getMonthOnly(mesKey) {
 
 function onSizingMonthSelect(mesKey) {
     if (!mesKey) return;
-    saveCurrentSizingMonthSnapshot();
+    
+    // Salva o snapshot do mês que estava ativo somente se ele não estiver travado
+    if (!isSizingMonthLocked(state.sizingCurrentMonth)) {
+        saveCurrentSizingMonthSnapshot();
+    }
     
     state.sizingCurrentMonth = mesKey;
     state.sizingParams.mesReferencia = mesKey;
@@ -7396,19 +7401,26 @@ function onSizingMonthSelect(mesKey) {
     }
     
     renderSizingView();
-    showToast(`Mês ${formatMonthName(mesKey)} carregado!`, 'info', 2000);
+    showToast(`Projeção de ${formatMonthName(mesKey)} carregada!`, 'info', 2000);
 }
 
 function saveCurrentSizingMonthSnapshot() {
     if (!state.sizingHistory) state.sizingHistory = {};
     const mesKey = state.sizingCurrentMonth || state.sizingParams.mesReferencia || '2026-11';
-    state.sizingHistory[mesKey] = Object.assign({}, state.sizingParams);
+    state.sizingHistory[mesKey] = Object.assign({}, state.sizingParams, {
+        mesReferencia: mesKey,
+        dataAtualizacao: new Date().toISOString()
+    });
     saveState();
 }
 
-function promptNewSizingMonth() {
-    const current = state.sizingCurrentMonth || '2026-11';
-    const [y, m] = current.split('-').map(Number);
+function openNewSizingModal() {
+    const allMonths = Object.keys(state.sizingHistory || {});
+    if (state.sizingCurrentMonth) allMonths.push(state.sizingCurrentMonth);
+    const validMonths = Array.from(new Set(allMonths.filter(m => /^\d{4}-\d{2}$/.test(m)))).sort();
+    const latest = validMonths.length > 0 ? validMonths[validMonths.length - 1] : (state.sizingCurrentMonth || '2026-11');
+    
+    const [y, m] = latest.split('-').map(Number);
     let nextM = m + 1;
     let nextY = y;
     if (nextM > 12) {
@@ -7416,23 +7428,63 @@ function promptNewSizingMonth() {
         nextY += 1;
     }
     const defNext = `${nextY}-${String(nextM).padStart(2, '0')}`;
-    const input = prompt('Informe o novo mês para projetar (formato AAAA-MM, ex: 2026-12 ou 2027-01):', defNext);
-    if (!input) return;
-    const mesKey = input.trim();
+    
+    const inputEl = document.getElementById('modal-input-new-sizing-month');
+    if (inputEl) {
+        inputEl.value = defNext;
+        inputEl.min = defNext;
+    }
+    
+    const tipEl = document.getElementById('modal-tip-new-sizing-month');
+    if (tipEl) {
+        tipEl.innerHTML = `Próximo mês sugerido: <strong>${formatMonthName(defNext)}</strong> (subsequente a ${formatMonthName(latest)})`;
+    }
+    
+    const modal = document.getElementById('modal-new-sizing-projection');
+    if (modal) modal.style.display = 'flex';
+}
+
+function closeNewSizingModal() {
+    const modal = document.getElementById('modal-new-sizing-projection');
+    if (modal) modal.style.display = 'none';
+}
+
+function confirmNewSizingMonth() {
+    const inputEl = document.getElementById('modal-input-new-sizing-month');
+    const mesKey = inputEl ? inputEl.value.trim() : '';
     if (!/^\d{4}-\d{2}$/.test(mesKey)) {
-        alert('Formato inválido! Use AAAA-MM (ex: 2026-12).');
+        showToast('Selecione um mês válido (formato AAAA-MM)!', 'warning', 3000);
         return;
     }
     
+    if (state.sizingHistory && state.sizingHistory[mesKey]) {
+        showToast(`Projeção para ${formatMonthName(mesKey)} já existe no histórico!`, 'info', 3000);
+        closeNewSizingModal();
+        onSizingMonthSelect(mesKey);
+        return;
+    }
+    
+    // Salva o snapshot do mês atual antes de alternar para o novo
     saveCurrentSizingMonthSnapshot();
     
-    if (!state.sizingHistory[mesKey]) {
-        state.sizingHistory[mesKey] = Object.assign({}, state.sizingParams, { mesReferencia: mesKey });
-    }
+    // Cria novo mês clonando parâmetros vigentes como base editável
+    if (!state.sizingHistory) state.sizingHistory = {};
+    state.sizingHistory[mesKey] = Object.assign({}, state.sizingParams, {
+        mesReferencia: mesKey,
+        dataCriacao: new Date().toISOString()
+    });
+    
     state.sizingCurrentMonth = mesKey;
-    state.sizingParams.mesReferencia = mesKey;
+    state.sizingParams = Object.assign({}, state.sizingHistory[mesKey]);
+    saveState();
+    
+    closeNewSizingModal();
     renderSizingView();
-    showToast(`Nova projeção criada para ${formatMonthName(mesKey)}!`, 'success', 3000);
+    showToast(`Nova projeção criada para ${formatMonthName(mesKey)}!`, 'success', 3500);
+}
+
+function promptNewSizingMonth() {
+    openNewSizingModal();
 }
 
 // ACCORDION TOGGLER FOR SIZING TECHNICAL BREAKDOWN
@@ -7857,20 +7909,20 @@ function renderSizingView() {
     // 1. Render Month Selector & Status
     const elSelect = document.getElementById('sizing-mes-select');
     if (elSelect) {
-        // Build set of months: history keys + current + next 3 months
+        // Collect all distinct registered months in history + current month + default
         const monthSet = new Set(Object.keys(state.sizingHistory || {}));
-        monthSet.add('2026-09');
-        monthSet.add('2026-10');
-        monthSet.add('2026-11');
-        monthSet.add('2026-12');
         monthSet.add(curMonth);
+        monthSet.add('2026-11');
         
-        const sortedMonths = Array.from(monthSet).sort();
+        const sortedMonths = Array.from(monthSet).filter(m => /^\d{4}-\d{2}$/.test(m)).sort();
+        const latestMonth = sortedMonths[sortedMonths.length - 1];
+        
         elSelect.innerHTML = sortedMonths.map(m => {
-            const locked = isSizingMonthLocked(m);
-            const lockIcon = locked ? '🔒 ' : '🔓 ';
+            const locked = (m < latestMonth);
+            const icon = locked ? '🔒 ' : '📝 ';
+            const statusTag = locked ? 'Histórico' : 'Vigente';
             const selected = (m === curMonth) ? 'selected' : '';
-            return `<option value="${m}" ${selected}>${lockIcon}${formatMonthName(m)}</option>`;
+            return `<option value="${m}" ${selected}>${icon}${formatMonthName(m)} (${statusTag})</option>`;
         }).join('');
     }
     
@@ -7879,26 +7931,25 @@ function renderSizingView() {
     if (elLockBadge) {
         if (isLocked) {
             elLockBadge.className = 'sizing-lock-badge badge-locked';
-            elLockBadge.innerHTML = '<i class="fa-solid fa-lock"></i> Mês encerrado — Histórico travado';
+            elLockBadge.innerHTML = '<i class="fa-solid fa-lock"></i> Somente Visualização (Histórico)';
         } else {
             elLockBadge.className = 'sizing-lock-badge badge-open';
-            elLockBadge.innerHTML = '<i class="fa-solid fa-lock-open"></i> Aberto para edição';
+            elLockBadge.innerHTML = '<i class="fa-solid fa-lock-open"></i> Aberto para edição (Vigente)';
         }
     }
     
-    // 3. Render Month Pills
-    const elPills = document.getElementById('sizing-month-pills');
-    if (elPills) {
-        const months = ['2026-09', '2026-10', '2026-11', '2026-12'];
-        if (!months.includes(curMonth)) months.push(curMonth);
-        months.sort();
-        
-        elPills.innerHTML = months.map(m => {
-            const locked = isSizingMonthLocked(m);
-            const active = (m === curMonth) ? 'active' : '';
-            const icon = locked ? '<i class="fa-solid fa-lock" style="font-size: 0.65rem;"></i>' : '';
-            return `<button type="button" class="sizing-month-pill ${active} ${locked ? 'locked' : ''}" onclick="onSizingMonthSelect('${m}')">${icon} ${formatMonthName(m)}</button>`;
-        }).join('');
+    // 3. Render History Banner
+    const elHistoryBanner = document.getElementById('sizing-history-banner');
+    const elHistoryText = document.getElementById('sizing-history-banner-text');
+    if (elHistoryBanner) {
+        if (isLocked) {
+            elHistoryBanner.style.display = 'flex';
+            if (elHistoryText) {
+                elHistoryText.innerHTML = `Visualizando projeção histórica de <strong>${formatMonthName(curMonth)}</strong> (Somente Leitura). Para editar ou planejar novo período, selecione o mês vigente na lista ou clique em <strong>Nova Projeção</strong>.`;
+            }
+        } else {
+            elHistoryBanner.style.display = 'none';
+        }
     }
     
     // 4. Fill form inputs from parameters
@@ -7962,6 +8013,10 @@ function renderSizingView() {
     sheetInputs.forEach(inp => {
         inp.disabled = isLocked;
     });
+    const btnReset = document.getElementById('btn-sizing-reset-defaults');
+    if (btnReset) btnReset.disabled = isLocked;
+    const btnImport = document.getElementById('btn-sizing-import-excel');
+    if (btnImport) btnImport.disabled = isLocked;
     
     // Setup event listeners if not already bound
     setupSizingEventListeners();
