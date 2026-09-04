@@ -2625,15 +2625,44 @@ body.light-theme #modal-add-resp {
     margin: 0;
 }
 
-.sizing-cell-input:hover:not(:disabled) {
-    border-color: #cbd5e1;
+/* Editable inputs styling */
+.sizing-sheet-table input.sizing-cell-input:not(.cell-calculated):not([readonly]) {
     background: #ffffff;
+    border: 1px solid #cbd5e1;
+    color: #0f172a;
+    cursor: text;
 }
 
-.sizing-cell-input:focus:not(:disabled) {
+.sizing-sheet-table input.sizing-cell-input:not(.cell-calculated):not([readonly]):hover:not(:disabled) {
     border-color: #f59e0b;
+    background: #fffdf5;
+}
+
+.sizing-sheet-table input.sizing-cell-input:not(.cell-calculated):not([readonly]):focus:not(:disabled) {
+    border-color: #d97706;
     background: #fffbeb;
-    box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.2);
+    box-shadow: 0 0 0 2px rgba(217, 119, 6, 0.25);
+}
+
+/* Calculated / Read-only formula cells */
+.sizing-cell-input.cell-calculated {
+    background: #f8fafc;
+    border: 1px dashed #cbd5e1;
+    color: #475569;
+    cursor: default;
+    user-select: all;
+}
+
+.sizing-cell-input.cell-calculated:hover {
+    border-color: #cbd5e1;
+    background: #f8fafc;
+}
+
+.sizing-cell-input.cell-calculated:focus {
+    outline: none;
+    border-color: #94a3b8;
+    background: #f1f5f9;
+    box-shadow: none;
 }
 
 .sizing-cell-input:disabled {
@@ -3988,11 +4017,11 @@ body.light-theme .sizing-acc-body {
                                     </div>
                                 </div>
 
-                                <!-- Row 14: Volume Atendidas -->
+                                <!-- Row 14: Volume Atendidas (Calculado) -->
                                 <div class="sizing-sheet-row">
                                     <span class="sheet-label">Volume Atendidas</span>
                                     <div class="sheet-cell">
-                                        <input type="number" id="input-sizing-vol-atendidas" min="0" step="1" value="19215" class="sizing-cell-input" inputmode="numeric">
+                                        <input type="number" id="input-sizing-vol-atendidas" value="19215" class="sizing-cell-input cell-calculated" readonly tabindex="-1">
                                     </div>
                                 </div>
 
@@ -4005,35 +4034,35 @@ body.light-theme .sizing-acc-body {
                                     </div>
                                 </div>
 
-                                <!-- Row 16: Volume DMM -->
+                                <!-- Row 16: Volume DMM (Calculado) -->
                                 <div class="sizing-sheet-row row-indented">
                                     <span class="sheet-label text-muted">Volume DMM</span>
                                     <div class="sheet-cell">
-                                        <input type="number" id="input-sizing-vol-dmm" min="0" step="1" value="1118" class="sizing-cell-input text-muted" inputmode="numeric">
+                                        <input type="number" id="input-sizing-vol-dmm" value="1118" class="sizing-cell-input cell-calculated text-muted" readonly tabindex="-1">
                                     </div>
                                 </div>
 
-                                <!-- Row 17: Volume HMM -->
+                                <!-- Row 17: Volume HMM (Calculado) -->
                                 <div class="sizing-sheet-row row-indented">
                                     <span class="sheet-label text-muted">Volume HMM</span>
                                     <div class="sheet-cell">
-                                        <input type="number" id="input-sizing-vol-hmm" min="0" step="1" value="108" class="sizing-cell-input text-muted" inputmode="numeric">
+                                        <input type="number" id="input-sizing-vol-hmm" value="108" class="sizing-cell-input cell-calculated text-muted" readonly tabindex="-1">
                                     </div>
                                 </div>
 
-                                <!-- Row 18: Erlang -->
+                                <!-- Row 18: Erlang (Calculado) -->
                                 <div class="sizing-sheet-row row-indented">
                                     <span class="sheet-label text-muted">Erlang</span>
                                     <div class="sheet-cell">
-                                        <input type="number" id="input-sizing-erlang" min="0" step="1" value="14" class="sizing-cell-input text-muted font-bold" inputmode="numeric">
+                                        <input type="number" id="input-sizing-erlang" value="14" class="sizing-cell-input cell-calculated text-muted font-bold" readonly tabindex="-1">
                                     </div>
                                 </div>
 
-                                <!-- Row 19: PA's Necessárias (Gold Highlight) -->
+                                <!-- Row 19: PA's Necessárias (Gold Highlight - Calculado) -->
                                 <div class="sizing-sheet-row row-result-gold">
                                     <span class="sheet-label font-bold" style="color: #92400e;">PA's Necessárias</span>
                                     <div class="sheet-cell">
-                                        <input type="number" id="input-sizing-pas-voz" min="0" step="1" value="29" class="sizing-cell-input font-bold cell-gold-input" inputmode="numeric">
+                                        <input type="number" id="input-sizing-pas-voz" value="29" class="sizing-cell-input cell-calculated font-bold cell-gold-input" readonly tabindex="-1">
                                     </div>
                                 </div>
 
@@ -4045,19 +4074,19 @@ body.light-theme .sizing-acc-body {
                                     </div>
                                 </div>
 
-                                <!-- Row 21: PA CONTRATADA (Bold Italic) -->
+                                <!-- Row 21: PA CONTRATADA (Bold Italic - Calculado) -->
                                 <div class="sizing-sheet-row row-result-amber">
                                     <span class="sheet-label font-bold font-italic" style="color: #b45309;">PA CONTRATADA</span>
                                     <div class="sheet-cell">
-                                        <input type="number" id="input-sizing-pa-contratada-voz" min="0" step="1" value="29" class="sizing-cell-input font-bold font-italic cell-amber-input" inputmode="numeric">
+                                        <input type="number" id="input-sizing-pa-contratada-voz" value="29" class="sizing-cell-input cell-calculated font-bold font-italic cell-amber-input" readonly tabindex="-1">
                                     </div>
                                 </div>
 
-                                <!-- Row 22: CHAMADAS / OPERADOR (Italic) -->
+                                <!-- Row 22: CHAMADAS / OPERADOR (Italic - Calculado) -->
                                 <div class="sizing-sheet-row">
                                     <span class="sheet-label font-italic text-muted">CHAMADAS / OPERADOR</span>
                                     <div class="sheet-cell">
-                                        <input type="number" id="input-sizing-chamadas-op-voz" min="0" step="1" value="687" class="sizing-cell-input font-italic text-muted font-bold" inputmode="numeric">
+                                        <input type="number" id="input-sizing-chamadas-op-voz" value="687" class="sizing-cell-input cell-calculated font-italic text-muted font-bold" readonly tabindex="-1">
                                     </div>
                                 </div>
                             </div>
@@ -4175,58 +4204,58 @@ body.light-theme .sizing-acc-body {
 
                                 <!-- Row 13: Volume Mês -->
                                 <div class="sizing-sheet-row row-highlight-text">
-                                    <span class="sheet-label font-bold">Volume Mês</span>
-                                    <div class="sheet-cell">
-                                        <input type="number" id="input-sizing-vol-chat" min="0" step="1" value="0" class="sizing-cell-input font-bold" style="font-size: 0.95rem;" inputmode="numeric">
-                                    </div>
-                                </div>
+                                     <span class="sheet-label font-bold">Volume Mês</span>
+                                     <div class="sheet-cell">
+                                         <input type="number" id="input-sizing-vol-chat" min="0" step="1" value="0" class="sizing-cell-input font-bold" style="font-size: 0.95rem;" inputmode="numeric">
+                                     </div>
+                                 </div>
 
-                                <!-- Row 14: Volume Atendidas -->
+                                <!-- Row 14: Volume Atendidas (Calculado) -->
                                 <div class="sizing-sheet-row">
-                                    <span class="sheet-label">Volume Atendidas</span>
-                                    <div class="sheet-cell">
-                                        <input type="number" id="input-sizing-vol-atendidas-chat" min="0" step="1" value="0" class="sizing-cell-input" inputmode="numeric">
-                                    </div>
-                                </div>
+                                     <span class="sheet-label">Volume Atendidas</span>
+                                     <div class="sheet-cell">
+                                         <input type="number" id="input-sizing-vol-atendidas-chat" value="0" class="sizing-cell-input cell-calculated" readonly tabindex="-1">
+                                     </div>
+                                 </div>
 
                                 <!-- Row 15: DMM (MÉDIA 5) - Separator bar -->
                                 <div class="sizing-sheet-row row-section-divider">
-                                    <span class="sheet-label font-bold">DMM (MÉDIA 5)</span>
-                                    <div class="sheet-cell">
-                                        <input type="number" id="input-sizing-dmm-chat" min="0.1" max="100" step="0.01" value="5.62" class="sizing-cell-input font-bold" inputmode="decimal">
-                                        <span class="sheet-unit font-bold">%</span>
-                                    </div>
-                                </div>
+                                     <span class="sheet-label font-bold">DMM (MÉDIA 5)</span>
+                                     <div class="sheet-cell">
+                                         <input type="number" id="input-sizing-dmm-chat" min="0.1" max="100" step="0.01" value="5.62" class="sizing-cell-input font-bold" inputmode="decimal">
+                                         <span class="sheet-unit font-bold">%</span>
+                                     </div>
+                                 </div>
 
-                                <!-- Row 16: Volume DMM -->
+                                <!-- Row 16: Volume DMM (Calculado) -->
                                 <div class="sizing-sheet-row row-indented">
                                     <span class="sheet-label text-muted">Volume DMM</span>
                                     <div class="sheet-cell">
-                                        <input type="number" id="input-sizing-vol-dmm-chat" min="0" step="1" value="0" class="sizing-cell-input text-muted" inputmode="numeric">
+                                        <input type="number" id="input-sizing-vol-dmm-chat" value="0" class="sizing-cell-input cell-calculated text-muted" readonly tabindex="-1">
                                     </div>
                                 </div>
 
-                                <!-- Row 17: Volume HMM -->
+                                <!-- Row 17: Volume HMM (Calculado) -->
                                 <div class="sizing-sheet-row row-indented">
                                     <span class="sheet-label text-muted">Volume HMM</span>
                                     <div class="sheet-cell">
-                                        <input type="number" id="input-sizing-vol-hmm-chat" min="0" step="1" value="0" class="sizing-cell-input text-muted" inputmode="numeric">
+                                        <input type="number" id="input-sizing-vol-hmm-chat" value="0" class="sizing-cell-input cell-calculated text-muted" readonly tabindex="-1">
                                     </div>
                                 </div>
 
-                                <!-- Row 18: Erlang -->
+                                <!-- Row 18: Erlang (Calculado) -->
                                 <div class="sizing-sheet-row row-indented">
                                     <span class="sheet-label text-muted">Erlang</span>
                                     <div class="sheet-cell">
-                                        <input type="number" id="input-sizing-erlang-chat" min="0" step="1" value="0" class="sizing-cell-input text-muted font-bold" inputmode="numeric">
+                                        <input type="number" id="input-sizing-erlang-chat" value="0" class="sizing-cell-input cell-calculated text-muted font-bold" readonly tabindex="-1">
                                     </div>
                                 </div>
 
-                                <!-- Row 19: PA's Necessárias (Gold Highlight) -->
+                                <!-- Row 19: PA's Necessárias (Gold Highlight - Calculado) -->
                                 <div class="sizing-sheet-row row-result-gold">
                                     <span class="sheet-label font-bold" style="color: #92400e;">PA's Necessárias</span>
                                     <div class="sheet-cell">
-                                        <input type="number" id="input-sizing-pas-chat" min="0" step="1" value="0" class="sizing-cell-input font-bold cell-gold-input" inputmode="numeric">
+                                        <input type="number" id="input-sizing-pas-chat" value="0" class="sizing-cell-input cell-calculated font-bold cell-gold-input" readonly tabindex="-1">
                                     </div>
                                 </div>
 
@@ -4238,19 +4267,19 @@ body.light-theme .sizing-acc-body {
                                     </div>
                                 </div>
 
-                                <!-- Row 21: PA CONTRATADA (Bold Italic) -->
+                                <!-- Row 21: PA CONTRATADA (Bold Italic - Calculado) -->
                                 <div class="sizing-sheet-row row-result-amber">
                                     <span class="sheet-label font-bold font-italic" style="color: #b45309;">PA CONTRATADA</span>
                                     <div class="sheet-cell">
-                                        <input type="number" id="input-sizing-pa-contratada-chat" min="0" step="1" value="0" class="sizing-cell-input font-bold font-italic cell-amber-input" inputmode="numeric">
+                                        <input type="number" id="input-sizing-pa-contratada-chat" value="0" class="sizing-cell-input cell-calculated font-bold font-italic cell-amber-input" readonly tabindex="-1">
                                     </div>
                                 </div>
 
-                                <!-- Row 22: ATENDIMENTOS / OPERADOR (Italic) -->
+                                <!-- Row 22: ATENDIMENTOS / OPERADOR (Italic - Calculado) -->
                                 <div class="sizing-sheet-row">
                                     <span class="sheet-label font-italic text-muted">ATENDIMENTOS / OPERADOR</span>
                                     <div class="sheet-cell">
-                                        <input type="number" id="input-sizing-chamadas-op-chat" min="0" step="1" value="0" class="sizing-cell-input font-italic text-muted font-bold" inputmode="numeric">
+                                        <input type="number" id="input-sizing-chamadas-op-chat" value="0" class="sizing-cell-input cell-calculated font-italic text-muted font-bold" readonly tabindex="-1">
                                     </div>
                                 </div>
                             </div>
@@ -4286,27 +4315,27 @@ body.light-theme .sizing-acc-body {
                                     </div>
                                 </div>
 
-                                <!-- Row 4: Volume Dia -->
+                                <!-- Row 4: Volume Dia (Calculado) -->
                                 <div class="sizing-sheet-row">
                                     <span class="sheet-label">Volume Dia</span>
                                     <div class="sheet-cell">
-                                        <input type="number" id="input-sizing-vol-dia-bo" min="0" step="1" value="342" class="sizing-cell-input" inputmode="numeric">
+                                        <input type="number" id="input-sizing-vol-dia-bo" value="342" class="sizing-cell-input cell-calculated" readonly tabindex="-1">
                                     </div>
                                 </div>
 
-                                <!-- Row 5: Prod. Máx. Operador/Dia -->
+                                <!-- Row 5: Prod. Máx. Operador/Dia (Calculado) -->
                                 <div class="sizing-sheet-row">
                                     <span class="sheet-label">Prod. Máx. Operador/Dia</span>
                                     <div class="sheet-cell">
-                                        <input type="number" id="input-sizing-prod-max-dia" min="0" step="1" value="22" class="sizing-cell-input font-bold" inputmode="numeric">
+                                        <input type="number" id="input-sizing-prod-max-dia" value="22" class="sizing-cell-input cell-calculated font-bold" readonly tabindex="-1">
                                     </div>
                                 </div>
 
-                                <!-- Row 6: PA's Necessárias (Gold Highlight) -->
+                                <!-- Row 6: PA's Necessárias (Gold Highlight - Calculado) -->
                                 <div class="sizing-sheet-row row-result-gold">
                                     <span class="sheet-label font-bold" style="color: #92400e;">PA's Necessárias</span>
                                     <div class="sheet-cell">
-                                        <input type="number" id="input-sizing-pas-bo" min="0" step="1" value="8" class="sizing-cell-input font-bold cell-gold-input" inputmode="numeric">
+                                        <input type="number" id="input-sizing-pas-bo" value="8" class="sizing-cell-input cell-calculated font-bold cell-gold-input" readonly tabindex="-1">
                                     </div>
                                 </div>
 
@@ -4318,27 +4347,27 @@ body.light-theme .sizing-acc-body {
                                     </div>
                                 </div>
 
-                                <!-- Row 8: PA CONTRATADA (Bold Italic) -->
+                                <!-- Row 8: PA CONTRATADA (Bold Italic - Calculado) -->
                                 <div class="sizing-sheet-row row-result-amber">
                                     <span class="sheet-label font-bold font-italic" style="color: #b45309;">PA CONTRATADA</span>
                                     <div class="sheet-cell">
-                                        <input type="number" id="input-sizing-pa-contratada-bo" min="0" step="1" value="8" class="sizing-cell-input font-bold font-italic cell-amber-input" inputmode="numeric">
+                                        <input type="number" id="input-sizing-pa-contratada-bo" value="8" class="sizing-cell-input cell-calculated font-bold font-italic cell-amber-input" readonly tabindex="-1">
                                     </div>
                                 </div>
 
-                                <!-- Row 9: CHAMADAS / OPERADOR -->
+                                <!-- Row 9: CHAMADAS / OPERADOR (Calculado) -->
                                 <div class="sizing-sheet-row">
                                     <span class="sheet-label font-bold">CHAMADAS / OPERADOR</span>
                                     <div class="sheet-cell">
-                                        <input type="number" id="input-sizing-chamadas-op-bo" min="0" step="1" value="21" class="sizing-cell-input font-bold" inputmode="numeric">
+                                        <input type="number" id="input-sizing-chamadas-op-bo" value="21" class="sizing-cell-input cell-calculated font-bold" readonly tabindex="-1">
                                     </div>
                                 </div>
 
-                                <!-- Row 10: TMA Real em Minutos -->
+                                <!-- Row 10: TMA Real em Minutos (Calculado) -->
                                 <div class="sizing-sheet-row">
                                     <span class="sheet-label">TMA Real em Minutos</span>
                                     <div class="sheet-cell">
-                                        <input type="text" id="input-sizing-tma-real-min" value="00:10:00" class="sizing-cell-input">
+                                        <input type="text" id="input-sizing-tma-real-min" value="00:10:00" class="sizing-cell-input cell-calculated" readonly tabindex="-1">
                                     </div>
                                 </div>
 
@@ -4358,11 +4387,11 @@ body.light-theme .sizing-acc-body {
                                     </div>
                                 </div>
 
-                                <!-- Row 13: Carga Horária -->
+                                <!-- Row 13: Carga Horária (Calculado) -->
                                 <div class="sizing-sheet-row">
                                     <span class="sheet-label font-italic text-muted">Carga Horária</span>
                                     <div class="sheet-cell">
-                                        <input type="text" id="input-sizing-ch-nominal-fmt" value="06:20:00" class="sizing-cell-input font-italic text-muted">
+                                        <input type="text" id="input-sizing-ch-nominal-fmt" value="06:20:00" class="sizing-cell-input cell-calculated font-italic text-muted" readonly tabindex="-1">
                                     </div>
                                 </div>
 
@@ -4375,19 +4404,19 @@ body.light-theme .sizing-acc-body {
                                     </div>
                                 </div>
 
-                                <!-- Row 15: Carga Horária de trabalho -->
+                                <!-- Row 15: Carga Horária de trabalho (Calculado) -->
                                 <div class="sizing-sheet-row">
                                     <span class="sheet-label font-italic text-muted">Carga Horária de trabalho</span>
                                     <div class="sheet-cell">
-                                        <input type="text" id="input-sizing-ch-trabalho" value="05:40:00" class="sizing-cell-input font-italic text-muted">
+                                        <input type="text" id="input-sizing-ch-trabalho" value="05:40:00" class="sizing-cell-input cell-calculated font-italic text-muted" readonly tabindex="-1">
                                     </div>
                                 </div>
 
-                                <!-- Row 16: Horas Mês -->
+                                <!-- Row 16: Horas Mês (Calculado) -->
                                 <div class="sizing-sheet-row">
                                     <span class="sheet-label font-italic text-muted">Horas Mês</span>
                                     <div class="sheet-cell">
-                                        <input type="text" id="input-sizing-horas-mes" value="170:00:00" class="sizing-cell-input font-italic text-muted">
+                                        <input type="text" id="input-sizing-horas-mes" value="170:00:00" class="sizing-cell-input cell-calculated font-italic text-muted" readonly tabindex="-1">
                                     </div>
                                 </div>
 
@@ -4400,11 +4429,11 @@ body.light-theme .sizing-acc-body {
                                     </div>
                                 </div>
 
-                                <!-- Row 18: Horas Produtivas -->
+                                <!-- Row 18: Horas Produtivas (Calculado) -->
                                 <div class="sizing-sheet-row">
                                     <span class="sheet-label font-italic text-muted">Horas Produtivas</span>
                                     <div class="sheet-cell">
-                                        <input type="text" id="input-sizing-horas-produtivas" value="05:17:59" class="sizing-cell-input font-italic text-muted">
+                                        <input type="text" id="input-sizing-horas-produtivas" value="05:17:59" class="sizing-cell-input cell-calculated font-italic text-muted" readonly tabindex="-1">
                                     </div>
                                 </div>
 
@@ -4417,11 +4446,11 @@ body.light-theme .sizing-acc-body {
                                     </div>
                                 </div>
 
-                                <!-- Row 20: Carga Horária de trabalho Efetivo -->
+                                <!-- Row 20: Carga Horária de trabalho Efetivo (Calculado) -->
                                 <div class="sizing-sheet-row">
                                     <span class="sheet-label font-italic text-muted">Carga Horária de trabalho Efetivo</span>
                                     <div class="sheet-cell">
-                                        <input type="text" id="input-sizing-ch-efetivo" value="03:42:36" class="sizing-cell-input font-italic text-muted">
+                                        <input type="text" id="input-sizing-ch-efetivo" value="03:42:36" class="sizing-cell-input cell-calculated font-italic text-muted" readonly tabindex="-1">
                                     </div>
                                 </div>
                             </div>
@@ -12149,9 +12178,7 @@ function calcSizingN1Voz(p) {
     const volEfetivo = Math.round(volBase * aumentoFactor);
     
     const abandonoMax = parseFloat(p.abandonoMax) || 3.5;
-    const volAtendidas = (p.volAtendidas !== undefined && p.volAtendidas !== null && p.volAtendidas !== '')
-        ? Math.round(parseFloat(p.volAtendidas))
-        : Math.round(volEfetivo * (1.0 - (abandonoMax / 100.0)));
+    const volAtendidas = Math.round(volEfetivo * (1.0 - (abandonoMax / 100.0)));
     
     const dmmPct = (parseFloat(p.dmmPercent) || 5.62) / 100.0;
     const hmmPct = (parseFloat(p.hmmPercent) || 9.70) / 100.0;
@@ -12224,9 +12251,7 @@ function calcSizingN1Chat(p) {
     const volEfetivo = Math.round(volBase * aumentoFactor);
     
     const abandonoMax = parseFloat(p.abandonoMaxChat !== undefined ? p.abandonoMaxChat : p.abandonoMax) || 3.5;
-    const volAtendidas = (p.volAtendidasChat !== undefined && p.volAtendidasChat !== null && p.volAtendidasChat !== '')
-        ? Math.round(parseFloat(p.volAtendidasChat))
-        : Math.round(volEfetivo * (1.0 - (abandonoMax / 100.0)));
+    const volAtendidas = Math.round(volEfetivo * (1.0 - (abandonoMax / 100.0)));
     
     const dmmPct = (parseFloat(p.dmmPercentChat !== undefined ? p.dmmPercentChat : p.dmmPercent) || 5.62) / 100.0;
     const hmmPct = (parseFloat(p.hmmPercentChat !== undefined ? p.hmmPercentChat : p.hmmPercent) || 9.70) / 100.0;
@@ -12531,7 +12556,6 @@ function recalcSizing(fromInputs = true) {
         
         // QUADRO 1: VOZ
         p.volumeMensalVoz = getNum('input-sizing-vol-voz', p.volumeMensalVoz || 19912);
-        p.volAtendidas = getNum('input-sizing-vol-atendidas', p.volAtendidas || 19215);
         p.tmaVoz = getNum('input-sizing-tma-voz', p.tmaVoz || 480);
         p.slaMeta = getNum('input-sizing-sla-meta', p.slaMeta || 80);
         p.nsMinimo = getNum('input-sizing-ns-minimo', p.nsMinimo || 60);
@@ -12548,7 +12572,6 @@ function recalcSizing(fromInputs = true) {
         
         // QUADRO 2: CHAT
         p.volumeMensalChat = getNum('input-sizing-vol-chat', p.volumeMensalChat || 0);
-        p.volAtendidasChat = getNum('input-sizing-vol-atendidas-chat', p.volAtendidasChat || 0);
         p.tmaChat = getNum('input-sizing-tma-chat', p.tmaChat || 480);
         p.slaMetaChat = getNum('input-sizing-sla-meta-chat', p.slaMetaChat || 80);
         p.nsMinimoChat = getNum('input-sizing-ns-minimo-chat', p.nsMinimoChat || 60);
@@ -12589,6 +12612,10 @@ function recalcSizing(fromInputs = true) {
     const resChat = calcSizingN1Chat(p);
     const resBO = calcSizingN2Backoffice(p);
     
+    // Update calculated results back in params object
+    p.volAtendidas = resVoz.volAtendidas;
+    p.volAtendidasChat = resChat.volAtendidas;
+    
     const safetyBuffer = Math.max(0, parseInt(p.safetyBuffer) || 0);
     const totalPAs = resVoz.paContratada + resChat.paContratada + resBO.paContratada + safetyBuffer;
     
@@ -12601,6 +12628,7 @@ function recalcSizing(fromInputs = true) {
     
     // Update calculated cells in Quadro 1 (Voz)
     setInputVal('input-sizing-mes-label-voz', mesLabel);
+    setInputVal('input-sizing-vol-atendidas', resVoz.volAtendidas);
     setInputVal('input-sizing-vol-dmm', resVoz.volDMM);
     setInputVal('input-sizing-vol-hmm', resVoz.volHMM);
     setInputVal('input-sizing-erlang', resVoz.erlang);
@@ -12610,6 +12638,7 @@ function recalcSizing(fromInputs = true) {
     
     // Update calculated cells in Quadro 2 (Chat)
     setInputVal('input-sizing-mes-label-chat', mesLabel);
+    setInputVal('input-sizing-vol-atendidas-chat', resChat.volAtendidas);
     setInputVal('input-sizing-vol-dmm-chat', resChat.volDMM);
     setInputVal('input-sizing-vol-hmm-chat', resChat.volHMM);
     setInputVal('input-sizing-erlang-chat', resChat.erlang);
@@ -12981,16 +13010,18 @@ function setupSizingEventListeners() {
     if (_sizingListenersBound) return;
     _sizingListenersBound = true;
     
-    // Recalculate on any input change (debounced 150ms)
+    // Recalculate on any input or change event (debounced 80ms)
     const container = document.getElementById('view-sizing');
     if (container) {
-        container.querySelectorAll('input').forEach(input => {
-            input.addEventListener('input', () => {
+        container.querySelectorAll('input:not([readonly])').forEach(input => {
+            const triggerRecalc = () => {
                 if (_sizingDebounceTimer) clearTimeout(_sizingDebounceTimer);
                 _sizingDebounceTimer = setTimeout(() => {
                     recalcSizing(true);
-                }, 150);
-            });
+                }, 80);
+            };
+            input.addEventListener('input', triggerRecalc);
+            input.addEventListener('change', triggerRecalc);
         });
     }
     
