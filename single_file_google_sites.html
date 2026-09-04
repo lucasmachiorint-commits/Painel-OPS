@@ -4048,13 +4048,10 @@ body.light-theme .sizing-acc-body {
                             <div class="widget-info">
                                 <h3 data-i18n="sizing_kpi_total_pas">Total PAs Requeridas</h3>
                                 <p class="widget-value" id="widget-sizing-total-pas" style="color: var(--color-success);">0</p>
-                                <span class="widget-sub" id="widget-sizing-total-sub">Buffer: +0 PAs</span>
+                                <span class="widget-sub" id="widget-sizing-total-sub">Voz + Chat + Backoffice</span>
                             </div>
                         </div>
                     </section>
-
-                    <!-- LIVE AUMENTO % BANNER -->
-                    <div id="sizing-aumento-banner" class="sizing-aumento-banner" style="display: none;"></div>
 
                     <!-- MONTH PROJECTION & VERSIONING BAR -->
                     <section class="panel glass-panel sizing-month-card" style="margin-bottom: 1.25rem; padding: 0.85rem 1.5rem;">
@@ -4658,64 +4655,7 @@ body.light-theme .sizing-acc-body {
                         </div>
                     </div>
 
-                    <!-- GOVERNANÇA, AUMENTO % & SAFETY BUFFER CARD -->
-                    <section class="panel glass-panel" style="margin-top: 1.5rem; margin-bottom: 1.5rem; padding: 1.5rem;">
-                        <h3 class="panel-title" style="margin-bottom: 1rem;">
-                            <i class="fa-solid fa-shield-halved" style="color: var(--color-primary);"></i> Governança de Demanda & Ajustes Globais
-                        </h3>
 
-                        <!-- AUMENTO % CHAMADAS HIGHLIGHT CARD -->
-                        <div class="sizing-increase-card">
-                            <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem;">
-                                <div>
-                                    <label for="input-sizing-aumento-pct" style="font-size: 1rem; font-weight: 700; color: #f59e0b; display: flex; align-items: center; gap: 0.5rem;">
-                                        <i class="fa-solid fa-arrow-trend-up"></i> <span data-i18n="sizing_lbl_aumento_pct">Aumento % sobre Chamadas / Demanda</span>
-                                    </label>
-                                    <p style="font-size: 0.8rem; color: var(--text-secondary); margin: 0.25rem 0 0 0;">
-                                        Multiplicador global que ajusta todos os volumes (Voz, Chat, Backoffice) e redimensiona as PAs de forma estruturada.
-                                    </p>
-                                </div>
-                                <div style="display: flex; align-items: center; gap: 0.5rem;">
-                                    <input type="number" id="input-sizing-aumento-pct" min="-50" max="200" step="0.5" value="0" class="sizing-increase-input">
-                                    <span style="font-size: 1.25rem; font-weight: 800; color: #f59e0b;">%</span>
-                                </div>
-                            </div>
-                            <div id="sizing-aumento-live-preview" class="sizing-live-preview" style="margin-top: 1rem;"></div>
-                        </div>
-
-                        <div class="sizing-params-grid" style="margin-top: 1.5rem;">
-                            <div class="sizing-field-group">
-                                <label for="input-sizing-vol-planejado" data-i18n="sizing_lbl_vol_planejado">Volume Planejado Contratual</label>
-                                <div class="sizing-input-wrap">
-                                    <input type="number" id="input-sizing-vol-planejado" min="0" step="1" value="19912">
-                                    <span class="sizing-unit">chamadas</span>
-                                </div>
-                                <span class="sizing-field-tip">Base de comparação para o Alerta de Desvio Contratual (&gt; 5%)</span>
-                            </div>
-
-                            <div class="sizing-field-group">
-                                <label for="input-sizing-mes-ref" data-i18n="sizing_lbl_mes_ref">Mês de Referência da Demanda</label>
-                                <div class="sizing-input-wrap">
-                                    <input type="month" id="input-sizing-mes-ref" style="font-family: inherit;">
-                                </div>
-                                <span class="sizing-field-tip">Usado para calcular a janela de contratação (M-2 / 45 dias)</span>
-                            </div>
-                        </div>
-
-                        <!-- SAFETY BUFFER SLIDER -->
-                        <div class="sizing-subpanel" style="margin-top: 1.5rem;">
-                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
-                                <label for="input-sizing-safety-buffer" style="font-weight: 700; color: var(--text-primary); font-size: 0.95rem;">
-                                    <i class="fa-solid fa-shield-cat" style="color: var(--color-success);"></i> Safety Buffer (Margem de Segurança)
-                                </label>
-                                <span class="sizing-badge-pill" id="sizing-val-safety-buffer">+0 PAs extras</span>
-                            </div>
-                            <input type="range" id="input-sizing-safety-buffer" min="0" max="20" step="1" value="0" style="width: 100%;">
-                            <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.5rem; margin-bottom: 0;">
-                                Permite parametrizar um ajuste adicional para absorver variações bruscas de tráfego antes da contratação final.
-                            </p>
-                        </div>
-                    </section>
 
                     <!-- CONTRACTUAL & GOVERNANCE ALERTS -->
                     <section class="panel glass-panel" style="margin-bottom: 1.5rem; padding: 1.5rem;">
@@ -13110,7 +13050,7 @@ function recalcSizing(fromInputs = true) {
     const elTotalPas = document.getElementById('widget-sizing-total-pas');
     const elTotalSub = document.getElementById('widget-sizing-total-sub');
     if (elTotalPas) elTotalPas.textContent = totalPAs;
-    if (elTotalSub) elTotalSub.textContent = `Buffer: +${safetyBuffer} PAs (Base: ${resVoz.paContratada + resChat.paContratada + resBO.paContratada})`;
+    if (elTotalSub) elTotalSub.textContent = `Voz: ${resVoz.paContratada} | Chat: ${resChat.paContratada} | BKO: ${resBO.paContratada}`;
     
     // 2. Update Safety buffer slider value display
     const elValBuffer = document.getElementById('sizing-val-safety-buffer');

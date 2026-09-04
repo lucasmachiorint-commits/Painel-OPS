@@ -7811,7 +7811,7 @@ function recalcSizing(fromInputs = true) {
     const elTotalPas = document.getElementById('widget-sizing-total-pas');
     const elTotalSub = document.getElementById('widget-sizing-total-sub');
     if (elTotalPas) elTotalPas.textContent = totalPAs;
-    if (elTotalSub) elTotalSub.textContent = `Buffer: +${safetyBuffer} PAs (Base: ${resVoz.paContratada + resChat.paContratada + resBO.paContratada})`;
+    if (elTotalSub) elTotalSub.textContent = `Voz: ${resVoz.paContratada} | Chat: ${resChat.paContratada} | BKO: ${resBO.paContratada}`;
     
     // 2. Update Safety buffer slider value display
     const elValBuffer = document.getElementById('sizing-val-safety-buffer');

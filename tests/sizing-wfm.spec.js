@@ -87,51 +87,41 @@ test.describe('Painel OPS - Redimensionamento (WFM & Erlang C) E2E', () => {
     await expect(page.locator('#input-sizing-nr17-bo-pct')).toHaveValue('10.53');
   });
 
-  test('4. Campo Aumento % Chamadas deve recalcular volumes efetivos e PAs com multiplicador', async ({ page }) => {
+  test('4. Alterar volume no Quadro Chat recalcula Erlang C e PAs de Chat em tempo real', async ({ page }) => {
     await page.evaluate(() => {
       // @ts-ignore
       switchToView('sizing');
     });
 
-    const inputAumento = page.locator('#input-sizing-aumento-pct');
-    await expect(inputAumento).toBeVisible();
-
-    const totalInitial = parseInt(await page.locator('#widget-sizing-total-pas').innerText());
-
-    await inputAumento.fill('25');
-    await inputAumento.dispatchEvent('input');
-    await page.waitForTimeout(300);
-
-    const banner = page.locator('#sizing-aumento-banner');
-    await expect(banner).toBeVisible();
-    await expect(banner).toContainText('+25%');
-
-    const totalNew = parseInt(await page.locator('#widget-sizing-total-pas').innerText());
-    expect(totalNew).toBeGreaterThan(totalInitial);
-  });
-
-  test('5. Safety Buffer slider deve somar PAs adicionais ao total', async ({ page }) => {
-    await page.evaluate(() => {
-      // @ts-ignore
-      switchToView('sizing');
-    });
+    const inputVolChat = page.locator('#input-sizing-vol-chat');
+    await expect(inputVolChat).toBeVisible();
 
     const initialTotal = parseInt(await page.locator('#widget-sizing-total-pas').innerText());
 
-    await page.evaluate(() => {
-      const slider = /** @type {HTMLInputElement} */ (document.getElementById('input-sizing-safety-buffer'));
-      if (slider) {
-        slider.value = '5';
-        slider.dispatchEvent(new Event('input'));
-      }
-    });
+    // Preenche volume no Chat
+    await inputVolChat.fill('5000');
+    await inputVolChat.dispatchEvent('input');
     await page.waitForTimeout(300);
 
     const newTotal = parseInt(await page.locator('#widget-sizing-total-pas').innerText());
-    expect(newTotal).toBe(initialTotal + 5);
+    expect(newTotal).toBeGreaterThan(initialTotal);
 
-    const bufferPill = page.locator('#sizing-val-safety-buffer');
-    await expect(bufferPill).toHaveText('+5 PAs extras');
+    // Verifica que as PAs de Chat foram calculadas
+    const pasChat = parseInt(await page.locator('#input-sizing-pas-chat').inputValue());
+    expect(pasChat).toBeGreaterThan(0);
+  });
+
+  test('5. Subtítulo do Total de PAs exibe detalhamento individual de canais', async ({ page }) => {
+    await page.evaluate(() => {
+      // @ts-ignore
+      switchToView('sizing');
+    });
+
+    const subTotal = page.locator('#widget-sizing-total-sub');
+    await expect(subTotal).toBeVisible();
+    await expect(subTotal).toContainText('Voz:');
+    await expect(subTotal).toContainText('Chat:');
+    await expect(subTotal).toContainText('BKO:');
   });
 
   test('6. Campo Ajuste manual deve alterar PA Contratada diretamente', async ({ page }) => {
