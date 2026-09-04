@@ -2440,6 +2440,129 @@ body.light-theme #modal-add-resp {
     animation: fadeIn 0.2s ease-in-out;
 }
 
+/* Sizing Modal Styling (Solid opaque background and high contrast) */
+#modal-new-sizing-projection.modal-overlay {
+    background: rgba(0, 0, 0, 0.65) !important;
+    backdrop-filter: blur(6px) !important;
+}
+
+.sizing-modal-box {
+    background: #0f172a !important;
+    border: 1px solid rgba(255, 255, 255, 0.15) !important;
+    border-radius: 14px !important;
+    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.65) !important;
+    max-width: 460px !important;
+    padding: 1.75rem !important;
+}
+
+body.light-theme .sizing-modal-box {
+    background: #ffffff !important;
+    border: 1px solid #cbd5e1 !important;
+    box-shadow: 0 25px 60px rgba(15, 23, 42, 0.2) !important;
+}
+
+.sizing-modal-desc {
+    font-size: 0.88rem;
+    color: #94a3b8;
+    line-height: 1.55;
+    margin: 0 0 1.25rem 0;
+}
+
+body.light-theme .sizing-modal-desc {
+    color: #475569 !important;
+}
+
+.sizing-modal-form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+    margin-bottom: 1.25rem;
+}
+
+.sizing-modal-form-group label {
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: #f8fafc;
+}
+
+body.light-theme .sizing-modal-form-group label {
+    color: #0f172a !important;
+}
+
+.sizing-modal-month-input {
+    width: 100%;
+    padding: 0.7rem 0.9rem;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    background: #1e293b;
+    color: #f8fafc;
+    font-size: 0.95rem;
+    font-family: inherit;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.sizing-modal-month-input:focus {
+    border-color: var(--color-primary, #eb5c27);
+}
+
+body.light-theme .sizing-modal-month-input {
+    background: #f8fafc !important;
+    border: 1.5px solid #cbd5e1 !important;
+    color: #0f172a !important;
+}
+
+body.light-theme .sizing-modal-month-input:focus {
+    border-color: var(--color-primary, #eb5c27) !important;
+    background: #ffffff !important;
+}
+
+.sizing-modal-tip {
+    font-size: 0.76rem;
+    color: #94a3b8;
+}
+
+body.light-theme .sizing-modal-tip {
+    color: #64748b !important;
+}
+
+.sizing-modal-callout {
+    background: rgba(245, 158, 11, 0.1);
+    border: 1px solid rgba(245, 158, 11, 0.3);
+    border-radius: 8px;
+    padding: 0.75rem 1rem;
+    margin-bottom: 1.5rem;
+    font-size: 0.82rem;
+    color: #fbbf24;
+    display: flex;
+    align-items: flex-start;
+    gap: 0.65rem;
+    line-height: 1.45;
+}
+
+body.light-theme .sizing-modal-callout {
+    background: #fffbeb !important;
+    border: 1px solid #fcd34d !important;
+    color: #92400e !important;
+}
+
+.sizing-modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.65rem;
+}
+
+.btn-confirm-sizing {
+    background: var(--color-primary, #eb5c27) !important;
+    border-color: var(--color-primary, #eb5c27) !important;
+    color: #ffffff !important;
+    font-weight: 700 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 0.45rem !important;
+    padding: 0.55rem 1.25rem !important;
+}
+
 .sizing-month-pills {
     display: flex;
     align-items: center;

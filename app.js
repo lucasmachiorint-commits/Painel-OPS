@@ -2359,11 +2359,24 @@ function applyStateMigrations() {
         }
     }
 
-    if (!state.sizingHistory || typeof state.sizingHistory !== 'object') {
+    // Baseline de redimensionamento: inicia limpo em Nov/2026 sem histórico prévio
+    if (!state.sizingBaselineNov26) {
+        state.sizingBaselineNov26 = true;
         state.sizingHistory = {};
-    }
-    if (!state.sizingCurrentMonth) {
-        state.sizingCurrentMonth = state.sizingParams.mesReferencia || '2026-11';
+        state.sizingCurrentMonth = '2026-11';
+        if (state.sizingParams) state.sizingParams.mesReferencia = '2026-11';
+    } else {
+        if (!state.sizingHistory || typeof state.sizingHistory !== 'object') {
+            state.sizingHistory = {};
+        }
+        // Remove quaisquer meses legados anteriores a 2026-11
+        Object.keys(state.sizingHistory).forEach(k => {
+            if (k < '2026-11') delete state.sizingHistory[k];
+        });
+        if (!state.sizingCurrentMonth || state.sizingCurrentMonth < '2026-11' || !/^\d{4}-\d{2}$/.test(state.sizingCurrentMonth)) {
+            state.sizingCurrentMonth = '2026-11';
+            if (state.sizingParams) state.sizingParams.mesReferencia = '2026-11';
+        }
     }
 }
 
@@ -7415,10 +7428,13 @@ function saveCurrentSizingMonthSnapshot() {
 }
 
 function openNewSizingModal() {
-    const allMonths = Object.keys(state.sizingHistory || {});
-    if (state.sizingCurrentMonth) allMonths.push(state.sizingCurrentMonth);
+    // Considera apenas meses a partir de 2026-11
+    const allMonths = Object.keys(state.sizingHistory || {}).filter(m => m >= '2026-11');
+    if (state.sizingCurrentMonth && state.sizingCurrentMonth >= '2026-11') {
+        allMonths.push(state.sizingCurrentMonth);
+    }
     const validMonths = Array.from(new Set(allMonths.filter(m => /^\d{4}-\d{2}$/.test(m)))).sort();
-    const latest = validMonths.length > 0 ? validMonths[validMonths.length - 1] : (state.sizingCurrentMonth || '2026-11');
+    const latest = validMonths.length > 0 ? validMonths[validMonths.length - 1] : '2026-11';
     
     const [y, m] = latest.split('-').map(Number);
     let nextM = m + 1;
@@ -7432,7 +7448,7 @@ function openNewSizingModal() {
     const inputEl = document.getElementById('modal-input-new-sizing-month');
     if (inputEl) {
         inputEl.value = defNext;
-        inputEl.min = defNext;
+        inputEl.min = '2026-11';
     }
     
     const tipEl = document.getElementById('modal-tip-new-sizing-month');
@@ -7454,6 +7470,10 @@ function confirmNewSizingMonth() {
     const mesKey = inputEl ? inputEl.value.trim() : '';
     if (!/^\d{4}-\d{2}$/.test(mesKey)) {
         showToast('Selecione um mês válido (formato AAAA-MM)!', 'warning', 3000);
+        return;
+    }
+    if (mesKey < '2026-11') {
+        showToast('O sistema só aceita projeções a partir de Novembro/2026!', 'warning', 3000);
         return;
     }
     
@@ -7901,7 +7921,9 @@ function renderSizingView() {
         };
     }
     if (!state.sizingHistory) state.sizingHistory = {};
-    if (!state.sizingCurrentMonth) state.sizingCurrentMonth = state.sizingParams.mesReferencia || '2026-11';
+    if (!state.sizingCurrentMonth || state.sizingCurrentMonth < '2026-11') {
+        state.sizingCurrentMonth = '2026-11';
+    }
     
     const curMonth = state.sizingCurrentMonth;
     const isLocked = isSizingMonthLocked(curMonth);
@@ -7909,8 +7931,8 @@ function renderSizingView() {
     // 1. Render Month Selector & Status
     const elSelect = document.getElementById('sizing-mes-select');
     if (elSelect) {
-        // Collect all distinct registered months in history + current month + default
-        const monthSet = new Set(Object.keys(state.sizingHistory || {}));
+        // Coleta apenas meses a partir de Nov/2026 (sem histórico anterior a isso)
+        const monthSet = new Set(Object.keys(state.sizingHistory || {}).filter(m => m >= '2026-11'));
         monthSet.add(curMonth);
         monthSet.add('2026-11');
         

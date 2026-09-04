@@ -155,7 +155,11 @@ test.describe('Painel OPS - Redimensionamento (WFM & Erlang C) E2E', () => {
       // @ts-ignore
       switchToView('sizing');
       // @ts-ignore
-      onSizingMonthSelect('2026-08'); // Month in the past
+      state.sizingHistory['2026-11'] = Object.assign({}, state.sizingParams, { mesReferencia: '2026-11' });
+      // @ts-ignore
+      state.sizingHistory['2026-12'] = Object.assign({}, state.sizingParams, { mesReferencia: '2026-12' });
+      // @ts-ignore
+      onSizingMonthSelect('2026-11'); // 2026-11 is earlier than 2026-12, so it is locked
     });
     await page.waitForTimeout(300);
 
@@ -167,16 +171,24 @@ test.describe('Painel OPS - Redimensionamento (WFM & Erlang C) E2E', () => {
     const volVozInput = page.locator('#input-sizing-vol-voz');
     await expect(volVozInput).toBeDisabled();
 
-    // Switch back to future/projected month
+    // Switch to the latest projected month (2026-12)
     await page.evaluate(() => {
       // @ts-ignore
-      onSizingMonthSelect('2026-11');
+      onSizingMonthSelect('2026-12');
     });
     await page.waitForTimeout(300);
 
     await expect(lockBadge).toContainText('Aberto para edição');
     await expect(page.locator('#sizing-history-banner')).toBeHidden();
     await expect(volVozInput).toBeEnabled();
+
+    // Reset back to baseline 2026-11 for subsequent tests
+    await page.evaluate(() => {
+      // @ts-ignore
+      delete state.sizingHistory['2026-12'];
+      // @ts-ignore
+      onSizingMonthSelect('2026-11');
+    });
   });
 
   test('8. Perfil CONSULTA pode ver a view mas os botoes de acao ficam restritos', async ({ page }) => {
@@ -297,6 +309,12 @@ test.describe('Painel OPS - Redimensionamento (WFM & Erlang C) E2E', () => {
 
   test('12. Modal de Nova Projecao cria mes subsequente e trava o anterior como historico', async ({ page }) => {
     await page.evaluate(() => {
+      // @ts-ignore
+      state.sizingBaselineNov26 = true;
+      // @ts-ignore
+      state.sizingHistory = {};
+      // @ts-ignore
+      state.sizingCurrentMonth = '2026-11';
       // @ts-ignore
       switchToView('sizing');
     });
