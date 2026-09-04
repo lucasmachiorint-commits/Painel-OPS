@@ -904,6 +904,9 @@
                                 </span>
                             </div>
                             <div style="display: flex; align-items: center; gap: 0.75rem;">
+                                <button id="btn-sizing-discard-month" type="button" class="btn btn-danger-subtle" style="font-size: 0.85rem; padding: 0.5rem 0.9rem; font-weight: 700; display: none; align-items: center; gap: 0.45rem;" onclick="openConfirmDiscardModal()" title="Descartar esta projeção e reabrir o mês anterior">
+                                    <i class="fa-solid fa-trash-can"></i> Descartar Projeção
+                                </button>
                                 <button id="btn-sizing-new-month" type="button" class="btn btn-secondary" style="font-size: 0.85rem; padding: 0.5rem 1rem; font-weight: 700; display: inline-flex; align-items: center; gap: 0.5rem;" onclick="openNewSizingModal()" title="Criar nova projeção para o mês subsequente (M-2 / 45 dias de antecedência)">
                                     <i class="fa-solid fa-calendar-plus" style="color: #f59e0b;"></i> Nova Projeção
                                 </button>
@@ -916,6 +919,14 @@
                         <i class="fa-solid fa-clock-rotate-left" style="font-size: 1.15rem;"></i>
                         <div id="sizing-history-banner-text" style="flex: 1;">
                             Visualizando projeção histórica de <strong>Novembro/2026</strong> (Somente Leitura).
+                        </div>
+                        <div id="sizing-history-banner-actions" style="display: flex; align-items: center; gap: 0.5rem;">
+                            <button id="btn-sizing-unlock-history" type="button" class="btn btn-secondary sizing-banner-action-btn" onclick="unlockCurrentHistoricalMonth()">
+                                <i class="fa-solid fa-lock-open" style="color: #10b981;"></i> Desbloquear para Ajustes
+                            </button>
+                            <button id="btn-sizing-relock-history" type="button" class="btn btn-secondary sizing-banner-action-btn" style="display: none;" onclick="relockCurrentHistoricalMonth()">
+                                <i class="fa-solid fa-lock" style="color: #f59e0b;"></i> Concluir e Bloquear
+                            </button>
                         </div>
                     </div>
 
@@ -2029,6 +2040,31 @@
                 <button type="button" class="btn btn-secondary" onclick="closeNewSizingModal()">Cancelar</button>
                 <button type="button" class="btn btn-primary btn-confirm-sizing" id="btn-confirm-new-sizing-month" onclick="confirmNewSizingMonth()">
                     <i class="fa-solid fa-check"></i> Criar Projeção
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL CONFIRMAR DESCARTE DE PROJEÇÃO -->
+    <div id="modal-confirm-discard-sizing" class="modal-overlay" style="display: none;" onclick="if(event.target === this) closeConfirmDiscardModal()">
+        <div class="modal-content sizing-modal-box" style="max-width: 440px;">
+            <div class="modal-header">
+                <h3>
+                    <i class="fa-solid fa-triangle-exclamation" style="color: #f43f5e;"></i> Descartar Projeção
+                </h3>
+                <button type="button" class="modal-close" onclick="closeConfirmDiscardModal()">&times;</button>
+            </div>
+            <p id="modal-discard-desc" class="sizing-modal-desc">
+                Deseja realmente descartar esta projeção? Esta ação removerá os dados deste período e reabrirá a projeção anterior para edição.
+            </p>
+            <div class="sizing-modal-callout" style="background: rgba(244, 63, 94, 0.08); border-color: rgba(244, 63, 94, 0.25); color: #f43f5e;">
+                <i class="fa-solid fa-circle-exclamation"></i>
+                <span id="modal-discard-tip">A projeção anterior voltará a ser a projeção vigente editável.</span>
+            </div>
+            <div class="sizing-modal-actions">
+                <button type="button" class="btn btn-secondary" onclick="closeConfirmDiscardModal()">Cancelar</button>
+                <button type="button" class="btn btn-danger" id="btn-confirm-discard-sizing" onclick="confirmDiscardSizingProjection()" style="background: #f43f5e; border-color: #f43f5e; color: #fff; font-weight: 700; display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.55rem 1.25rem; border-radius: 8px;">
+                    <i class="fa-solid fa-trash-can"></i> Sim, Descartar
                 </button>
             </div>
         </div>

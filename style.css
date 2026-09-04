@@ -2425,9 +2425,16 @@ body.light-theme #modal-add-resp {
     border: 1px solid rgba(244, 63, 94, 0.35);
 }
 
+.sizing-lock-badge.badge-reopened {
+    background: rgba(245, 158, 11, 0.18);
+    color: #f59e0b;
+    border: 1px solid rgba(245, 158, 11, 0.45);
+}
+
 .sizing-history-banner {
     display: flex;
     align-items: center;
+    justify-content: space-between;
     gap: 0.85rem;
     padding: 0.75rem 1.25rem;
     background: rgba(245, 158, 11, 0.1);
@@ -2440,8 +2447,48 @@ body.light-theme #modal-add-resp {
     animation: fadeIn 0.2s ease-in-out;
 }
 
+.sizing-banner-action-btn {
+    font-size: 0.8rem !important;
+    padding: 0.35rem 0.8rem !important;
+    font-weight: 700 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 0.4rem !important;
+    border-radius: 6px !important;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.btn-danger-subtle {
+    background: rgba(244, 63, 94, 0.08);
+    border: 1px solid rgba(244, 63, 94, 0.3);
+    color: #f43f5e;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.btn-danger-subtle:hover {
+    background: rgba(244, 63, 94, 0.2);
+    border-color: #f43f5e;
+    color: #f43f5e;
+}
+
+body.light-theme .btn-danger-subtle {
+    background: #fff1f2;
+    border: 1px solid #fecdd3;
+    color: #e11d48;
+}
+
+body.light-theme .btn-danger-subtle:hover {
+    background: #ffe4e6;
+    border-color: #fda4af;
+    color: #be123c;
+}
+
 /* Sizing Modal Styling (Solid opaque background and high contrast) */
-#modal-new-sizing-projection.modal-overlay {
+#modal-new-sizing-projection.modal-overlay,
+#modal-confirm-discard-sizing.modal-overlay {
     background: rgba(0, 0, 0, 0.65) !important;
     backdrop-filter: blur(6px) !important;
 }

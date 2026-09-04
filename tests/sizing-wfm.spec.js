@@ -358,4 +358,76 @@ test.describe('Painel OPS - Redimensionamento (WFM & Erlang C) E2E', () => {
     await expect(page.locator('#sizing-history-banner')).toBeHidden();
     await expect(page.locator('#input-sizing-vol-voz')).toBeEnabled();
   });
+
+  test('13. Reversao de erro manual: descartar projecao e desbloquear historico para ajustes', async ({ page }) => {
+    await page.evaluate(() => {
+      // @ts-ignore
+      state.sizingBaselineNov26 = true;
+      // @ts-ignore
+      state.sizingHistory = {};
+      // @ts-ignore
+      state.sizingCurrentMonth = '2026-11';
+      // @ts-ignore
+      switchToView('sizing');
+    });
+
+    // 1. Em 2026-11, o botao descartar NAO deve aparecer (baseline protegido)
+    const btnDiscard = page.locator('#btn-sizing-discard-month');
+    await expect(btnDiscard).toBeHidden();
+
+    // 2. Cria 2026-12 por engano
+    const btnNew = page.locator('#btn-sizing-new-month');
+    await btnNew.click();
+    await page.locator('#btn-confirm-new-sizing-month').click();
+    await page.waitForTimeout(300);
+
+    // Em 2026-12, o botao descartar DEVE aparecer
+    await expect(btnDiscard).toBeVisible();
+
+    // Clica em descartar
+    await btnDiscard.click();
+    const modalDiscard = page.locator('#modal-confirm-discard-sizing');
+    await expect(modalDiscard).toBeVisible();
+
+    // Confirma o descarte
+    await page.locator('#btn-confirm-discard-sizing').click();
+    await page.waitForTimeout(300);
+    await expect(modalDiscard).toBeHidden();
+
+    // Deve ter retornado para 2026-11 aberto para edicao
+    await expect(page.locator('#sizing-mes-select')).toHaveValue('2026-11');
+    await expect(page.locator('#sizing-lock-badge')).toContainText('Aberto para edição');
+    await expect(page.locator('#input-sizing-vol-voz')).toBeEnabled();
+    await expect(btnDiscard).toBeHidden();
+
+    // 3. Cria 2026-12 novamente
+    await btnNew.click();
+    await page.locator('#btn-confirm-new-sizing-month').click();
+    await page.waitForTimeout(300);
+
+    // Navega para o historico 2026-11
+    await page.locator('#sizing-mes-select').selectOption('2026-11');
+    await page.waitForTimeout(300);
+    await expect(page.locator('#input-sizing-vol-voz')).toBeDisabled();
+
+    // Clica em "Desbloquear para Ajustes"
+    const btnUnlock = page.locator('#btn-sizing-unlock-history');
+    await expect(btnUnlock).toBeVisible();
+    await btnUnlock.click();
+    await page.waitForTimeout(200);
+
+    // Deve reabrir os campos para edicao
+    await expect(page.locator('#sizing-lock-badge')).toContainText('Reaberto para Ajustes');
+    await expect(page.locator('#input-sizing-vol-voz')).toBeEnabled();
+
+    // Clica em "Concluir e Bloquear"
+    const btnRelock = page.locator('#btn-sizing-relock-history');
+    await expect(btnRelock).toBeVisible();
+    await btnRelock.click();
+    await page.waitForTimeout(200);
+
+    // Deve voltar a ficar travado
+    await expect(page.locator('#sizing-lock-badge')).toContainText('Somente Visualização');
+    await expect(page.locator('#input-sizing-vol-voz')).toBeDisabled();
+  });
 });
