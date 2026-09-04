@@ -2669,15 +2669,18 @@ body.light-theme .sizing-modal-callout {
 /* SPREADSHEET TRIPLE PANEL (VOZ, CHAT, BKO SIDE-BY-SIDE) */
 .sizing-triple-panel {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(3, minmax(320px, 1fr));
     gap: 1.25rem;
     margin-bottom: 1.5rem;
     align-items: start;
+    overflow-x: auto;
+    padding-bottom: 0.5rem;
 }
 
-@media (max-width: 1100px) {
+@media (max-width: 1024px) {
     .sizing-triple-panel {
         grid-template-columns: 1fr;
+        overflow-x: visible;
     }
 }
 
@@ -4066,6 +4069,9 @@ body.light-theme .sizing-acc-body {
                                 </div>
                                 <span id="sizing-lock-badge" class="sizing-lock-badge">
                                     <i class="fa-solid fa-lock-open"></i> Aberto para edição (Vigente)
+                                </span>
+                                <span id="sizing-sync-badge" class="sizing-sync-badge" style="display: none; align-items: center; gap: 0.35rem; font-size: 0.78rem; font-weight: 700; color: #10b981; padding: 3px 8px; border-radius: 999px; background: rgba(16, 185, 129, 0.12); border: 1px solid rgba(16, 185, 129, 0.3);">
+                                    <i class="fa-solid fa-check"></i> Salvo
                                 </span>
                             </div>
                             <div style="display: flex; align-items: center; gap: 0.75rem;">
@@ -12664,6 +12670,25 @@ function onSizingMonthSelect(mesKey) {
     showToast(`Projeção de ${formatMonthName(mesKey)} carregada!`, 'info', 2000);
 }
 
+let _sizingSyncBadgeTimer = null;
+function flashSizingSyncBadge() {
+    const badge = document.getElementById('sizing-sync-badge');
+    if (!badge) return;
+    badge.style.display = 'inline-flex';
+    badge.style.opacity = '1';
+    badge.style.transition = 'opacity 0.2s ease';
+    if (_sizingSyncBadgeTimer) clearTimeout(_sizingSyncBadgeTimer);
+    _sizingSyncBadgeTimer = setTimeout(() => {
+        if (badge) {
+            badge.style.transition = 'opacity 0.4s ease';
+            badge.style.opacity = '0';
+            setTimeout(() => {
+                if (badge && badge.style.opacity === '0') badge.style.display = 'none';
+            }, 400);
+        }
+    }, 1500);
+}
+
 function saveCurrentSizingMonthSnapshot() {
     if (!state.sizingHistory) state.sizingHistory = {};
     const mesKey = state.sizingCurrentMonth || state.sizingParams.mesReferencia || '2026-11';
@@ -12672,6 +12697,7 @@ function saveCurrentSizingMonthSnapshot() {
         dataAtualizacao: new Date().toISOString()
     });
     saveState();
+    flashSizingSyncBadge();
 }
 
 function openNewSizingModal() {
@@ -12926,50 +12952,50 @@ function recalcSizing(fromInputs = true) {
         };
         
         // QUADRO 1: VOZ
-        p.volumeMensalVoz = getNum('input-sizing-vol-voz', p.volumeMensalVoz || 19912);
-        p.tmaVoz = getNum('input-sizing-tma-voz', p.tmaVoz || 480);
-        p.slaMeta = getNum('input-sizing-sla-meta', p.slaMeta || 80);
-        p.nsMinimo = getNum('input-sizing-ns-minimo', p.nsMinimo || 60);
-        p.tmeMax = getNum('input-sizing-tme-max', p.tmeMax || 20);
-        p.abandonoMax = getNum('input-sizing-abandono-max', p.abandonoMax || 3.5);
-        p.telasVoz = getNum('input-sizing-telas-voz', p.telasVoz || 1.0);
-        p.dmmPercent = getNum('input-sizing-dmm', p.dmmPercent || 5.62);
-        p.hmmPercent = getNum('input-sizing-hmm', p.hmmPercent || 9.7);
-        p.shrinkageLanche = getNum('input-sizing-shrink-lanche', p.shrinkageLanche || 10.5);
-        p.shrinkageTreinamento = getNum('input-sizing-shrink-treino', p.shrinkageTreinamento || 4.0);
-        p.shrinkageFeedback = getNum('input-sizing-shrink-fb', p.shrinkageFeedback || 1.5);
-        p.shrinkageNR17 = getNum('input-sizing-shrink-nr17', p.shrinkageNR17 || 17.0);
+        p.volumeMensalVoz = Math.max(0, getNum('input-sizing-vol-voz', p.volumeMensalVoz || 19912));
+        p.tmaVoz = Math.max(1, getNum('input-sizing-tma-voz', p.tmaVoz || 480));
+        p.slaMeta = Math.min(100, Math.max(1, getNum('input-sizing-sla-meta', p.slaMeta || 80)));
+        p.nsMinimo = Math.min(100, Math.max(1, getNum('input-sizing-ns-minimo', p.nsMinimo || 60)));
+        p.tmeMax = Math.max(1, getNum('input-sizing-tme-max', p.tmeMax || 20));
+        p.abandonoMax = Math.min(100, Math.max(0, getNum('input-sizing-abandono-max', p.abandonoMax || 3.5)));
+        p.telasVoz = Math.max(0.1, getNum('input-sizing-telas-voz', p.telasVoz || 1.0));
+        p.dmmPercent = Math.min(100, Math.max(0.01, getNum('input-sizing-dmm', p.dmmPercent || 5.62)));
+        p.hmmPercent = Math.min(100, Math.max(0.01, getNum('input-sizing-hmm', p.hmmPercent || 9.7)));
+        p.shrinkageLanche = Math.min(99, Math.max(0, getNum('input-sizing-shrink-lanche', p.shrinkageLanche || 10.5)));
+        p.shrinkageTreinamento = Math.min(99, Math.max(0, getNum('input-sizing-shrink-treino', p.shrinkageTreinamento || 4.0)));
+        p.shrinkageFeedback = Math.min(99, Math.max(0, getNum('input-sizing-shrink-fb', p.shrinkageFeedback || 1.5)));
+        p.shrinkageNR17 = Math.min(99, Math.max(0, getNum('input-sizing-shrink-nr17', p.shrinkageNR17 || 17.0)));
         p.ajusteVoz = getNum('input-sizing-ajuste-voz', p.ajusteVoz || 0);
         
         // QUADRO 2: CHAT
-        p.volumeMensalChat = getNum('input-sizing-vol-chat', p.volumeMensalChat || 0);
-        p.tmaChat = getNum('input-sizing-tma-chat', p.tmaChat || 480);
-        p.slaMetaChat = getNum('input-sizing-sla-meta-chat', p.slaMetaChat || 80);
-        p.nsMinimoChat = getNum('input-sizing-ns-minimo-chat', p.nsMinimoChat || 60);
-        p.tmeMaxChat = getNum('input-sizing-tme-max-chat', p.tmeMaxChat || 20);
-        p.abandonoMaxChat = getNum('input-sizing-abandono-max-chat', p.abandonoMaxChat || 3.5);
-        p.telasSimultaneas = getNum('input-sizing-telas-chat', p.telasSimultaneas || 2.0);
-        p.dmmPercentChat = getNum('input-sizing-dmm-chat', p.dmmPercentChat || 5.62);
-        p.hmmPercentChat = getNum('input-sizing-hmm-chat', p.hmmPercentChat || 9.7);
-        p.shrinkageLancheChat = getNum('input-sizing-shrink-lanche-chat', p.shrinkageLancheChat || 10.5);
-        p.shrinkageTreinamentoChat = getNum('input-sizing-shrink-treino-chat', p.shrinkageTreinamentoChat || 4.0);
-        p.shrinkageFeedbackChat = getNum('input-sizing-shrink-fb-chat', p.shrinkageFeedbackChat || 1.5);
-        p.shrinkageNR17Chat = getNum('input-sizing-shrink-nr17-chat', p.shrinkageNR17Chat || 17.0);
+        p.volumeMensalChat = Math.max(0, getNum('input-sizing-vol-chat', p.volumeMensalChat || 0));
+        p.tmaChat = Math.max(1, getNum('input-sizing-tma-chat', p.tmaChat || 480));
+        p.slaMetaChat = Math.min(100, Math.max(1, getNum('input-sizing-sla-meta-chat', p.slaMetaChat || 80)));
+        p.nsMinimoChat = Math.min(100, Math.max(1, getNum('input-sizing-ns-minimo-chat', p.nsMinimoChat || 60)));
+        p.tmeMaxChat = Math.max(1, getNum('input-sizing-tme-max-chat', p.tmeMaxChat || 20));
+        p.abandonoMaxChat = Math.min(100, Math.max(0, getNum('input-sizing-abandono-max-chat', p.abandonoMaxChat || 3.5)));
+        p.telasSimultaneas = Math.max(0.1, getNum('input-sizing-telas-chat', p.telasSimultaneas || 2.0));
+        p.dmmPercentChat = Math.min(100, Math.max(0.01, getNum('input-sizing-dmm-chat', p.dmmPercentChat || 5.62)));
+        p.hmmPercentChat = Math.min(100, Math.max(0.01, getNum('input-sizing-hmm-chat', p.hmmPercentChat || 9.7)));
+        p.shrinkageLancheChat = Math.min(99, Math.max(0, getNum('input-sizing-shrink-lanche-chat', p.shrinkageLancheChat || 10.5)));
+        p.shrinkageTreinamentoChat = Math.min(99, Math.max(0, getNum('input-sizing-shrink-treino-chat', p.shrinkageTreinamentoChat || 4.0)));
+        p.shrinkageFeedbackChat = Math.min(99, Math.max(0, getNum('input-sizing-shrink-fb-chat', p.shrinkageFeedbackChat || 1.5)));
+        p.shrinkageNR17Chat = Math.min(99, Math.max(0, getNum('input-sizing-shrink-nr17-chat', p.shrinkageNR17Chat || 17.0)));
         p.ajusteChat = getNum('input-sizing-ajuste-chat', p.ajusteChat || 0);
         
         // QUADRO 3: BKO
-        p.volumeMensalBO = getNum('input-sizing-vol-bo', p.volumeMensalBO || 10270);
-        p.diasUteis = getNum('input-sizing-dias-uteis-bo', p.diasUteis || 30);
+        p.volumeMensalBO = Math.max(0, getNum('input-sizing-vol-bo', p.volumeMensalBO || 10270));
+        p.diasUteis = Math.max(1, getNum('input-sizing-dias-uteis-bo', p.diasUteis || 30));
         p.ajusteBo = getNum('input-sizing-ajuste-bo', p.ajusteBo || 0);
-        p.tmaBO = getNum('input-sizing-tma-bo', p.tmaBO || 600);
-        p.diasAtendimento = getNum('input-sizing-dias-atend', p.diasAtendimento || 30);
-        p.nr17BoPct = getNum('input-sizing-nr17-bo-pct', p.nr17BoPct || 10.53);
-        p.treinFbPct = getNum('input-sizing-trein-fb-pct', p.treinFbPct || 6.47);
-        p.eficienciaOcupacao = getNum('input-sizing-eficiencia', p.eficienciaOcupacao || 70.0);
+        p.tmaBO = Math.max(1, getNum('input-sizing-tma-bo', p.tmaBO || 600));
+        p.diasAtendimento = Math.max(1, getNum('input-sizing-dias-atend', p.diasAtendimento || 30));
+        p.nr17BoPct = Math.min(99, Math.max(0, getNum('input-sizing-nr17-bo-pct', p.nr17BoPct || 10.53)));
+        p.treinFbPct = Math.min(99, Math.max(0, getNum('input-sizing-trein-fb-pct', p.treinFbPct || 6.47)));
+        p.eficienciaOcupacao = Math.min(100, Math.max(1, getNum('input-sizing-eficiencia', p.eficienciaOcupacao || 70.0)));
         
         p.aumentoPctChamadas = getNum('input-sizing-aumento-pct', p.aumentoPctChamadas || 0);
-        p.volumePlanejado = getNum('input-sizing-vol-planejado', p.volumePlanejado || 19912);
-        p.safetyBuffer = getNum('input-sizing-safety-buffer', p.safetyBuffer || 0);
+        p.volumePlanejado = Math.max(0, getNum('input-sizing-vol-planejado', p.volumePlanejado || 19912));
+        p.safetyBuffer = Math.max(0, getNum('input-sizing-safety-buffer', p.safetyBuffer || 0));
         
         const elMes = document.getElementById('input-sizing-mes-ref');
         if (elMes && elMes.value) {
