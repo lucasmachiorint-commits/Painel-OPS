@@ -62,20 +62,23 @@ test.describe('Painel OPS - Redimensionamento (WFM & Erlang C) E2E', () => {
     expect(parseInt(totalText)).toBeGreaterThanOrEqual(parseInt(vozText) + parseInt(boText));
   });
 
-  test('3. Formato planilha dual-panel: Voz/Chat e BKO visiveis lado a lado com campos editaveis', async ({ page }) => {
+  test('3. Formato planilha triple-panel: Voz, Chat e BKO visiveis lado a lado com campos editaveis', async ({ page }) => {
     await page.evaluate(() => {
       // @ts-ignore
       switchToView('sizing');
     });
 
     const tableVoz = page.locator('#sizing-table-voz');
+    const tableChat = page.locator('#sizing-table-chat');
     const tableBO = page.locator('#sizing-table-bo');
 
     await expect(tableVoz).toBeVisible();
+    await expect(tableChat).toBeVisible();
     await expect(tableBO).toBeVisible();
 
     // Verify key fields match the spreadsheet
     await expect(page.locator('#input-sizing-vol-voz')).toHaveValue('19912');
+    await expect(page.locator('#input-sizing-telas-chat')).toHaveValue(/^(1|1\.0|2|2\.0)$/);
     await expect(page.locator('#input-sizing-vol-bo')).toHaveValue('10270');
     await expect(page.locator('#input-sizing-dias-uteis-bo')).toHaveValue('30');
     await expect(page.locator('#input-sizing-pas-bo')).toHaveValue('8');

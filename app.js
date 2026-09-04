@@ -2317,10 +2317,22 @@ function applyStateMigrations() {
         shrinkageTreinamento: 4.0,
         shrinkageFeedback: 1.5,
         shrinkageNR17: 17.0,
-        telasSimultaneas: 1.0,
+        telasSimultaneas: 2.0,
         ajusteVoz: 0,
         volumeMensalChat: 0,
+        volAtendidasChat: 0,
         tmaChat: 480,
+        slaMetaChat: 80,
+        nsMinimoChat: 60,
+        tmeMaxChat: 20,
+        abandonoMaxChat: 3.5,
+        dmmPercentChat: 5.62,
+        hmmPercentChat: 9.7,
+        shrinkageLancheChat: 10.5,
+        shrinkageTreinamentoChat: 4.0,
+        shrinkageFeedbackChat: 1.5,
+        shrinkageNR17Chat: 17.0,
+        ajusteChat: 0,
         volumeMensalBO: 10270,
         tmaBO: 600,
         diasUteis: 30,
@@ -7193,17 +7205,23 @@ function calcSizingN1Chat(p) {
     const volBase = Math.max(0, parseFloat(p.volumeMensalChat) || 0);
     const volEfetivo = Math.round(volBase * aumentoFactor);
     
-    const dmmPct = (parseFloat(p.dmmPercent) || 5.62) / 100.0;
-    const hmmPct = (parseFloat(p.hmmPercent) || 9.70) / 100.0;
+    const abandonoMax = parseFloat(p.abandonoMaxChat !== undefined ? p.abandonoMaxChat : p.abandonoMax) || 3.5;
+    const volAtendidas = (p.volAtendidasChat !== undefined && p.volAtendidasChat !== null && p.volAtendidasChat !== '')
+        ? Math.round(parseFloat(p.volAtendidasChat))
+        : Math.round(volEfetivo * (1.0 - (abandonoMax / 100.0)));
+    
+    const dmmPct = (parseFloat(p.dmmPercentChat !== undefined ? p.dmmPercentChat : p.dmmPercent) || 5.62) / 100.0;
+    const hmmPct = (parseFloat(p.hmmPercentChat !== undefined ? p.hmmPercentChat : p.hmmPercent) || 9.70) / 100.0;
     const volDMM = Math.round(volEfetivo * dmmPct);
-    const volHMM = Math.round(volEfetivo * dmmPct * hmmPct);
+    const volHMM = Math.round(volDMM * hmmPct);
     
     const tma = Math.max(1, parseFloat(p.tmaChat) || 480);
     const lambda = volHMM / 3600.0;
     const A = lambda * tma;
+    const erlang = Math.round(A);
     
-    const targetSL = parseFloat(p.slaMeta) || 80;
-    const targetWait = parseFloat(p.tmeMax) || 20;
+    const targetSL = parseFloat(p.slaMetaChat !== undefined ? p.slaMetaChat : p.slaMeta) || 80;
+    const targetWait = parseFloat(p.tmeMaxChat !== undefined ? p.tmeMaxChat : p.tmeMax) || 20;
     
     let m = 0;
     let achievedSL = 1.0;
@@ -7215,26 +7233,44 @@ function calcSizingN1Chat(p) {
         pw = erlangCPw(m, A);
     }
     
-    const telas = Math.max(1, parseFloat(p.telasSimultaneas) || 1.0);
-    const shrinkPct = parseFloat(p.shrinkageChat) || 33.0;
-    const dispEfetiva = Math.max(0.01, 1.0 - (shrinkPct / 100.0));
+    const telas = Math.max(0.1, parseFloat(p.telasSimultaneas) || 2.0);
+    const sLanche = parseFloat(p.shrinkageLancheChat !== undefined ? p.shrinkageLancheChat : p.shrinkageLanche) || 10.5;
+    const sTreino = parseFloat(p.shrinkageTreinamentoChat !== undefined ? p.shrinkageTreinamentoChat : p.shrinkageTreinamento) || 4.0;
+    const sFb = parseFloat(p.shrinkageFeedbackChat !== undefined ? p.shrinkageFeedbackChat : p.shrinkageFeedback) || 1.5;
+    const sNR17 = parseFloat(p.shrinkageNR17Chat !== undefined ? p.shrinkageNR17Chat : p.shrinkageNR17) || 17.0;
+    const totalShrinkPct = sLanche + sTreino + sFb + sNR17;
+    const dispEfetiva = Math.max(0.01, 1.0 - (totalShrinkPct / 100.0));
     
     const pas = Math.ceil((m / telas) / dispEfetiva);
+    const ajuste = parseFloat(p.ajusteChat) || 0;
+    const paContratada = Math.max(0, pas + ajuste);
+    const chamadasOp = paContratada > 0 ? Math.round(volEfetivo / paContratada) : 0;
     
     return {
         volBase,
         volEfetivo,
+        volAtendidas,
+        dmmPct: dmmPct * 100,
+        hmmPct: hmmPct * 100,
         volDMM,
         volHMM,
+        erlang,
         lambda,
         A,
         m,
         telas,
         achievedSL: achievedSL * 100,
         pw: pw * 100,
-        totalShrinkPct: shrinkPct,
+        sLanche,
+        sTreino,
+        sFb,
+        sNR17,
+        totalShrinkPct,
         dispEfetiva: dispEfetiva * 100,
-        pas
+        pas,
+        ajuste,
+        paContratada,
+        chamadasOp
     };
 }
 
@@ -7423,10 +7459,22 @@ function resetSizingDefaults() {
         shrinkageTreinamento: 4.0,
         shrinkageFeedback: 1.5,
         shrinkageNR17: 17.0,
-        telasSimultaneas: 1.0,
         ajusteVoz: 0,
         volumeMensalChat: 0,
+        volAtendidasChat: 0,
         tmaChat: 480,
+        slaMetaChat: 80,
+        nsMinimoChat: 60,
+        tmeMaxChat: 20,
+        abandonoMaxChat: 3.5,
+        telasSimultaneas: 2.0,
+        dmmPercentChat: 5.62,
+        hmmPercentChat: 9.7,
+        shrinkageLancheChat: 10.5,
+        shrinkageTreinamentoChat: 4.0,
+        shrinkageFeedbackChat: 1.5,
+        shrinkageNR17Chat: 17.0,
+        ajusteChat: 0,
         volumeMensalBO: 10270,
         tmaBO: 600,
         diasUteis: 30,
@@ -7461,6 +7509,7 @@ function recalcSizing(fromInputs = true) {
             return isNaN(val) ? fallback : val;
         };
         
+        // QUADRO 1: VOZ
         p.volumeMensalVoz = getNum('input-sizing-vol-voz', p.volumeMensalVoz || 19912);
         p.volAtendidas = getNum('input-sizing-vol-atendidas', p.volAtendidas || 19215);
         p.tmaVoz = getNum('input-sizing-tma-voz', p.tmaVoz || 480);
@@ -7468,7 +7517,6 @@ function recalcSizing(fromInputs = true) {
         p.nsMinimo = getNum('input-sizing-ns-minimo', p.nsMinimo || 60);
         p.tmeMax = getNum('input-sizing-tme-max', p.tmeMax || 20);
         p.abandonoMax = getNum('input-sizing-abandono-max', p.abandonoMax || 3.5);
-        p.telasSimultaneas = getNum('input-sizing-telas-chat', p.telasSimultaneas || 1.0);
         p.dmmPercent = getNum('input-sizing-dmm', p.dmmPercent || 5.62);
         p.hmmPercent = getNum('input-sizing-hmm', p.hmmPercent || 9.7);
         p.shrinkageLanche = getNum('input-sizing-shrink-lanche', p.shrinkageLanche || 10.5);
@@ -7477,6 +7525,24 @@ function recalcSizing(fromInputs = true) {
         p.shrinkageNR17 = getNum('input-sizing-shrink-nr17', p.shrinkageNR17 || 17.0);
         p.ajusteVoz = getNum('input-sizing-ajuste-voz', p.ajusteVoz || 0);
         
+        // QUADRO 2: CHAT
+        p.volumeMensalChat = getNum('input-sizing-vol-chat', p.volumeMensalChat || 0);
+        p.volAtendidasChat = getNum('input-sizing-vol-atendidas-chat', p.volAtendidasChat || 0);
+        p.tmaChat = getNum('input-sizing-tma-chat', p.tmaChat || 480);
+        p.slaMetaChat = getNum('input-sizing-sla-meta-chat', p.slaMetaChat || 80);
+        p.nsMinimoChat = getNum('input-sizing-ns-minimo-chat', p.nsMinimoChat || 60);
+        p.tmeMaxChat = getNum('input-sizing-tme-max-chat', p.tmeMaxChat || 20);
+        p.abandonoMaxChat = getNum('input-sizing-abandono-max-chat', p.abandonoMaxChat || 3.5);
+        p.telasSimultaneas = getNum('input-sizing-telas-chat', p.telasSimultaneas || 2.0);
+        p.dmmPercentChat = getNum('input-sizing-dmm-chat', p.dmmPercentChat || 5.62);
+        p.hmmPercentChat = getNum('input-sizing-hmm-chat', p.hmmPercentChat || 9.7);
+        p.shrinkageLancheChat = getNum('input-sizing-shrink-lanche-chat', p.shrinkageLancheChat || 10.5);
+        p.shrinkageTreinamentoChat = getNum('input-sizing-shrink-treino-chat', p.shrinkageTreinamentoChat || 4.0);
+        p.shrinkageFeedbackChat = getNum('input-sizing-shrink-fb-chat', p.shrinkageFeedbackChat || 1.5);
+        p.shrinkageNR17Chat = getNum('input-sizing-shrink-nr17-chat', p.shrinkageNR17Chat || 17.0);
+        p.ajusteChat = getNum('input-sizing-ajuste-chat', p.ajusteChat || 0);
+        
+        // QUADRO 3: BKO
         p.volumeMensalBO = getNum('input-sizing-vol-bo', p.volumeMensalBO || 10270);
         p.diasUteis = getNum('input-sizing-dias-uteis-bo', p.diasUteis || 30);
         p.ajusteBo = getNum('input-sizing-ajuste-bo', p.ajusteBo || 0);
@@ -7503,15 +7569,16 @@ function recalcSizing(fromInputs = true) {
     const resBO = calcSizingN2Backoffice(p);
     
     const safetyBuffer = Math.max(0, parseInt(p.safetyBuffer) || 0);
-    const totalPAs = resVoz.paContratada + resChat.pas + resBO.paContratada + safetyBuffer;
+    const totalPAs = resVoz.paContratada + resChat.paContratada + resBO.paContratada + safetyBuffer;
     
-    // Update calculated cells in Left Panel (Voz / Chat)
     const setInputVal = (id, val) => {
         const el = document.getElementById(id);
         if (el && val !== undefined && val !== null) el.value = val;
     };
     
     const mesLabel = getMonthOnly(state.sizingCurrentMonth || p.mesReferencia || '2026-11');
+    
+    // Update calculated cells in Quadro 1 (Voz)
     setInputVal('input-sizing-mes-label-voz', mesLabel);
     setInputVal('input-sizing-vol-dmm', resVoz.volDMM);
     setInputVal('input-sizing-vol-hmm', resVoz.volHMM);
@@ -7520,7 +7587,16 @@ function recalcSizing(fromInputs = true) {
     setInputVal('input-sizing-pa-contratada-voz', resVoz.paContratada);
     setInputVal('input-sizing-chamadas-op-voz', resVoz.chamadasOp);
     
-    // Update calculated cells in Right Panel (BKO)
+    // Update calculated cells in Quadro 2 (Chat)
+    setInputVal('input-sizing-mes-label-chat', mesLabel);
+    setInputVal('input-sizing-vol-dmm-chat', resChat.volDMM);
+    setInputVal('input-sizing-vol-hmm-chat', resChat.volHMM);
+    setInputVal('input-sizing-erlang-chat', resChat.erlang);
+    setInputVal('input-sizing-pas-chat', resChat.pas);
+    setInputVal('input-sizing-pa-contratada-chat', resChat.paContratada);
+    setInputVal('input-sizing-chamadas-op-chat', resChat.chamadasOp);
+    
+    // Update calculated cells in Quadro 3 (BKO)
     setInputVal('input-sizing-mes-label-bo', mesLabel);
     setInputVal('input-sizing-vol-dia-bo', resBO.volDia);
     setInputVal('input-sizing-prod-max-dia', resBO.prodMaxDia);
@@ -7542,8 +7618,8 @@ function recalcSizing(fromInputs = true) {
     
     const elPasChat = document.getElementById('widget-sizing-pas-chat');
     const elSubChat = document.getElementById('widget-sizing-sub-chat');
-    if (elPasChat) elPasChat.textContent = resChat.pas;
-    if (elSubChat) elSubChat.textContent = `${resChat.m} agentes (${p.telasSimultaneas || 1} telas simul.)`;
+    if (elPasChat) elPasChat.textContent = resChat.paContratada;
+    if (elSubChat) elSubChat.textContent = `${resChat.m} agentes (${p.telasSimultaneas || 2} telas simul.)`;
     
     const elPasBO = document.getElementById('widget-sizing-pas-bo');
     const elSubBO = document.getElementById('widget-sizing-sub-bo');
@@ -7553,7 +7629,7 @@ function recalcSizing(fromInputs = true) {
     const elTotalPas = document.getElementById('widget-sizing-total-pas');
     const elTotalSub = document.getElementById('widget-sizing-total-sub');
     if (elTotalPas) elTotalPas.textContent = totalPAs;
-    if (elTotalSub) elTotalSub.textContent = `Buffer: +${safetyBuffer} PAs (Base: ${resVoz.paContratada + resChat.pas + resBO.paContratada})`;
+    if (elTotalSub) elTotalSub.textContent = `Buffer: +${safetyBuffer} PAs (Base: ${resVoz.paContratada + resChat.paContratada + resBO.paContratada})`;
     
     // 2. Update Safety buffer slider value display
     const elValBuffer = document.getElementById('sizing-val-safety-buffer');
@@ -7815,6 +7891,7 @@ function renderSizingView() {
         if (el && val !== undefined && val !== null) el.value = val;
     };
     
+    // QUADRO 1: VOZ
     setVal('input-sizing-vol-voz', p.volumeMensalVoz);
     setVal('input-sizing-vol-atendidas', p.volAtendidas);
     setVal('input-sizing-tma-voz', p.tmaVoz);
@@ -7828,9 +7905,26 @@ function renderSizingView() {
     setVal('input-sizing-shrink-treino', p.shrinkageTreinamento);
     setVal('input-sizing-shrink-fb', p.shrinkageFeedback);
     setVal('input-sizing-shrink-nr17', p.shrinkageNR17);
-    setVal('input-sizing-telas-chat', p.telasSimultaneas);
     setVal('input-sizing-ajuste-voz', p.ajusteVoz);
     
+    // QUADRO 2: CHAT
+    setVal('input-sizing-vol-chat', p.volumeMensalChat);
+    setVal('input-sizing-vol-atendidas-chat', p.volAtendidasChat);
+    setVal('input-sizing-tma-chat', p.tmaChat);
+    setVal('input-sizing-sla-meta-chat', p.slaMetaChat);
+    setVal('input-sizing-ns-minimo-chat', p.nsMinimoChat);
+    setVal('input-sizing-tme-max-chat', p.tmeMaxChat);
+    setVal('input-sizing-abandono-max-chat', p.abandonoMaxChat);
+    setVal('input-sizing-telas-chat', p.telasSimultaneas);
+    setVal('input-sizing-dmm-chat', p.dmmPercentChat);
+    setVal('input-sizing-hmm-chat', p.hmmPercentChat);
+    setVal('input-sizing-shrink-lanche-chat', p.shrinkageLancheChat);
+    setVal('input-sizing-shrink-treino-chat', p.shrinkageTreinamentoChat);
+    setVal('input-sizing-shrink-fb-chat', p.shrinkageFeedbackChat);
+    setVal('input-sizing-shrink-nr17-chat', p.shrinkageNR17Chat);
+    setVal('input-sizing-ajuste-chat', p.ajusteChat);
+    
+    // QUADRO 3: BKO
     setVal('input-sizing-vol-bo', p.volumeMensalBO);
     setVal('input-sizing-dias-uteis-bo', p.diasUteis);
     setVal('input-sizing-tma-bo', p.tmaBO);

@@ -914,12 +914,12 @@
                         </div>
                     </section>
 
-                    <!-- SPREADSHEET DUAL PANEL (VOZ / CHAT & BKO) -->
-                    <div class="sizing-dual-panel" id="sizing-dual-panel-container">
-                        <!-- PAINEL ESQUERDO: VOZ / CHAT -->
+                    <!-- SPREADSHEET TRIPLE PANEL (VOZ, CHAT & BKO) -->
+                    <div class="sizing-triple-panel" id="sizing-triple-panel-container">
+                        <!-- QUADRO 1: VOZ -->
                         <div class="sizing-sheet-card">
                             <div class="sizing-sheet-header">
-                                <span>Voz / Chat</span>
+                                <span>Voz</span>
                             </div>
                             <div class="sizing-sheet-table" id="sizing-table-voz">
                                 <!-- Row 1: Mês (Header Row) -->
@@ -934,7 +934,7 @@
                                 <div class="sizing-sheet-row">
                                     <span class="sheet-label">NS Mês</span>
                                     <div class="sheet-cell">
-                                        <input type="number" id="input-sizing-sla-meta" min="1" max="100" step="1" value="80" class="sizing-cell-input">
+                                        <input type="number" id="input-sizing-sla-meta" min="1" max="100" step="1" value="80" class="sizing-cell-input" inputmode="decimal">
                                         <span class="sheet-unit">%</span>
                                     </div>
                                 </div>
@@ -943,7 +943,7 @@
                                 <div class="sizing-sheet-row">
                                     <span class="sheet-label">NS Mínimo</span>
                                     <div class="sheet-cell">
-                                        <input type="number" id="input-sizing-ns-minimo" min="1" max="100" step="1" value="60" class="sizing-cell-input">
+                                        <input type="number" id="input-sizing-ns-minimo" min="1" max="100" step="1" value="60" class="sizing-cell-input" inputmode="decimal">
                                         <span class="sheet-unit">%</span>
                                     </div>
                                 </div>
@@ -952,7 +952,7 @@
                                 <div class="sizing-sheet-row">
                                     <span class="sheet-label">TME (seg)</span>
                                     <div class="sheet-cell">
-                                        <input type="number" id="input-sizing-tme-max" min="1" step="1" value="20" class="sizing-cell-input font-bold">
+                                        <input type="number" id="input-sizing-tme-max" min="1" step="1" value="20" class="sizing-cell-input font-bold" inputmode="numeric">
                                     </div>
                                 </div>
 
@@ -960,7 +960,192 @@
                                 <div class="sizing-sheet-row">
                                     <span class="sheet-label">Taxa de Abandono</span>
                                     <div class="sheet-cell">
-                                        <input type="number" id="input-sizing-abandono-max" min="0" max="100" step="0.1" value="3.5" class="sizing-cell-input">
+                                        <input type="number" id="input-sizing-abandono-max" min="0" max="100" step="0.1" value="3.5" class="sizing-cell-input" inputmode="decimal">
+                                        <span class="sheet-unit">%</span>
+                                    </div>
+                                </div>
+
+                                <!-- Row 6: TMA Mês -->
+                                <div class="sizing-sheet-row">
+                                    <span class="sheet-label">TMA Mês</span>
+                                    <div class="sheet-cell">
+                                        <input type="number" id="input-sizing-tma-voz" min="10" step="10" value="480" class="sizing-cell-input font-bold" inputmode="numeric">
+                                    </div>
+                                </div>
+
+                                <!-- Row 7: % HMM -->
+                                <div class="sizing-sheet-row">
+                                    <span class="sheet-label">% HMM</span>
+                                    <div class="sheet-cell">
+                                        <input type="number" id="input-sizing-hmm" min="0.1" max="100" step="0.01" value="9.7" class="sizing-cell-input font-bold" inputmode="decimal">
+                                        <span class="sheet-unit">%</span>
+                                    </div>
+                                </div>
+
+                                <!-- Row 8: Lanche (Italic indented) -->
+                                <div class="sizing-sheet-row row-indented">
+                                    <span class="sheet-label font-italic text-muted">Lanche</span>
+                                    <div class="sheet-cell">
+                                        <input type="number" id="input-sizing-shrink-lanche" min="0" max="50" step="0.1" value="10.5" class="sizing-cell-input font-italic text-muted" inputmode="decimal">
+                                        <span class="sheet-unit font-italic text-muted">%</span>
+                                    </div>
+                                </div>
+
+                                <!-- Row 9: Treinamento (Italic indented) -->
+                                <div class="sizing-sheet-row row-indented">
+                                    <span class="sheet-label font-italic text-muted">Treinamento</span>
+                                    <div class="sheet-cell">
+                                        <input type="number" id="input-sizing-shrink-treino" min="0" max="50" step="0.1" value="4.0" class="sizing-cell-input font-italic text-muted" inputmode="decimal">
+                                        <span class="sheet-unit font-italic text-muted">%</span>
+                                    </div>
+                                </div>
+
+                                <!-- Row 10: Feedback (Italic indented) -->
+                                <div class="sizing-sheet-row row-indented">
+                                    <span class="sheet-label font-italic text-muted">Feedback</span>
+                                    <div class="sheet-cell">
+                                        <input type="number" id="input-sizing-shrink-fb" min="0" max="50" step="0.1" value="1.5" class="sizing-cell-input font-italic text-muted" inputmode="decimal">
+                                        <span class="sheet-unit font-italic text-muted">%</span>
+                                    </div>
+                                </div>
+
+                                <!-- Row 11: NR 17 (HMM) -->
+                                <div class="sizing-sheet-row">
+                                    <span class="sheet-label font-bold">NR 17 (HMM)</span>
+                                    <div class="sheet-cell">
+                                        <input type="number" id="input-sizing-shrink-nr17" min="0" max="50" step="0.1" value="17.0" class="sizing-cell-input font-bold" inputmode="decimal">
+                                        <span class="sheet-unit font-bold">%</span>
+                                    </div>
+                                </div>
+
+                                <!-- Row 12: Volume Mês -->
+                                <div class="sizing-sheet-row row-highlight-text">
+                                    <span class="sheet-label font-bold">Volume Mês</span>
+                                    <div class="sheet-cell">
+                                        <input type="number" id="input-sizing-vol-voz" min="0" step="1" value="19912" class="sizing-cell-input font-bold" style="font-size: 0.95rem;" inputmode="numeric">
+                                    </div>
+                                </div>
+
+                                <!-- Row 13: Volume Atendidas -->
+                                <div class="sizing-sheet-row">
+                                    <span class="sheet-label">Volume Atendidas</span>
+                                    <div class="sheet-cell">
+                                        <input type="number" id="input-sizing-vol-atendidas" min="0" step="1" value="19215" class="sizing-cell-input" inputmode="numeric">
+                                    </div>
+                                </div>
+
+                                <!-- Row 14: DMM (MÉDIA 5) - Separator bar -->
+                                <div class="sizing-sheet-row row-section-divider">
+                                    <span class="sheet-label font-bold">DMM (MÉDIA 5)</span>
+                                    <div class="sheet-cell">
+                                        <input type="number" id="input-sizing-dmm" min="0.1" max="100" step="0.01" value="5.62" class="sizing-cell-input font-bold" inputmode="decimal">
+                                        <span class="sheet-unit font-bold">%</span>
+                                    </div>
+                                </div>
+
+                                <!-- Row 15: Volume DMM -->
+                                <div class="sizing-sheet-row row-indented">
+                                    <span class="sheet-label text-muted">Volume DMM</span>
+                                    <div class="sheet-cell">
+                                        <input type="number" id="input-sizing-vol-dmm" min="0" step="1" value="1118" class="sizing-cell-input text-muted" inputmode="numeric">
+                                    </div>
+                                </div>
+
+                                <!-- Row 16: Volume HMM -->
+                                <div class="sizing-sheet-row row-indented">
+                                    <span class="sheet-label text-muted">Volume HMM</span>
+                                    <div class="sheet-cell">
+                                        <input type="number" id="input-sizing-vol-hmm" min="0" step="1" value="108" class="sizing-cell-input text-muted" inputmode="numeric">
+                                    </div>
+                                </div>
+
+                                <!-- Row 17: Erlang -->
+                                <div class="sizing-sheet-row row-indented">
+                                    <span class="sheet-label text-muted">Erlang</span>
+                                    <div class="sheet-cell">
+                                        <input type="number" id="input-sizing-erlang" min="0" step="1" value="14" class="sizing-cell-input text-muted font-bold" inputmode="numeric">
+                                    </div>
+                                </div>
+
+                                <!-- Row 18: PA's Necessárias (Gold Highlight) -->
+                                <div class="sizing-sheet-row row-result-gold">
+                                    <span class="sheet-label font-bold" style="color: #92400e;">PA's Necessárias</span>
+                                    <div class="sheet-cell">
+                                        <input type="number" id="input-sizing-pas-voz" min="0" step="1" value="29" class="sizing-cell-input font-bold cell-gold-input" inputmode="numeric">
+                                    </div>
+                                </div>
+
+                                <!-- Row 19: Ajuste (Italic) -->
+                                <div class="sizing-sheet-row">
+                                    <span class="sheet-label font-italic text-muted">Ajuste</span>
+                                    <div class="sheet-cell">
+                                        <input type="number" id="input-sizing-ajuste-voz" step="1" value="0" class="sizing-cell-input font-italic" inputmode="numeric">
+                                    </div>
+                                </div>
+
+                                <!-- Row 20: PA CONTRATADA (Bold Italic) -->
+                                <div class="sizing-sheet-row row-result-amber">
+                                    <span class="sheet-label font-bold font-italic" style="color: #b45309;">PA CONTRATADA</span>
+                                    <div class="sheet-cell">
+                                        <input type="number" id="input-sizing-pa-contratada-voz" min="0" step="1" value="29" class="sizing-cell-input font-bold font-italic cell-amber-input" inputmode="numeric">
+                                    </div>
+                                </div>
+
+                                <!-- Row 21: CHAMADAS / OPERADOR (Italic) -->
+                                <div class="sizing-sheet-row">
+                                    <span class="sheet-label font-italic text-muted">CHAMADAS / OPERADOR</span>
+                                    <div class="sheet-cell">
+                                        <input type="number" id="input-sizing-chamadas-op-voz" min="0" step="1" value="687" class="sizing-cell-input font-italic text-muted font-bold" inputmode="numeric">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- QUADRO 2: CHAT -->
+                        <div class="sizing-sheet-card">
+                            <div class="sizing-sheet-header">
+                                <span>Chat</span>
+                            </div>
+                            <div class="sizing-sheet-table" id="sizing-table-chat">
+                                <!-- Row 1: Mês (Header Row) -->
+                                <div class="sizing-sheet-row row-black-header">
+                                    <span class="sheet-label">Mês</span>
+                                    <div class="sheet-cell">
+                                        <input type="text" id="input-sizing-mes-label-chat" class="sizing-cell-input cell-header-input" value="Jan" readonly>
+                                    </div>
+                                </div>
+
+                                <!-- Row 2: NS Mês -->
+                                <div class="sizing-sheet-row">
+                                    <span class="sheet-label">NS Mês</span>
+                                    <div class="sheet-cell">
+                                        <input type="number" id="input-sizing-sla-meta-chat" min="1" max="100" step="1" value="80" class="sizing-cell-input" inputmode="decimal">
+                                        <span class="sheet-unit">%</span>
+                                    </div>
+                                </div>
+
+                                <!-- Row 3: NS Mínimo -->
+                                <div class="sizing-sheet-row">
+                                    <span class="sheet-label">NS Mínimo</span>
+                                    <div class="sheet-cell">
+                                        <input type="number" id="input-sizing-ns-minimo-chat" min="1" max="100" step="1" value="60" class="sizing-cell-input" inputmode="decimal">
+                                        <span class="sheet-unit">%</span>
+                                    </div>
+                                </div>
+
+                                <!-- Row 4: TME (seg) -->
+                                <div class="sizing-sheet-row">
+                                    <span class="sheet-label">TME (seg)</span>
+                                    <div class="sheet-cell">
+                                        <input type="number" id="input-sizing-tme-max-chat" min="1" step="1" value="20" class="sizing-cell-input font-bold" inputmode="numeric">
+                                    </div>
+                                </div>
+
+                                <!-- Row 5: Taxa de Abandono -->
+                                <div class="sizing-sheet-row">
+                                    <span class="sheet-label">Taxa de Abandono</span>
+                                    <div class="sheet-cell">
+                                        <input type="number" id="input-sizing-abandono-max-chat" min="0" max="100" step="0.1" value="3.5" class="sizing-cell-input" inputmode="decimal">
                                         <span class="sheet-unit">%</span>
                                     </div>
                                 </div>
@@ -969,7 +1154,7 @@
                                 <div class="sizing-sheet-row">
                                     <span class="sheet-label">Telas Simultâneas</span>
                                     <div class="sheet-cell cell-peach">
-                                        <input type="number" id="input-sizing-telas-chat" min="1" max="5" step="0.5" value="1.0" class="sizing-cell-input font-bold">
+                                        <input type="number" id="input-sizing-telas-chat" min="1" max="5" step="0.5" value="2.0" class="sizing-cell-input font-bold" inputmode="decimal">
                                     </div>
                                 </div>
 
@@ -977,7 +1162,7 @@
                                 <div class="sizing-sheet-row">
                                     <span class="sheet-label">TMA Mês</span>
                                     <div class="sheet-cell">
-                                        <input type="number" id="input-sizing-tma-voz" min="10" step="10" value="480" class="sizing-cell-input font-bold">
+                                        <input type="number" id="input-sizing-tma-chat" min="10" step="10" value="480" class="sizing-cell-input font-bold" inputmode="numeric">
                                     </div>
                                 </div>
 
@@ -985,7 +1170,7 @@
                                 <div class="sizing-sheet-row">
                                     <span class="sheet-label">% HMM</span>
                                     <div class="sheet-cell">
-                                        <input type="number" id="input-sizing-hmm" min="0.1" max="100" step="0.01" value="9.7" class="sizing-cell-input font-bold">
+                                        <input type="number" id="input-sizing-hmm-chat" min="0.1" max="100" step="0.01" value="9.7" class="sizing-cell-input font-bold" inputmode="decimal">
                                         <span class="sheet-unit">%</span>
                                     </div>
                                 </div>
@@ -994,7 +1179,7 @@
                                 <div class="sizing-sheet-row row-indented">
                                     <span class="sheet-label font-italic text-muted">Lanche</span>
                                     <div class="sheet-cell">
-                                        <input type="number" id="input-sizing-shrink-lanche" min="0" max="50" step="0.1" value="10.5" class="sizing-cell-input font-italic text-muted">
+                                        <input type="number" id="input-sizing-shrink-lanche-chat" min="0" max="50" step="0.1" value="10.5" class="sizing-cell-input font-italic text-muted" inputmode="decimal">
                                         <span class="sheet-unit font-italic text-muted">%</span>
                                     </div>
                                 </div>
@@ -1003,7 +1188,7 @@
                                 <div class="sizing-sheet-row row-indented">
                                     <span class="sheet-label font-italic text-muted">Treinamento</span>
                                     <div class="sheet-cell">
-                                        <input type="number" id="input-sizing-shrink-treino" min="0" max="50" step="0.1" value="4.0" class="sizing-cell-input font-italic text-muted">
+                                        <input type="number" id="input-sizing-shrink-treino-chat" min="0" max="50" step="0.1" value="4.0" class="sizing-cell-input font-italic text-muted" inputmode="decimal">
                                         <span class="sheet-unit font-italic text-muted">%</span>
                                     </div>
                                 </div>
@@ -1012,7 +1197,7 @@
                                 <div class="sizing-sheet-row row-indented">
                                     <span class="sheet-label font-italic text-muted">Feedback</span>
                                     <div class="sheet-cell">
-                                        <input type="number" id="input-sizing-shrink-fb" min="0" max="50" step="0.1" value="1.5" class="sizing-cell-input font-italic text-muted">
+                                        <input type="number" id="input-sizing-shrink-fb-chat" min="0" max="50" step="0.1" value="1.5" class="sizing-cell-input font-italic text-muted" inputmode="decimal">
                                         <span class="sheet-unit font-italic text-muted">%</span>
                                     </div>
                                 </div>
@@ -1021,7 +1206,7 @@
                                 <div class="sizing-sheet-row">
                                     <span class="sheet-label font-bold">NR 17 (HMM)</span>
                                     <div class="sheet-cell">
-                                        <input type="number" id="input-sizing-shrink-nr17" min="0" max="50" step="0.1" value="17.0" class="sizing-cell-input font-bold">
+                                        <input type="number" id="input-sizing-shrink-nr17-chat" min="0" max="50" step="0.1" value="17.0" class="sizing-cell-input font-bold" inputmode="decimal">
                                         <span class="sheet-unit font-bold">%</span>
                                     </div>
                                 </div>
@@ -1030,7 +1215,7 @@
                                 <div class="sizing-sheet-row row-highlight-text">
                                     <span class="sheet-label font-bold">Volume Mês</span>
                                     <div class="sheet-cell">
-                                        <input type="number" id="input-sizing-vol-voz" min="0" step="1" value="19912" class="sizing-cell-input font-bold" style="font-size: 1rem;">
+                                        <input type="number" id="input-sizing-vol-chat" min="0" step="1" value="0" class="sizing-cell-input font-bold" style="font-size: 0.95rem;" inputmode="numeric">
                                     </div>
                                 </div>
 
@@ -1038,7 +1223,7 @@
                                 <div class="sizing-sheet-row">
                                     <span class="sheet-label">Volume Atendidas</span>
                                     <div class="sheet-cell">
-                                        <input type="number" id="input-sizing-vol-atendidas" min="0" step="1" value="19215" class="sizing-cell-input">
+                                        <input type="number" id="input-sizing-vol-atendidas-chat" min="0" step="1" value="0" class="sizing-cell-input" inputmode="numeric">
                                     </div>
                                 </div>
 
@@ -1046,7 +1231,7 @@
                                 <div class="sizing-sheet-row row-section-divider">
                                     <span class="sheet-label font-bold">DMM (MÉDIA 5)</span>
                                     <div class="sheet-cell">
-                                        <input type="number" id="input-sizing-dmm" min="0.1" max="100" step="0.01" value="5.62" class="sizing-cell-input font-bold">
+                                        <input type="number" id="input-sizing-dmm-chat" min="0.1" max="100" step="0.01" value="5.62" class="sizing-cell-input font-bold" inputmode="decimal">
                                         <span class="sheet-unit font-bold">%</span>
                                     </div>
                                 </div>
@@ -1055,7 +1240,7 @@
                                 <div class="sizing-sheet-row row-indented">
                                     <span class="sheet-label text-muted">Volume DMM</span>
                                     <div class="sheet-cell">
-                                        <input type="number" id="input-sizing-vol-dmm" min="0" step="1" value="1118" class="sizing-cell-input text-muted">
+                                        <input type="number" id="input-sizing-vol-dmm-chat" min="0" step="1" value="0" class="sizing-cell-input text-muted" inputmode="numeric">
                                     </div>
                                 </div>
 
@@ -1063,7 +1248,7 @@
                                 <div class="sizing-sheet-row row-indented">
                                     <span class="sheet-label text-muted">Volume HMM</span>
                                     <div class="sheet-cell">
-                                        <input type="number" id="input-sizing-vol-hmm" min="0" step="1" value="108" class="sizing-cell-input text-muted">
+                                        <input type="number" id="input-sizing-vol-hmm-chat" min="0" step="1" value="0" class="sizing-cell-input text-muted" inputmode="numeric">
                                     </div>
                                 </div>
 
@@ -1071,7 +1256,7 @@
                                 <div class="sizing-sheet-row row-indented">
                                     <span class="sheet-label text-muted">Erlang</span>
                                     <div class="sheet-cell">
-                                        <input type="number" id="input-sizing-erlang" min="0" step="1" value="14" class="sizing-cell-input text-muted font-bold">
+                                        <input type="number" id="input-sizing-erlang-chat" min="0" step="1" value="0" class="sizing-cell-input text-muted font-bold" inputmode="numeric">
                                     </div>
                                 </div>
 
@@ -1079,7 +1264,7 @@
                                 <div class="sizing-sheet-row row-result-gold">
                                     <span class="sheet-label font-bold" style="color: #92400e;">PA's Necessárias</span>
                                     <div class="sheet-cell">
-                                        <input type="number" id="input-sizing-pas-voz" min="0" step="1" value="29" class="sizing-cell-input font-bold cell-gold-input">
+                                        <input type="number" id="input-sizing-pas-chat" min="0" step="1" value="0" class="sizing-cell-input font-bold cell-gold-input" inputmode="numeric">
                                     </div>
                                 </div>
 
@@ -1087,7 +1272,7 @@
                                 <div class="sizing-sheet-row">
                                     <span class="sheet-label font-italic text-muted">Ajuste</span>
                                     <div class="sheet-cell">
-                                        <input type="number" id="input-sizing-ajuste-voz" step="1" value="0" class="sizing-cell-input font-italic">
+                                        <input type="number" id="input-sizing-ajuste-chat" step="1" value="0" class="sizing-cell-input font-italic" inputmode="numeric">
                                     </div>
                                 </div>
 
@@ -1095,21 +1280,21 @@
                                 <div class="sizing-sheet-row row-result-amber">
                                     <span class="sheet-label font-bold font-italic" style="color: #b45309;">PA CONTRATADA</span>
                                     <div class="sheet-cell">
-                                        <input type="number" id="input-sizing-pa-contratada-voz" min="0" step="1" value="29" class="sizing-cell-input font-bold font-italic cell-amber-input">
+                                        <input type="number" id="input-sizing-pa-contratada-chat" min="0" step="1" value="0" class="sizing-cell-input font-bold font-italic cell-amber-input" inputmode="numeric">
                                     </div>
                                 </div>
 
-                                <!-- Row 22: CHAMADAS / OPERADOR (Italic) -->
+                                <!-- Row 22: ATENDIMENTOS / OPERADOR (Italic) -->
                                 <div class="sizing-sheet-row">
-                                    <span class="sheet-label font-italic text-muted">CHAMADAS / OPERADOR</span>
+                                    <span class="sheet-label font-italic text-muted">ATENDIMENTOS / OPERADOR</span>
                                     <div class="sheet-cell">
-                                        <input type="number" id="input-sizing-chamadas-op-voz" min="0" step="1" value="687" class="sizing-cell-input font-italic text-muted font-bold">
+                                        <input type="number" id="input-sizing-chamadas-op-chat" min="0" step="1" value="0" class="sizing-cell-input font-italic text-muted font-bold" inputmode="numeric">
                                     </div>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- PAINEL DIREITO: BKO -->
+                        <!-- QUADRO 3: BKO -->
                         <div class="sizing-sheet-card">
                             <div class="sizing-sheet-header">
                                 <span>BKO</span>
@@ -1127,7 +1312,7 @@
                                 <div class="sizing-sheet-row row-highlight-text">
                                     <span class="sheet-label font-bold">Volume Mês</span>
                                     <div class="sheet-cell">
-                                        <input type="number" id="input-sizing-vol-bo" min="0" step="1" value="10270" class="sizing-cell-input font-bold" style="font-size: 1rem;">
+                                        <input type="number" id="input-sizing-vol-bo" min="0" step="1" value="10270" class="sizing-cell-input font-bold" style="font-size: 0.95rem;" inputmode="numeric">
                                     </div>
                                 </div>
 
@@ -1135,7 +1320,7 @@
                                 <div class="sizing-sheet-row">
                                     <span class="sheet-label">Dias Úteis</span>
                                     <div class="sheet-cell">
-                                        <input type="number" id="input-sizing-dias-uteis-bo" min="1" max="31" step="1" value="30" class="sizing-cell-input font-bold">
+                                        <input type="number" id="input-sizing-dias-uteis-bo" min="1" max="31" step="1" value="30" class="sizing-cell-input font-bold" inputmode="numeric">
                                     </div>
                                 </div>
 
@@ -1143,7 +1328,7 @@
                                 <div class="sizing-sheet-row">
                                     <span class="sheet-label">Volume Dia</span>
                                     <div class="sheet-cell">
-                                        <input type="number" id="input-sizing-vol-dia-bo" min="0" step="1" value="342" class="sizing-cell-input">
+                                        <input type="number" id="input-sizing-vol-dia-bo" min="0" step="1" value="342" class="sizing-cell-input" inputmode="numeric">
                                     </div>
                                 </div>
 
@@ -1151,7 +1336,7 @@
                                 <div class="sizing-sheet-row">
                                     <span class="sheet-label">Prod. Máx. Operador/Dia</span>
                                     <div class="sheet-cell">
-                                        <input type="number" id="input-sizing-prod-max-dia" min="0" step="1" value="22" class="sizing-cell-input font-bold">
+                                        <input type="number" id="input-sizing-prod-max-dia" min="0" step="1" value="22" class="sizing-cell-input font-bold" inputmode="numeric">
                                     </div>
                                 </div>
 
@@ -1159,7 +1344,7 @@
                                 <div class="sizing-sheet-row row-result-gold">
                                     <span class="sheet-label font-bold" style="color: #92400e;">PA's Necessárias</span>
                                     <div class="sheet-cell">
-                                        <input type="number" id="input-sizing-pas-bo" min="0" step="1" value="8" class="sizing-cell-input font-bold cell-gold-input">
+                                        <input type="number" id="input-sizing-pas-bo" min="0" step="1" value="8" class="sizing-cell-input font-bold cell-gold-input" inputmode="numeric">
                                     </div>
                                 </div>
 
@@ -1167,7 +1352,7 @@
                                 <div class="sizing-sheet-row">
                                     <span class="sheet-label font-italic text-muted">Ajuste</span>
                                     <div class="sheet-cell">
-                                        <input type="number" id="input-sizing-ajuste-bo" step="1" value="0" class="sizing-cell-input font-italic">
+                                        <input type="number" id="input-sizing-ajuste-bo" step="1" value="0" class="sizing-cell-input font-italic" inputmode="numeric">
                                     </div>
                                 </div>
 
@@ -1175,7 +1360,7 @@
                                 <div class="sizing-sheet-row row-result-amber">
                                     <span class="sheet-label font-bold font-italic" style="color: #b45309;">PA CONTRATADA</span>
                                     <div class="sheet-cell">
-                                        <input type="number" id="input-sizing-pa-contratada-bo" min="0" step="1" value="8" class="sizing-cell-input font-bold font-italic cell-amber-input">
+                                        <input type="number" id="input-sizing-pa-contratada-bo" min="0" step="1" value="8" class="sizing-cell-input font-bold font-italic cell-amber-input" inputmode="numeric">
                                     </div>
                                 </div>
 
@@ -1183,7 +1368,7 @@
                                 <div class="sizing-sheet-row">
                                     <span class="sheet-label font-bold">CHAMADAS / OPERADOR</span>
                                     <div class="sheet-cell">
-                                        <input type="number" id="input-sizing-chamadas-op-bo" min="0" step="1" value="21" class="sizing-cell-input font-bold">
+                                        <input type="number" id="input-sizing-chamadas-op-bo" min="0" step="1" value="21" class="sizing-cell-input font-bold" inputmode="numeric">
                                     </div>
                                 </div>
 
@@ -1199,7 +1384,7 @@
                                 <div class="sizing-sheet-row">
                                     <span class="sheet-label font-bold">TMA em Segundos</span>
                                     <div class="sheet-cell">
-                                        <input type="number" id="input-sizing-tma-bo" min="10" step="10" value="600" class="sizing-cell-input font-bold">
+                                        <input type="number" id="input-sizing-tma-bo" min="10" step="10" value="600" class="sizing-cell-input font-bold" inputmode="numeric">
                                     </div>
                                 </div>
 
@@ -1207,7 +1392,7 @@
                                 <div class="sizing-sheet-row">
                                     <span class="sheet-label font-italic text-muted">Dias de Atendimento</span>
                                     <div class="sheet-cell">
-                                        <input type="number" id="input-sizing-dias-atend" min="1" max="31" step="1" value="30" class="sizing-cell-input font-italic text-muted">
+                                        <input type="number" id="input-sizing-dias-atend" min="1" max="31" step="1" value="30" class="sizing-cell-input font-italic text-muted" inputmode="numeric">
                                     </div>
                                 </div>
 
@@ -1223,7 +1408,7 @@
                                 <div class="sizing-sheet-row">
                                     <span class="sheet-label font-italic text-muted">NR 17</span>
                                     <div class="sheet-cell">
-                                        <input type="number" id="input-sizing-nr17-bo-pct" min="0" max="50" step="0.01" value="10.53" class="sizing-cell-input font-italic text-muted">
+                                        <input type="number" id="input-sizing-nr17-bo-pct" min="0" max="50" step="0.01" value="10.53" class="sizing-cell-input font-italic text-muted" inputmode="decimal">
                                         <span class="sheet-unit font-italic text-muted">%</span>
                                     </div>
                                 </div>
@@ -1248,7 +1433,7 @@
                                 <div class="sizing-sheet-row">
                                     <span class="sheet-label font-italic text-muted">Treinamento+FeedBack</span>
                                     <div class="sheet-cell">
-                                        <input type="number" id="input-sizing-trein-fb-pct" min="0" max="50" step="0.01" value="6.47" class="sizing-cell-input font-italic text-muted">
+                                        <input type="number" id="input-sizing-trein-fb-pct" min="0" max="50" step="0.01" value="6.47" class="sizing-cell-input font-italic text-muted" inputmode="decimal">
                                         <span class="sheet-unit font-italic text-muted">%</span>
                                     </div>
                                 </div>
@@ -1263,9 +1448,9 @@
 
                                 <!-- Row 19: % deste tempo falando -->
                                 <div class="sizing-sheet-row">
-                                    <span class="sheet-label font-italic text-muted" style="font-size: 0.8rem;">% deste tempo falando (padrão de mercado)</span>
+                                    <span class="sheet-label font-italic text-muted" style="font-size: 0.78rem;">% deste tempo falando (mercado)</span>
                                     <div class="sheet-cell">
-                                        <input type="number" id="input-sizing-eficiencia" min="10" max="100" step="1" value="70.0" class="sizing-cell-input font-italic text-muted">
+                                        <input type="number" id="input-sizing-eficiencia" min="10" max="100" step="1" value="70.0" class="sizing-cell-input font-italic text-muted" inputmode="decimal">
                                         <span class="sheet-unit font-italic text-muted">%</span>
                                     </div>
                                 </div>

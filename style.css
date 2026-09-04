@@ -2463,173 +2463,209 @@ body.light-theme #modal-add-resp {
     opacity: 0.65;
 }
 
-/* SPREADSHEET DUAL PANEL (SIDE-BY-SIDE) */
-.sizing-dual-panel {
+/* SPREADSHEET TRIPLE PANEL (VOZ, CHAT, BKO SIDE-BY-SIDE) */
+.sizing-triple-panel {
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 1.5rem;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.25rem;
     margin-bottom: 1.5rem;
+    align-items: start;
 }
 
-@media (max-width: 960px) {
-    .sizing-dual-panel {
+@media (max-width: 1100px) {
+    .sizing-triple-panel {
         grid-template-columns: 1fr;
     }
 }
 
 .sizing-sheet-card {
-    background: rgba(15, 23, 42, 0.6);
-    border: 1px solid var(--border-color);
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
     border-radius: var(--radius-md);
     overflow: hidden;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
-    backdrop-filter: blur(16px);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
 }
 
 .sizing-sheet-header {
     background: #f59e0b;
-    color: #090d16;
+    color: #000000;
     font-weight: 900;
-    font-size: 1.05rem;
+    font-size: 1rem;
     text-align: center;
-    padding: 0.6rem 1rem;
+    padding: 0.55rem 1rem;
     letter-spacing: 0.5px;
     text-transform: uppercase;
-    box-shadow: 0 2px 10px rgba(245, 158, 11, 0.2);
 }
 
 .sizing-sheet-table {
     display: flex;
     flex-direction: column;
     width: 100%;
+    background: #ffffff;
 }
 
 .sizing-sheet-row {
-    display: flex;
-    justify-content: space-between;
+    display: grid;
+    grid-template-columns: 1fr auto;
     align-items: center;
-    padding: 0.32rem 0.9rem;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-    min-height: 35px;
+    padding: 0.22rem 0.65rem;
+    border-bottom: 1px solid #f1f5f9;
+    min-height: 29px;
+    background: #ffffff;
     transition: background var(--transition-fast);
 }
 
 .sizing-sheet-row:hover {
-    background: rgba(255, 255, 255, 0.02);
+    background: #f8fafc;
 }
 
 .sizing-sheet-row.row-black-header {
-    background: #000000;
+    background: #0f172a;
     color: #ffffff;
     font-weight: 800;
-    border-bottom: 2px solid #222222;
+    border-bottom: 1px solid #0f172a;
+}
+
+.sizing-sheet-row.row-black-header .sheet-label {
+    color: #ffffff;
 }
 
 .sizing-sheet-row.row-section-divider {
-    border-top: 2px solid #000000;
-    background: rgba(0, 0, 0, 0.25);
+    border-top: 2px solid #0f172a;
+    background: #f8fafc;
 }
 
 .sizing-sheet-row.row-indented .sheet-label {
-    padding-left: 1.25rem;
+    padding-left: 1.1rem;
 }
 
 .sizing-sheet-row.row-highlight-text {
-    background: rgba(255, 255, 255, 0.03);
+    background: #fbfcfe;
 }
 
 .sizing-sheet-row.row-result-gold {
-    background: rgba(253, 230, 138, 0.18);
+    background: #fef3c7;
     border-top: 1.5px solid #f59e0b;
     border-bottom: 1.5px solid #f59e0b;
 }
 
+.sizing-sheet-row.row-result-gold .sheet-label {
+    color: #92400e !important;
+    font-weight: 800;
+}
+
 .sizing-sheet-row.row-result-amber {
-    background: rgba(245, 158, 11, 0.12);
+    background: #fffbeb;
     border-bottom: 1.5px solid #f59e0b;
 }
 
+.sizing-sheet-row.row-result-amber .sheet-label {
+    color: #b45309 !important;
+    font-weight: 800;
+    font-style: italic;
+}
+
 .sheet-label {
-    font-size: 0.84rem;
+    font-size: 0.81rem;
     font-weight: 600;
-    color: var(--text-primary);
+    color: #334155;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    padding-right: 0.5rem;
+    padding-right: 0.4rem;
 }
 
 .sheet-cell {
     display: flex;
     align-items: center;
     justify-content: flex-end;
-    gap: 0.25rem;
-    min-width: 120px;
+    gap: 0.2rem;
+    min-width: 95px;
 }
 
 .sizing-cell-input {
-    background: transparent;
-    border: 1px solid transparent;
-    color: var(--text-primary);
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    color: #0f172a;
     font-family: inherit;
-    font-size: 0.86rem;
+    font-size: 0.84rem;
     text-align: right;
-    width: 105px;
-    padding: 3px 6px;
+    width: 82px;
+    padding: 2px 5px;
     border-radius: 4px;
     transition: all var(--transition-fast);
     outline: none;
-    font-weight: 500;
+    font-weight: 600;
+    /* Remove browser spin buttons */
+    -moz-appearance: textfield;
+    appearance: textfield;
+}
+
+.sizing-cell-input::-webkit-outer-spin-button,
+.sizing-cell-input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
 }
 
 .sizing-cell-input:hover:not(:disabled) {
-    border-color: rgba(255, 255, 255, 0.2);
-    background: rgba(255, 255, 255, 0.04);
+    border-color: #cbd5e1;
+    background: #ffffff;
 }
 
 .sizing-cell-input:focus:not(:disabled) {
     border-color: #f59e0b;
-    background: rgba(245, 158, 11, 0.1);
+    background: #fffbeb;
     box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.2);
 }
 
 .sizing-cell-input:disabled {
-    opacity: 0.65;
+    background: #f1f5f9;
+    color: #94a3b8;
+    border-color: #e2e8f0;
     cursor: not-allowed;
-    color: var(--text-muted);
 }
 
 .cell-peach {
-    background: rgba(254, 215, 170, 0.2);
+    background: #ffedd5;
+    border: 1px solid #fed7aa;
     border-radius: 4px;
     padding: 1px 4px;
 }
 
 .cell-peach .sizing-cell-input {
-    color: #ea580c !important;
+    color: #c2410c !important;
     font-weight: 800 !important;
+    background: transparent;
+    border: none;
 }
 
 .cell-gold-input {
-    color: #fbbf24 !important;
-    font-size: 1.05rem !important;
+    color: #b45309 !important;
+    font-size: 1rem !important;
     font-weight: 900 !important;
+    background: transparent !important;
+    border: none !important;
 }
 
 .cell-amber-input {
-    color: #f59e0b !important;
-    font-size: 1.05rem !important;
+    color: #b45309 !important;
+    font-size: 1rem !important;
     font-weight: 900 !important;
+    font-style: italic !important;
+    background: transparent !important;
+    border: none !important;
 }
 
 .cell-header-input {
     color: #ffffff !important;
     font-weight: 800 !important;
+    background: transparent !important;
+    border: none !important;
 }
 
 .sheet-unit {
-    font-size: 0.8rem;
-    color: var(--text-muted);
+    font-size: 0.78rem;
+    color: #64748b;
     padding-left: 2px;
 }
 
