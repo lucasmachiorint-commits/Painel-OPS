@@ -2458,6 +2458,129 @@ body.light-theme #modal-add-resp {
     animation: fadeIn 0.2s ease-in-out;
 }
 
+/* Sizing Modal Styling (Solid opaque background and high contrast) */
+#modal-new-sizing-projection.modal-overlay {
+    background: rgba(0, 0, 0, 0.65) !important;
+    backdrop-filter: blur(6px) !important;
+}
+
+.sizing-modal-box {
+    background: #0f172a !important;
+    border: 1px solid rgba(255, 255, 255, 0.15) !important;
+    border-radius: 14px !important;
+    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.65) !important;
+    max-width: 460px !important;
+    padding: 1.75rem !important;
+}
+
+body.light-theme .sizing-modal-box {
+    background: #ffffff !important;
+    border: 1px solid #cbd5e1 !important;
+    box-shadow: 0 25px 60px rgba(15, 23, 42, 0.2) !important;
+}
+
+.sizing-modal-desc {
+    font-size: 0.88rem;
+    color: #94a3b8;
+    line-height: 1.55;
+    margin: 0 0 1.25rem 0;
+}
+
+body.light-theme .sizing-modal-desc {
+    color: #475569 !important;
+}
+
+.sizing-modal-form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+    margin-bottom: 1.25rem;
+}
+
+.sizing-modal-form-group label {
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: #f8fafc;
+}
+
+body.light-theme .sizing-modal-form-group label {
+    color: #0f172a !important;
+}
+
+.sizing-modal-month-input {
+    width: 100%;
+    padding: 0.7rem 0.9rem;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    background: #1e293b;
+    color: #f8fafc;
+    font-size: 0.95rem;
+    font-family: inherit;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.sizing-modal-month-input:focus {
+    border-color: var(--color-primary, #eb5c27);
+}
+
+body.light-theme .sizing-modal-month-input {
+    background: #f8fafc !important;
+    border: 1.5px solid #cbd5e1 !important;
+    color: #0f172a !important;
+}
+
+body.light-theme .sizing-modal-month-input:focus {
+    border-color: var(--color-primary, #eb5c27) !important;
+    background: #ffffff !important;
+}
+
+.sizing-modal-tip {
+    font-size: 0.76rem;
+    color: #94a3b8;
+}
+
+body.light-theme .sizing-modal-tip {
+    color: #64748b !important;
+}
+
+.sizing-modal-callout {
+    background: rgba(245, 158, 11, 0.1);
+    border: 1px solid rgba(245, 158, 11, 0.3);
+    border-radius: 8px;
+    padding: 0.75rem 1rem;
+    margin-bottom: 1.5rem;
+    font-size: 0.82rem;
+    color: #fbbf24;
+    display: flex;
+    align-items: flex-start;
+    gap: 0.65rem;
+    line-height: 1.45;
+}
+
+body.light-theme .sizing-modal-callout {
+    background: #fffbeb !important;
+    border: 1px solid #fcd34d !important;
+    color: #92400e !important;
+}
+
+.sizing-modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.65rem;
+}
+
+.btn-confirm-sizing {
+    background: var(--color-primary, #eb5c27) !important;
+    border-color: var(--color-primary, #eb5c27) !important;
+    color: #ffffff !important;
+    font-weight: 700 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 0.45rem !important;
+    padding: 0.55rem 1.25rem !important;
+}
+
 .sizing-month-pills {
     display: flex;
     align-items: center;
@@ -5004,28 +5127,28 @@ body.light-theme .sizing-acc-body {
 
     <!-- MODAL NOVA PROJEÇÃO SIZING (M-2 / 45 DIAS) -->
     <div id="modal-new-sizing-projection" class="modal-overlay" style="display: none;" onclick="if(event.target === this) closeNewSizingModal()">
-        <div class="modal-container" style="max-width: 440px; padding: 1.75rem;">
-            <div class="modal-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-                <h3 style="font-size: 1.15rem; font-weight: 700; color: var(--text-primary); display: flex; align-items: center; gap: 0.5rem; margin: 0;">
+        <div class="modal-content sizing-modal-box">
+            <div class="modal-header">
+                <h3>
                     <i class="fa-solid fa-calendar-plus" style="color: #f59e0b;"></i> Nova Projeção de Demanda
                 </h3>
                 <button type="button" class="modal-close" onclick="closeNewSizingModal()">&times;</button>
             </div>
-            <div style="font-size: 0.86rem; color: var(--text-secondary); line-height: 1.5; margin-bottom: 1.25rem;">
-                Indique o mês de atendimento a ser projetado com 45 dias de antecedência. A projeção anterior será salva e mantida como <strong>histórico (somente leitura)</strong>.
+            <p class="sizing-modal-desc">
+                Indique o mês de atendimento a ser projetado com 45 dias de antecedência. A projeção anterior será mantida como <strong>histórico (somente leitura)</strong>.
+            </p>
+            <div class="sizing-modal-form-group">
+                <label for="modal-input-new-sizing-month">Mês a Projetar:</label>
+                <input type="month" id="modal-input-new-sizing-month" class="sizing-modal-month-input" min="2026-11">
+                <span id="modal-tip-new-sizing-month" class="sizing-modal-tip">Sugerido automaticamente a partir da última projeção.</span>
             </div>
-            <div style="display: flex; flex-direction: column; gap: 0.4rem; margin-bottom: 1.25rem;">
-                <label for="modal-input-new-sizing-month" style="font-size: 0.8rem; font-weight: 700; color: var(--text-primary);">Mês Subsequente a Projetar:</label>
-                <input type="month" id="modal-input-new-sizing-month" style="width: 100%; padding: 0.65rem 0.85rem; border-radius: 8px; border: 1px solid var(--border-color); background: rgba(255,255,255,0.06); color: var(--text-primary); font-size: 0.95rem; font-family: inherit; outline: none;">
-                <span id="modal-tip-new-sizing-month" style="font-size: 0.76rem; color: var(--text-muted);">Sugerido automaticamente a partir da última projeção.</span>
-            </div>
-            <div style="background: rgba(245, 158, 11, 0.08); border: 1px solid rgba(245, 158, 11, 0.25); border-radius: 8px; padding: 0.75rem 1rem; margin-bottom: 1.5rem; font-size: 0.8rem; color: #fbbf24; display: flex; align-items: flex-start; gap: 0.6rem; line-height: 1.4;">
-                <i class="fa-solid fa-info-circle" style="margin-top: 2px;"></i>
+            <div class="sizing-modal-callout">
+                <i class="fa-solid fa-info-circle"></i>
                 <span>Os parâmetros de atendimento (TMAs, metas e shrinkages) serão clonados para o novo mês como ponto de partida editável.</span>
             </div>
-            <div style="display: flex; justify-content: flex-end; gap: 0.6rem;">
+            <div class="sizing-modal-actions">
                 <button type="button" class="btn btn-secondary" onclick="closeNewSizingModal()">Cancelar</button>
-                <button type="button" class="btn btn-primary" id="btn-confirm-new-sizing-month" onclick="confirmNewSizingMonth()" style="background: var(--color-primary); border-color: var(--color-primary); color: #fff; font-weight: 700; display: inline-flex; align-items: center; gap: 0.4rem;">
+                <button type="button" class="btn btn-primary btn-confirm-sizing" id="btn-confirm-new-sizing-month" onclick="confirmNewSizingMonth()">
                     <i class="fa-solid fa-check"></i> Criar Projeção
                 </button>
             </div>
@@ -7452,11 +7575,24 @@ function applyStateMigrations() {
         }
     }
 
-    if (!state.sizingHistory || typeof state.sizingHistory !== 'object') {
+    // Baseline de redimensionamento: inicia limpo em Nov/2026 sem histórico prévio
+    if (!state.sizingBaselineNov26) {
+        state.sizingBaselineNov26 = true;
         state.sizingHistory = {};
-    }
-    if (!state.sizingCurrentMonth) {
-        state.sizingCurrentMonth = state.sizingParams.mesReferencia || '2026-11';
+        state.sizingCurrentMonth = '2026-11';
+        if (state.sizingParams) state.sizingParams.mesReferencia = '2026-11';
+    } else {
+        if (!state.sizingHistory || typeof state.sizingHistory !== 'object') {
+            state.sizingHistory = {};
+        }
+        // Remove quaisquer meses legados anteriores a 2026-11
+        Object.keys(state.sizingHistory).forEach(k => {
+            if (k < '2026-11') delete state.sizingHistory[k];
+        });
+        if (!state.sizingCurrentMonth || state.sizingCurrentMonth < '2026-11' || !/^\d{4}-\d{2}$/.test(state.sizingCurrentMonth)) {
+            state.sizingCurrentMonth = '2026-11';
+            if (state.sizingParams) state.sizingParams.mesReferencia = '2026-11';
+        }
     }
 }
 
@@ -12508,10 +12644,13 @@ function saveCurrentSizingMonthSnapshot() {
 }
 
 function openNewSizingModal() {
-    const allMonths = Object.keys(state.sizingHistory || {});
-    if (state.sizingCurrentMonth) allMonths.push(state.sizingCurrentMonth);
+    // Considera apenas meses a partir de 2026-11
+    const allMonths = Object.keys(state.sizingHistory || {}).filter(m => m >= '2026-11');
+    if (state.sizingCurrentMonth && state.sizingCurrentMonth >= '2026-11') {
+        allMonths.push(state.sizingCurrentMonth);
+    }
     const validMonths = Array.from(new Set(allMonths.filter(m => /^\d{4}-\d{2}$/.test(m)))).sort();
-    const latest = validMonths.length > 0 ? validMonths[validMonths.length - 1] : (state.sizingCurrentMonth || '2026-11');
+    const latest = validMonths.length > 0 ? validMonths[validMonths.length - 1] : '2026-11';
     
     const [y, m] = latest.split('-').map(Number);
     let nextM = m + 1;
@@ -12525,7 +12664,7 @@ function openNewSizingModal() {
     const inputEl = document.getElementById('modal-input-new-sizing-month');
     if (inputEl) {
         inputEl.value = defNext;
-        inputEl.min = defNext;
+        inputEl.min = '2026-11';
     }
     
     const tipEl = document.getElementById('modal-tip-new-sizing-month');
@@ -12547,6 +12686,10 @@ function confirmNewSizingMonth() {
     const mesKey = inputEl ? inputEl.value.trim() : '';
     if (!/^\d{4}-\d{2}$/.test(mesKey)) {
         showToast('Selecione um mês válido (formato AAAA-MM)!', 'warning', 3000);
+        return;
+    }
+    if (mesKey < '2026-11') {
+        showToast('O sistema só aceita projeções a partir de Novembro/2026!', 'warning', 3000);
         return;
     }
     
@@ -12994,7 +13137,9 @@ function renderSizingView() {
         };
     }
     if (!state.sizingHistory) state.sizingHistory = {};
-    if (!state.sizingCurrentMonth) state.sizingCurrentMonth = state.sizingParams.mesReferencia || '2026-11';
+    if (!state.sizingCurrentMonth || state.sizingCurrentMonth < '2026-11') {
+        state.sizingCurrentMonth = '2026-11';
+    }
     
     const curMonth = state.sizingCurrentMonth;
     const isLocked = isSizingMonthLocked(curMonth);
@@ -13002,8 +13147,8 @@ function renderSizingView() {
     // 1. Render Month Selector & Status
     const elSelect = document.getElementById('sizing-mes-select');
     if (elSelect) {
-        // Collect all distinct registered months in history + current month + default
-        const monthSet = new Set(Object.keys(state.sizingHistory || {}));
+        // Coleta apenas meses a partir de Nov/2026 (sem histórico anterior a isso)
+        const monthSet = new Set(Object.keys(state.sizingHistory || {}).filter(m => m >= '2026-11'));
         monthSet.add(curMonth);
         monthSet.add('2026-11');
         
