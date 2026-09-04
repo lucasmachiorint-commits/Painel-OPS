@@ -2722,11 +2722,12 @@ body.light-theme .sizing-modal-callout {
     display: grid;
     grid-template-columns: 1fr auto;
     align-items: center;
-    padding: 0.28rem 0.75rem;
+    padding: 0.32rem 1.15rem;
     border-bottom: 1px solid var(--border-color);
-    min-height: 31px;
+    min-height: 32px;
     background: transparent;
     transition: background var(--transition-fast);
+    gap: 0.75rem;
 }
 
 .sizing-sheet-row:hover {
@@ -2815,15 +2816,15 @@ body.light-theme .sizing-modal-callout {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    padding-right: 0.4rem;
 }
 
 .sheet-cell {
     display: flex;
     align-items: center;
     justify-content: flex-end;
-    gap: 0.2rem;
-    min-width: 95px;
+    gap: 0.35rem;
+    min-width: 105px;
+    padding-right: 2px;
 }
 
 .sizing-cell-input {
@@ -2831,16 +2832,23 @@ body.light-theme .sizing-modal-callout {
     border: 1px solid var(--border-color);
     color: var(--text-primary);
     font-family: inherit;
-    font-size: 0.84rem;
+    font-size: 0.85rem;
     text-align: right;
     width: 82px;
-    padding: 3px 6px;
+    padding: 3px 8px;
     border-radius: var(--radius-sm);
     transition: all var(--transition-fast);
     outline: none;
     font-weight: 600;
+    line-height: 1.2;
+    box-sizing: border-box;
+    font-variant-numeric: tabular-nums;
     -moz-appearance: textfield;
     appearance: textfield;
+}
+
+.sizing-card-bo .sizing-cell-input {
+    width: 90px;
 }
 
 .sizing-cell-input::-webkit-outer-spin-button,
@@ -2911,7 +2919,9 @@ body.light-theme .sizing-modal-callout {
     background: rgba(235, 92, 39, 0.12);
     border: 1px solid rgba(235, 92, 39, 0.3);
     border-radius: var(--radius-sm);
-    padding: 1px 3px;
+    padding: 1px 4px;
+    display: inline-flex;
+    align-items: center;
 }
 
 .sizing-card-chat .cell-peach {
@@ -2921,9 +2931,12 @@ body.light-theme .sizing-modal-callout {
 
 .cell-peach .sizing-cell-input {
     color: var(--color-primary) !important;
-    font-weight: 800 !important;
+    font-weight: 700 !important;
+    font-size: 0.85rem !important;
     background: transparent;
     border: none;
+    padding: 2px 4px;
+    width: 60px;
 }
 
 .sizing-card-chat .cell-peach .sizing-cell-input {
@@ -2932,16 +2945,16 @@ body.light-theme .sizing-modal-callout {
 
 .cell-gold-input {
     color: var(--text-primary) !important;
-    font-size: 0.95rem !important;
-    font-weight: 800 !important;
+    font-size: 0.85rem !important;
+    font-weight: 700 !important;
     background: transparent !important;
     border: none !important;
 }
 
 .cell-amber-input {
     color: var(--color-primary) !important;
-    font-size: 1.05rem !important;
-    font-weight: 900 !important;
+    font-size: 0.85rem !important;
+    font-weight: 800 !important;
     background: transparent !important;
     border: none !important;
 }
@@ -2956,6 +2969,7 @@ body.light-theme .sizing-modal-callout {
 
 .cell-header-input {
     color: var(--text-primary) !important;
+    font-size: 0.85rem !important;
     font-weight: 700 !important;
     background: transparent !important;
     border: none !important;
@@ -2964,7 +2978,10 @@ body.light-theme .sizing-modal-callout {
 .sheet-unit {
     font-size: 0.78rem;
     color: var(--text-muted);
+    min-width: 12px;
+    text-align: left;
     padding-left: 2px;
+    font-weight: 600;
 }
 
 .font-italic {

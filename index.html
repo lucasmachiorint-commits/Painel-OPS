@@ -1046,7 +1046,7 @@
                                 <div class="sizing-sheet-row row-highlight-text">
                                     <span class="sheet-label font-bold">Volume Mês</span>
                                     <div class="sheet-cell">
-                                        <input type="number" id="input-sizing-vol-voz" min="0" step="1" value="19912" class="sizing-cell-input font-bold" style="font-size: 0.95rem;" inputmode="numeric">
+                                        <input type="number" id="input-sizing-vol-voz" min="0" step="1" value="19912" class="sizing-cell-input font-bold" inputmode="numeric">
                                     </div>
                                 </div>
 
@@ -1239,7 +1239,7 @@
                                 <div class="sizing-sheet-row row-highlight-text">
                                      <span class="sheet-label font-bold">Volume Mês</span>
                                      <div class="sheet-cell">
-                                         <input type="number" id="input-sizing-vol-chat" min="0" step="1" value="0" class="sizing-cell-input font-bold" style="font-size: 0.95rem;" inputmode="numeric">
+                                         <input type="number" id="input-sizing-vol-chat" min="0" step="1" value="0" class="sizing-cell-input font-bold" inputmode="numeric">
                                      </div>
                                  </div>
 
@@ -1336,7 +1336,7 @@
                                 <div class="sizing-sheet-row row-highlight-text">
                                     <span class="sheet-label font-bold">Volume Mês</span>
                                     <div class="sheet-cell">
-                                        <input type="number" id="input-sizing-vol-bo" min="0" step="1" value="10270" class="sizing-cell-input font-bold" style="font-size: 0.95rem;" inputmode="numeric">
+                                        <input type="number" id="input-sizing-vol-bo" min="0" step="1" value="10270" class="sizing-cell-input font-bold" inputmode="numeric">
                                     </div>
                                 </div>
 
@@ -1511,8 +1511,8 @@
                             <!-- ACCORDION N1 VOZ -->
                             <div class="sizing-acc-item">
                                 <button type="button" class="sizing-acc-header" onclick="toggleSizingAccordion('acc-voz')">
-                                    <span><i class="fa-solid fa-headset"></i> Memória N1 Voz (Erlang C com Shrinkage)</span>
-                                    <i class="fa-solid fa-chevron-down sizing-acc-arrow" id="arrow-acc-voz"></i>
+                                    <span><i class="fa-solid fa-headset" style="color: var(--color-primary); margin-right: 0.35rem;"></i> Memória N1 Voz (Erlang C com Shrinkage)</span>
+                                    <i class="fa-solid fa-chevron-down sizing-acc-arrow open" id="arrow-acc-voz"></i>
                                 </button>
                                 <div class="sizing-acc-body" id="body-acc-voz" style="display: block;">
                                     <div id="sizing-calc-detail-voz" class="sizing-calc-detail"></div>
@@ -1522,10 +1522,10 @@
                             <!-- ACCORDION N1 CHAT -->
                             <div class="sizing-acc-item">
                                 <button type="button" class="sizing-acc-header" onclick="toggleSizingAccordion('acc-chat')">
-                                    <span><i class="fa-solid fa-comments"></i> Memória N1 Chat (Atendimento Paralelo)</span>
-                                    <i class="fa-solid fa-chevron-down sizing-acc-arrow" id="arrow-acc-chat"></i>
+                                    <span><i class="fa-solid fa-comments" style="color: var(--color-secondary); margin-right: 0.35rem;"></i> Memória N1 Chat (Atendimento Paralelo)</span>
+                                    <i class="fa-solid fa-chevron-down sizing-acc-arrow open" id="arrow-acc-chat"></i>
                                 </button>
-                                <div class="sizing-acc-body" id="body-acc-chat" style="display: none;">
+                                <div class="sizing-acc-body" id="body-acc-chat" style="display: block;">
                                     <div id="sizing-calc-detail-chat" class="sizing-calc-detail"></div>
                                 </div>
                             </div>
@@ -1533,10 +1533,10 @@
                             <!-- ACCORDION N2 BACKOFFICE -->
                             <div class="sizing-acc-item">
                                 <button type="button" class="sizing-acc-header" onclick="toggleSizingAccordion('acc-bo')">
-                                    <span><i class="fa-solid fa-briefcase"></i> Memória N2 Backoffice (Capacidade Linear)</span>
-                                    <i class="fa-solid fa-chevron-down sizing-acc-arrow" id="arrow-acc-bo"></i>
+                                    <span><i class="fa-solid fa-briefcase" style="color: var(--color-success); margin-right: 0.35rem;"></i> Memória N2 Backoffice (Capacidade Linear)</span>
+                                    <i class="fa-solid fa-chevron-down sizing-acc-arrow open" id="arrow-acc-bo"></i>
                                 </button>
-                                <div class="sizing-acc-body" id="body-acc-bo" style="display: none;">
+                                <div class="sizing-acc-body" id="body-acc-bo" style="display: block;">
                                     <div id="sizing-calc-detail-bo" class="sizing-calc-detail"></div>
                                 </div>
                             </div>

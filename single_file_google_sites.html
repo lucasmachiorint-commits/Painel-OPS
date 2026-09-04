@@ -2740,11 +2740,12 @@ body.light-theme .sizing-modal-callout {
     display: grid;
     grid-template-columns: 1fr auto;
     align-items: center;
-    padding: 0.28rem 0.75rem;
+    padding: 0.32rem 1.15rem;
     border-bottom: 1px solid var(--border-color);
-    min-height: 31px;
+    min-height: 32px;
     background: transparent;
     transition: background var(--transition-fast);
+    gap: 0.75rem;
 }
 
 .sizing-sheet-row:hover {
@@ -2833,15 +2834,15 @@ body.light-theme .sizing-modal-callout {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    padding-right: 0.4rem;
 }
 
 .sheet-cell {
     display: flex;
     align-items: center;
     justify-content: flex-end;
-    gap: 0.2rem;
-    min-width: 95px;
+    gap: 0.35rem;
+    min-width: 105px;
+    padding-right: 2px;
 }
 
 .sizing-cell-input {
@@ -2849,16 +2850,23 @@ body.light-theme .sizing-modal-callout {
     border: 1px solid var(--border-color);
     color: var(--text-primary);
     font-family: inherit;
-    font-size: 0.84rem;
+    font-size: 0.85rem;
     text-align: right;
     width: 82px;
-    padding: 3px 6px;
+    padding: 3px 8px;
     border-radius: var(--radius-sm);
     transition: all var(--transition-fast);
     outline: none;
     font-weight: 600;
+    line-height: 1.2;
+    box-sizing: border-box;
+    font-variant-numeric: tabular-nums;
     -moz-appearance: textfield;
     appearance: textfield;
+}
+
+.sizing-card-bo .sizing-cell-input {
+    width: 90px;
 }
 
 .sizing-cell-input::-webkit-outer-spin-button,
@@ -2929,7 +2937,9 @@ body.light-theme .sizing-modal-callout {
     background: rgba(235, 92, 39, 0.12);
     border: 1px solid rgba(235, 92, 39, 0.3);
     border-radius: var(--radius-sm);
-    padding: 1px 3px;
+    padding: 1px 4px;
+    display: inline-flex;
+    align-items: center;
 }
 
 .sizing-card-chat .cell-peach {
@@ -2939,9 +2949,12 @@ body.light-theme .sizing-modal-callout {
 
 .cell-peach .sizing-cell-input {
     color: var(--color-primary) !important;
-    font-weight: 800 !important;
+    font-weight: 700 !important;
+    font-size: 0.85rem !important;
     background: transparent;
     border: none;
+    padding: 2px 4px;
+    width: 60px;
 }
 
 .sizing-card-chat .cell-peach .sizing-cell-input {
@@ -2950,16 +2963,16 @@ body.light-theme .sizing-modal-callout {
 
 .cell-gold-input {
     color: var(--text-primary) !important;
-    font-size: 0.95rem !important;
-    font-weight: 800 !important;
+    font-size: 0.85rem !important;
+    font-weight: 700 !important;
     background: transparent !important;
     border: none !important;
 }
 
 .cell-amber-input {
     color: var(--color-primary) !important;
-    font-size: 1.05rem !important;
-    font-weight: 900 !important;
+    font-size: 0.85rem !important;
+    font-weight: 800 !important;
     background: transparent !important;
     border: none !important;
 }
@@ -2974,6 +2987,7 @@ body.light-theme .sizing-modal-callout {
 
 .cell-header-input {
     color: var(--text-primary) !important;
+    font-size: 0.85rem !important;
     font-weight: 700 !important;
     background: transparent !important;
     border: none !important;
@@ -2982,7 +2996,10 @@ body.light-theme .sizing-modal-callout {
 .sheet-unit {
     font-size: 0.78rem;
     color: var(--text-muted);
+    min-width: 12px;
+    text-align: left;
     padding-left: 2px;
+    font-weight: 600;
 }
 
 .font-italic {
@@ -4353,7 +4370,7 @@ body.light-theme .sizing-calc-table tr {
                                 <div class="sizing-sheet-row row-highlight-text">
                                     <span class="sheet-label font-bold">Volume Mês</span>
                                     <div class="sheet-cell">
-                                        <input type="number" id="input-sizing-vol-voz" min="0" step="1" value="19912" class="sizing-cell-input font-bold" style="font-size: 0.95rem;" inputmode="numeric">
+                                        <input type="number" id="input-sizing-vol-voz" min="0" step="1" value="19912" class="sizing-cell-input font-bold" inputmode="numeric">
                                     </div>
                                 </div>
 
@@ -4546,7 +4563,7 @@ body.light-theme .sizing-calc-table tr {
                                 <div class="sizing-sheet-row row-highlight-text">
                                      <span class="sheet-label font-bold">Volume Mês</span>
                                      <div class="sheet-cell">
-                                         <input type="number" id="input-sizing-vol-chat" min="0" step="1" value="0" class="sizing-cell-input font-bold" style="font-size: 0.95rem;" inputmode="numeric">
+                                         <input type="number" id="input-sizing-vol-chat" min="0" step="1" value="0" class="sizing-cell-input font-bold" inputmode="numeric">
                                      </div>
                                  </div>
 
@@ -4643,7 +4660,7 @@ body.light-theme .sizing-calc-table tr {
                                 <div class="sizing-sheet-row row-highlight-text">
                                     <span class="sheet-label font-bold">Volume Mês</span>
                                     <div class="sheet-cell">
-                                        <input type="number" id="input-sizing-vol-bo" min="0" step="1" value="10270" class="sizing-cell-input font-bold" style="font-size: 0.95rem;" inputmode="numeric">
+                                        <input type="number" id="input-sizing-vol-bo" min="0" step="1" value="10270" class="sizing-cell-input font-bold" inputmode="numeric">
                                     </div>
                                 </div>
 
@@ -4818,8 +4835,8 @@ body.light-theme .sizing-calc-table tr {
                             <!-- ACCORDION N1 VOZ -->
                             <div class="sizing-acc-item">
                                 <button type="button" class="sizing-acc-header" onclick="toggleSizingAccordion('acc-voz')">
-                                    <span><i class="fa-solid fa-headset"></i> Memória N1 Voz (Erlang C com Shrinkage)</span>
-                                    <i class="fa-solid fa-chevron-down sizing-acc-arrow" id="arrow-acc-voz"></i>
+                                    <span><i class="fa-solid fa-headset" style="color: var(--color-primary); margin-right: 0.35rem;"></i> Memória N1 Voz (Erlang C com Shrinkage)</span>
+                                    <i class="fa-solid fa-chevron-down sizing-acc-arrow open" id="arrow-acc-voz"></i>
                                 </button>
                                 <div class="sizing-acc-body" id="body-acc-voz" style="display: block;">
                                     <div id="sizing-calc-detail-voz" class="sizing-calc-detail"></div>
@@ -4829,10 +4846,10 @@ body.light-theme .sizing-calc-table tr {
                             <!-- ACCORDION N1 CHAT -->
                             <div class="sizing-acc-item">
                                 <button type="button" class="sizing-acc-header" onclick="toggleSizingAccordion('acc-chat')">
-                                    <span><i class="fa-solid fa-comments"></i> Memória N1 Chat (Atendimento Paralelo)</span>
-                                    <i class="fa-solid fa-chevron-down sizing-acc-arrow" id="arrow-acc-chat"></i>
+                                    <span><i class="fa-solid fa-comments" style="color: var(--color-secondary); margin-right: 0.35rem;"></i> Memória N1 Chat (Atendimento Paralelo)</span>
+                                    <i class="fa-solid fa-chevron-down sizing-acc-arrow open" id="arrow-acc-chat"></i>
                                 </button>
-                                <div class="sizing-acc-body" id="body-acc-chat" style="display: none;">
+                                <div class="sizing-acc-body" id="body-acc-chat" style="display: block;">
                                     <div id="sizing-calc-detail-chat" class="sizing-calc-detail"></div>
                                 </div>
                             </div>
@@ -4840,10 +4857,10 @@ body.light-theme .sizing-calc-table tr {
                             <!-- ACCORDION N2 BACKOFFICE -->
                             <div class="sizing-acc-item">
                                 <button type="button" class="sizing-acc-header" onclick="toggleSizingAccordion('acc-bo')">
-                                    <span><i class="fa-solid fa-briefcase"></i> Memória N2 Backoffice (Capacidade Linear)</span>
-                                    <i class="fa-solid fa-chevron-down sizing-acc-arrow" id="arrow-acc-bo"></i>
+                                    <span><i class="fa-solid fa-briefcase" style="color: var(--color-success); margin-right: 0.35rem;"></i> Memória N2 Backoffice (Capacidade Linear)</span>
+                                    <i class="fa-solid fa-chevron-down sizing-acc-arrow open" id="arrow-acc-bo"></i>
                                 </button>
-                                <div class="sizing-acc-body" id="body-acc-bo" style="display: none;">
+                                <div class="sizing-acc-body" id="body-acc-bo" style="display: block;">
                                     <div id="sizing-calc-detail-bo" class="sizing-calc-detail"></div>
                                 </div>
                             </div>
