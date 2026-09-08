@@ -8198,34 +8198,126 @@ function recalcSizing(fromInputs = true) {
             `;
         }
         
-        // Alert 2: Janela de Contratação e Treinamento (45 dias / M-2)
+        // Alert 2: Gestão de Recursos e Capacidade (Acréscimo, Decréscimo ou Manutenção a partir da 2ª projeção)
         let contrataCardHtml = '';
         if (mesRef && /^\d{4}-\d{2}$/.test(mesRef)) {
             const parts = mesRef.split('-');
             const year = parseInt(parts[0], 10);
             const month = parseInt(parts[1], 10);
             
-            let prevMonth = month - 2;
-            let prevYear = year;
-            if (prevMonth <= 0) {
-                prevMonth += 12;
-                prevYear -= 1;
+            let m2Month = month - 2;
+            let m2Year = year;
+            if (m2Month <= 0) {
+                m2Month += 12;
+                m2Year -= 1;
             }
             const strMesRef = `${String(month).padStart(2, '0')}/${year}`;
-            const strMesM2 = `${String(prevMonth).padStart(2, '0')}/${prevYear}`;
+            const strMesM2 = `${String(m2Month).padStart(2, '0')}/${m2Year}`;
+
+            // Localiza meses anteriores para identificar se estamos na 1ª projeção (baseline) ou na 2ª em diante
+            const pastMonths = Object.keys(state.sizingHistory || {})
+                .filter(m => /^\d{4}-\d{2}$/.test(m) && m < mesRef)
+                .sort();
             
-            contrataCardHtml = `
-                <div class="sizing-alert-card sizing-alert-info">
-                    <div class="sizing-alert-icon"><i class="fa-solid fa-calendar-check"></i></div>
-                    <div class="sizing-alert-content" style="flex: 1;">
-                        <h4>Cronograma de Contratação Preventiva (Janela 45 dias / M-2)</h4>
-                        <p>
-                            Para atender o mês projetado de <strong>${strMesRef}</strong> com <strong>${totalPAs} PAs contratadas</strong>, o processo seletivo e treinamento de integração deve ocorrer impreterivelmente até <strong>${strMesM2} (M-2)</strong> para garantir conformidade à curva de aprendizado NR17.
-                        </p>
-                        ${refFooterHtml}
+            // Se for o mês inicial (2026-11) ou não houver histórico de mês anterior:
+            if (pastMonths.length === 0 || mesRef === '2026-11') {
+                contrataCardHtml = `
+                    <div class="sizing-alert-card sizing-alert-info">
+                        <div class="sizing-alert-icon"><i class="fa-solid fa-users-gear"></i></div>
+                        <div class="sizing-alert-content" style="flex: 1;">
+                            <h4>Capacidade Operacional Base (Quadro Atual Alocado)</h4>
+                            <p>
+                                O mês de <strong>${strMesRef}</strong> consolida a capacidade do time atualmente alocado na operação com <strong>${totalPAs} PAs contratadas</strong> (📞 Voz: ${resVoz.paContratada} | 💬 Chat: ${resChat.paContratada} | 📋 Backoffice: ${resBO.paContratada}).
+                                Como a equipe já se encontra contratada e ativa para este baseline, <strong>não há necessidade de nova contratação</strong>.
+                                A apuração de <strong>acréscimo ou decréscimo</strong> de recursos será considerada <strong>a partir da 2ª projeção</strong> em relação a esta base.
+                            </p>
+                            ${refFooterHtml}
+                        </div>
                     </div>
-                </div>
-            `;
+                `;
+            } else {
+                // A partir da 2ª projeção: compara com o mês imediatamente anterior
+                const prevMonthKey = pastMonths[pastMonths.length - 1];
+                let prevParams = state.sizingHistory[prevMonthKey];
+                let prevTotalPAs = totalPAs;
+                let prevVozPAs = resVoz.paContratada;
+                let prevChatPAs = resChat.paContratada;
+                let prevBOPAs = resBO.paContratada;
+                
+                if (prevParams) {
+                    const prevResVoz = calcSizingN1Voz(prevParams);
+                    const prevResChat = calcSizingN1Chat(prevParams);
+                    const prevResBO = calcSizingN2Backoffice(prevParams);
+                    prevVozPAs = prevResVoz.paContratada;
+                    prevChatPAs = prevResChat.paContratada;
+                    prevBOPAs = prevResBO.paContratada;
+                    prevTotalPAs = prevVozPAs + prevChatPAs + prevBOPAs + (parseInt(prevParams.safetyBuffer) || 0);
+                }
+                
+                const diffPAs = totalPAs - prevTotalPAs;
+                const diffVoz = resVoz.paContratada - prevVozPAs;
+                const diffChat = resChat.paContratada - prevChatPAs;
+                const diffBO = resBO.paContratada - prevBOPAs;
+                const prevMonthLabel = formatMonthName(prevMonthKey);
+                
+                const breakdownVariacao = `
+                    <div style="display: flex; flex-wrap: wrap; gap: 1rem; margin: 0.45rem 0; font-size: 0.82rem; background: rgba(0,0,0,0.15); padding: 0.4rem 0.75rem; border-radius: 6px;">
+                        <span>📞 <strong>Voz:</strong> ${resVoz.paContratada} PAs (${diffVoz >= 0 ? '+' : ''}${diffVoz})</span>
+                        <span>💬 <strong>Chat:</strong> ${resChat.paContratada} PAs (${diffChat >= 0 ? '+' : ''}${diffChat})</span>
+                        <span>📋 <strong>Backoffice:</strong> ${resBO.paContratada} PAs (${diffBO >= 0 ? '+' : ''}${diffBO})</span>
+                    </div>
+                `;
+                
+                if (diffPAs > 0) {
+                    // Acréscimo: Necessidade real de contratação
+                    contrataCardHtml = `
+                        <div class="sizing-alert-card sizing-alert-warning">
+                            <div class="sizing-alert-icon"><i class="fa-solid fa-user-plus"></i></div>
+                            <div class="sizing-alert-content" style="flex: 1;">
+                                <h4>Necessidade de Acréscimo de Recursos (+${diffPAs} PAs)</h4>
+                                <p>
+                                    A projeção de <strong>${strMesRef}</strong> demanda <strong>${totalPAs} PAs</strong>, representando um acréscimo de <strong>+${diffPAs} PAs</strong> frente ao quadro contratado em ${prevMonthLabel} (${prevTotalPAs} PAs).
+                                    ${breakdownVariacao}
+                                    Para atender a essa ampliação de capacidade, o processo seletivo e treinamento de integração deve ocorrer com antecedência de <strong>45 dias (até ${strMesM2})</strong> para cumprimento da curva de aprendizado NR17.
+                                </p>
+                                ${refFooterHtml}
+                            </div>
+                        </div>
+                    `;
+                } else if (diffPAs < 0) {
+                    // Decréscimo: Nenhuma contratação necessária, mitigação de ociosidade
+                    contrataCardHtml = `
+                        <div class="sizing-alert-card sizing-alert-info">
+                            <div class="sizing-alert-icon"><i class="fa-solid fa-user-minus"></i></div>
+                            <div class="sizing-alert-content" style="flex: 1;">
+                                <h4>Decréscimo de Recursos / Ociosidade (-${Math.abs(diffPAs)} PAs)</h4>
+                                <p>
+                                    A projeção de <strong>${strMesRef}</strong> demanda <strong>${totalPAs} PAs</strong>, indicando uma redução de <strong>${Math.abs(diffPAs)} PAs</strong> em relação ao mês anterior (${prevMonthLabel}: ${prevTotalPAs} PAs).
+                                    ${breakdownVariacao}
+                                    <strong>Nenhuma contratação é necessária.</strong> Recomenda-se remanejamento de capacidade, realocação interna entre operações ou adequação de escalas para mitigar ociosidade de pessoal.
+                                </p>
+                                ${refFooterHtml}
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    // Quadro estável: Nenhuma alteração
+                    contrataCardHtml = `
+                        <div class="sizing-alert-card sizing-alert-success">
+                            <div class="sizing-alert-icon"><i class="fa-solid fa-circle-check"></i></div>
+                            <div class="sizing-alert-content" style="flex: 1;">
+                                <h4>Quadro de Recursos Estável (${totalPAs} PAs)</h4>
+                                <p>
+                                    A projeção de <strong>${strMesRef}</strong> mantém exatamente as <strong>${totalPAs} PAs contratadas</strong> em operação no mês anterior (${prevMonthLabel}).
+                                    ${breakdownVariacao}
+                                    <strong>Nenhuma contratação ou desmobilização é necessária</strong>, operando com total equilíbrio de capacidade operacional.
+                                </p>
+                                ${refFooterHtml}
+                            </div>
+                        </div>
+                    `;
+                }
+            }
         }
         
         alertsContainer.innerHTML = desvioCardHtml + contrataCardHtml;
