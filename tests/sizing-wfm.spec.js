@@ -514,4 +514,44 @@ test.describe('Painel OPS - Redimensionamento (WFM & Erlang C) E2E', () => {
     await expect(bodyVoz).toBeHidden();
     await expect(page.locator('#arrow-acc-voz')).not.toHaveClass(/open/);
   });
+
+  test('17. Quadro Backoffice valida com precisao todas as formulas da planilha (500 demandas -> 1 PA, 8 cham/op)', async ({ page }) => {
+    await page.evaluate(() => {
+      // @ts-ignore
+      switchToView('sizing');
+    });
+
+    const volBo = page.locator('#input-sizing-vol-bo');
+    const diasUteis = page.locator('#input-sizing-dias-uteis-bo');
+    
+    // Configura Volume Mês = 500 e Dias Úteis = 30 conforme imagem da planilha
+    await volBo.fill('500');
+    await volBo.dispatchEvent('input');
+    await diasUteis.fill('30');
+    await diasUteis.dispatchEvent('input');
+    await page.waitForTimeout(300);
+
+    // Validações exatas das células da planilha:
+    // E8 (Volume Dia) = 17 (=E6/E7 = 500/30)
+    await expect(page.locator('#input-sizing-vol-dia-bo')).toHaveValue('17');
+
+    // E9 (Prod. Máx. Operador/Dia) = 22 (=E24/E14 = 03:42:36 / 00:10:00)
+    await expect(page.locator('#input-sizing-prod-max-dia')).toHaveValue('22');
+
+    // E10 (PA's Necessárias) = 1 (=ARREDONDAR.PARA.CIMA(E8/E9/2;0))
+    await expect(page.locator('#input-sizing-pas-bo')).toHaveValue('1');
+
+    // E12 (PA CONTRATADA) = 1 (=E10+E11)
+    await expect(page.locator('#input-sizing-pa-contratada-bo')).toHaveValue('1');
+
+    // E13 (CHAMADAS / OPERADOR) = 8 (=E8/(E12*2) = 16.666 / 2 = 8)
+    await expect(page.locator('#input-sizing-chamadas-op-bo')).toHaveValue('8');
+
+    // Células de tempo e jornada:
+    await expect(page.locator('#input-sizing-tma-real-min')).toHaveValue('00:10:00');
+    await expect(page.locator('#input-sizing-ch-nominal-fmt')).toHaveValue('06:20:00');
+    await expect(page.locator('#input-sizing-ch-trabalho')).toHaveValue('05:40:00');
+    await expect(page.locator('#input-sizing-horas-mes')).toHaveValue('170:00:00');
+    await expect(page.locator('#input-sizing-ch-efetivo')).toHaveValue('03:42:36');
+  });
 });

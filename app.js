@@ -7310,36 +7310,53 @@ function calcSizingN2Backoffice(p) {
     const volBase = Math.max(0, parseFloat(p.volumeMensalBO) || 0);
     const volEfetivo = Math.round(volBase * aumentoFactor);
     
+    // E8: Volume Dia = =E6/E7
     const diasUteis = Math.max(1, parseFloat(p.diasUteis) || 30);
-    const volDia = Math.round(volEfetivo / diasUteis);
+    const volDiaExact = volEfetivo / diasUteis;
+    const volDia = Math.round(volDiaExact);
     
+    // E15: TMA em Segundos & E14: TMA Real em Minutos
     const tma = Math.max(1, parseFloat(p.tmaBO) || 600);
+    const tmaRealMin = tma / 60.0;
+    
+    // E17: Carga Horária Nominal (minutos)
     const chNominalMin = parseFloat(p.cargaHorariaNominal) || 380;
+    
+    // E18: NR 17 (%) & E19: Carga Horária de trabalho (minutos)
     const nr17Pct = parseFloat(p.nr17BoPct) || 10.53;
     const pausasNR17Min = chNominalMin * (nr17Pct / 100.0);
     const chTrabalhoMin = chNominalMin - pausasNR17Min;
     
+    // E16: Dias de Atendimento & E20: Horas Mês
     const diasAtend = Math.max(1, parseFloat(p.diasAtendimento) || 30);
     const horasMesMin = chTrabalhoMin * diasAtend;
     
+    // E21: Treinamento+FeedBack (%) & E22: Horas Produtivas (minutos)
     const treinFbPct = parseFloat(p.treinFbPct) || 6.47;
     const treinFbMin = chTrabalhoMin * (treinFbPct / 100.0);
     const horasProdutivasMin = chTrabalhoMin - treinFbMin;
     
+    // E23: % deste tempo falando & E24: Carga Horária de trabalho Efetivo (minutos/segundos)
     const eficienciaPct = (parseFloat(p.eficienciaOcupacao) || 70.0) / 100.0;
     const chEfetivaMin = horasProdutivasMin * eficienciaPct;
-    const chEfetivaSeg = chEfetivaMin * 60;
+    const chEfetivaSeg = chEfetivaMin * 60.0;
     
-    const prodMaxDia = Math.floor(chEfetivaSeg / tma);
+    // E9: Prod. Máx. Operador/Dia = =E24/E14
+    const prodMaxDiaExact = tmaRealMin > 0 ? (chEfetivaMin / tmaRealMin) : 0;
+    const prodMaxDia = Math.round(prodMaxDiaExact);
     
-    // In reference spreadsheet: 342 volDia / 22 prodMaxDia gives 8 PAs (with 2 shifts / factor)
-    let pas = 8;
-    if (prodMaxDia > 0 && volDia > 0) {
-        pas = Math.ceil(volDia / (prodMaxDia * 2));
+    // E10: PA's Necessárias = =ARREDONDAR.PARA.CIMA(E8/E9/2;0)
+    let pas = 0;
+    if (prodMaxDiaExact > 0 && volDiaExact > 0) {
+        pas = Math.ceil((volDiaExact / prodMaxDiaExact) / 2);
     }
+    
+    // E11: Ajuste & E12: PA CONTRATADA = =E10+E11
     const ajuste = parseFloat(p.ajusteBo) || 0;
     const paContratada = Math.max(0, pas + ajuste);
-    const chamadasOp = paContratada > 0 ? Math.round(volDia / (paContratada * 2)) : 0;
+    
+    // E13: CHAMADAS / OPERADOR = =E8/(E12*2)
+    const chamadasOp = paContratada > 0 ? Math.round(volDiaExact / (paContratada * 2)) : 0;
     
     return {
         volBase,
@@ -8079,16 +8096,18 @@ function recalcSizing(fromInputs = true) {
             <table class="sizing-calc-table">
                 <tr><td class="calc-label">Volume Mensal Backoffice Efetivo</td><td class="calc-formula">Vol_Base &times; (1 + ${aumentoPct}%)</td><td class="calc-val">${resBO.volEfetivo.toLocaleString('pt-BR')} demandas</td></tr>
                 <tr><td class="calc-label">Dias Úteis no Mês</td><td class="calc-formula">Dias_Uteis</td><td class="calc-val">${resBO.diasUteis} dias</td></tr>
-                <tr><td class="calc-label">Volume Diário a Produzir</td><td class="calc-formula">Vol_Efetivo / Dias_Uteis</td><td class="calc-val">${resBO.volDia.toFixed(1)} demandas/dia</td></tr>
+                <tr><td class="calc-label">Volume Diário a Produzir</td><td class="calc-formula">E6 / E7 (Vol_Efetivo / Dias_Uteis)</td><td class="calc-val">${resBO.volDia} demandas/dia</td></tr>
                 <tr><td class="calc-label">Carga Horária Nominal</td><td class="calc-formula">Jornada Contratual</td><td class="calc-val">${resBO.chNominalMin} min (${resBO.chNominalFmt})</td></tr>
                 <tr><td class="calc-label">NR 17 (Pausas Regulamentares)</td><td class="calc-formula">${resBO.nr17Pct}% da jornada</td><td class="calc-val">${resBO.chTrabalhoFmt} líquidos</td></tr>
                 <tr><td class="calc-label">Horas Mês</td><td class="calc-formula">CH Trabalho &times; ${resBO.diasAtend} dias</td><td class="calc-val">${resBO.horasMesFmt}</td></tr>
                 <tr><td class="calc-label">Treinamento + Feedback</td><td class="calc-formula">${resBO.treinFbPct}% da jornada líq.</td><td class="calc-val">${resBO.horasProdutivasFmt} produtivas</td></tr>
-                <tr><td class="calc-label">Eficiência / Tempo Falando</td><td class="calc-formula">Padrão de Mercado</td><td class="calc-val">${resBO.eficienciaPct.toFixed(1)}% (${resBO.chEfetivoFmt} efetivo)</td></tr>
-                <tr><td class="calc-label">Prod. Máx. Operador/Dia</td><td class="calc-formula">&lfloor; Tempo_Efetivo / TMA (${resBO.tma}s) &rfloor;</td><td class="calc-val" style="color: var(--color-secondary);">${resBO.prodMaxDia} demandas/dia</td></tr>
-                <tr><td class="calc-label">PA's Necessárias</td><td class="calc-formula">Vol_Diario / (Prod_Max &times; 2)</td><td class="calc-val" style="color: var(--color-secondary); font-size: 1.05rem;">${resBO.pas} PAs</td></tr>
+                <tr><td class="calc-label">% deste tempo falando (padrão de mercado)</td><td class="calc-formula">Eficiência (${resBO.eficienciaPct.toFixed(1)}%)</td><td class="calc-val">${resBO.chEfetivoFmt} efetivo</td></tr>
+                <tr><td class="calc-label">TMA Real em Minutos</td><td class="calc-formula">TMA_Seg / 60</td><td class="calc-val">${resBO.tmaRealMinFmt}</td></tr>
+                <tr><td class="calc-label">Prod. Máx. Operador/Dia</td><td class="calc-formula">E24 / E14 (CH_Efetiva / TMA_Real)</td><td class="calc-val" style="color: var(--color-success); font-weight: 700;">${resBO.prodMaxDia} demandas/dia</td></tr>
+                <tr><td class="calc-label">PA's Necessárias</td><td class="calc-formula">&lceil; (Vol_Dia / Prod_Max) / 2 &rceil;</td><td class="calc-val" style="color: var(--color-success); font-size: 1.05rem; font-weight: 700;">${resBO.pas} PAs</td></tr>
                 <tr><td class="calc-label">Ajuste Manual</td><td class="calc-formula">Ajuste</td><td class="calc-val">${resBO.ajuste} PAs</td></tr>
-                <tr style="background: rgba(229, 95, 145, 0.08);"><td class="calc-label" style="font-weight: 700; color: #fff;">PA CONTRATADA (BKO)</td><td class="calc-formula" style="color: #fff;">PA's Necessárias + Ajuste</td><td class="calc-val" style="color: var(--color-secondary); font-size: 1.15rem;">${resBO.paContratada} PAs</td></tr>
+                <tr style="background: rgba(16, 185, 129, 0.08);"><td class="calc-label" style="font-weight: 700; color: #fff;">PA CONTRATADA (BKO)</td><td class="calc-formula" style="color: #fff;">E10 + E11 (PA's Necessárias + Ajuste)</td><td class="calc-val" style="color: var(--color-success); font-size: 1.15rem; font-weight: 700;">${resBO.paContratada} PAs</td></tr>
+                <tr><td class="calc-label">CHAMADAS / OPERADOR</td><td class="calc-formula">E8 / (E12 &times; 2)</td><td class="calc-val" style="color: var(--color-success); font-weight: 700;">${resBO.chamadasOp} chamadas/op</td></tr>
             </table>
         `;
     }
