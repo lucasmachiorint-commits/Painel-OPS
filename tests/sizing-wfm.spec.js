@@ -204,10 +204,9 @@ test.describe('Painel OPS - Redimensionamento (WFM & Erlang C) E2E', () => {
       switchToView('sizing');
     });
 
-    // 1. Verify calculated fields have readonly and cell-calculated class
+    // 1. Verify calculated fields have readonly and cell-calculated class (and Volume Atendidas is editable)
     const volAtendidasVoz = page.locator('#input-sizing-vol-atendidas');
-    await expect(volAtendidasVoz).toHaveAttribute('readonly', '');
-    await expect(volAtendidasVoz).toHaveClass(/cell-calculated/);
+    await expect(volAtendidasVoz).not.toHaveAttribute('readonly', '');
 
     const erlangVoz = page.locator('#input-sizing-erlang');
     await expect(erlangVoz).toHaveAttribute('readonly', '');
@@ -619,5 +618,61 @@ test.describe('Painel OPS - Redimensionamento (WFM & Erlang C) E2E', () => {
     await expect(page.locator('#input-sizing-vol-voz')).toBeEnabled();
     await expect(page.locator('#input-sizing-vol-chat')).toBeEnabled();
     await expect(page.locator('#input-sizing-vol-bo')).toBeEnabled();
+  });
+
+  test('19. Volume Atendidas como 2o campo editavel alimenta apuracao do desvio contratual', async ({ page }) => {
+    await page.evaluate(() => {
+      // @ts-ignore
+      switchToView('sizing');
+    });
+
+    const volAtendVoz = page.locator('#input-sizing-vol-atendidas');
+    const volAtendChat = page.locator('#input-sizing-vol-atendidas-chat');
+    const volAtendBO = page.locator('#input-sizing-vol-atendidas-bo');
+
+    // 1. Campos devem estar visíveis e habilitados para edição (sem readonly)
+    await expect(volAtendVoz).toBeVisible();
+    await expect(volAtendVoz).toBeEnabled();
+    await expect(volAtendChat).toBeVisible();
+    await expect(volAtendChat).toBeEnabled();
+    await expect(volAtendBO).toBeVisible();
+    await expect(volAtendBO).toBeEnabled();
+
+    // 2. Valida que é o 2º campo em Voz e Chat (logo após Volume Mês)
+    const vozRows = page.locator('#sizing-table-voz .sizing-sheet-row');
+    await expect(vozRows.nth(1)).toContainText('Volume Mês');
+    await expect(vozRows.nth(2)).toContainText('Volume Atendidas');
+
+    const chatRows = page.locator('#sizing-table-chat .sizing-sheet-row');
+    await expect(chatRows.nth(1)).toContainText('Volume Mês');
+    await expect(chatRows.nth(2)).toContainText('Volume Atendidas');
+
+    // 3. Altera Volume Atendidas para simular desvio contratual positivo (> +5%)
+    // Volume planejado Voz: 19912. Se digitar 22000 atendidas (+10.5%)
+    await volAtendVoz.fill('22000');
+    await volAtendVoz.dispatchEvent('input');
+    await page.waitForTimeout(300);
+
+    // Badge no quadro deve indicar desvio positivo
+    const badgeVoz = page.locator('#sizing-desvio-badge-voz');
+    await expect(badgeVoz).toContainText('+10.5%');
+
+    // Card de alerta deve refletir desvio crítico
+    const alertsContainer = page.locator('#sizing-alerts-container');
+    await expect(alertsContainer).toContainText('Alerta de Desvio Contratual Crítico');
+    await expect(alertsContainer).toContainText('22.000');
+
+    // 4. Altera para volume abaixo do planejado (< -5%)
+    await volAtendVoz.fill('16000');
+    await volAtendVoz.dispatchEvent('input');
+    await page.waitForTimeout(300);
+    await expect(alertsContainer).toContainText('Volume Abaixo do Planejado');
+    await expect(alertsContainer).toContainText('16.000');
+
+    // 5. Restaura para valor padrão dentro da tolerância
+    await volAtendVoz.fill('19215');
+    await volAtendVoz.dispatchEvent('input');
+    await page.waitForTimeout(300);
+    await expect(alertsContainer).toContainText('Volume Dentro da Tolerância Contratual');
   });
 });

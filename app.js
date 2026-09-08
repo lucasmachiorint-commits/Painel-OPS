@@ -2336,6 +2336,7 @@ function applyStateMigrations() {
         shrinkageNR17Chat: 17.0,
         ajusteChat: 0,
         volumeMensalBO: 500,
+        volAtendidasBO: 500,
         tmaBO: 600,
         diasUteis: 30,
         diasAtendimento: 30,
@@ -2355,6 +2356,22 @@ function applyStateMigrations() {
         for (const [k, v] of Object.entries(defaultSizingParams)) {
             if (state.sizingParams[k] === undefined || state.sizingParams[k] === null) {
                 state.sizingParams[k] = v;
+            }
+        }
+    }
+
+    // Migração para Volume Atendidas editável em Voz, Chat e Backoffice
+    if (!state.sizingVolAtendidasEditable_v3) {
+        state.sizingVolAtendidasEditable_v3 = true;
+        if (state.sizingParams) {
+            if (state.sizingParams.volAtendidas === undefined || state.sizingParams.volAtendidas === null) {
+                state.sizingParams.volAtendidas = 19215;
+            }
+            if (state.sizingParams.volAtendidasChat === undefined || state.sizingParams.volAtendidasChat === null) {
+                state.sizingParams.volAtendidasChat = 2895;
+            }
+            if (state.sizingParams.volAtendidasBO === undefined || state.sizingParams.volAtendidasBO === null) {
+                state.sizingParams.volAtendidasBO = 500;
             }
         }
     }
@@ -7169,7 +7186,12 @@ function calcSizingN1Voz(p) {
     const volEfetivo = Math.round(volBase * aumentoFactor);
     
     const abandonoMax = parseFloat(p.abandonoMax) || 3.5;
-    const volAtendidas = Math.round(volEfetivo * (1.0 - (abandonoMax / 100.0)));
+    let volAtendidas;
+    if (p.volAtendidas !== undefined && p.volAtendidas !== null && !isNaN(p.volAtendidas) && p.volAtendidas >= 0) {
+        volAtendidas = Math.round(parseFloat(p.volAtendidas));
+    } else {
+        volAtendidas = Math.round(volEfetivo * (1.0 - (abandonoMax / 100.0)));
+    }
     
     const dmmPct = (parseFloat(p.dmmPercent) || 5.62) / 100.0;
     const hmmPct = (parseFloat(p.hmmPercent) || 9.70) / 100.0;
@@ -7208,9 +7230,8 @@ function calcSizingN1Voz(p) {
     const pas = Math.ceil((m / telas) / dispEfetiva);
     const ajuste = parseFloat(p.ajusteVoz) || 0;
     const paContratada = Math.max(0, pas + ajuste);
-    // Planilha original: =(VolMês * (1 - Abandono) / (PA_CONTRATADA * 2)) / 21
-    const factorAtend = 1.0 - (abandonoMax / 100.0);
-    const chamadasOp = paContratada > 0 ? Math.round((volEfetivo * factorAtend) / (paContratada * 2) / 21) : 0;
+    // Planilha original: =(VolAtendidas / (PA_CONTRATADA * 2)) / 21
+    const chamadasOp = paContratada > 0 ? Math.round(volAtendidas / (paContratada * 2) / 21) : 0;
     
     return {
         volBase,
@@ -7247,7 +7268,12 @@ function calcSizingN1Chat(p) {
     const volEfetivo = Math.round(volBase * aumentoFactor);
     
     const abandonoMax = parseFloat(p.abandonoMaxChat !== undefined ? p.abandonoMaxChat : p.abandonoMax) || 3.5;
-    const volAtendidas = Math.round(volEfetivo * (1.0 - (abandonoMax / 100.0)));
+    let volAtendidas;
+    if (p.volAtendidasChat !== undefined && p.volAtendidasChat !== null && !isNaN(p.volAtendidasChat) && p.volAtendidasChat >= 0) {
+        volAtendidas = Math.round(parseFloat(p.volAtendidasChat));
+    } else {
+        volAtendidas = Math.round(volEfetivo * (1.0 - (abandonoMax / 100.0)));
+    }
     
     const dmmPct = (parseFloat(p.dmmPercentChat !== undefined ? p.dmmPercentChat : p.dmmPercent) || 5.62) / 100.0;
     const hmmPct = (parseFloat(p.hmmPercentChat !== undefined ? p.hmmPercentChat : p.hmmPercent) || 9.70) / 100.0;
@@ -7286,9 +7312,8 @@ function calcSizingN1Chat(p) {
     const pas = Math.ceil((m / telas) / dispEfetiva);
     const ajuste = parseFloat(p.ajusteChat) || 0;
     const paContratada = Math.max(0, pas + ajuste);
-    // Planilha original: =(VolMês * (1 - Abandono) / (PA_CONTRATADA * 2)) / 21
-    const factorAtend = 1.0 - (abandonoMax / 100.0);
-    const chamadasOp = paContratada > 0 ? Math.round((volEfetivo * factorAtend) / (paContratada * 2) / 21) : 0;
+    // Planilha original: =(VolAtendidas / (PA_CONTRATADA * 2)) / 21
+    const chamadasOp = paContratada > 0 ? Math.round(volAtendidas / (paContratada * 2) / 21) : 0;
     
     return {
         volBase,
@@ -7374,9 +7399,14 @@ function calcSizingN2Backoffice(p) {
     // E13: CHAMADAS / OPERADOR = =E8/(E12*2)
     const chamadasOp = paContratada > 0 ? Math.round(volDiaExact / (paContratada * 2)) : 0;
     
+    const volAtendidas = (p.volAtendidasBO !== undefined && p.volAtendidasBO !== null && !isNaN(p.volAtendidasBO)) 
+        ? Math.round(parseFloat(p.volAtendidasBO)) 
+        : volEfetivo;
+    
     return {
         volBase,
         volEfetivo,
+        volAtendidas,
         diasUteis,
         volDia,
         prodMaxDia,
@@ -7781,6 +7811,7 @@ function resetSizingDefaults() {
         shrinkageNR17Chat: 17.0,
         ajusteChat: 0,
         volumeMensalBO: 500,
+        volAtendidasBO: 500,
         tmaBO: 600,
         diasUteis: 30,
         diasAtendimento: 30,
@@ -7830,8 +7861,19 @@ function recalcSizing(fromInputs = true) {
             return isNaN(val) ? fallback : val;
         };
         
+        const activeId = document.activeElement ? document.activeElement.id : '';
+
         // QUADRO 1: VOZ
         p.volumeMensalVoz = Math.max(0, getNum('input-sizing-vol-voz', p.volumeMensalVoz || 19912));
+        if (activeId === 'input-sizing-vol-voz' || activeId === 'input-sizing-abandono-max') {
+            const defAtendVoz = Math.round(p.volumeMensalVoz * (1.0 - ((parseFloat(p.abandonoMax) || 3.5) / 100.0)));
+            const elAtendVoz = document.getElementById('input-sizing-vol-atendidas');
+            if (elAtendVoz) elAtendVoz.value = defAtendVoz;
+            p.volAtendidas = defAtendVoz;
+        } else {
+            p.volAtendidas = Math.max(0, getNum('input-sizing-vol-atendidas', p.volAtendidas !== undefined ? p.volAtendidas : 19215));
+        }
+
         p.tmaVoz = Math.max(1, getNum('input-sizing-tma-voz', p.tmaVoz || 480));
         p.slaMeta = Math.min(100, Math.max(1, getNum('input-sizing-sla-meta', p.slaMeta || 80)));
         p.nsMinimo = Math.min(100, Math.max(1, getNum('input-sizing-ns-minimo', p.nsMinimo || 60)));
@@ -7848,6 +7890,15 @@ function recalcSizing(fromInputs = true) {
         
         // QUADRO 2: CHAT
         p.volumeMensalChat = Math.max(0, getNum('input-sizing-vol-chat', (p.volumeMensalChat !== undefined && p.volumeMensalChat !== null) ? p.volumeMensalChat : 3000));
+        if (activeId === 'input-sizing-vol-chat' || activeId === 'input-sizing-abandono-max-chat') {
+            const defAtendChat = Math.round(p.volumeMensalChat * (1.0 - ((parseFloat(p.abandonoMaxChat) || 3.5) / 100.0)));
+            const elAtendChat = document.getElementById('input-sizing-vol-atendidas-chat');
+            if (elAtendChat) elAtendChat.value = defAtendChat;
+            p.volAtendidasChat = defAtendChat;
+        } else {
+            p.volAtendidasChat = Math.max(0, getNum('input-sizing-vol-atendidas-chat', p.volAtendidasChat !== undefined ? p.volAtendidasChat : 2895));
+        }
+
         p.tmaChat = Math.max(1, getNum('input-sizing-tma-chat', p.tmaChat || 480));
         p.slaMetaChat = Math.min(100, Math.max(1, getNum('input-sizing-sla-meta-chat', p.slaMetaChat || 80)));
         p.nsMinimoChat = Math.min(100, Math.max(1, getNum('input-sizing-ns-minimo-chat', p.nsMinimoChat || 60)));
@@ -7865,6 +7916,15 @@ function recalcSizing(fromInputs = true) {
         
         // QUADRO 3: BKO
         p.volumeMensalBO = Math.max(0, getNum('input-sizing-vol-bo', (p.volumeMensalBO !== undefined && p.volumeMensalBO !== null) ? p.volumeMensalBO : 500));
+        if (activeId === 'input-sizing-vol-bo') {
+            const defAtendBO = p.volumeMensalBO;
+            const elAtendBO = document.getElementById('input-sizing-vol-atendidas-bo');
+            if (elAtendBO) elAtendBO.value = defAtendBO;
+            p.volAtendidasBO = defAtendBO;
+        } else {
+            p.volAtendidasBO = Math.max(0, getNum('input-sizing-vol-atendidas-bo', p.volAtendidasBO !== undefined ? p.volAtendidasBO : 500));
+        }
+
         p.diasUteis = Math.max(1, getNum('input-sizing-dias-uteis-bo', p.diasUteis || 30));
         p.ajusteBo = getNum('input-sizing-ajuste-bo', p.ajusteBo || 0);
         p.tmaBO = Math.max(1, getNum('input-sizing-tma-bo', p.tmaBO || 600));
@@ -7892,6 +7952,7 @@ function recalcSizing(fromInputs = true) {
     // Update calculated results back in params object
     p.volAtendidas = resVoz.volAtendidas;
     p.volAtendidasChat = resChat.volAtendidas;
+    p.volAtendidasBO = resBO.volAtendidas;
     
     const safetyBuffer = Math.max(0, parseInt(p.safetyBuffer) || 0);
     const totalPAs = resVoz.paContratada + resChat.paContratada + resBO.paContratada + safetyBuffer;
@@ -7899,6 +7960,7 @@ function recalcSizing(fromInputs = true) {
     const setInputVal = (id, val) => {
         const el = document.getElementById(id);
         if (el && val !== undefined && val !== null) {
+            if (document.activeElement === el) return;
             const strVal = String(val);
             if (el.value !== strVal) {
                 el.value = strVal;
@@ -7931,6 +7993,7 @@ function recalcSizing(fromInputs = true) {
     
     // Update calculated cells in Quadro 3 (BKO)
     setInputVal('input-sizing-mes-label-bo', mesLabel);
+    setInputVal('input-sizing-vol-atendidas-bo', p.volAtendidasBO !== undefined ? p.volAtendidasBO : resBO.volBase);
     setInputVal('input-sizing-vol-dia-bo', resBO.volDia);
     setInputVal('input-sizing-prod-max-dia', resBO.prodMaxDia);
     setInputVal('input-sizing-pas-bo', resBO.pas);
@@ -7942,6 +8005,26 @@ function recalcSizing(fromInputs = true) {
     setInputVal('input-sizing-horas-mes', resBO.horasMesFmt);
     setInputVal('input-sizing-horas-produtivas', resBO.horasProdutivasFmt);
     setInputVal('input-sizing-ch-efetivo', resBO.chEfetivoFmt);
+
+    // Update individual desvio badges on quadros
+    const updateDesvioBadge = (badgeId, valReal, valPlan) => {
+        const elBadge = document.getElementById(badgeId);
+        if (!elBadge) return;
+        const diff = valReal - valPlan;
+        const pct = valPlan > 0 ? (diff / valPlan) * 100 : 0;
+        const sign = pct >= 0 ? '+' : '';
+        elBadge.textContent = `${sign}${pct.toFixed(1)}%`;
+        if (pct > 5.0) {
+            elBadge.style.color = '#ef4444';
+        } else if (pct < -5.0) {
+            elBadge.style.color = '#3b82f6';
+        } else {
+            elBadge.style.color = '#10b981';
+        }
+    };
+    updateDesvioBadge('sizing-desvio-badge-voz', resVoz.volAtendidas, resVoz.volBase);
+    updateDesvioBadge('sizing-desvio-badge-chat', resChat.volAtendidas, resChat.volBase);
+    updateDesvioBadge('sizing-desvio-badge-bo', p.volAtendidasBO !== undefined ? p.volAtendidasBO : resBO.volBase, resBO.volBase);
     
     // 1. Update KPI widgets
     const elPasVoz = document.getElementById('widget-sizing-pas-voz');
@@ -7952,7 +8035,7 @@ function recalcSizing(fromInputs = true) {
     const elPasChat = document.getElementById('widget-sizing-pas-chat');
     const elSubChat = document.getElementById('widget-sizing-sub-chat');
     if (elPasChat) elPasChat.textContent = resChat.paContratada;
-    if (elSubChat) elSubChat.textContent = `${resChat.m} agentes (${p.telasSimultaneas || 2} telas simul.)`;
+    if (elSubChat) elSubChat.textContent = `${resChat.m} agentes (${p.telasSimultaneas || 1} telas simul.)`;
     
     const elPasBO = document.getElementById('widget-sizing-pas-bo');
     const elSubBO = document.getElementById('widget-sizing-sub-bo');
@@ -8003,10 +8086,21 @@ function recalcSizing(fromInputs = true) {
     if (alertsContainer) {
         alertsContainer.innerHTML = '';
         
-        // Alert 1: Desvio Contratual (Threshold 5%)
-        const volPlan = parseFloat(p.volumePlanejado) || 19912;
-        const diffVol = resVoz.volEfetivo - volPlan;
-        const diffPct = volPlan > 0 ? (diffVol / volPlan) * 100 : 0;
+        // Alert 1: Desvio Contratual (Threshold 5%) - Comparação entre Volume Atendidas (Realizado) e Volume Mês (Planejado)
+        const volPlanVoz = resVoz.volBase;
+        const volRealVoz = resVoz.volAtendidas;
+        const diffVolVoz = volRealVoz - volPlanVoz;
+        const diffPctVoz = volPlanVoz > 0 ? (diffVolVoz / volPlanVoz) * 100 : 0;
+
+        const volPlanChat = resChat.volBase;
+        const volRealChat = resChat.volAtendidas;
+        const diffVolChat = volRealChat - volPlanChat;
+        const diffPctChat = volPlanChat > 0 ? (diffVolChat / volPlanChat) * 100 : 0;
+
+        const volPlanTotal = volPlanVoz + volPlanChat;
+        const volRealTotal = volRealVoz + volRealChat;
+        const diffVolTotal = volRealTotal - volPlanTotal;
+        const diffPctTotal = volPlanTotal > 0 ? (diffVolTotal / volPlanTotal) * 100 : 0;
         
         const mesRef = state.sizingCurrentMonth || p.mesReferencia || '2026-11';
         const confData = state.sizingConfirmedMonths && state.sizingConfirmedMonths[mesRef];
@@ -8029,31 +8123,40 @@ function recalcSizing(fromInputs = true) {
                 </div>
             `;
         }
+
+        const canalBreakdownHtml = `
+            <div style="display: flex; flex-wrap: wrap; gap: 1rem; margin: 0.45rem 0; font-size: 0.82rem; background: rgba(0,0,0,0.15); padding: 0.4rem 0.75rem; border-radius: 6px;">
+                <span>📞 <strong>Voz:</strong> ${volRealVoz.toLocaleString('pt-BR')} atendidas vs ${volPlanVoz.toLocaleString('pt-BR')} plan. (<strong>${diffPctVoz >= 0 ? '+' : ''}${diffPctVoz.toFixed(1)}%</strong>)</span>
+                <span>💬 <strong>Chat:</strong> ${volRealChat.toLocaleString('pt-BR')} atendidas vs ${volPlanChat.toLocaleString('pt-BR')} plan. (<strong>${diffPctChat >= 0 ? '+' : ''}${diffPctChat.toFixed(1)}%</strong>)</span>
+            </div>
+        `;
         
         let desvioCardHtml = '';
-        if (diffPct > 5.0) {
+        if (diffPctTotal > 5.0) {
             desvioCardHtml = `
                 <div class="sizing-alert-card sizing-alert-warning">
                     <div class="sizing-alert-icon"><i class="fa-solid fa-triangle-exclamation"></i></div>
                     <div class="sizing-alert-content" style="flex: 1;">
-                        <h4>Alerta de Desvio Contratual Crítico (+${diffPct.toFixed(1)}%)</h4>
+                        <h4>Alerta de Desvio Contratual Crítico (+${diffPctTotal.toFixed(1)}%)</h4>
                         <p>
-                            O volume efetivo de <strong>${resVoz.volEfetivo.toLocaleString('pt-BR')} chamadas</strong> excede a meta planejada contratual de <strong>${volPlan.toLocaleString('pt-BR')}</strong> em <strong>+${diffPct.toFixed(1)}% (+${diffVol.toLocaleString('pt-BR')} chamadas)</strong>.
-                            <br><span style="color: #fbbf24; font-weight: 600;">Ação recomendada:</span> Acionar plano de contingência e renegociar aditivo contratual com os parceiros.
+                            O volume de <strong>${volRealTotal.toLocaleString('pt-BR')} chamadas/conversas atendidas</strong> excede o planejado de <strong>${volPlanTotal.toLocaleString('pt-BR')}</strong> em <strong>+${diffPctTotal.toFixed(1)}% (+${diffVolTotal.toLocaleString('pt-BR')} chamadas)</strong>.
+                            ${canalBreakdownHtml}
+                            <span style="color: #fbbf24; font-weight: 600;">Ação recomendada:</span> Acionar plano de contingência e renegociar aditivo contratual com os parceiros.
                         </p>
                         ${refFooterHtml}
                     </div>
                 </div>
             `;
-        } else if (diffPct < -5.0) {
+        } else if (diffPctTotal < -5.0) {
             desvioCardHtml = `
                 <div class="sizing-alert-card sizing-alert-info">
                     <div class="sizing-alert-icon"><i class="fa-solid fa-circle-info"></i></div>
                     <div class="sizing-alert-content" style="flex: 1;">
-                        <h4>Volume Abaixo do Planejado (${diffPct.toFixed(1)}%)</h4>
+                        <h4>Volume Abaixo do Planejado (${diffPctTotal.toFixed(1)}%)</h4>
                         <p>
-                            O volume de <strong>${resVoz.volEfetivo.toLocaleString('pt-BR')} chamadas</strong> está <strong>${Math.abs(diffPct).toFixed(1)}% abaixo</strong> do teto planejado (${volPlan.toLocaleString('pt-BR')}).
-                            <br>Oportunidade para rebalanceamento ou remanejamento de capacidade ociosa.
+                            O volume de <strong>${volRealTotal.toLocaleString('pt-BR')} chamadas/conversas atendidas</strong> está <strong>${Math.abs(diffPctTotal).toFixed(1)}% abaixo</strong> do teto planejado (${volPlanTotal.toLocaleString('pt-BR')}).
+                            ${canalBreakdownHtml}
+                            Oportunidade para rebalanceamento ou remanejamento de capacidade ociosa.
                         </p>
                         ${refFooterHtml}
                     </div>
@@ -8066,7 +8169,8 @@ function recalcSizing(fromInputs = true) {
                     <div class="sizing-alert-content" style="flex: 1;">
                         <h4>Volume Dentro da Tolerância Contratual (&plusmn;5%)</h4>
                         <p>
-                            O volume de <strong>${resVoz.volEfetivo.toLocaleString('pt-BR')} chamadas</strong> apresenta desvio de <strong>${diffPct >= 0 ? '+' : ''}${diffPct.toFixed(1)}%</strong> em relação ao planejado (${volPlan.toLocaleString('pt-BR')}), operando em conformidade com o SLA.
+                            O volume de <strong>${volRealTotal.toLocaleString('pt-BR')} chamadas/conversas atendidas</strong> apresenta desvio de <strong>${diffPctTotal >= 0 ? '+' : ''}${diffPctTotal.toFixed(1)}%</strong> em relação ao planejado (${volPlanTotal.toLocaleString('pt-BR')}), operando em conformidade com o SLA.
+                            ${canalBreakdownHtml}
                         </p>
                         ${refFooterHtml}
                     </div>
@@ -8247,9 +8351,11 @@ function renderSizingView() {
             shrinkageNR17: 17.0,
             telasSimultaneas: 1.0,
             ajusteVoz: 0,
-            volumeMensalChat: 0,
+            volumeMensalChat: 3000,
+            volAtendidasChat: 2895,
             tmaChat: 480,
             volumeMensalBO: 500,
+            volAtendidasBO: 500,
             tmaBO: 600,
             diasUteis: 30,
             diasAtendimento: 30,
@@ -8421,6 +8527,7 @@ function renderSizingView() {
     
     // QUADRO 3: BKO
     setVal('input-sizing-vol-bo', p.volumeMensalBO);
+    setVal('input-sizing-vol-atendidas-bo', p.volAtendidasBO !== undefined ? p.volAtendidasBO : p.volumeMensalBO);
     setVal('input-sizing-dias-uteis-bo', p.diasUteis);
     setVal('input-sizing-tma-bo', p.tmaBO);
     setVal('input-sizing-dias-atend', p.diasAtendimento);

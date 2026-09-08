@@ -963,6 +963,18 @@
                                     </div>
                                 </div>
 
+                                <!-- Row 3: Volume Atendidas (2º Campo - Realizado / Editável) -->
+                                <div class="sizing-sheet-row row-highlight-atendidas">
+                                    <span class="sheet-label font-bold">
+                                        Volume Atendidas
+                                        <span class="atendidas-badge"><i class="fa-solid fa-headset" style="font-size: 0.6rem;"></i> Realizado</span>
+                                    </span>
+                                    <div class="sheet-cell">
+                                        <input type="number" id="input-sizing-vol-atendidas" min="0" step="1" value="19215" class="sizing-cell-input font-bold" inputmode="numeric" title="Volume de chamadas de voz efetivamente atendidas (realizado)">
+                                        <span id="sizing-desvio-badge-voz" class="sheet-unit font-bold" style="font-size: 0.72rem; color: #10b981;" title="Desvio em relação ao planejado">-3.5%</span>
+                                    </div>
+                                </div>
+
                                 <!-- Row 3: NS Mês -->
                                 <div class="sizing-sheet-row">
                                     <span class="sheet-label">NS Mês</span>
@@ -1059,13 +1071,6 @@
                                     </div>
                                 </div>
 
-                                <!-- Row 14: Volume Atendidas (Calculado) -->
-                                <div class="sizing-sheet-row">
-                                    <span class="sheet-label">Volume Atendidas</span>
-                                    <div class="sheet-cell">
-                                        <input type="number" id="input-sizing-vol-atendidas" value="19215" class="sizing-cell-input cell-calculated" readonly tabindex="-1">
-                                    </div>
-                                </div>
 
                                 <!-- Row 15: DMM (MÉDIA 5) - Separator bar -->
                                 <div class="sizing-sheet-row row-section-divider">
@@ -1155,7 +1160,19 @@
                                         <span class="driver-badge"><i class="fa-solid fa-bolt" style="font-size: 0.62rem;"></i> Direcionador</span>
                                     </span>
                                     <div class="sheet-cell">
-                                        <input type="number" id="input-sizing-vol-chat" min="0" step="1" value="0" class="sizing-cell-input font-bold" inputmode="numeric">
+                                        <input type="number" id="input-sizing-vol-chat" min="0" step="1" value="3000" class="sizing-cell-input font-bold" inputmode="numeric">
+                                    </div>
+                                </div>
+
+                                <!-- Row 3: Volume Atendidas (2º Campo - Realizado / Editável) -->
+                                <div class="sizing-sheet-row row-highlight-atendidas">
+                                    <span class="sheet-label font-bold">
+                                        Volume Atendidas
+                                        <span class="atendidas-badge"><i class="fa-solid fa-comments" style="font-size: 0.6rem;"></i> Realizado</span>
+                                    </span>
+                                    <div class="sheet-cell">
+                                        <input type="number" id="input-sizing-vol-atendidas-chat" min="0" step="1" value="2895" class="sizing-cell-input font-bold" inputmode="numeric" title="Volume de conversas de chat efetivamente atendidas (realizado)">
+                                        <span id="sizing-desvio-badge-chat" class="sheet-unit font-bold" style="font-size: 0.72rem; color: #10b981;" title="Desvio em relação ao planejado">-3.5%</span>
                                     </div>
                                 </div>
 
@@ -1255,13 +1272,6 @@
                                     </div>
                                 </div>
 
-                                <!-- Row 14: Volume Atendidas (Calculado) -->
-                                <div class="sizing-sheet-row">
-                                     <span class="sheet-label">Volume Atendidas</span>
-                                     <div class="sheet-cell">
-                                         <input type="number" id="input-sizing-vol-atendidas-chat" value="0" class="sizing-cell-input cell-calculated" readonly tabindex="-1">
-                                     </div>
-                                 </div>
 
                                 <!-- Row 15: DMM (MÉDIA 5) - Separator bar -->
                                 <div class="sizing-sheet-row row-section-divider">
@@ -1352,6 +1362,18 @@
                                     </span>
                                     <div class="sheet-cell">
                                         <input type="number" id="input-sizing-vol-bo" min="0" step="1" value="500" class="sizing-cell-input font-bold" inputmode="numeric">
+                                    </div>
+                                </div>
+
+                                <!-- Row 3: Volume Atendidas (2º Campo - Realizado / Editável) -->
+                                <div class="sizing-sheet-row row-highlight-atendidas">
+                                    <span class="sheet-label font-bold">
+                                        Volume Atendidas
+                                        <span class="atendidas-badge"><i class="fa-solid fa-clipboard-check" style="font-size: 0.6rem;"></i> Realizado</span>
+                                    </span>
+                                    <div class="sheet-cell">
+                                        <input type="number" id="input-sizing-vol-atendidas-bo" min="0" step="1" value="500" class="sizing-cell-input font-bold" inputmode="numeric" title="Volume de demandas de backoffice efetivamente atendidas (realizado)">
+                                        <span id="sizing-desvio-badge-bo" class="sheet-unit font-bold" style="font-size: 0.72rem; color: #10b981;" title="Desvio em relação ao planejado">0.0%</span>
                                     </div>
                                 </div>
 

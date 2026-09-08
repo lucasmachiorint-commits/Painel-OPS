@@ -2962,6 +2962,80 @@ body.light-theme .sizing-sheet-row.row-highlight-driver .sizing-cell-input {
     background: #ffffff !important;
 }
 
+/* Destaque para Volume Atendidas como 2º Campo (Realizado / Editável) */
+.sizing-sheet-row.row-highlight-atendidas {
+    background: rgba(59, 130, 246, 0.05) !important;
+    border-bottom: 1px solid rgba(59, 130, 246, 0.25) !important;
+}
+
+.sizing-card-chat .sizing-sheet-row.row-highlight-atendidas {
+    background: rgba(147, 51, 234, 0.05) !important;
+    border-bottom-color: rgba(147, 51, 234, 0.25) !important;
+}
+
+.sizing-card-bo .sizing-sheet-row.row-highlight-atendidas {
+    background: rgba(16, 185, 129, 0.05) !important;
+    border-bottom-color: rgba(16, 185, 129, 0.25) !important;
+}
+
+.sizing-sheet-row.row-highlight-atendidas .sheet-label {
+    font-weight: 700 !important;
+    color: var(--text-primary) !important;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+}
+
+.atendidas-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    font-size: 0.62rem;
+    font-weight: 800;
+    padding: 1px 5px;
+    border-radius: 4px;
+    background: rgba(59, 130, 246, 0.15);
+    color: #60a5fa;
+    border: 1px solid rgba(59, 130, 246, 0.3);
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+
+.sizing-card-chat .atendidas-badge {
+    background: rgba(147, 51, 234, 0.15);
+    color: #c084fc;
+    border-color: rgba(147, 51, 234, 0.3);
+}
+
+.sizing-card-bo .atendidas-badge {
+    background: rgba(16, 185, 129, 0.15);
+    color: #34d399;
+    border-color: rgba(16, 185, 129, 0.3);
+}
+
+.sizing-sheet-row.row-highlight-atendidas .sizing-cell-input {
+    font-weight: 700 !important;
+    border: 1px solid rgba(59, 130, 246, 0.4) !important;
+    background: rgba(59, 130, 246, 0.06) !important;
+}
+
+.sizing-card-chat .sizing-sheet-row.row-highlight-atendidas .sizing-cell-input {
+    border-color: rgba(147, 51, 234, 0.4) !important;
+    background: rgba(147, 51, 234, 0.06) !important;
+}
+
+.sizing-card-bo .sizing-sheet-row.row-highlight-atendidas .sizing-cell-input {
+    border-color: rgba(16, 185, 129, 0.4) !important;
+    background: rgba(16, 185, 129, 0.06) !important;
+}
+
+body.light-theme .sizing-sheet-row.row-highlight-atendidas {
+    background: rgba(59, 130, 246, 0.04) !important;
+}
+body.light-theme .sizing-sheet-row.row-highlight-atendidas .sizing-cell-input {
+    background: #ffffff !important;
+}
+
 .sizing-cell-input::-webkit-outer-spin-button,
 .sizing-cell-input::-webkit-inner-spin-button {
     -webkit-appearance: none !important;
