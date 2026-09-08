@@ -483,4 +483,35 @@ test.describe('Painel OPS - Redimensionamento (WFM & Erlang C) E2E', () => {
     await expect(erlangCard).toContainText('Agner Krarup Erlang');
     await expect(erlangCard).toContainText('Padrão WFM');
   });
+
+  test('16. Acordeoes de Memoria de Calculo devem iniciar compactados por padrao e expandir ao clicar', async ({ page }) => {
+    await page.evaluate(() => {
+      // @ts-ignore
+      switchToView('sizing');
+    });
+
+    const bodyVoz = page.locator('#body-acc-voz');
+    const bodyChat = page.locator('#body-acc-chat');
+    const bodyBo = page.locator('#body-acc-bo');
+
+    // Devem iniciar fechados (ocultos)
+    await expect(bodyVoz).toBeHidden();
+    await expect(bodyChat).toBeHidden();
+    await expect(bodyBo).toBeHidden();
+
+    // Clica no header de Voz para expandir
+    const headerVoz = page.locator('.sizing-acc-header').filter({ hasText: 'Memória N1 Voz' });
+    await headerVoz.click();
+    await page.waitForTimeout(200);
+
+    // Agora Voz deve estar visível
+    await expect(bodyVoz).toBeVisible();
+    await expect(page.locator('#arrow-acc-voz')).toHaveClass(/open/);
+
+    // Clica novamente para fechar
+    await headerVoz.click();
+    await page.waitForTimeout(200);
+    await expect(bodyVoz).toBeHidden();
+    await expect(page.locator('#arrow-acc-voz')).not.toHaveClass(/open/);
+  });
 });

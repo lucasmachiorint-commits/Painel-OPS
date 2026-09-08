@@ -4917,9 +4917,9 @@ body.light-theme .sizing-calc-table tr {
                             <div class="sizing-acc-item">
                                 <button type="button" class="sizing-acc-header" onclick="toggleSizingAccordion('acc-voz')">
                                     <span><i class="fa-solid fa-headset" style="color: var(--color-primary); margin-right: 0.35rem;"></i> Memória N1 Voz (Erlang C com Shrinkage)</span>
-                                    <i class="fa-solid fa-chevron-down sizing-acc-arrow open" id="arrow-acc-voz"></i>
+                                    <i class="fa-solid fa-chevron-down sizing-acc-arrow" id="arrow-acc-voz"></i>
                                 </button>
-                                <div class="sizing-acc-body" id="body-acc-voz" style="display: block;">
+                                <div class="sizing-acc-body" id="body-acc-voz" style="display: none;">
                                     <div id="sizing-calc-detail-voz" class="sizing-calc-detail"></div>
                                 </div>
                             </div>
@@ -4928,9 +4928,9 @@ body.light-theme .sizing-calc-table tr {
                             <div class="sizing-acc-item">
                                 <button type="button" class="sizing-acc-header" onclick="toggleSizingAccordion('acc-chat')">
                                     <span><i class="fa-solid fa-comments" style="color: var(--color-secondary); margin-right: 0.35rem;"></i> Memória N1 Chat (Atendimento Paralelo)</span>
-                                    <i class="fa-solid fa-chevron-down sizing-acc-arrow open" id="arrow-acc-chat"></i>
+                                    <i class="fa-solid fa-chevron-down sizing-acc-arrow" id="arrow-acc-chat"></i>
                                 </button>
-                                <div class="sizing-acc-body" id="body-acc-chat" style="display: block;">
+                                <div class="sizing-acc-body" id="body-acc-chat" style="display: none;">
                                     <div id="sizing-calc-detail-chat" class="sizing-calc-detail"></div>
                                 </div>
                             </div>
@@ -4939,9 +4939,9 @@ body.light-theme .sizing-calc-table tr {
                             <div class="sizing-acc-item">
                                 <button type="button" class="sizing-acc-header" onclick="toggleSizingAccordion('acc-bo')">
                                     <span><i class="fa-solid fa-briefcase" style="color: var(--color-success); margin-right: 0.35rem;"></i> Memória N2 Backoffice (Capacidade Linear)</span>
-                                    <i class="fa-solid fa-chevron-down sizing-acc-arrow open" id="arrow-acc-bo"></i>
+                                    <i class="fa-solid fa-chevron-down sizing-acc-arrow" id="arrow-acc-bo"></i>
                                 </button>
-                                <div class="sizing-acc-body" id="body-acc-bo" style="display: block;">
+                                <div class="sizing-acc-body" id="body-acc-bo" style="display: none;">
                                     <div id="sizing-calc-detail-bo" class="sizing-calc-detail"></div>
                                 </div>
                             </div>
@@ -13217,7 +13217,7 @@ function toggleSizingAccordion(accId) {
     const body = document.getElementById(`body-${accId}`);
     const arrow = document.getElementById(`arrow-${accId}`);
     if (!body) return;
-    const isHidden = body.style.display === 'none';
+    const isHidden = body.style.display === 'none' || (!body.style.display && getComputedStyle(body).display === 'none');
     body.style.display = isHidden ? 'block' : 'none';
     if (arrow) {
         if (isHidden) arrow.classList.add('open');

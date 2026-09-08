@@ -7700,7 +7700,7 @@ function toggleSizingAccordion(accId) {
     const body = document.getElementById(`body-${accId}`);
     const arrow = document.getElementById(`arrow-${accId}`);
     if (!body) return;
-    const isHidden = body.style.display === 'none';
+    const isHidden = body.style.display === 'none' || (!body.style.display && getComputedStyle(body).display === 'none');
     body.style.display = isHidden ? 'block' : 'none';
     if (arrow) {
         if (isHidden) arrow.classList.add('open');
