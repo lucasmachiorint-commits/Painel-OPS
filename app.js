@@ -2359,11 +2359,13 @@ function applyStateMigrations() {
         }
     }
 
-    // Baseline de redimensionamento: inicia limpo em Nov/2026 sem histórico prévio
-    if (!state.sizingBaselineNov26) {
+    // Baseline de redimensionamento: Novembro/2026 como único mês ativo inicial, aberto para edição (sem coexistência de Dezembro)
+    if (!state.sizingNov26OnlyOpen_v1) {
+        state.sizingNov26OnlyOpen_v1 = true;
         state.sizingBaselineNov26 = true;
         state.sizingHistory = {};
         state.sizingConfirmedMonths = {};
+        state.sizingUnlockedMonths = {};
         state.sizingCurrentMonth = '2026-11';
         if (state.sizingParams) state.sizingParams.mesReferencia = '2026-11';
     } else {
@@ -2373,12 +2375,18 @@ function applyStateMigrations() {
         if (!state.sizingConfirmedMonths || typeof state.sizingConfirmedMonths !== 'object') {
             state.sizingConfirmedMonths = {};
         }
+        if (!state.sizingUnlockedMonths || typeof state.sizingUnlockedMonths !== 'object') {
+            state.sizingUnlockedMonths = {};
+        }
         // Remove quaisquer meses legados anteriores a 2026-11
         Object.keys(state.sizingHistory).forEach(k => {
             if (k < '2026-11') delete state.sizingHistory[k];
         });
         Object.keys(state.sizingConfirmedMonths).forEach(k => {
             if (k < '2026-11') delete state.sizingConfirmedMonths[k];
+        });
+        Object.keys(state.sizingUnlockedMonths).forEach(k => {
+            if (k < '2026-11') delete state.sizingUnlockedMonths[k];
         });
         if (!state.sizingCurrentMonth || state.sizingCurrentMonth < '2026-11' || !/^\d{4}-\d{2}$/.test(state.sizingCurrentMonth)) {
             state.sizingCurrentMonth = '2026-11';

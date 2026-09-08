@@ -567,4 +567,57 @@ test.describe('Painel OPS - Redimensionamento (WFM & Erlang C) E2E', () => {
     await expect(page.locator('#input-sizing-pas-bo')).toHaveValue('1');
     await expect(page.locator('#input-sizing-vol-dia-bo')).toHaveValue('17');
   });
+
+  test('18. Estado limpo e inicial: Novembro/26 deve ser o unico mes aberto para edicao sem coexistencia de Dezembro', async ({ page }) => {
+    await page.evaluate(() => {
+      // @ts-ignore
+      state.sizingNov26OnlyOpen_v1 = true;
+      // @ts-ignore
+      state.sizingBaselineNov26 = true;
+      // @ts-ignore
+      state.sizingHistory = {};
+      // @ts-ignore
+      state.sizingConfirmedMonths = {};
+      // @ts-ignore
+      state.sizingUnlockedMonths = {};
+      // @ts-ignore
+      state.sizingCurrentMonth = '2026-11';
+      // @ts-ignore
+      if (state.sizingParams) state.sizingParams.mesReferencia = '2026-11';
+      // @ts-ignore
+      saveState();
+      // @ts-ignore
+      switchToView('sizing');
+      // @ts-ignore
+      renderSizingView();
+    });
+    await page.waitForTimeout(300);
+
+    // 1. Dropdown deve ter estritamente apenas Novembro/2026 como Vigente
+    const selectMes = page.locator('#sizing-mes-select');
+    await expect(selectMes).toHaveValue('2026-11');
+    const options = await selectMes.locator('option').allInnerTexts();
+    expect(options.length).toBe(1);
+    expect(options[0]).toContain('Nov/26 (Vigente)');
+    expect(options[0]).not.toContain('Dez/26');
+
+    // 2. Selo de status deve ser 'Aberto para edição (Vigente)'
+    const lockBadge = page.locator('#sizing-lock-badge');
+    await expect(lockBadge).toHaveClass(/badge-open/);
+    await expect(lockBadge).toContainText('Aberto para edição (Vigente)');
+    await expect(lockBadge).not.toContainText('Reaberto');
+    await expect(lockBadge).not.toContainText('Histórico');
+
+    // 3. Banner de histórico deve estar completamente oculto
+    await expect(page.locator('#sizing-history-banner')).toBeHidden();
+
+    // 4. Botão 'Confirmar Projeção' deve estar visível e 'Descartar' oculto
+    await expect(page.locator('#btn-sizing-confirm-month')).toBeVisible();
+    await expect(page.locator('#btn-sizing-discard-month')).toBeHidden();
+
+    // 5. Campos operacionais devem estar habilitados para edição
+    await expect(page.locator('#input-sizing-vol-voz')).toBeEnabled();
+    await expect(page.locator('#input-sizing-vol-chat')).toBeEnabled();
+    await expect(page.locator('#input-sizing-vol-bo')).toBeEnabled();
+  });
 });
