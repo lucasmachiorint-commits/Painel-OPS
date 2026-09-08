@@ -8118,6 +8118,20 @@ function applyStateMigrations() {
         }
     }
 
+    // Migração v4: Garantir inclusão de Backoffice e saneamento de Chat se ainda tiver o volume de Voz
+    if (!state.sizingBkoAlertsAndChatSync_v4) {
+        state.sizingBkoAlertsAndChatSync_v4 = true;
+        if (state.sizingParams) {
+            if (state.sizingParams.volumeMensalChat === 19912 || !state.sizingParams.volumeMensalChat) {
+                state.sizingParams.volumeMensalChat = 3000;
+                state.sizingParams.volAtendidasChat = 2895;
+            }
+            if (state.sizingParams.volAtendidasBO === undefined || state.sizingParams.volAtendidasBO === null || state.sizingParams.volAtendidasBO === 19215) {
+                state.sizingParams.volAtendidasBO = 500;
+            }
+        }
+    }
+
     // Baseline de redimensionamento: Novembro/2026 como único mês ativo inicial, aberto para edição (sem coexistência de Dezembro)
     if (!state.sizingNov26OnlyOpen_v2) {
         state.sizingNov26OnlyOpen_v2 = true;
@@ -13839,8 +13853,13 @@ function recalcSizing(fromInputs = true) {
         const diffVolChat = volRealChat - volPlanChat;
         const diffPctChat = volPlanChat > 0 ? (diffVolChat / volPlanChat) * 100 : 0;
 
-        const volPlanTotal = volPlanVoz + volPlanChat;
-        const volRealTotal = volRealVoz + volRealChat;
+        const volPlanBO = resBO.volBase;
+        const volRealBO = (resBO.volAtendidas !== undefined && resBO.volAtendidas !== null) ? resBO.volAtendidas : (p.volAtendidasBO !== undefined ? p.volAtendidasBO : resBO.volBase);
+        const diffVolBO = volRealBO - volPlanBO;
+        const diffPctBO = volPlanBO > 0 ? (diffVolBO / volPlanBO) * 100 : 0;
+
+        const volPlanTotal = volPlanVoz + volPlanChat + volPlanBO;
+        const volRealTotal = volRealVoz + volRealChat + volRealBO;
         const diffVolTotal = volRealTotal - volPlanTotal;
         const diffPctTotal = volPlanTotal > 0 ? (diffVolTotal / volPlanTotal) * 100 : 0;
         
@@ -13870,6 +13889,7 @@ function recalcSizing(fromInputs = true) {
             <div style="display: flex; flex-wrap: wrap; gap: 1rem; margin: 0.45rem 0; font-size: 0.82rem; background: rgba(0,0,0,0.15); padding: 0.4rem 0.75rem; border-radius: 6px;">
                 <span>📞 <strong>Voz:</strong> ${volRealVoz.toLocaleString('pt-BR')} atendidas vs ${volPlanVoz.toLocaleString('pt-BR')} plan. (<strong>${diffPctVoz >= 0 ? '+' : ''}${diffPctVoz.toFixed(1)}%</strong>)</span>
                 <span>💬 <strong>Chat:</strong> ${volRealChat.toLocaleString('pt-BR')} atendidas vs ${volPlanChat.toLocaleString('pt-BR')} plan. (<strong>${diffPctChat >= 0 ? '+' : ''}${diffPctChat.toFixed(1)}%</strong>)</span>
+                <span>📋 <strong>Backoffice:</strong> ${volRealBO.toLocaleString('pt-BR')} atendidas vs ${volPlanBO.toLocaleString('pt-BR')} plan. (<strong>${diffPctBO >= 0 ? '+' : ''}${diffPctBO.toFixed(1)}%</strong>)</span>
             </div>
         `;
         
@@ -13881,7 +13901,7 @@ function recalcSizing(fromInputs = true) {
                     <div class="sizing-alert-content" style="flex: 1;">
                         <h4>Alerta de Desvio Contratual Crítico (+${diffPctTotal.toFixed(1)}%)</h4>
                         <p>
-                            O volume de <strong>${volRealTotal.toLocaleString('pt-BR')} chamadas/conversas atendidas</strong> excede o planejado de <strong>${volPlanTotal.toLocaleString('pt-BR')}</strong> em <strong>+${diffPctTotal.toFixed(1)}% (+${diffVolTotal.toLocaleString('pt-BR')} chamadas)</strong>.
+                            O volume consolidado de <strong>${volRealTotal.toLocaleString('pt-BR')} chamadas/demandas atendidas</strong> excede o planejado de <strong>${volPlanTotal.toLocaleString('pt-BR')}</strong> em <strong>+${diffPctTotal.toFixed(1)}% (+${diffVolTotal.toLocaleString('pt-BR')} demandas)</strong>.
                             ${canalBreakdownHtml}
                             <span style="color: #fbbf24; font-weight: 600;">Ação recomendada:</span> Acionar plano de contingência e renegociar aditivo contratual com os parceiros.
                         </p>
@@ -13896,7 +13916,7 @@ function recalcSizing(fromInputs = true) {
                     <div class="sizing-alert-content" style="flex: 1;">
                         <h4>Volume Abaixo do Planejado (${diffPctTotal.toFixed(1)}%)</h4>
                         <p>
-                            O volume de <strong>${volRealTotal.toLocaleString('pt-BR')} chamadas/conversas atendidas</strong> está <strong>${Math.abs(diffPctTotal).toFixed(1)}% abaixo</strong> do teto planejado (${volPlanTotal.toLocaleString('pt-BR')}).
+                            O volume consolidado de <strong>${volRealTotal.toLocaleString('pt-BR')} chamadas/demandas atendidas</strong> está <strong>${Math.abs(diffPctTotal).toFixed(1)}% abaixo</strong> do teto planejado (${volPlanTotal.toLocaleString('pt-BR')}).
                             ${canalBreakdownHtml}
                             Oportunidade para rebalanceamento ou remanejamento de capacidade ociosa.
                         </p>
@@ -13911,7 +13931,7 @@ function recalcSizing(fromInputs = true) {
                     <div class="sizing-alert-content" style="flex: 1;">
                         <h4>Volume Dentro da Tolerância Contratual (&plusmn;5%)</h4>
                         <p>
-                            O volume de <strong>${volRealTotal.toLocaleString('pt-BR')} chamadas/conversas atendidas</strong> apresenta desvio de <strong>${diffPctTotal >= 0 ? '+' : ''}${diffPctTotal.toFixed(1)}%</strong> em relação ao planejado (${volPlanTotal.toLocaleString('pt-BR')}), operando em conformidade com o SLA.
+                            O volume consolidado de <strong>${volRealTotal.toLocaleString('pt-BR')} chamadas/demandas atendidas</strong> apresenta desvio de <strong>${diffPctTotal >= 0 ? '+' : ''}${diffPctTotal.toFixed(1)}%</strong> em relação ao planejado (${volPlanTotal.toLocaleString('pt-BR')}), operando em conformidade com o SLA.
                             ${canalBreakdownHtml}
                         </p>
                         ${refFooterHtml}
