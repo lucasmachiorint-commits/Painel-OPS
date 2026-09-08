@@ -3,6 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
     <title>Capacity & FTE - Eficiência Operacional</title>
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📊</text></svg>">
     <!-- Google Fonts -->
@@ -3395,6 +3398,21 @@ body.light-theme .sizing-calc-table tr {
     border-bottom: 1px solid rgba(4, 62, 38, 0.08);
 }
 
+/* Flash animation for recalculated values */
+@keyframes cellRecalculatedPulse {
+    0% {
+        box-shadow: 0 0 0 2px rgba(235, 92, 39, 0.6), 0 0 12px rgba(235, 92, 39, 0.4);
+        background-color: rgba(235, 92, 39, 0.22);
+    }
+    100% {
+        box-shadow: none;
+    }
+}
+
+.cell-recalculated-flash {
+    animation: cellRecalculatedPulse 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
 
 
 
@@ -4252,8 +4270,8 @@ body.light-theme .sizing-calc-table tr {
                             </div>
                             <div class="widget-info">
                                 <h3 data-i18n="sizing_kpi_pas_bo">PAs N2 Backoffice</h3>
-                                <p class="widget-value" id="widget-sizing-pas-bo">0</p>
-                                <span class="widget-sub" id="widget-sizing-sub-bo">0 atend./dia por operador</span>
+                                <p class="widget-value" id="widget-sizing-pas-bo">1</p>
+                                <span class="widget-sub" id="widget-sizing-sub-bo">22 atend./dia por operador (30d úteis)</span>
                             </div>
                         </div>
 
@@ -4724,7 +4742,7 @@ body.light-theme .sizing-calc-table tr {
                                 <div class="sizing-sheet-row row-highlight-text">
                                     <span class="sheet-label font-bold">Volume Mês</span>
                                     <div class="sheet-cell">
-                                        <input type="number" id="input-sizing-vol-bo" min="0" step="1" value="10270" class="sizing-cell-input font-bold" inputmode="numeric">
+                                        <input type="number" id="input-sizing-vol-bo" min="0" step="1" value="500" class="sizing-cell-input font-bold" inputmode="numeric">
                                     </div>
                                 </div>
 
@@ -4740,7 +4758,7 @@ body.light-theme .sizing-calc-table tr {
                                 <div class="sizing-sheet-row">
                                     <span class="sheet-label">Volume Dia</span>
                                     <div class="sheet-cell">
-                                        <input type="number" id="input-sizing-vol-dia-bo" value="342" class="sizing-cell-input cell-calculated" readonly tabindex="-1">
+                                        <input type="number" id="input-sizing-vol-dia-bo" value="17" class="sizing-cell-input cell-calculated" readonly tabindex="-1">
                                     </div>
                                 </div>
 
@@ -4756,7 +4774,7 @@ body.light-theme .sizing-calc-table tr {
                                 <div class="sizing-sheet-row row-result-gold">
                                     <span class="sheet-label font-bold">PA's Necessárias</span>
                                     <div class="sheet-cell">
-                                        <input type="number" id="input-sizing-pas-bo" value="8" class="sizing-cell-input cell-calculated font-bold cell-gold-input" readonly tabindex="-1">
+                                        <input type="number" id="input-sizing-pas-bo" value="1" class="sizing-cell-input cell-calculated font-bold cell-gold-input" readonly tabindex="-1">
                                     </div>
                                 </div>
 
@@ -4772,7 +4790,7 @@ body.light-theme .sizing-calc-table tr {
                                 <div class="sizing-sheet-row row-result-amber">
                                     <span class="sheet-label font-bold font-italic">PA CONTRATADA</span>
                                     <div class="sheet-cell">
-                                        <input type="number" id="input-sizing-pa-contratada-bo" value="8" class="sizing-cell-input cell-calculated font-bold font-italic cell-amber-input" readonly tabindex="-1">
+                                        <input type="number" id="input-sizing-pa-contratada-bo" value="1" class="sizing-cell-input cell-calculated font-bold font-italic cell-amber-input" readonly tabindex="-1">
                                     </div>
                                 </div>
 
@@ -4780,7 +4798,7 @@ body.light-theme .sizing-calc-table tr {
                                 <div class="sizing-sheet-row">
                                     <span class="sheet-label font-bold">CHAMADAS / OPERADOR</span>
                                     <div class="sheet-cell">
-                                        <input type="number" id="input-sizing-chamadas-op-bo" value="21" class="sizing-cell-input cell-calculated font-bold" readonly tabindex="-1">
+                                        <input type="number" id="input-sizing-chamadas-op-bo" value="8" class="sizing-cell-input cell-calculated font-bold" readonly tabindex="-1">
                                     </div>
                                 </div>
 
@@ -7852,7 +7870,7 @@ function applyStateMigrations() {
         shrinkageFeedbackChat: 1.5,
         shrinkageNR17Chat: 17.0,
         ajusteChat: 0,
-        volumeMensalBO: 10270,
+        volumeMensalBO: 500,
         tmaBO: 600,
         diasUteis: 30,
         diasAtendimento: 30,
@@ -13283,7 +13301,7 @@ function resetSizingDefaults() {
         shrinkageFeedbackChat: 1.5,
         shrinkageNR17Chat: 17.0,
         ajusteChat: 0,
-        volumeMensalBO: 10270,
+        volumeMensalBO: 500,
         tmaBO: 600,
         diasUteis: 30,
         diasAtendimento: 30,
@@ -13301,6 +13319,14 @@ function resetSizingDefaults() {
     showToast('Parâmetros restaurados para o padrão da planilha!', 'info');
 }
 
+// FLASH HIGHLIGHT ON RECALCULATED CELLS
+function highlightCellUpdate(el) {
+    if (!el) return;
+    el.classList.remove('cell-recalculated-flash');
+    void el.offsetWidth;
+    el.classList.add('cell-recalculated-flash');
+}
+
 // RECALCULATE & UPDATE ALL SIZING RESULTS
 let _sizingDebounceTimer = null;
 
@@ -13313,7 +13339,15 @@ function recalcSizing(fromInputs = true) {
         const getNum = (id, fallback) => {
             const el = document.getElementById(id);
             if (!el) return fallback;
-            const val = parseFloat(el.value);
+            let valStr = String(el.value || '').trim();
+            if (!valStr) return fallback;
+            // Suporte resiliente a formatos BR com ponto de milhar (ex: 1.000 ou 10.270)
+            if (/^\d{1,3}(\.\d{3})+(,\d+)?$/.test(valStr)) {
+                valStr = valStr.replace(/\./g, '').replace(',', '.');
+            } else if (valStr.includes(',')) {
+                valStr = valStr.replace(',', '.');
+            }
+            const val = parseFloat(valStr);
             return isNaN(val) ? fallback : val;
         };
         
@@ -13350,7 +13384,7 @@ function recalcSizing(fromInputs = true) {
         p.ajusteChat = getNum('input-sizing-ajuste-chat', p.ajusteChat || 0);
         
         // QUADRO 3: BKO
-        p.volumeMensalBO = Math.max(0, getNum('input-sizing-vol-bo', p.volumeMensalBO || 10270));
+        p.volumeMensalBO = Math.max(0, getNum('input-sizing-vol-bo', (p.volumeMensalBO !== undefined && p.volumeMensalBO !== null) ? p.volumeMensalBO : 500));
         p.diasUteis = Math.max(1, getNum('input-sizing-dias-uteis-bo', p.diasUteis || 30));
         p.ajusteBo = getNum('input-sizing-ajuste-bo', p.ajusteBo || 0);
         p.tmaBO = Math.max(1, getNum('input-sizing-tma-bo', p.tmaBO || 600));
@@ -13384,7 +13418,13 @@ function recalcSizing(fromInputs = true) {
     
     const setInputVal = (id, val) => {
         const el = document.getElementById(id);
-        if (el && val !== undefined && val !== null) el.value = val;
+        if (el && val !== undefined && val !== null) {
+            const strVal = String(val);
+            if (el.value !== strVal) {
+                el.value = strVal;
+                highlightCellUpdate(el);
+            }
+        }
     };
     
     const mesLabel = getMonthOnly(state.sizingCurrentMonth || p.mesReferencia || '2026-11');
@@ -13657,7 +13697,7 @@ function renderSizingView() {
             ajusteVoz: 0,
             volumeMensalChat: 0,
             tmaChat: 480,
-            volumeMensalBO: 10270,
+            volumeMensalBO: 500,
             tmaBO: 600,
             diasUteis: 30,
             diasAtendimento: 30,
@@ -13866,7 +13906,7 @@ function setupSizingEventListeners() {
     if (_sizingListenersBound) return;
     _sizingListenersBound = true;
     
-    // Recalculate on any input or change event (debounced 80ms)
+    // Recalculate on any input, change, keyup, paste or blur event
     const container = document.getElementById('view-sizing');
     if (container) {
         container.querySelectorAll('input:not([readonly])').forEach(input => {
@@ -13874,10 +13914,13 @@ function setupSizingEventListeners() {
                 if (_sizingDebounceTimer) clearTimeout(_sizingDebounceTimer);
                 _sizingDebounceTimer = setTimeout(() => {
                     recalcSizing(true);
-                }, 80);
+                }, 50);
             };
             input.addEventListener('input', triggerRecalc);
             input.addEventListener('change', triggerRecalc);
+            input.addEventListener('keyup', triggerRecalc);
+            input.addEventListener('paste', () => setTimeout(() => recalcSizing(true), 10));
+            input.addEventListener('blur', () => recalcSizing(true));
         });
     }
     
