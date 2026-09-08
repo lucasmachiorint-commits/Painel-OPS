@@ -2850,11 +2850,12 @@ body.light-theme .sizing-confirm-summary {
     text-align: right;
     width: 78px;
     height: 28px;
-    padding: 0 8px;
+    padding: 0 10px;
     border-radius: var(--radius-sm);
     transition: all var(--transition-fast);
     outline: none;
     font-weight: 600;
+    font-style: normal !important;
     line-height: 28px;
     box-sizing: border-box !important;
     font-variant-numeric: tabular-nums;
@@ -2862,8 +2863,14 @@ body.light-theme .sizing-confirm-summary {
     appearance: textfield;
 }
 
+.sizing-sheet-table input,
+.sheet-cell input {
+    font-style: normal !important;
+    font-variant-numeric: tabular-nums;
+}
+
 .sizing-card-bo .sizing-cell-input {
-    width: 86px;
+    width: 98px;
 }
 
 .sizing-cell-input::-webkit-outer-spin-button,
@@ -2966,16 +2973,20 @@ body.light-theme .sizing-confirm-summary {
     color: var(--text-primary) !important;
     font-size: 0.85rem !important;
     font-weight: 700 !important;
+    font-style: normal !important;
     background: transparent !important;
     border: none !important;
+    padding-right: 14px !important;
 }
 
 .cell-amber-input {
     color: var(--color-primary) !important;
     font-size: 0.85rem !important;
     font-weight: 800 !important;
+    font-style: normal !important;
     background: transparent !important;
     border: none !important;
+    padding-right: 14px !important;
 }
 
 .sizing-card-chat .cell-amber-input {
