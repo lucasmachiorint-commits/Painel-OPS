@@ -674,5 +674,8 @@ test.describe('Painel OPS - Redimensionamento (WFM & Erlang C) E2E', () => {
     await volAtendVoz.dispatchEvent('input');
     await page.waitForTimeout(300);
     await expect(alertsContainer).toContainText('Volume Dentro da Tolerância Contratual');
+
+    // 6. Valida que o Backoffice também é exibido no breakdown de canais do Alertas Contratuais
+    await expect(alertsContainer).toContainText('Backoffice:');
   });
 });
