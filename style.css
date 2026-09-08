@@ -2419,6 +2419,12 @@ body.light-theme #modal-add-resp {
     border: 1px solid rgba(16, 185, 129, 0.35);
 }
 
+.sizing-lock-badge.badge-confirmed {
+    background: rgba(16, 185, 129, 0.2);
+    color: #10b981;
+    border: 1px solid rgba(16, 185, 129, 0.45);
+}
+
 .sizing-lock-badge.badge-locked {
     background: rgba(244, 63, 94, 0.15);
     color: #f43f5e;
@@ -2488,7 +2494,8 @@ body.light-theme .btn-danger-subtle:hover {
 
 /* Sizing Modal Styling (Solid opaque background and high contrast) */
 #modal-new-sizing-projection.modal-overlay,
-#modal-confirm-discard-sizing.modal-overlay {
+#modal-confirm-discard-sizing.modal-overlay,
+#modal-confirm-sizing-projection.modal-overlay {
     background: rgba(0, 0, 0, 0.65) !important;
     backdrop-filter: blur(6px) !important;
 }
@@ -2591,6 +2598,11 @@ body.light-theme .sizing-modal-callout {
     background: #fffbeb !important;
     border: 1px solid #fcd34d !important;
     color: #92400e !important;
+}
+
+body.light-theme .sizing-confirm-summary {
+    background: #ecfdf5 !important;
+    border: 1px solid #a7f3d0 !important;
 }
 
 .sizing-modal-actions {
@@ -3137,6 +3149,47 @@ body.light-theme .sizing-modal-callout {
     font-size: 0.82rem;
     color: var(--text-secondary);
     line-height: 1.4;
+}
+
+.sizing-alert-ref {
+    margin-top: 0.65rem;
+    padding-top: 0.5rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    font-size: 0.78rem;
+    color: var(--text-secondary);
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+}
+
+body.light-theme .sizing-alert-ref {
+    border-top-color: rgba(0, 0, 0, 0.08);
+    color: #64748b;
+}
+
+/* Erlang C Explanatory Info Card */
+.sizing-erlang-info-card {
+    background: var(--bg-glass);
+    border: 1px solid var(--border-color);
+    border-left: 4px solid var(--color-primary);
+    border-radius: var(--radius-md);
+    padding: 1.15rem 1.4rem;
+    backdrop-filter: var(--backdrop-blur);
+    box-shadow: var(--shadow-glass);
+    margin-bottom: 1.5rem;
+}
+
+.sizing-erlang-info-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.85rem;
+}
+
+body.light-theme .sizing-erlang-info-card {
+    background: #ffffff;
+    border: 1px solid rgba(4, 62, 38, 0.12);
+    border-left: 4px solid var(--color-primary);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
 }
 
 /* Accordion */

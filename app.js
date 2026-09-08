@@ -2363,15 +2363,22 @@ function applyStateMigrations() {
     if (!state.sizingBaselineNov26) {
         state.sizingBaselineNov26 = true;
         state.sizingHistory = {};
+        state.sizingConfirmedMonths = {};
         state.sizingCurrentMonth = '2026-11';
         if (state.sizingParams) state.sizingParams.mesReferencia = '2026-11';
     } else {
         if (!state.sizingHistory || typeof state.sizingHistory !== 'object') {
             state.sizingHistory = {};
         }
+        if (!state.sizingConfirmedMonths || typeof state.sizingConfirmedMonths !== 'object') {
+            state.sizingConfirmedMonths = {};
+        }
         // Remove quaisquer meses legados anteriores a 2026-11
         Object.keys(state.sizingHistory).forEach(k => {
             if (k < '2026-11') delete state.sizingHistory[k];
+        });
+        Object.keys(state.sizingConfirmedMonths).forEach(k => {
+            if (k < '2026-11') delete state.sizingConfirmedMonths[k];
         });
         if (!state.sizingCurrentMonth || state.sizingCurrentMonth < '2026-11' || !/^\d{4}-\d{2}$/.test(state.sizingCurrentMonth)) {
             state.sizingCurrentMonth = '2026-11';
@@ -7383,6 +7390,11 @@ function isSizingMonthLocked(mesKey) {
         return false;
     }
     
+    // Se o mês estiver confirmado oficialmente, está travado
+    if (state.sizingConfirmedMonths && state.sizingConfirmedMonths[mesKey]) {
+        return true;
+    }
+    
     const allMonths = Object.keys(state.sizingHistory || {}).filter(m => m >= '2026-11');
     if (state.sizingCurrentMonth && state.sizingCurrentMonth >= '2026-11') {
         allMonths.push(state.sizingCurrentMonth);
@@ -7453,6 +7465,66 @@ function saveCurrentSizingMonthSnapshot() {
     });
     saveState();
     flashSizingSyncBadge();
+}
+
+// CONFIRMAÇÃO OFICIAL DE PROJEÇÃO DE DEMANDA
+function openConfirmProjectionModal() {
+    const curMonth = state.sizingCurrentMonth || '2026-11';
+    
+    const titleEl = document.getElementById('modal-confirm-proj-month-name');
+    if (titleEl) {
+        titleEl.textContent = formatMonthName(curMonth);
+    }
+    
+    // Lê os valores finais calculados diretamente dos widgets
+    const vozVal = document.getElementById('widget-sizing-pas-voz')?.textContent || '0';
+    const chatVal = document.getElementById('widget-sizing-pas-chat')?.textContent || '0';
+    const boVal = document.getElementById('widget-sizing-pas-bo')?.textContent || '0';
+    const totalVal = document.getElementById('widget-sizing-total-pas')?.textContent || '0';
+    
+    const elVoz = document.getElementById('modal-confirm-summary-voz');
+    const elChat = document.getElementById('modal-confirm-summary-chat');
+    const elBO = document.getElementById('modal-confirm-summary-bo');
+    const elTotal = document.getElementById('modal-confirm-summary-total');
+    
+    if (elVoz) elVoz.textContent = vozVal;
+    if (elChat) elChat.textContent = chatVal;
+    if (elBO) elBO.textContent = boVal;
+    if (elTotal) elTotal.textContent = totalVal;
+    
+    const modal = document.getElementById('modal-confirm-sizing-projection');
+    if (modal) modal.style.display = 'flex';
+}
+
+function closeConfirmProjectionModal() {
+    const modal = document.getElementById('modal-confirm-sizing-projection');
+    if (modal) modal.style.display = 'none';
+}
+
+function confirmSizingProjection() {
+    const curMonth = state.sizingCurrentMonth || '2026-11';
+    
+    if (!state.sizingConfirmedMonths) state.sizingConfirmedMonths = {};
+    const confirmedUser = (typeof currentUser !== 'undefined' && currentUser && (currentUser.nome || currentUser.email)) 
+        ? (currentUser.nome || currentUser.email) 
+        : 'Operador';
+        
+    state.sizingConfirmedMonths[curMonth] = {
+        confirmedAt: new Date().toISOString(),
+        confirmedBy: confirmedUser
+    };
+    
+    // Salva o snapshot definitivo com o registro de confirmação
+    saveCurrentSizingMonthSnapshot();
+    
+    closeConfirmProjectionModal();
+    renderSizingView();
+    showToast(`Projeção de ${formatMonthName(curMonth)} confirmada e travada oficialmente!`, 'success', 3500);
+    
+    // Encadeia automaticamente a abertura para criação da projeção subsequente
+    setTimeout(() => {
+        openNewSizingModal();
+    }, 450);
 }
 
 function openNewSizingModal() {
@@ -7573,9 +7645,12 @@ function confirmDiscardSizingProjection() {
         return;
     }
     
-    // Remove do histórico e do rastreio de desbloqueio
+    // Remove do histórico, da confirmação e do rastreio de desbloqueio
     if (state.sizingHistory) {
         delete state.sizingHistory[curMonth];
+    }
+    if (state.sizingConfirmedMonths) {
+        delete state.sizingConfirmedMonths[curMonth];
     }
     if (state.sizingUnlockedMonths) {
         delete state.sizingUnlockedMonths[curMonth];
@@ -7877,17 +7952,40 @@ function recalcSizing(fromInputs = true) {
         const diffVol = resVoz.volEfetivo - volPlan;
         const diffPct = volPlan > 0 ? (diffVol / volPlan) * 100 : 0;
         
+        const mesRef = state.sizingCurrentMonth || p.mesReferencia || '2026-11';
+        const confData = state.sizingConfirmedMonths && state.sizingConfirmedMonths[mesRef];
+        let refFooterHtml = '';
+        if (confData && confData.confirmedAt) {
+            const d = new Date(confData.confirmedAt);
+            const dStr = d.toLocaleDateString('pt-BR');
+            const hStr = d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+            refFooterHtml = `
+                <div class="sizing-alert-ref">
+                    <i class="fa-solid fa-circle-check" style="color: var(--color-success); font-size: 0.85rem;"></i>
+                    <span>Ref.: Projeção de <strong>${formatMonthName(mesRef)}</strong> confirmada em <strong>${dStr} às ${hStr}</strong>${confData.confirmedBy ? ` (${confData.confirmedBy})` : ''}</span>
+                </div>
+            `;
+        } else {
+            refFooterHtml = `
+                <div class="sizing-alert-ref" style="opacity: 0.85;">
+                    <i class="fa-solid fa-pen-to-square" style="color: var(--color-primary); font-size: 0.85rem;"></i>
+                    <span>Ref.: Projeção de <strong>${formatMonthName(mesRef)}</strong> em edição (não confirmada)</span>
+                </div>
+            `;
+        }
+        
         let desvioCardHtml = '';
         if (diffPct > 5.0) {
             desvioCardHtml = `
                 <div class="sizing-alert-card sizing-alert-warning">
                     <div class="sizing-alert-icon"><i class="fa-solid fa-triangle-exclamation"></i></div>
-                    <div class="sizing-alert-content">
+                    <div class="sizing-alert-content" style="flex: 1;">
                         <h4>Alerta de Desvio Contratual Crítico (+${diffPct.toFixed(1)}%)</h4>
                         <p>
                             O volume efetivo de <strong>${resVoz.volEfetivo.toLocaleString('pt-BR')} chamadas</strong> excede a meta planejada contratual de <strong>${volPlan.toLocaleString('pt-BR')}</strong> em <strong>+${diffPct.toFixed(1)}% (+${diffVol.toLocaleString('pt-BR')} chamadas)</strong>.
                             <br><span style="color: #fbbf24; font-weight: 600;">Ação recomendada:</span> Acionar plano de contingência e renegociar aditivo contratual com os parceiros.
                         </p>
+                        ${refFooterHtml}
                     </div>
                 </div>
             `;
@@ -7895,12 +7993,13 @@ function recalcSizing(fromInputs = true) {
             desvioCardHtml = `
                 <div class="sizing-alert-card sizing-alert-info">
                     <div class="sizing-alert-icon"><i class="fa-solid fa-circle-info"></i></div>
-                    <div class="sizing-alert-content">
+                    <div class="sizing-alert-content" style="flex: 1;">
                         <h4>Volume Abaixo do Planejado (${diffPct.toFixed(1)}%)</h4>
                         <p>
                             O volume de <strong>${resVoz.volEfetivo.toLocaleString('pt-BR')} chamadas</strong> está <strong>${Math.abs(diffPct).toFixed(1)}% abaixo</strong> do teto planejado (${volPlan.toLocaleString('pt-BR')}).
                             <br>Oportunidade para rebalanceamento ou remanejamento de capacidade ociosa.
                         </p>
+                        ${refFooterHtml}
                     </div>
                 </div>
             `;
@@ -7908,11 +8007,12 @@ function recalcSizing(fromInputs = true) {
             desvioCardHtml = `
                 <div class="sizing-alert-card sizing-alert-success">
                     <div class="sizing-alert-icon"><i class="fa-solid fa-circle-check"></i></div>
-                    <div class="sizing-alert-content">
+                    <div class="sizing-alert-content" style="flex: 1;">
                         <h4>Volume Dentro da Tolerância Contratual (&plusmn;5%)</h4>
                         <p>
                             O volume de <strong>${resVoz.volEfetivo.toLocaleString('pt-BR')} chamadas</strong> apresenta desvio de <strong>${diffPct >= 0 ? '+' : ''}${diffPct.toFixed(1)}%</strong> em relação ao planejado (${volPlan.toLocaleString('pt-BR')}), operando em conformidade com o SLA.
                         </p>
+                        ${refFooterHtml}
                     </div>
                 </div>
             `;
@@ -7920,7 +8020,6 @@ function recalcSizing(fromInputs = true) {
         
         // Alert 2: Janela de Contratação e Treinamento (45 dias / M-2)
         let contrataCardHtml = '';
-        const mesRef = state.sizingCurrentMonth || p.mesReferencia;
         if (mesRef && /^\d{4}-\d{2}$/.test(mesRef)) {
             const parts = mesRef.split('-');
             const year = parseInt(parts[0], 10);
@@ -7938,11 +8037,12 @@ function recalcSizing(fromInputs = true) {
             contrataCardHtml = `
                 <div class="sizing-alert-card sizing-alert-info">
                     <div class="sizing-alert-icon"><i class="fa-solid fa-calendar-check"></i></div>
-                    <div class="sizing-alert-content">
+                    <div class="sizing-alert-content" style="flex: 1;">
                         <h4>Cronograma de Contratação Preventiva (Janela 45 dias / M-2)</h4>
                         <p>
                             Para atender o mês projetado de <strong>${strMesRef}</strong> com <strong>${totalPAs} PAs contratadas</strong>, o processo seletivo e treinamento de integração deve ocorrer impreterivelmente até <strong>${strMesM2} (M-2)</strong> para garantir conformidade à curva de aprendizado NR17.
                         </p>
+                        ${refFooterHtml}
                     </div>
                 </div>
             `;
@@ -8048,23 +8148,28 @@ function renderSizingView() {
     const sortedMonths = Array.from(monthSet).filter(m => /^\d{4}-\d{2}$/.test(m)).sort();
     const latestMonth = sortedMonths[sortedMonths.length - 1];
     const isLatestMonth = (curMonth === latestMonth);
+    const isConfirmed = !!(state.sizingConfirmedMonths && state.sizingConfirmedMonths[curMonth]);
     const isTemporarilyUnlocked = !!(state.sizingUnlockedMonths && state.sizingUnlockedMonths[curMonth]);
-    const isLocked = !isLatestMonth && !isTemporarilyUnlocked;
+    const isLocked = (!isLatestMonth || isConfirmed) && !isTemporarilyUnlocked;
     
     // 1. Render Month Selector & Status
     const elSelect = document.getElementById('sizing-mes-select');
     if (elSelect) {
         elSelect.innerHTML = sortedMonths.map(m => {
+            const isConf = !!(state.sizingConfirmedMonths && state.sizingConfirmedMonths[m]);
             const isLatest = (m === latestMonth);
             const isUnl = !!(state.sizingUnlockedMonths && state.sizingUnlockedMonths[m]);
             let icon = '🔒 ';
             let statusTag = 'Histórico';
-            if (isLatest) {
-                icon = '📝 ';
-                statusTag = 'Vigente';
-            } else if (isUnl) {
+            if (isUnl) {
                 icon = '⚠️ ';
                 statusTag = 'Reaberto';
+            } else if (isConf) {
+                icon = '✅ ';
+                statusTag = 'Confirmado';
+            } else if (isLatest) {
+                icon = '📝 ';
+                statusTag = 'Vigente';
             }
             const selected = (m === curMonth) ? 'selected' : '';
             return `<option value="${m}" ${selected}>${icon}${formatMonthName(m)} (${statusTag})</option>`;
@@ -8077,19 +8182,31 @@ function renderSizingView() {
         if (isTemporarilyUnlocked) {
             elLockBadge.className = 'sizing-lock-badge badge-reopened';
             elLockBadge.innerHTML = '<i class="fa-solid fa-lock-open"></i> Reaberto para Ajustes (Histórico)';
+        } else if (isConfirmed) {
+            elLockBadge.className = 'sizing-lock-badge badge-confirmed';
+            elLockBadge.innerHTML = '<i class="fa-solid fa-circle-check"></i> Projeção Confirmada (Somente Leitura)';
         } else if (isLocked) {
             elLockBadge.className = 'sizing-lock-badge badge-locked';
             elLockBadge.innerHTML = '<i class="fa-solid fa-lock"></i> Somente Visualização (Histórico)';
         } else {
             elLockBadge.className = 'sizing-lock-badge badge-open';
-            elLockBadge.innerHTML = '<i class="fa-solid fa-lock-open"></i> Aberto para edição (Vigente)';
+            elLockBadge.innerHTML = '<i class="fa-solid fa-pen-to-square"></i> Aberto para edição (Vigente)';
         }
     }
     
-    // 3. Render Discard Button (visible only on latest month when curMonth > 2026-11)
+    // 3. Render Action Buttons
+    const btnConfirmMonth = document.getElementById('btn-sizing-confirm-month');
+    if (btnConfirmMonth) {
+        if (isLatestMonth && !isConfirmed && !isTemporarilyUnlocked) {
+            btnConfirmMonth.style.display = 'inline-flex';
+        } else {
+            btnConfirmMonth.style.display = 'none';
+        }
+    }
+
     const btnDiscard = document.getElementById('btn-sizing-discard-month');
     if (btnDiscard) {
-        if (isLatestMonth && curMonth > '2026-11') {
+        if (isLatestMonth && curMonth > '2026-11' && !isConfirmed) {
             btnDiscard.style.display = 'inline-flex';
         } else {
             btnDiscard.style.display = 'none';
@@ -8103,14 +8220,22 @@ function renderSizingView() {
     const btnRelock = document.getElementById('btn-sizing-relock-history');
     
     if (elHistoryBanner) {
-        if (!isLatestMonth) {
+        if (isLocked || !isLatestMonth || isConfirmed) {
             elHistoryBanner.style.display = 'flex';
             if (isTemporarilyUnlocked) {
                 if (elHistoryText) {
-                    elHistoryText.innerHTML = `⚠️ Projeção histórica de <strong>${formatMonthName(curMonth)}</strong> <strong>reaberta para edição</strong>. As alterações salvas atualizarão este período.`;
+                    elHistoryText.innerHTML = `⚠️ Projeção de <strong>${formatMonthName(curMonth)}</strong> <strong>reaberta para edição</strong>. As alterações salvas atualizarão este período.`;
                 }
                 if (btnUnlock) btnUnlock.style.display = 'none';
                 if (btnRelock) btnRelock.style.display = 'inline-flex';
+            } else if (isConfirmed) {
+                const confInfo = state.sizingConfirmedMonths[curMonth];
+                const dataFmt = confInfo?.confirmedAt ? new Date(confInfo.confirmedAt).toLocaleString('pt-BR') : '';
+                if (elHistoryText) {
+                    elHistoryText.innerHTML = `✅ Projeção de <strong>${formatMonthName(curMonth)}</strong> <strong>confirmada e fechada</strong>${dataFmt ? ` em ${dataFmt}` : ''} (Somente Leitura).`;
+                }
+                if (btnUnlock) btnUnlock.style.display = 'inline-flex';
+                if (btnRelock) btnRelock.style.display = 'none';
             } else {
                 if (elHistoryText) {
                     elHistoryText.innerHTML = `Visualizando projeção histórica de <strong>${formatMonthName(curMonth)}</strong> (Somente Leitura).`;

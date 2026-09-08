@@ -420,4 +420,67 @@ test.describe('Painel OPS - Redimensionamento (WFM & Erlang C) E2E', () => {
     await expect(page.locator('#sizing-lock-badge')).toContainText('Somente Visualização');
     await expect(page.locator('#input-sizing-vol-voz')).toBeDisabled();
   });
+
+  test('14. Fluxo oficial de Confirmar Projecao: trava mes com selo, atualiza alertas e encadeia novo mes', async ({ page }) => {
+    await page.evaluate(() => {
+      // @ts-ignore
+      state.sizingBaselineNov26 = true;
+      // @ts-ignore
+      state.sizingHistory = {};
+      // @ts-ignore
+      state.sizingConfirmedMonths = {};
+      // @ts-ignore
+      state.sizingCurrentMonth = '2026-11';
+      // @ts-ignore
+      switchToView('sizing');
+    });
+
+    const btnConfirmProj = page.locator('#btn-sizing-confirm-month');
+    await expect(btnConfirmProj).toBeVisible();
+
+    // Clica no botão Confirmar Projeção
+    await btnConfirmProj.click();
+
+    const modalConfirm = page.locator('#modal-confirm-sizing-projection');
+    await expect(modalConfirm).toBeVisible();
+    await expect(page.locator('#modal-confirm-proj-month-name')).toContainText('Nov/26');
+    await expect(page.locator('#modal-confirm-summary-total')).not.toHaveText('-');
+
+    // Confirma no modal
+    await page.locator('#btn-submit-confirm-sizing').click();
+    await page.waitForTimeout(600);
+
+    // Modal de confirmação fecha e abre modal de nova projeção sugerindo o próximo mês
+    await expect(modalConfirm).toBeHidden();
+    const modalNew = page.locator('#modal-new-sizing-projection');
+    await expect(modalNew).toBeVisible();
+
+    // Fecha o modal de nova projeção para inspecionar o mês confirmado
+    await page.locator('#modal-new-sizing-projection .modal-close').click();
+    await page.waitForTimeout(300);
+
+    // 2026-11 agora deve estar travado como Projeção Confirmada
+    await expect(page.locator('#sizing-lock-badge')).toContainText('Projeção Confirmada');
+    await expect(page.locator('#sizing-history-banner')).toBeVisible();
+    await expect(page.locator('#sizing-history-banner')).toContainText('confirmada e fechada');
+    await expect(page.locator('#input-sizing-vol-voz')).toBeDisabled();
+    await expect(btnConfirmProj).toBeHidden();
+
+    // Cards de alerta devem exibir rodapé com referência à confirmação
+    const alertsContainer = page.locator('#sizing-alerts-container');
+    await expect(alertsContainer).toContainText('Ref.: Projeção de Nov/26 confirmada em');
+  });
+
+  test('15. Card explicativo da Regra de Erlang C deve estar visivel na secao tecnica', async ({ page }) => {
+    await page.evaluate(() => {
+      // @ts-ignore
+      switchToView('sizing');
+    });
+
+    const erlangCard = page.locator('.sizing-erlang-info-card');
+    await expect(erlangCard).toBeVisible();
+    await expect(erlangCard).toContainText('O que é a Regra de Erlang C?');
+    await expect(erlangCard).toContainText('Agner Krarup Erlang');
+    await expect(erlangCard).toContainText('Padrão WFM');
+  });
 });
