@@ -2847,10 +2847,10 @@ body.light-theme .sizing-confirm-summary {
     color: var(--text-primary);
     font-family: inherit;
     font-size: 0.85rem;
-    text-align: right;
+    text-align: center !important;
     width: 78px;
     height: 28px;
-    padding: 0 10px;
+    padding: 0 6px;
     border-radius: var(--radius-sm);
     transition: all var(--transition-fast);
     outline: none;
@@ -2865,12 +2865,101 @@ body.light-theme .sizing-confirm-summary {
 
 .sizing-sheet-table input,
 .sheet-cell input {
+    text-align: center !important;
     font-style: normal !important;
     font-variant-numeric: tabular-nums;
 }
 
 .sizing-card-bo .sizing-cell-input {
     width: 98px;
+}
+
+/* Destaque para Volume Mês como Direcionador Principal dos Cálculos */
+.sizing-sheet-row.row-highlight-driver {
+    background: rgba(235, 92, 39, 0.08) !important;
+    border-top: 1.5px solid rgba(235, 92, 39, 0.4) !important;
+    border-bottom: 1.5px solid rgba(235, 92, 39, 0.4) !important;
+}
+
+.sizing-card-chat .sizing-sheet-row.row-highlight-driver {
+    background: rgba(229, 95, 145, 0.08) !important;
+    border-top-color: rgba(229, 95, 145, 0.4) !important;
+    border-bottom-color: rgba(229, 95, 145, 0.4) !important;
+}
+
+.sizing-card-bo .sizing-sheet-row.row-highlight-driver {
+    background: rgba(16, 185, 129, 0.08) !important;
+    border-top-color: rgba(16, 185, 129, 0.4) !important;
+    border-bottom-color: rgba(16, 185, 129, 0.4) !important;
+}
+
+.sizing-sheet-row.row-highlight-driver .sheet-label {
+    font-weight: 800 !important;
+    font-size: 0.84rem !important;
+    color: var(--text-primary) !important;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+.driver-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    font-size: 0.65rem;
+    font-weight: 800;
+    padding: 1px 6px;
+    border-radius: 4px;
+    background: rgba(235, 92, 39, 0.16);
+    color: var(--color-primary);
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    border: 1px solid rgba(235, 92, 39, 0.3);
+}
+
+.sizing-card-chat .driver-badge {
+    background: rgba(229, 95, 145, 0.16);
+    color: var(--color-secondary);
+    border-color: rgba(229, 95, 145, 0.3);
+}
+
+.sizing-card-bo .driver-badge {
+    background: rgba(16, 185, 129, 0.16);
+    color: var(--color-success);
+    border-color: rgba(16, 185, 129, 0.3);
+}
+
+.sizing-sheet-row.row-highlight-driver .sizing-cell-input {
+    font-weight: 800 !important;
+    font-size: 0.92rem !important;
+    border: 1.5px solid var(--color-primary) !important;
+    box-shadow: 0 0 0 2px rgba(235, 92, 39, 0.15) !important;
+    background: rgba(235, 92, 39, 0.06) !important;
+}
+
+.sizing-card-chat .sizing-sheet-row.row-highlight-driver .sizing-cell-input {
+    border-color: var(--color-secondary) !important;
+    box-shadow: 0 0 0 2px rgba(229, 95, 145, 0.15) !important;
+    background: rgba(229, 95, 145, 0.06) !important;
+}
+
+.sizing-card-bo .sizing-sheet-row.row-highlight-driver .sizing-cell-input {
+    border-color: var(--color-success) !important;
+    box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.15) !important;
+    background: rgba(16, 185, 129, 0.06) !important;
+}
+
+body.light-theme .sizing-sheet-row.row-highlight-driver {
+    background: rgba(235, 92, 39, 0.06) !important;
+}
+body.light-theme .sizing-card-chat .sizing-sheet-row.row-highlight-driver {
+    background: rgba(229, 95, 145, 0.06) !important;
+}
+body.light-theme .sizing-card-bo .sizing-sheet-row.row-highlight-driver {
+    background: rgba(16, 185, 129, 0.06) !important;
+}
+body.light-theme .sizing-sheet-row.row-highlight-driver .sizing-cell-input {
+    background: #ffffff !important;
 }
 
 .sizing-cell-input::-webkit-outer-spin-button,
@@ -2974,9 +3063,10 @@ body.light-theme .sizing-confirm-summary {
     font-size: 0.85rem !important;
     font-weight: 700 !important;
     font-style: normal !important;
+    text-align: center !important;
     background: transparent !important;
     border: none !important;
-    padding-right: 14px !important;
+    padding: 0 6px !important;
 }
 
 .cell-amber-input {
@@ -2984,9 +3074,10 @@ body.light-theme .sizing-confirm-summary {
     font-size: 0.85rem !important;
     font-weight: 800 !important;
     font-style: normal !important;
+    text-align: center !important;
     background: transparent !important;
     border: none !important;
-    padding-right: 14px !important;
+    padding: 0 6px !important;
 }
 
 .sizing-card-chat .cell-amber-input {
