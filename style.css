@@ -3377,6 +3377,21 @@ body.light-theme .sizing-calc-table tr {
     border-bottom: 1px solid rgba(4, 62, 38, 0.08);
 }
 
+/* Flash animation for recalculated values */
+@keyframes cellRecalculatedPulse {
+    0% {
+        box-shadow: 0 0 0 2px rgba(235, 92, 39, 0.6), 0 0 12px rgba(235, 92, 39, 0.4);
+        background-color: rgba(235, 92, 39, 0.22);
+    }
+    100% {
+        box-shadow: none;
+    }
+}
+
+.cell-recalculated-flash {
+    animation: cellRecalculatedPulse 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
 
 
 

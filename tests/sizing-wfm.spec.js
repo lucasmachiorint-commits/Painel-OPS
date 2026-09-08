@@ -58,7 +58,7 @@ test.describe('Painel OPS - Redimensionamento (WFM & Erlang C) E2E', () => {
     const totalText = await widgetTotal.innerText();
 
     expect(parseInt(vozText)).toBe(23);
-    expect(parseInt(boText)).toBe(8);
+    expect(parseInt(boText)).toBe(1);
     expect(parseInt(totalText)).toBeGreaterThanOrEqual(parseInt(vozText) + parseInt(boText));
   });
 
@@ -80,9 +80,9 @@ test.describe('Painel OPS - Redimensionamento (WFM & Erlang C) E2E', () => {
     await expect(page.locator('#input-sizing-vol-voz')).toHaveValue('19912');
     await expect(page.locator('#input-sizing-telas-voz')).toHaveValue(/^(1|1\.0)$/);
     await expect(page.locator('#input-sizing-telas-chat')).toHaveValue(/^(1|1\.0|2|2\.0)$/);
-    await expect(page.locator('#input-sizing-vol-bo')).toHaveValue('10270');
+    await expect(page.locator('#input-sizing-vol-bo')).toHaveValue('500');
     await expect(page.locator('#input-sizing-dias-uteis-bo')).toHaveValue('30');
-    await expect(page.locator('#input-sizing-pas-bo')).toHaveValue('8');
+    await expect(page.locator('#input-sizing-pas-bo')).toHaveValue('1');
     await expect(page.locator('#input-sizing-tma-real-min')).toHaveValue('00:10:00');
     await expect(page.locator('#input-sizing-nr17-bo-pct')).toHaveValue('10.53');
   });
@@ -135,9 +135,9 @@ test.describe('Painel OPS - Redimensionamento (WFM & Erlang C) E2E', () => {
     await inputAjusteBo.dispatchEvent('input');
     await page.waitForTimeout(300);
 
-    // PA Contratada should be 8 + 3 = 11
-    await expect(page.locator('#input-sizing-pa-contratada-bo')).toHaveValue('11');
-    await expect(page.locator('#widget-sizing-pas-bo')).toHaveText('11');
+    // PA Contratada should be 1 + 3 = 4
+    await expect(page.locator('#input-sizing-pa-contratada-bo')).toHaveValue('4');
+    await expect(page.locator('#widget-sizing-pas-bo')).toHaveText('4');
   });
 
   test('7. Versionamento mensal e travamento de meses passados', async ({ page }) => {
@@ -553,5 +553,18 @@ test.describe('Painel OPS - Redimensionamento (WFM & Erlang C) E2E', () => {
     await expect(page.locator('#input-sizing-ch-trabalho')).toHaveValue('05:40:00');
     await expect(page.locator('#input-sizing-horas-mes')).toHaveValue('170:00:00');
     await expect(page.locator('#input-sizing-ch-efetivo')).toHaveValue('03:42:36');
+
+    // Validação de Reatividade Dinâmica Imediata:
+    // Altera volume para 10270 -> PA's Necessárias deve recalcular instantaneamente para 8
+    await volBo.fill('10270');
+    await volBo.dispatchEvent('input');
+    await expect(page.locator('#input-sizing-pas-bo')).toHaveValue('8');
+    await expect(page.locator('#input-sizing-vol-dia-bo')).toHaveValue('342');
+
+    // Retorna para 500 -> PA's Necessárias deve recalcular instantaneamente para 1
+    await volBo.fill('500');
+    await volBo.dispatchEvent('input');
+    await expect(page.locator('#input-sizing-pas-bo')).toHaveValue('1');
+    await expect(page.locator('#input-sizing-vol-dia-bo')).toHaveValue('17');
   });
 });

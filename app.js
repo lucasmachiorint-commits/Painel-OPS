@@ -2335,7 +2335,7 @@ function applyStateMigrations() {
         shrinkageFeedbackChat: 1.5,
         shrinkageNR17Chat: 17.0,
         ajusteChat: 0,
-        volumeMensalBO: 10270,
+        volumeMensalBO: 500,
         tmaBO: 600,
         diasUteis: 30,
         diasAtendimento: 30,
@@ -7766,7 +7766,7 @@ function resetSizingDefaults() {
         shrinkageFeedbackChat: 1.5,
         shrinkageNR17Chat: 17.0,
         ajusteChat: 0,
-        volumeMensalBO: 10270,
+        volumeMensalBO: 500,
         tmaBO: 600,
         diasUteis: 30,
         diasAtendimento: 30,
@@ -7784,6 +7784,14 @@ function resetSizingDefaults() {
     showToast('Parâmetros restaurados para o padrão da planilha!', 'info');
 }
 
+// FLASH HIGHLIGHT ON RECALCULATED CELLS
+function highlightCellUpdate(el) {
+    if (!el) return;
+    el.classList.remove('cell-recalculated-flash');
+    void el.offsetWidth;
+    el.classList.add('cell-recalculated-flash');
+}
+
 // RECALCULATE & UPDATE ALL SIZING RESULTS
 let _sizingDebounceTimer = null;
 
@@ -7796,7 +7804,15 @@ function recalcSizing(fromInputs = true) {
         const getNum = (id, fallback) => {
             const el = document.getElementById(id);
             if (!el) return fallback;
-            const val = parseFloat(el.value);
+            let valStr = String(el.value || '').trim();
+            if (!valStr) return fallback;
+            // Suporte resiliente a formatos BR com ponto de milhar (ex: 1.000 ou 10.270)
+            if (/^\d{1,3}(\.\d{3})+(,\d+)?$/.test(valStr)) {
+                valStr = valStr.replace(/\./g, '').replace(',', '.');
+            } else if (valStr.includes(',')) {
+                valStr = valStr.replace(',', '.');
+            }
+            const val = parseFloat(valStr);
             return isNaN(val) ? fallback : val;
         };
         
@@ -7833,7 +7849,7 @@ function recalcSizing(fromInputs = true) {
         p.ajusteChat = getNum('input-sizing-ajuste-chat', p.ajusteChat || 0);
         
         // QUADRO 3: BKO
-        p.volumeMensalBO = Math.max(0, getNum('input-sizing-vol-bo', p.volumeMensalBO || 10270));
+        p.volumeMensalBO = Math.max(0, getNum('input-sizing-vol-bo', (p.volumeMensalBO !== undefined && p.volumeMensalBO !== null) ? p.volumeMensalBO : 500));
         p.diasUteis = Math.max(1, getNum('input-sizing-dias-uteis-bo', p.diasUteis || 30));
         p.ajusteBo = getNum('input-sizing-ajuste-bo', p.ajusteBo || 0);
         p.tmaBO = Math.max(1, getNum('input-sizing-tma-bo', p.tmaBO || 600));
@@ -7867,7 +7883,13 @@ function recalcSizing(fromInputs = true) {
     
     const setInputVal = (id, val) => {
         const el = document.getElementById(id);
-        if (el && val !== undefined && val !== null) el.value = val;
+        if (el && val !== undefined && val !== null) {
+            const strVal = String(val);
+            if (el.value !== strVal) {
+                el.value = strVal;
+                highlightCellUpdate(el);
+            }
+        }
     };
     
     const mesLabel = getMonthOnly(state.sizingCurrentMonth || p.mesReferencia || '2026-11');
@@ -8140,7 +8162,7 @@ function renderSizingView() {
             ajusteVoz: 0,
             volumeMensalChat: 0,
             tmaChat: 480,
-            volumeMensalBO: 10270,
+            volumeMensalBO: 500,
             tmaBO: 600,
             diasUteis: 30,
             diasAtendimento: 30,
@@ -8349,7 +8371,7 @@ function setupSizingEventListeners() {
     if (_sizingListenersBound) return;
     _sizingListenersBound = true;
     
-    // Recalculate on any input or change event (debounced 80ms)
+    // Recalculate on any input, change, keyup, paste or blur event
     const container = document.getElementById('view-sizing');
     if (container) {
         container.querySelectorAll('input:not([readonly])').forEach(input => {
@@ -8357,10 +8379,13 @@ function setupSizingEventListeners() {
                 if (_sizingDebounceTimer) clearTimeout(_sizingDebounceTimer);
                 _sizingDebounceTimer = setTimeout(() => {
                     recalcSizing(true);
-                }, 80);
+                }, 50);
             };
             input.addEventListener('input', triggerRecalc);
             input.addEventListener('change', triggerRecalc);
+            input.addEventListener('keyup', triggerRecalc);
+            input.addEventListener('paste', () => setTimeout(() => recalcSizing(true), 10));
+            input.addEventListener('blur', () => recalcSizing(true));
         });
     }
     
