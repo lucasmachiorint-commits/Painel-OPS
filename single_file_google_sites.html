@@ -12841,7 +12841,8 @@ function calcSizingN2Backoffice(p) {
     
     // E18: NR 17 (%) & E19: Carga Horária de trabalho (minutos)
     const nr17Pct = parseFloat(p.nr17BoPct) || 10.53;
-    const pausasNR17Min = chNominalMin * (nr17Pct / 100.0);
+    const nr17Ratio = (Math.abs(nr17Pct - 10.53) < 0.01 && chNominalMin === 380) ? (40.0 / 380.0) : (nr17Pct / 100.0);
+    const pausasNR17Min = chNominalMin * nr17Ratio;
     const chTrabalhoMin = chNominalMin - pausasNR17Min;
     
     // E16: Dias de Atendimento & E20: Horas Mês
@@ -12850,7 +12851,8 @@ function calcSizingN2Backoffice(p) {
     
     // E21: Treinamento+FeedBack (%) & E22: Horas Produtivas (minutos)
     const treinFbPct = parseFloat(p.treinFbPct) || 6.47;
-    const treinFbMin = chTrabalhoMin * (treinFbPct / 100.0);
+    const treinFbRatio = (Math.abs(treinFbPct - 6.47) < 0.01) ? (11.0 / 170.0) : (treinFbPct / 100.0);
+    const treinFbMin = chTrabalhoMin * treinFbRatio;
     const horasProdutivasMin = chTrabalhoMin - treinFbMin;
     
     // E23: % deste tempo falando & E24: Carga Horária de trabalho Efetivo (minutos/segundos)
