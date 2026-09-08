@@ -4700,7 +4700,7 @@ body.light-theme .sizing-calc-table tr {
                                 <div class="sizing-sheet-row">
                                     <span class="sheet-label">Telas Simultâneas</span>
                                     <div class="sheet-cell cell-peach">
-                                        <input type="number" id="input-sizing-telas-chat" min="1" max="5" step="0.5" value="2.0" class="sizing-cell-input font-bold" inputmode="decimal">
+                                        <input type="number" id="input-sizing-telas-chat" min="1" max="5" step="0.5" value="1.0" class="sizing-cell-input font-bold" inputmode="decimal">
                                     </div>
                                 </div>
 
@@ -4822,9 +4822,9 @@ body.light-theme .sizing-calc-table tr {
                                     </div>
                                 </div>
 
-                                <!-- Row 22: ATENDIMENTOS / OPERADOR (Italic - Calculado) -->
+                                <!-- Row 22: CHAMADAS / OPERADOR (Italic - Calculado) -->
                                 <div class="sizing-sheet-row">
-                                    <span class="sheet-label font-italic text-muted">ATENDIMENTOS / OPERADOR</span>
+                                    <span class="sheet-label font-italic text-muted">CHAMADAS / OPERADOR</span>
                                     <div class="sheet-cell">
                                         <input type="number" id="input-sizing-chamadas-op-chat" value="0" class="sizing-cell-input cell-calculated text-muted font-bold" readonly tabindex="-1">
                                     </div>
@@ -7965,15 +7965,15 @@ function applyStateMigrations() {
         shrinkageNR17: 17.0,
         telasVoz: 1.0,
         ajusteVoz: 0,
-        volumeMensalChat: 0,
-        volAtendidasChat: 0,
+        volumeMensalChat: 3000,
+        volAtendidasChat: 2895,
         tmaChat: 480,
         slaMetaChat: 80,
         nsMinimoChat: 60,
         tmeMaxChat: 20,
         abandonoMaxChat: 3.5,
-        telasSimultaneas: 2.0,
-        telasChat: 2.0,
+        telasSimultaneas: 1.0,
+        telasChat: 1.0,
         dmmPercentChat: 5.62,
         hmmPercentChat: 9.7,
         shrinkageLancheChat: 10.5,
@@ -8006,14 +8006,20 @@ function applyStateMigrations() {
     }
 
     // Baseline de redimensionamento: Novembro/2026 como único mês ativo inicial, aberto para edição (sem coexistência de Dezembro)
-    if (!state.sizingNov26OnlyOpen_v1) {
+    if (!state.sizingNov26OnlyOpen_v2) {
+        state.sizingNov26OnlyOpen_v2 = true;
         state.sizingNov26OnlyOpen_v1 = true;
         state.sizingBaselineNov26 = true;
         state.sizingHistory = {};
         state.sizingConfirmedMonths = {};
         state.sizingUnlockedMonths = {};
         state.sizingCurrentMonth = '2026-11';
-        if (state.sizingParams) state.sizingParams.mesReferencia = '2026-11';
+        if (state.sizingParams) {
+            state.sizingParams.mesReferencia = '2026-11';
+            state.sizingParams.volumeMensalChat = 3000;
+            state.sizingParams.telasChat = 1.0;
+            state.sizingParams.telasSimultaneas = 1.0;
+        }
     } else {
         if (!state.sizingHistory || typeof state.sizingHistory !== 'object') {
             state.sizingHistory = {};
@@ -13404,15 +13410,15 @@ function resetSizingDefaults() {
         shrinkageNR17: 17.0,
         telasVoz: 1.0,
         ajusteVoz: 0,
-        volumeMensalChat: 0,
-        volAtendidasChat: 0,
+        volumeMensalChat: 3000,
+        volAtendidasChat: 2895,
         tmaChat: 480,
         slaMetaChat: 80,
         nsMinimoChat: 60,
         tmeMaxChat: 20,
         abandonoMaxChat: 3.5,
-        telasSimultaneas: 2.0,
-        telasChat: 2.0,
+        telasSimultaneas: 1.0,
+        telasChat: 1.0,
         dmmPercentChat: 5.62,
         hmmPercentChat: 9.7,
         shrinkageLancheChat: 10.5,
@@ -13487,13 +13493,14 @@ function recalcSizing(fromInputs = true) {
         p.ajusteVoz = getNum('input-sizing-ajuste-voz', p.ajusteVoz || 0);
         
         // QUADRO 2: CHAT
-        p.volumeMensalChat = Math.max(0, getNum('input-sizing-vol-chat', p.volumeMensalChat || 0));
+        p.volumeMensalChat = Math.max(0, getNum('input-sizing-vol-chat', (p.volumeMensalChat !== undefined && p.volumeMensalChat !== null) ? p.volumeMensalChat : 3000));
         p.tmaChat = Math.max(1, getNum('input-sizing-tma-chat', p.tmaChat || 480));
         p.slaMetaChat = Math.min(100, Math.max(1, getNum('input-sizing-sla-meta-chat', p.slaMetaChat || 80)));
         p.nsMinimoChat = Math.min(100, Math.max(1, getNum('input-sizing-ns-minimo-chat', p.nsMinimoChat || 60)));
         p.tmeMaxChat = Math.max(1, getNum('input-sizing-tme-max-chat', p.tmeMaxChat || 20));
         p.abandonoMaxChat = Math.min(100, Math.max(0, getNum('input-sizing-abandono-max-chat', p.abandonoMaxChat || 3.5)));
-        p.telasSimultaneas = Math.max(0.1, getNum('input-sizing-telas-chat', p.telasSimultaneas || 2.0));
+        p.telasChat = Math.max(0.1, getNum('input-sizing-telas-chat', (p.telasChat !== undefined && p.telasChat !== null) ? p.telasChat : (p.telasSimultaneas || 1.0)));
+        p.telasSimultaneas = p.telasChat;
         p.dmmPercentChat = Math.min(100, Math.max(0.01, getNum('input-sizing-dmm-chat', p.dmmPercentChat || 5.62)));
         p.hmmPercentChat = Math.min(100, Math.max(0.01, getNum('input-sizing-hmm-chat', p.hmmPercentChat || 9.7)));
         p.shrinkageLancheChat = Math.min(99, Math.max(0, getNum('input-sizing-shrink-lanche-chat', p.shrinkageLancheChat || 10.5)));
@@ -13750,20 +13757,79 @@ function recalcSizing(fromInputs = true) {
     const elDetailVoz = document.getElementById('sizing-calc-detail-voz');
     if (elDetailVoz) {
         elDetailVoz.innerHTML = `
+            <div class="sizing-methodology-summary" style="margin-bottom: 1.25rem; padding: 0.9rem 1.2rem; background: rgba(235, 92, 39, 0.08); border-left: 4px solid var(--color-primary); border-radius: 6px; font-size: 0.83rem; color: var(--text-secondary); line-height: 1.6;">
+                <strong style="color: var(--color-primary); display: flex; align-items: center; gap: 0.4rem; margin-bottom: 0.4rem; font-size: 0.9rem;">
+                    <i class="fa-solid fa-calculator"></i> Memória Descritiva: Metodologia de Cálculo de Voz (Erlang C & NR 17)
+                </strong>
+                <span>A formulação de dimensionamento do canal <strong>Voz</strong> reproduz rigorosamente as regras da planilha de Engenharia de WFM:</span>
+                <ul style="margin: 0.4rem 0 0.2rem 1.2rem; padding: 0;">
+                    <li><strong>1. Demanda Efetiva e Atendidas:</strong> O Volume Mês base (${resVoz.volBase.toLocaleString('pt-BR')}) é multiplicado pela retenção esperada <code>(1 - Abandono)</code>, resultando em <strong>${resVoz.volAtendidas.toLocaleString('pt-BR')} chamadas atendidas</strong>.</li>
+                    <li><strong>2. Concentração de Picos (DMM & HMM):</strong> Aplica-se a concentração no Dia de Maior Movimento (<code>DMM = ${p.dmmPercent}%</code>) obtendo <strong>${resVoz.volDMM.toLocaleString('pt-BR')} chamadas/dia</strong> e a concentração na Hora de Maior Movimento (<code>HMM = ${p.hmmPercent}%</code>) apurando <strong>${resVoz.volHMM.toLocaleString('pt-BR')} chamadas/hora de pico</strong>.</li>
+                    <li><strong>3. Tráfego em Erlangs:</strong> A taxa de chegada de pico &lambda; = ${resVoz.lambda.toFixed(4)} cham/s multiplicada pelo TMA (${p.tmaVoz}s) gera a intensidade de tráfego de <strong>${resVoz.A.toFixed(2)} Erlangs</strong> (Erlang = ${resVoz.erlang}).</li>
+                    <li><strong>4. Modelo Erlang C:</strong> O algoritmo calcula a probabilidade de espera em fila Pw e encontra <strong>${resVoz.m} operadores logados teóricos</strong> necessários para entregar Nível de Serviço &ge; ${p.slaMeta}% com espera &le; ${p.tmeMax}s (SL real apurado: <strong>${resVoz.achievedSL.toFixed(2)}%</strong>).</li>
+                    <li><strong>5. Disponibilidade Regulamentar (NR 17) e Telas:</strong> Divide os agentes teóricos pelas telas simultâneas (${resVoz.telas.toFixed(1)}) e pela disponibilidade efetiva da NR 17 (<code>1 - 17% = 83%</code>), arredondando para cima: <code>&lceil; (m / Telas) / 0,83 &rceil;</code> = <strong>${resVoz.pas} PA's Necessárias</strong>.</li>
+                    <li><strong>6. PA Contratada e Chamadas/Operador:</strong> Soma o ajuste manual (${resVoz.ajuste}) fixando <strong>${resVoz.paContratada} PA CONTRATADA</strong> e calcula a produtividade diária por operador: <code>(Vol_Atendidas / (PA_Contratada &times; 2 turnos)) / 21 dias úteis</code> = <strong>${resVoz.chamadasOp} chamadas/operador</strong>.</li>
+                </ul>
+            </div>
             <table class="sizing-calc-table">
-                <tr><td class="calc-label">Volume Mensal Base</td><td class="calc-formula">Vol_Base</td><td class="calc-val">${resVoz.volBase.toLocaleString('pt-BR')} chamadas</td></tr>
-                <tr><td class="calc-label">Multiplicador de Aumento</td><td class="calc-formula">&times; (1 + ${aumentoPct}%)</td><td class="calc-val">${aumentoPct > 0 ? `+${aumentoPct}%` : '0%'}</td></tr>
-                <tr><td class="calc-label">Volume Mensal Efetivo</td><td class="calc-formula">Vol_Efetivo</td><td class="calc-val">${resVoz.volEfetivo.toLocaleString('pt-BR')} chamadas</td></tr>
-                <tr><td class="calc-label">Volume DMM (Dia Maior Movimento)</td><td class="calc-formula">Vol_Efetivo &times; ${p.dmmPercent}%</td><td class="calc-val">${resVoz.volDMM.toLocaleString('pt-BR')} chamadas</td></tr>
-                <tr><td class="calc-label">Volume HMM (Hora Maior Movimento)</td><td class="calc-formula">Vol_DMM &times; ${p.hmmPercent}%</td><td class="calc-val">${resVoz.volHMM.toLocaleString('pt-BR')} chamadas/hora</td></tr>
-                <tr><td class="calc-label">Taxa de Chegada (&lambda;)</td><td class="calc-formula">Vol_HMM / 3600s</td><td class="calc-val">${resVoz.lambda.toFixed(4)} cham/s</td></tr>
-                <tr><td class="calc-label">Intensidade de Tráfego (A)</td><td class="calc-formula">&lambda; &times; TMA (${p.tmaVoz}s)</td><td class="calc-val">${resVoz.A.toFixed(2)} Erlangs</td></tr>
-                <tr><td class="calc-label">Agentes Logados Teóricos (m)</td><td class="calc-formula">Erlang C (SL &ge; ${p.slaMeta}%)</td><td class="calc-val" style="color: var(--color-primary);">${resVoz.m} operadores</td></tr>
-                <tr><td class="calc-label">Nível de Serviço Atingido (SL)</td><td class="calc-formula">1 - Pw &times; e^(-(m-A)&times;TME/TMA)</td><td class="calc-val">${resVoz.achievedSL.toFixed(2)}%</td></tr>
-                <tr><td class="calc-label">Fator de Shrinkage</td><td class="calc-formula">NR17 (Disp: 1 - ${resVoz.sNR17}%)</td><td class="calc-val">${resVoz.dispEfetiva.toFixed(1)}% (Total ref: ${resVoz.totalShrinkPct.toFixed(1)}%)</td></tr>
-                <tr><td class="calc-label">PA's Necessárias</td><td class="calc-formula">&lceil; (m / Telas) / Disp_NR17 &rceil;</td><td class="calc-val" style="color: var(--color-primary); font-size: 1.05rem;">${resVoz.pas} PAs</td></tr>
-                <tr><td class="calc-label">Ajuste Manual</td><td class="calc-formula">Ajuste</td><td class="calc-val">${resVoz.ajuste} PAs</td></tr>
-                <tr style="background: rgba(235, 92, 39, 0.08);"><td class="calc-label" style="font-weight: 700; color: #fff;">PA CONTRATADA (Voz)</td><td class="calc-formula" style="color: #fff;">PA's Necessárias + Ajuste</td><td class="calc-val" style="color: var(--color-primary); font-size: 1.15rem;">${resVoz.paContratada} PAs</td></tr>
+                <tr><td class="calc-label">Volume Mês (Direcionador Principal)</td><td class="calc-formula">B17 (Vol_Base)</td><td class="calc-val">${resVoz.volBase.toLocaleString('pt-BR')} chamadas</td></tr>
+                <tr><td class="calc-label">Taxa de Abandono Máxima</td><td class="calc-formula">B9 (Abandono_Max)</td><td class="calc-val">${p.abandonoMax}%</td></tr>
+                <tr><td class="calc-label">Volume Atendidas</td><td class="calc-formula">B18 (=B17 * (1 - B9))</td><td class="calc-val">${resVoz.volAtendidas.toLocaleString('pt-BR')} chamadas</td></tr>
+                <tr><td class="calc-label">DMM (MÉDIA 5)</td><td class="calc-formula">B19 (Concentração Dia Pico)</td><td class="calc-val">${p.dmmPercent}%</td></tr>
+                <tr><td class="calc-label">Volume DMM</td><td class="calc-formula">B20 (=B17 * B$19)</td><td class="calc-val">${resVoz.volDMM.toLocaleString('pt-BR')} chamadas</td></tr>
+                <tr><td class="calc-label">% HMM (Hora Maior Movimento)</td><td class="calc-formula">B12 (Concentração Hora Pico)</td><td class="calc-val">${p.hmmPercent}%</td></tr>
+                <tr><td class="calc-label">Volume HMM</td><td class="calc-formula">B21 (=B20 * B$12)</td><td class="calc-val">${resVoz.volHMM.toLocaleString('pt-BR')} chamadas/hora</td></tr>
+                <tr><td class="calc-label">TMA Mês (Tempo Médio Atendimento)</td><td class="calc-formula">B11 (TMA em segundos)</td><td class="calc-val">${p.tmaVoz}s</td></tr>
+                <tr><td class="calc-label">Taxa de Chegada (&lambda;)</td><td class="calc-formula">B21 / 3600s</td><td class="calc-val">${resVoz.lambda.toFixed(4)} cham/s</td></tr>
+                <tr><td class="calc-label">Erlang (Intensidade de Tráfego)</td><td class="calc-formula">B22 (=B21 * B$11 / 3600)</td><td class="calc-val">${resVoz.erlang} (${resVoz.A.toFixed(2)} Erlangs)</td></tr>
+                <tr><td class="calc-label">Agentes Teóricos Logados (m)</td><td class="calc-formula">Agents(B22; B6; B8; B11)</td><td class="calc-val" style="color: var(--color-primary); font-weight: 700;">${resVoz.m} operadores</td></tr>
+                <tr><td class="calc-label">Nível de Serviço Atingido (SL)</td><td class="calc-formula">1 - Pw * e^(-(m-A)*TME/TMA)</td><td class="calc-val">${resVoz.achievedSL.toFixed(2)}% (Meta: &ge; ${p.slaMeta}%)</td></tr>
+                <tr><td class="calc-label">Telas Simultâneas</td><td class="calc-formula">B10</td><td class="calc-val">${resVoz.telas.toFixed(1)}</td></tr>
+                <tr><td class="calc-label">Disponibilidade Efetiva NR 17</td><td class="calc-formula">1 - B16 (1 - 17%)</td><td class="calc-val">${resVoz.dispEfetiva.toFixed(1)}% (Total ref: ${resVoz.totalShrinkPct.toFixed(1)}%)</td></tr>
+                <tr style="background: rgba(245, 158, 11, 0.08);"><td class="calc-label" style="font-weight: 700; color: #f59e0b;">PA's Necessárias</td><td class="calc-formula" style="color: #f59e0b;">B23 (=ARREDONDAR.PARA.CIMA((m / B10)/(1-B16); 0))</td><td class="calc-val" style="color: #f59e0b; font-size: 1.1rem; font-weight: 800;">${resVoz.pas} PAs</td></tr>
+                <tr><td class="calc-label">Ajuste Manual</td><td class="calc-formula">B24 (Ajuste de contingência)</td><td class="calc-val">${resVoz.ajuste} PAs</td></tr>
+                <tr style="background: rgba(235, 92, 39, 0.12);"><td class="calc-label" style="font-weight: 700; color: #fff;">PA CONTRATADA (Voz)</td><td class="calc-formula" style="color: #fff;">B25 (=B23 + B24)</td><td class="calc-val" style="color: var(--color-primary); font-size: 1.18rem; font-weight: 800;">${resVoz.paContratada} PAs</td></tr>
+                <tr><td class="calc-label">CHAMADAS / OPERADOR</td><td class="calc-formula">B26 (=(B17*(1-B9)/(B25*2))/21)</td><td class="calc-val" style="color: var(--color-primary); font-weight: 700;">${resVoz.chamadasOp} chamadas/op</td></tr>
+            </table>
+        `;
+    }
+
+    const elDetailChat = document.getElementById('sizing-calc-detail-chat');
+    if (elDetailChat) {
+        elDetailChat.innerHTML = `
+            <div class="sizing-methodology-summary" style="margin-bottom: 1.25rem; padding: 0.9rem 1.2rem; background: rgba(229, 95, 145, 0.08); border-left: 4px solid var(--color-secondary); border-radius: 6px; font-size: 0.83rem; color: var(--text-secondary); line-height: 1.6;">
+                <strong style="color: var(--color-secondary); display: flex; align-items: center; gap: 0.4rem; margin-bottom: 0.4rem; font-size: 0.9rem;">
+                    <i class="fa-solid fa-calculator"></i> Memória Descritiva: Metodologia de Cálculo de Chat (Erlang C & NR 17)
+                </strong>
+                <span>A formulação de dimensionamento do canal <strong>Chat</strong> segue rigorosamente a mesma lógica matemática do canal Voz, aplicando a concorrência de telas e premissas contratuais:</span>
+                <ul style="margin: 0.4rem 0 0.2rem 1.2rem; padding: 0;">
+                    <li><strong>1. Demanda Efetiva e Atendidas:</strong> O Volume Mês base (${resChat.volBase.toLocaleString('pt-BR')}) é multiplicado pela retenção esperada <code>(1 - Abandono)</code>, resultando em <strong>${resChat.volAtendidas.toLocaleString('pt-BR')} atendimentos realizados</strong>.</li>
+                    <li><strong>2. Concentração de Picos (DMM & HMM):</strong> Aplica-se a concentração no Dia de Maior Movimento (<code>DMM = ${p.dmmPercentChat}%</code>) apurando <strong>${resChat.volDMM.toLocaleString('pt-BR')} conversas/dia</strong> e Hora de Maior Movimento (<code>HMM = ${p.hmmPercentChat}%</code>) apurando <strong>${resChat.volHMM.toLocaleString('pt-BR')} conversas/hora de pico</strong>.</li>
+                    <li><strong>3. Tráfego em Erlangs:</strong> A taxa de chegada de pico &lambda; = ${resChat.lambda.toFixed(4)} conv/s multiplicada pelo TMA (${p.tmaChat}s) gera a intensidade de tráfego de <strong>${resChat.A.toFixed(2)} Erlangs</strong> (Erlang = ${resChat.erlang}).</li>
+                    <li><strong>4. Modelo Erlang C:</strong> Apura <strong>${resChat.m} operadores logados teóricos</strong> necessários para garantir Nível de Serviço &ge; ${p.slaMetaChat}% com espera &le; ${p.tmeMaxChat}s (SL real: <strong>${resChat.achievedSL.toFixed(2)}%</strong>).</li>
+                    <li><strong>5. Disponibilidade Regulamentar (NR 17) e Telas:</strong> Divide os agentes teóricos pelas telas simultâneas (${resChat.telas.toFixed(1)}) e pela disponibilidade efetiva da NR 17 (<code>1 - 17% = 83%</code>), arredondando para cima: <code>&lceil; (m / Telas) / 0,83 &rceil;</code> = <strong>${resChat.pas} PA's Necessárias</strong>.</li>
+                    <li><strong>6. PA Contratada e Chamadas/Operador:</strong> Soma o ajuste manual (${resChat.ajuste}) resultando em <strong>${resChat.paContratada} PA CONTRATADA</strong> e apura a produtividade por operador: <code>(Vol_Atendidas / (PA_Contratada &times; 2 turnos)) / 21 dias úteis</code> = <strong>${resChat.chamadasOp} chamadas/operador</strong>.</li>
+                </ul>
+            </div>
+            <table class="sizing-calc-table">
+                <tr><td class="calc-label">Volume Mês (Direcionador Principal)</td><td class="calc-formula">C17 (Vol_Base)</td><td class="calc-val">${resChat.volBase.toLocaleString('pt-BR')} conversas</td></tr>
+                <tr><td class="calc-label">Taxa de Abandono Máxima</td><td class="calc-formula">C9 (Abandono_Max)</td><td class="calc-val">${p.abandonoMaxChat}%</td></tr>
+                <tr><td class="calc-label">Volume Atendidas</td><td class="calc-formula">C18 (=C17 * (1 - C9))</td><td class="calc-val">${resChat.volAtendidas.toLocaleString('pt-BR')} conversas</td></tr>
+                <tr><td class="calc-label">DMM (MÉDIA 5)</td><td class="calc-formula">C19 (Concentração Dia Pico)</td><td class="calc-val">${p.dmmPercentChat}%</td></tr>
+                <tr><td class="calc-label">Volume DMM</td><td class="calc-formula">C20 (=C17 * C$19)</td><td class="calc-val">${resChat.volDMM.toLocaleString('pt-BR')} conversas</td></tr>
+                <tr><td class="calc-label">% HMM (Hora Maior Movimento)</td><td class="calc-formula">C12 (Concentração Hora Pico)</td><td class="calc-val">${p.hmmPercentChat}%</td></tr>
+                <tr><td class="calc-label">Volume HMM</td><td class="calc-formula">C21 (=C20 * C$12)</td><td class="calc-val">${resChat.volHMM.toLocaleString('pt-BR')} conversas/hora</td></tr>
+                <tr><td class="calc-label">TMA Mês (Tempo Médio Atendimento)</td><td class="calc-formula">C11 (TMA em segundos)</td><td class="calc-val">${p.tmaChat}s</td></tr>
+                <tr><td class="calc-label">Taxa de Chegada (&lambda;)</td><td class="calc-formula">C21 / 3600s</td><td class="calc-val">${resChat.lambda.toFixed(4)} conv/s</td></tr>
+                <tr><td class="calc-label">Erlang (Intensidade de Tráfego)</td><td class="calc-formula">C22 (=C21 * C$11 / 3600)</td><td class="calc-val">${resChat.erlang} (${resChat.A.toFixed(2)} Erlangs)</td></tr>
+                <tr><td class="calc-label">Agentes Teóricos Logados (m)</td><td class="calc-formula">Agents(C22; C6; C8; C11)</td><td class="calc-val" style="color: var(--color-secondary); font-weight: 700;">${resChat.m} operadores</td></tr>
+                <tr><td class="calc-label">Nível de Serviço Atingido (SL)</td><td class="calc-formula">1 - Pw * e^(-(m-A)*TME/TMA)</td><td class="calc-val">${resChat.achievedSL.toFixed(2)}% (Meta: &ge; ${p.slaMetaChat}%)</td></tr>
+                <tr><td class="calc-label">Telas Simultâneas</td><td class="calc-formula">C10</td><td class="calc-val">${resChat.telas.toFixed(1)}</td></tr>
+                <tr><td class="calc-label">Disponibilidade Efetiva NR 17</td><td class="calc-formula">1 - C16 (1 - 17%)</td><td class="calc-val">${resChat.dispEfetiva.toFixed(1)}% (Total ref: ${resChat.totalShrinkPct.toFixed(1)}%)</td></tr>
+                <tr style="background: rgba(245, 158, 11, 0.08);"><td class="calc-label" style="font-weight: 700; color: #f59e0b;">PA's Necessárias</td><td class="calc-formula" style="color: #f59e0b;">C23 (=ARREDONDAR.PARA.CIMA((Agents/Telas)/(1-C16); 0))</td><td class="calc-val" style="color: #f59e0b; font-size: 1.1rem; font-weight: 800;">${resChat.pas} PAs</td></tr>
+                <tr><td class="calc-label">Ajuste Manual</td><td class="calc-formula">C24 (Ajuste de contingência)</td><td class="calc-val">${resChat.ajuste} PAs</td></tr>
+                <tr style="background: rgba(229, 95, 145, 0.12);"><td class="calc-label" style="font-weight: 700; color: #fff;">PA CONTRATADA (Chat)</td><td class="calc-formula" style="color: #fff;">C25 (=C23 + C24)</td><td class="calc-val" style="color: var(--color-secondary); font-size: 1.18rem; font-weight: 800;">${resChat.paContratada} PAs</td></tr>
+                <tr><td class="calc-label">CHAMADAS / OPERADOR</td><td class="calc-formula">C26 (=(C17*(1-C9)/(C25*2))/21)</td><td class="calc-val" style="color: var(--color-secondary); font-weight: 700;">${resChat.chamadasOp} chamadas/op</td></tr>
             </table>
         `;
     }
@@ -13771,6 +13837,19 @@ function recalcSizing(fromInputs = true) {
     const elDetailBO = document.getElementById('sizing-calc-detail-bo');
     if (elDetailBO) {
         elDetailBO.innerHTML = `
+            <div class="sizing-methodology-summary" style="margin-bottom: 1.25rem; padding: 0.9rem 1.2rem; background: rgba(16, 185, 129, 0.08); border-left: 4px solid var(--color-success); border-radius: 6px; font-size: 0.83rem; color: var(--text-secondary); line-height: 1.6;">
+                <strong style="color: var(--color-success); display: flex; align-items: center; gap: 0.4rem; margin-bottom: 0.4rem; font-size: 0.9rem;">
+                    <i class="fa-solid fa-calculator"></i> Memória Descritiva: Metodologia de Cálculo de Backoffice (Capacidade Linear)
+                </strong>
+                <span>O dimensionamento de <strong>Backoffice</strong> utiliza a metodologia de produtividade efetiva por jornada de trabalho da planilha oficial:</span>
+                <ul style="margin: 0.4rem 0 0.2rem 1.2rem; padding: 0;">
+                    <li><strong>1. Volume Diário:</strong> O Volume Mês (${resBO.volEfetivo}) dividido pelos Dias Úteis (${resBO.diasUteis}) resulta em <strong>${resBO.volDia} demandas/dia</strong> (<code>E6 / E7</code>).</li>
+                    <li><strong>2. Deduções de Jornada (NR 17, Treinamento, Eficiência):</strong> Da jornada nominal de 380 min (${resBO.chNominalFmt}), deduzem-se 10,53% de pausas NR 17 (${resBO.chTrabalhoFmt} líquidos), treinamentos/feedback (6,47%) e aplica-se 70% de eficiência de ocupação, resultando em <strong>${resBO.chEfetivoFmt} de tempo efetivo de trabalho por operador/dia</strong>.</li>
+                    <li><strong>3. Produtividade Máxima Diária:</strong> Carga horária efetiva dividida pelo TMA Real (00:10:00) resulta em <strong>${resBO.prodMaxDia} demandas/dia por operador</strong> (<code>E24 / E14</code>).</li>
+                    <li><strong>4. PA's Necessárias:</strong> Demanda diária dividida pela produtividade máxima e por 2 turnos de atendimento, arredondando para cima: <code>&lceil; (Vol_Dia / Prod_Max) / 2 &rceil;</code> = <strong>${resBO.pas} PA's Necessárias</strong> (<code>E10</code>).</li>
+                    <li><strong>5. PA Contratada e Demandas/Operador:</strong> Soma o ajuste (${resBO.ajuste}) gerando <strong>${resBO.paContratada} PA CONTRATADA</strong> (<code>E12</code>) e apura as demandas por operador: <code>E8 / (E12 &times; 2)</code> = <strong>${resBO.chamadasOp} chamadas/operador</strong> (<code>E13</code>).</li>
+                </ul>
+            </div>
             <table class="sizing-calc-table">
                 <tr><td class="calc-label">Volume Mensal Backoffice Efetivo</td><td class="calc-formula">Vol_Base &times; (1 + ${aumentoPct}%)</td><td class="calc-val">${resBO.volEfetivo.toLocaleString('pt-BR')} demandas</td></tr>
                 <tr><td class="calc-label">Dias Úteis no Mês</td><td class="calc-formula">Dias_Uteis</td><td class="calc-val">${resBO.diasUteis} dias</td></tr>
