@@ -52,39 +52,42 @@
             </div>
             
             <ul class="sidebar-menu">
-                <!-- SEÇÃO: GERAL -->
-                <li class="menu-section-label" data-i18n="section_overview" title="Geral">Geral</li>
-                <li class="menu-item active" data-view="dashboard" data-i18n-title="menu_dashboard_title" title="Dashboard Operacional">
+                <!-- SEÇÃO: GERAL (OPERAÇÕES) -->
+                <li class="menu-section-label" data-module="operacoes" data-i18n="section_overview" title="Geral">Geral</li>
+                <li class="menu-item active" data-module="operacoes" data-view="dashboard" data-i18n-title="menu_dashboard_title" title="Dashboard Operacional">
                     <i class="fa-solid fa-chart-pie"></i>
                     <span data-i18n="menu_dashboard">Dashboard</span>
                 </li>
-                <li class="menu-item" data-view="history" data-i18n-title="menu_history_title" title="Histórico de Volumes">
+                <li class="menu-item" data-module="operacoes" data-view="history" data-i18n-title="menu_history_title" title="Histórico de Volumes">
                     <i class="fa-solid fa-chart-line"></i>
                     <span data-i18n="menu_history">Histórico</span>
                 </li>
 
-                <!-- SEÇÃO: GESTÃO -->
-                <li class="menu-section-label" data-i18n="section_management" title="Gestão da Operação">Gestão</li>
-                <li class="menu-item" data-view="cadastros" data-i18n-title="menu_cadastros_title" title="Estrutura e Cadastros">
+                <!-- SEÇÃO: GESTÃO (OPERAÇÕES) -->
+                <li class="menu-section-label" data-module="operacoes" data-i18n="section_management" title="Gestão da Operação">Gestão</li>
+                <li class="menu-item" data-module="operacoes" data-view="cadastros" data-i18n-title="menu_cadastros_title" title="Estrutura e Cadastros">
                     <i class="fa-solid fa-address-book"></i>
                     <span data-i18n="menu_cadastros">Cadastros</span>
                 </li>
-                <li class="menu-item" data-view="balancing" data-i18n-title="menu_balancing_title" title="Balanceamento de Backlog" data-permissao="ADMIN">
+                <li class="menu-item" data-module="operacoes" data-view="balancing" data-i18n-title="menu_balancing_title" title="Balanceamento de Backlog" data-permissao="ADMIN">
                     <i class="fa-solid fa-scale-balanced"></i>
                     <span data-i18n="menu_balancing">Balanceamento</span>
                 </li>
-                <li class="menu-item" data-view="automations" data-i18n-title="menu_automations_title" title="Quadro de Automações (RPA)">
+                <li class="menu-item" data-module="operacoes" data-view="automations" data-i18n-title="menu_automations_title" title="Quadro de Automações (RPA)">
                     <i class="fa-solid fa-robot"></i>
                     <span data-i18n="menu_automations">Automações</span>
                 </li>
-                <li class="menu-item" data-view="sizing" data-i18n-title="menu_sizing_title" title="Redimensionamento de Capacidade">
+
+                <!-- SEÇÃO: ATENDIMENTO (ATENDIMENTO) -->
+                <li class="menu-section-label" data-module="atendimento" data-i18n="section_attendance" title="Canais de Atendimento">Atendimento</li>
+                <li class="menu-item" data-module="atendimento" data-view="sizing" data-i18n-title="menu_sizing_title" title="Redimensionamento de Capacidade">
                     <i class="fa-solid fa-calculator"></i>
                     <span data-i18n="menu_sizing">Redimensionamento</span>
                 </li>
 
-                <!-- SEÇÃO: ADMINISTRAÇÃO -->
-                <li class="menu-section-label admin-only" data-i18n="section_admin" title="Administração e Governança" data-permissao="ADMIN">Admin</li>
-                <li class="menu-item" data-view="access-control" data-permissao="ADMIN" data-i18n-title="menu_access_title" title="Controle de Acesso e Perfis">
+                <!-- SEÇÃO: ADMINISTRAÇÃO (OPERAÇÕES) -->
+                <li class="menu-section-label admin-only" data-module="operacoes" data-i18n="section_admin" title="Administração e Governança" data-permissao="ADMIN">Admin</li>
+                <li class="menu-item" data-module="operacoes" data-view="access-control" data-permissao="ADMIN" data-i18n-title="menu_access_title" title="Controle de Acesso e Perfis">
                     <i class="fa-solid fa-shield-halved"></i>
                     <span data-i18n="menu_access">Acesso</span>
                 </li>
@@ -108,6 +111,8 @@
                         <nav class="breadcrumb" id="app-breadcrumb">
                             <span class="bc-app"><i class="fa-solid fa-chart-simple"></i> EmanaPay</span>
                             <span class="bc-sep">›</span>
+                            <span class="bc-module" id="bc-module-title">Operações</span>
+                            <span class="bc-sep">›</span>
                             <span class="bc-section" id="bc-section-title" data-i18n="section_overview">Geral</span>
                             <span class="bc-sep">›</span>
                             <span class="bc-page" id="bc-page-title" data-i18n="menu_dashboard">Dashboard</span>
@@ -116,8 +121,20 @@
                         <p class="view-subtitle" id="app-view-subtitle" data-i18n="view_sub_dashboard">Visão operacional de volumes mensais, FTEs requeridos e capacidade por equipe.</p>
                     </div>
 
-                    <!-- Header Right Group: Country Selector + User Chip -->
+                    <!-- Header Right Group: Module Switcher + Country Selector + User Chip -->
                     <div class="header-right-group" style="display: flex; align-items: center; gap: 10px;">
+                        <!-- Module Switcher Trigger Button -->
+                        <button type="button" id="btn-switch-module" class="btn-module-switch mod-operacoes" onclick="openModuleSelectorModal()" title="Alternar entre Atendimento e Operações">
+                            <div class="module-switch-icon-badge" id="module-switch-badge">
+                                <i class="fa-solid fa-gears" id="module-switch-icon"></i>
+                            </div>
+                            <div class="module-switch-text">
+                                <span class="module-switch-caption" data-i18n="lbl_environment">Ambiente</span>
+                                <span class="module-switch-label" id="module-switch-label">Operações</span>
+                            </div>
+                            <i class="fa-solid fa-chevron-down module-switch-chevron"></i>
+                        </button>
+
                         <!-- Country Selector (Opção B - Header Dropdown) -->
                         <div class="country-selector-header" id="country-selector-header">
                             <button id="btn-country-active" class="btn-country-trigger" onclick="toggleCountryDropdown(event)" title="Selecionar Região / País">
@@ -2101,6 +2118,73 @@
                 <button type="button" class="btn btn-primary" id="btn-submit-confirm-sizing" onclick="confirmSizingProjection()" style="background: var(--color-success); border-color: var(--color-success); color: #fff; font-weight: 700; display: inline-flex; align-items: center; gap: 0.45rem; padding: 0.55rem 1.25rem; border-radius: 8px; cursor: pointer;">
                     <i class="fa-solid fa-circle-check"></i> Sim, Confirmar e Fechar
                 </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODULE SELECTOR OVERLAY -->
+    <div id="module-selector-overlay" style="display: none;">
+        <div class="module-selector-box">
+            <button type="button" class="module-selector-close" id="btn-close-module-selector" onclick="closeModuleSelectorModal()" title="Fechar" style="display: none;">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <div class="module-selector-brand">
+                <span class="dot"><i class="fa-solid fa-chart-simple"></i></span>
+                <span>EmanaPay · Painel OPS</span>
+            </div>
+            <h2 class="module-selector-greet" id="module-selector-greet">Olá! Para onde vamos hoje?</h2>
+            <p class="module-selector-sub" id="module-selector-sub" data-i18n="module_selector_sub">Escolha o ambiente que deseja acessar. Você pode trocar a qualquer momento pelo topo da tela.</p>
+            <div class="module-user-chip">
+                <i class="fa-solid fa-user"></i>
+                <span id="module-user-email">usuario@exemplo.com</span>
+                <span class="role" id="module-user-role">ADMIN</span>
+                <span id="module-user-country">🇧🇷 Brasil</span>
+            </div>
+
+            <div class="module-cards">
+                <button type="button" class="module-card mod-atendimento" id="card-module-atendimento" onclick="selectModule('atendimento')">
+                    <span class="module-badge-soon" id="module-soon-badge-atendimento" style="display: none;" data-i18n="module_soon_badge">Disponível apenas Brasil</span>
+                    <div class="module-icon"><i class="fa-solid fa-headset"></i></div>
+                    <h3 data-i18n="module_atendimento_title">Atendimento</h3>
+                    <p data-i18n="module_atendimento_desc">Redimensionamento de capacidade dos canais de atendimento com Erlang C, NR17 e governança contratual.</p>
+                    <ul class="module-features">
+                        <li><i class="fa-solid fa-phone"></i> <span data-i18n="feature_voz">Voz</span></li>
+                        <li><i class="fa-solid fa-comments"></i> <span data-i18n="feature_chat">Chat</span></li>
+                        <li><i class="fa-solid fa-clipboard-list"></i> <span data-i18n="feature_backoffice">Backoffice</span></li>
+                        <li><i class="fa-solid fa-calculator"></i> <span data-i18n="feature_projecao">Projeção mensal de PAs</span></li>
+                    </ul>
+                    <div class="module-cta">
+                        <span data-i18n="module_cta_atendimento">Acessar Atendimento</span>
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </div>
+                </button>
+
+                <button type="button" class="module-card mod-operacoes" id="card-module-operacoes" onclick="selectModule('operacoes')">
+                    <div class="module-icon"><i class="fa-solid fa-gears"></i></div>
+                    <h3 data-i18n="module_operacoes_title">Operações</h3>
+                    <p data-i18n="module_operacoes_desc">Gestão de FTE e capacidade das equipes operacionais: processos, volumes, histórico e automações.</p>
+                    <ul class="module-features">
+                        <li><i class="fa-solid fa-chart-pie"></i> <span data-i18n="menu_dashboard">Dashboard</span></li>
+                        <li><i class="fa-solid fa-chart-line"></i> <span data-i18n="menu_history">Histórico</span></li>
+                        <li><i class="fa-solid fa-address-book"></i> <span data-i18n="menu_cadastros">Cadastros</span></li>
+                        <li><i class="fa-solid fa-scale-balanced"></i> <span data-i18n="menu_balancing">Balanceamento</span></li>
+                        <li><i class="fa-solid fa-robot"></i> <span data-i18n="menu_automations">Automações</span></li>
+                        <li><i class="fa-solid fa-shield-halved"></i> <span data-i18n="menu_access">Acesso</span></li>
+                    </ul>
+                    <div class="module-cta">
+                        <span data-i18n="module_cta_operacoes">Acessar Operações</span>
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </div>
+                </button>
+            </div>
+
+            <div class="module-selector-footer">
+                <a href="javascript:void(0)" onclick="document.getElementById('theme-toggle').click()">
+                    <i class="fa-solid fa-circle-half-stroke"></i> <span data-i18n="btn_toggle_theme">Alternar tema</span>
+                </a>
+                <a href="javascript:void(0)" onclick="handleLogout()">
+                    <i class="fa-solid fa-right-from-bracket"></i> <span data-i18n="btn_logout">Sair</span>
+                </a>
             </div>
         </div>
     </div>

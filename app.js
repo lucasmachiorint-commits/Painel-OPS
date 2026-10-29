@@ -219,6 +219,9 @@ function aplicarPerfilDeAcesso() {
 
     // Controla visibilidade de RPA e Menus de acordo com a região/país
     applyCountryRpaVisibility();
+    if (typeof applyModuleVisibility === 'function' && currentModule) {
+        applyModuleVisibility();
+    }
 }
 
 function applyCountryRpaVisibility() {
@@ -515,7 +518,24 @@ const I18N = {
         modal_btn_cancel: 'Cancelar',
         toast_activity_added: 'Atividade adicionada com sucesso!',
         val_activity_name_required: 'Por favor, informe o nome da atividade.',
-        val_area_required: 'Por favor, selecione uma equipe / área.'
+        val_area_required: 'Por favor, selecione uma equipe / área.',
+        lbl_environment: 'Ambiente',
+        module_selector_greet: 'Olá, {nome}! Para onde vamos hoje?',
+        module_selector_sub: 'Escolha o ambiente que deseja acessar. Você pode trocar a qualquer momento pelo topo da tela.',
+        module_atendimento_title: 'Atendimento',
+        module_atendimento_desc: 'Redimensionamento de capacidade dos canais de atendimento com Erlang C, NR17 e governança contratual.',
+        module_operacoes_title: 'Operações',
+        module_operacoes_desc: 'Gestão de FTE e capacidade das equipes operacionais: processos, volumes, histórico e automações.',
+        module_cta_atendimento: 'Acessar Atendimento',
+        module_cta_operacoes: 'Acessar Operações',
+        module_soon_badge: 'Disponível apenas Brasil',
+        feature_voz: 'Voz',
+        feature_chat: 'Chat',
+        feature_backoffice: 'Backoffice',
+        feature_projecao: 'Projeção mensal de PAs',
+        section_attendance: 'Atendimento',
+        btn_toggle_theme: 'Alternar tema',
+        btn_logout: 'Sair'
     },
     'es-LatAm': {
         section_overview: 'General',
@@ -724,7 +744,24 @@ const I18N = {
         modal_btn_cancel: 'Cancelar',
         toast_activity_added: '¡Actividad agregada con éxito!',
         val_activity_name_required: 'Por favor, ingrese el nombre de la actividad.',
-        val_area_required: 'Por favor, seleccione un equipo / área.'
+        val_area_required: 'Por favor, seleccione un equipo / área.',
+        lbl_environment: 'Ambiente',
+        module_selector_greet: '¡Hola, {nome}! ¿A dónde vamos hoy?',
+        module_selector_sub: 'Elige el entorno al que deseas acceder. Puedes cambiar en cualquier momento desde la parte superior.',
+        module_atendimento_title: 'Atención',
+        module_atendimento_desc: 'Redimensionamiento de capacidad de los canales de atención con Erlang C, NR17 y gobernanza contractual.',
+        module_operacoes_title: 'Operaciones',
+        module_operacoes_desc: 'Gestión de FTE y capacidad de los equipos operativos: procesos, volúmenes, historial y automatizaciones.',
+        module_cta_atendimento: 'Acceder a Atención',
+        module_cta_operacoes: 'Acceder a Operaciones',
+        module_soon_badge: 'Disponible solo en Brasil',
+        feature_voz: 'Voz',
+        feature_chat: 'Chat',
+        feature_backoffice: 'Backoffice',
+        feature_projecao: 'Proyección mensual de PAs',
+        section_attendance: 'Atención',
+        btn_toggle_theme: 'Cambiar tema',
+        btn_logout: 'Cerrar sesión'
     }
 };
 
@@ -830,6 +867,19 @@ async function switchCountry(countryCode) {
     // 7. Re-renderizar todas as telas
     refreshCurrentUserAssignedTeam();
     refreshAllViews();
+
+    // Se o usuário estiver no módulo Atendimento e mudar para Hispana, redirecionar para Operações
+    if (countryCode === 'HISPANA' && currentModule === 'atendimento') {
+        currentModule = 'operacoes';
+        switchToView('dashboard');
+        showToast('Ambiente Atendimento disponível apenas para o Brasil. Redirecionado para Operações.', 'info', 4500);
+    }
+
+    // Se o overlay seletor estiver aberto, atualizar textos e estado
+    const moduleOverlay = document.getElementById('module-selector-overlay');
+    if (moduleOverlay && moduleOverlay.style.display !== 'none') {
+        showModuleSelector();
+    }
 
     const dict = I18N[COUNTRY_CONFIG[countryCode].locale] || I18N['pt-BR'];
     showToast(dict.toast_country_switched, 'info', 4000);
@@ -1646,6 +1696,9 @@ async function setupUserSession(user) {
         const hashView = (window.location.hash || '').replace('#/', '').trim();
         const targetView = (hashView && VIEW_META[hashView]) ? hashView : 'dashboard';
         switchToView(targetView);
+
+        // Sempre exibir o seletor de módulo após o login para escolha do ambiente
+        showModuleSelector();
     } catch (err) {
         alert('[DIAGNÓSTICO] Erro em setupUserSession: ' + (err.message || err));
         console.error('Erro em setupUserSession:', err);
@@ -2815,6 +2868,173 @@ function renderOrganogramFlowchart() {
 }
 
 // ============================================================
+// APP MODULES & ENVIRONMENT MANAGEMENT (ATENDIMENTO x OPERAÇÕES)
+// ============================================================
+const APP_MODULES = {
+    operacoes: {
+        key: 'operacoes',
+        name: 'Operações',
+        nameEs: 'Operaciones',
+        icon: 'fa-gears',
+        colorClass: 'mod-operacoes',
+        defaultView: 'dashboard',
+        views: ['dashboard', 'history', 'cadastros', 'balancing', 'automations', 'access-control']
+    },
+    atendimento: {
+        key: 'atendimento',
+        name: 'Atendimento',
+        nameEs: 'Atención',
+        icon: 'fa-headset',
+        colorClass: 'mod-atendimento',
+        defaultView: 'sizing',
+        views: ['sizing']
+    }
+};
+
+let currentModule = null; // 'operacoes' | 'atendimento'
+
+function getModuleForView(view) {
+    if (view === 'sizing') return 'atendimento';
+    return 'operacoes';
+}
+
+function updateModuleHeaderSwitcher() {
+    const btn = document.getElementById('btn-switch-module');
+    const label = document.getElementById('module-switch-label');
+    const icon = document.getElementById('module-switch-icon');
+    const bcModule = document.getElementById('bc-module-title');
+
+    const modKey = currentModule || 'operacoes';
+    const mod = APP_MODULES[modKey] || APP_MODULES.operacoes;
+    const displayName = currentCountry === 'HISPANA' ? mod.nameEs : mod.name;
+
+    if (label) label.textContent = displayName;
+    if (bcModule) bcModule.textContent = displayName;
+    if (icon) {
+        icon.className = `fa-solid ${mod.icon}`;
+    }
+    if (btn) {
+        btn.classList.remove('mod-operacoes', 'mod-atendimento');
+        btn.classList.add(mod.colorClass);
+    }
+}
+
+function applyModuleVisibility() {
+    if (!currentModule) return;
+
+    const isHsp = currentCountry === 'HISPANA';
+    const isAdmin = currentUser.perfil === 'ADMIN';
+
+    // 1. Filtrar itens do menu lateral e rótulos de seção de acordo com o módulo ativo
+    document.querySelectorAll('.sidebar-menu [data-module]').forEach(el => {
+        const itemModule = el.getAttribute('data-module');
+        if (itemModule === currentModule) {
+            // Verificar restrições de país (ex: Atendimento não permitido na Hispana)
+            if (isHsp && itemModule === 'atendimento') {
+                el.style.display = 'none';
+                return;
+            }
+            // Histórico, Balanceamento e Automações desativados na Hispana temporariamente
+            if (isHsp && el.dataset && (el.dataset.view === 'history' || el.dataset.view === 'balancing' || el.dataset.view === 'automations')) {
+                el.style.display = 'none';
+                return;
+            }
+            // Verificar permissão ADMIN
+            if (el.getAttribute('data-permissao') === 'ADMIN' && !isAdmin) {
+                el.style.display = 'none';
+                return;
+            }
+            el.style.display = (el.tagName === 'LI' && el.classList.contains('menu-section-label')) ? 'block' : 'flex';
+        } else {
+            el.style.display = 'none';
+        }
+    });
+
+    // 2. Atualizar botão e breadcrumb do seletor no header
+    updateModuleHeaderSwitcher();
+}
+
+function showModuleSelector() {
+    const overlay = document.getElementById('module-selector-overlay');
+    if (!overlay) return;
+
+    // Atualizar dados do usuário no chip do seletor
+    const emailEl = document.getElementById('module-user-email');
+    const roleEl = document.getElementById('module-user-role');
+    const countryEl = document.getElementById('module-user-country');
+    const greetEl = document.getElementById('module-selector-greet');
+    const closeBtn = document.getElementById('btn-close-module-selector');
+
+    const firstName = (currentUser.nome || 'Usuário').split(' ')[0];
+    if (greetEl) {
+        if (currentCountry === 'HISPANA') {
+            greetEl.textContent = `¡Hola, ${firstName}! ¿A dónde vamos hoy?`;
+        } else {
+            greetEl.textContent = `Olá, ${firstName}! Para onde vamos hoje?`;
+        }
+    }
+
+    if (emailEl) emailEl.textContent = currentUser.email || 'usuario@exemplo.com';
+    if (roleEl) {
+        roleEl.textContent = currentUser.perfil || 'CONSULTA';
+        roleEl.className = 'role role-' + (currentUser.perfil || 'consulta').toLowerCase();
+    }
+    if (countryEl) {
+        countryEl.textContent = currentCountry === 'HISPANA' ? '🌐 Hispana' : '🇧🇷 Brasil';
+    }
+
+    // Controle do card Atendimento para Hispana (desabilitado com badge)
+    const cardAtendimento = document.getElementById('card-module-atendimento');
+    const badgeAtendimento = document.getElementById('module-soon-badge-atendimento');
+    if (cardAtendimento) {
+        if (currentCountry === 'HISPANA') {
+            cardAtendimento.classList.add('is-disabled');
+            cardAtendimento.disabled = true;
+            if (badgeAtendimento) badgeAtendimento.style.display = 'inline-block';
+        } else {
+            cardAtendimento.classList.remove('is-disabled');
+            cardAtendimento.disabled = false;
+            if (badgeAtendimento) badgeAtendimento.style.display = 'none';
+        }
+    }
+
+    // Se o usuário já selecionou um módulo antes (abriu pelo botão do header), exibe botão de fechar
+    if (currentModule) {
+        if (closeBtn) closeBtn.style.display = 'inline-flex';
+    } else {
+        if (closeBtn) closeBtn.style.display = 'none';
+    }
+
+    overlay.style.display = 'flex';
+}
+
+function openModuleSelectorModal() {
+    showModuleSelector();
+}
+
+function closeModuleSelectorModal() {
+    if (!currentModule) return; // Escolha obrigatória no login
+    const overlay = document.getElementById('module-selector-overlay');
+    if (overlay) overlay.style.display = 'none';
+}
+
+function selectModule(moduleKey) {
+    if (moduleKey === 'atendimento' && currentCountry === 'HISPANA') {
+        showToast('O módulo Atendimento está disponível apenas para o Brasil no momento.', 'warning');
+        return;
+    }
+
+    currentModule = moduleKey;
+    const overlay = document.getElementById('module-selector-overlay');
+    if (overlay) overlay.style.display = 'none';
+
+    applyModuleVisibility();
+
+    const targetView = APP_MODULES[moduleKey]?.defaultView || 'dashboard';
+    switchToView(targetView);
+}
+
+// ============================================================
 // VIEW METADATA & BREADCRUMB / HEADER MANAGEMENT
 // ============================================================
 const VIEW_META = {
@@ -2862,11 +3082,23 @@ function updateViewHeader(view) {
     const sectionEl = document.getElementById('bc-section-title');
     const pageEl = document.getElementById('bc-page-title');
     const subtitleEl = document.getElementById('app-view-subtitle');
+    const bcModuleEl = document.getElementById('bc-module-title');
     
     if (titleEl) titleEl.textContent = meta.title;
     if (sectionEl) sectionEl.textContent = meta.section;
     if (pageEl) pageEl.textContent = meta.title;
     if (subtitleEl) subtitleEl.textContent = meta.subtitle;
+
+    const modKey = currentModule || getModuleForView(view);
+    if (bcModuleEl && APP_MODULES[modKey]) {
+        bcModuleEl.textContent = currentCountry === 'HISPANA' ? APP_MODULES[modKey].nameEs : APP_MODULES[modKey].name;
+    }
+
+    // Ocultar filtros globais de área/responsável na visão Atendimento (pois Canais têm parâmetros próprios)
+    const globalFiltersEl = document.getElementById('header-global-filters');
+    if (globalFiltersEl) {
+        globalFiltersEl.style.display = (modKey === 'atendimento') ? 'none' : 'flex';
+    }
 
     // Control visibility of action buttons per view
     const btnReset = document.getElementById('btn-reset-global-state');
@@ -2883,10 +3115,27 @@ function switchToView(view) {
     const targetEl = document.getElementById(`view-${view}`);
     if (!targetEl) view = 'dashboard';
 
+    // Auto-sync currentModule baseado na visão solicitada
+    const targetModule = getModuleForView(view);
+    if (currentModule !== targetModule) {
+        currentModule = targetModule;
+    }
+
+    // Se o seletor de módulos estiver aberto, fechar
+    const overlay = document.getElementById('module-selector-overlay');
+    if (overlay && overlay.style.display !== 'none') {
+        overlay.style.display = 'none';
+    }
+
+    // Aplicar isolamento do menu lateral e botão do header
+    applyModuleVisibility();
+
     // Verify RBAC access
     const menuItem = document.querySelector(`.sidebar-menu .menu-item[data-view="${view}"]`);
     if (menuItem && (menuItem.getAttribute('data-rbac-hidden') === 'true' || menuItem.style.display === 'none')) {
         view = 'dashboard';
+        currentModule = getModuleForView(view);
+        applyModuleVisibility();
     }
 
     // Update active menu item
@@ -3341,6 +3590,24 @@ function setupEventListeners() {
 
     safeAddListener('btn-print', 'click', () => {
         window.print();
+    });
+
+    // Module Selector Overlay backdrop and escape key listeners
+    const moduleOverlay = document.getElementById('module-selector-overlay');
+    if (moduleOverlay) {
+        moduleOverlay.addEventListener('click', (e) => {
+            if (e.target === moduleOverlay && currentModule) {
+                closeModuleSelectorModal();
+            }
+        });
+    }
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && currentModule) {
+            const overlay = document.getElementById('module-selector-overlay');
+            if (overlay && overlay.style.display !== 'none') {
+                closeModuleSelectorModal();
+            }
+        }
     });
 }
 

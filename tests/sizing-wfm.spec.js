@@ -22,6 +22,11 @@ test.describe('Painel OPS - Redimensionamento (WFM & Erlang C) E2E', () => {
   });
 
   test('1. Item Redimensionamento deve existir no menu e abrir a view corretamente', async ({ page }) => {
+    await page.evaluate(() => {
+      // @ts-ignore
+      selectModule('atendimento');
+    });
+
     const sizingMenuItem = page.locator('.sidebar-menu .menu-item[data-view="sizing"]');
     await expect(sizingMenuItem).toBeVisible();
 

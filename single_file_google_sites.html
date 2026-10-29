@@ -3589,6 +3589,387 @@ body.light-theme .sizing-calc-table tr {
     animation: cellRecalculatedPulse 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
+/* ============================================================
+   SELETOR DE MÓDULO / AMBIENTE (ATENDIMENTO x OPERAÇÕES)
+   ============================================================ */
+#module-selector-overlay {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: radial-gradient(circle at 20% 15%, rgba(235, 92, 39, 0.18), transparent 45%),
+                radial-gradient(circle at 85% 85%, rgba(229, 95, 145, 0.16), transparent 45%),
+                rgba(3, 17, 10, 0.94);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    z-index: 9998;
+    padding: 2rem;
+    box-sizing: border-box;
+}
+
+body.light-theme #module-selector-overlay {
+    background: radial-gradient(circle at 20% 15%, rgba(235, 92, 39, 0.12), transparent 45%),
+                radial-gradient(circle at 85% 85%, rgba(229, 95, 145, 0.10), transparent 45%),
+                rgba(245, 247, 246, 0.96);
+}
+
+.module-selector-box {
+    position: relative;
+    width: 100%;
+    max-width: 880px;
+    text-align: center;
+    animation: fadeInModal 0.25s ease-out;
+}
+
+.module-selector-close {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--border-color);
+    color: var(--text-secondary);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: all 0.2s ease;
+    z-index: 10;
+}
+
+.module-selector-close:hover {
+    background: rgba(235, 92, 39, 0.15);
+    border-color: var(--color-primary);
+    color: var(--text-primary);
+    transform: rotate(90deg);
+}
+
+body.light-theme .module-selector-close {
+    background: #f1f5f9;
+    border-color: #cbd5e1;
+    color: #475569;
+}
+
+.module-selector-brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    margin-bottom: 0.9rem;
+    font-weight: 700;
+    font-size: 1.05rem;
+    color: var(--text-primary);
+    letter-spacing: 0.3px;
+}
+
+.module-selector-brand .dot {
+    width: 34px;
+    height: 34px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, #eb5c27, #e55f91);
+    display: grid;
+    place-items: center;
+    color: #fff;
+    font-size: 0.95rem;
+}
+
+.module-selector-greet {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0 0 0.35rem;
+}
+
+.module-selector-sub {
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    margin: 0 0 0.9rem;
+}
+
+.module-user-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.35rem 0.8rem;
+    border-radius: 999px;
+    border: 1px solid var(--border-color);
+    background: rgba(255, 255, 255, 0.04);
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    margin-bottom: 2rem;
+}
+
+.module-user-chip .role {
+    padding: 0.1rem 0.5rem;
+    border-radius: 999px;
+    background: rgba(235, 92, 39, 0.15);
+    color: #eb5c27;
+    font-weight: 700;
+    font-size: 0.7rem;
+}
+
+.module-cards {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+}
+
+.module-card {
+    position: relative;
+    text-align: left;
+    cursor: pointer;
+    padding: 1.8rem 1.6rem 1.5rem;
+    border-radius: 18px;
+    border: 1px solid var(--border-color);
+    background: var(--bg-glass, rgba(255, 255, 255, 0.04));
+    backdrop-filter: blur(16px);
+    transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+    display: flex;
+    flex-direction: column;
+    gap: 0.9rem;
+    font-family: inherit;
+    color: inherit;
+}
+
+.module-card:hover {
+    transform: translateY(-4px);
+}
+
+.module-card.mod-atendimento:hover {
+    border-color: rgba(229, 95, 145, 0.7);
+    box-shadow: 0 14px 40px -12px rgba(229, 95, 145, 0.45);
+}
+
+.module-card.mod-operacoes:hover {
+    border-color: rgba(235, 92, 39, 0.7);
+    box-shadow: 0 14px 40px -12px rgba(235, 92, 39, 0.45);
+}
+
+.module-icon {
+    width: 58px;
+    height: 58px;
+    border-radius: 16px;
+    display: grid;
+    place-items: center;
+    font-size: 1.5rem;
+    color: #fff;
+}
+
+.mod-atendimento .module-icon {
+    background: linear-gradient(135deg, #e55f91, #b93e72);
+}
+
+.mod-operacoes .module-icon {
+    background: linear-gradient(135deg, #eb5c27, #c2410c);
+}
+
+.module-card h3 {
+    margin: 0;
+    font-size: 1.35rem;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.module-card p {
+    margin: 0;
+    color: var(--text-secondary);
+    font-size: 0.88rem;
+    line-height: 1.5;
+}
+
+.module-features {
+    list-style: none;
+    padding: 0;
+    margin: 0.2rem 0 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+}
+
+.module-features li {
+    font-size: 0.74rem;
+    padding: 0.25rem 0.6rem;
+    border-radius: 999px;
+    border: 1px solid var(--border-color);
+    color: var(--text-secondary);
+    background: rgba(255, 255, 255, 0.03);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+}
+
+.module-cta {
+    margin-top: auto;
+    padding-top: 0.9rem;
+    border-top: 1px solid var(--border-color);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-weight: 600;
+    font-size: 0.88rem;
+}
+
+.mod-atendimento .module-cta {
+    color: #e55f91;
+}
+
+.mod-operacoes .module-cta {
+    color: #eb5c27;
+}
+
+.module-card.is-disabled {
+    cursor: not-allowed;
+    opacity: 0.45;
+    filter: grayscale(0.7);
+}
+
+.module-card.is-disabled:hover {
+    transform: none;
+    box-shadow: none;
+    border-color: var(--border-color);
+}
+
+.module-badge-soon {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    font-size: 0.7rem;
+    font-weight: 700;
+    padding: 0.2rem 0.6rem;
+    border-radius: 999px;
+    background: rgba(148, 163, 184, 0.18);
+    color: var(--text-secondary);
+    border: 1px solid rgba(148, 163, 184, 0.25);
+}
+
+.module-selector-footer {
+    margin-top: 1.8rem;
+    display: flex;
+    justify-content: center;
+    gap: 1.5rem;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+}
+
+.module-selector-footer a {
+    color: var(--text-secondary);
+    text-decoration: none;
+    display: inline-flex;
+    gap: 0.35rem;
+    align-items: center;
+    transition: color 0.15s ease;
+}
+
+.module-selector-footer a:hover {
+    color: var(--color-primary);
+}
+
+/* Header Module Switcher Trigger */
+.btn-module-switch {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    padding: 0.35rem 0.85rem;
+    height: 48px;
+    box-sizing: border-box;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
+    font-family: inherit;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+}
+
+.btn-module-switch:hover {
+    border-color: var(--color-primary);
+    background: rgba(235, 92, 39, 0.08);
+    box-shadow: 0 0 14px rgba(235, 92, 39, 0.25);
+}
+
+body.light-theme .btn-module-switch {
+    background: #ffffff;
+    border-color: #cbd5e1;
+    color: #1e293b;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+body.light-theme .btn-module-switch:hover {
+    border-color: var(--color-primary);
+    background: #fff7ed;
+    box-shadow: 0 4px 14px rgba(235, 92, 39, 0.18);
+}
+
+.module-switch-icon-badge {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: rgba(235, 92, 39, 0.12);
+    border: 1px solid rgba(235, 92, 39, 0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    color: var(--color-primary);
+    font-size: 0.95rem;
+    transition: all 0.2s ease;
+}
+
+.btn-module-switch.mod-atendimento .module-switch-icon-badge {
+    background: rgba(229, 95, 145, 0.15);
+    border-color: rgba(229, 95, 145, 0.35);
+    color: #e55f91;
+}
+
+.module-switch-text {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    line-height: 1.15;
+}
+
+.module-switch-caption {
+    font-size: 0.68rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--text-secondary);
+}
+
+.module-switch-label {
+    font-size: 0.88rem;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.module-switch-chevron {
+    font-size: 0.72rem;
+    color: var(--text-secondary);
+    margin-left: 0.15rem;
+    transition: transform 0.2s ease, color 0.2s ease;
+}
+
+.btn-module-switch:hover .module-switch-chevron {
+    color: var(--color-primary);
+}
+
+/* Responsive adjustments for module cards */
+@media (max-width: 768px) {
+    .module-cards {
+        grid-template-columns: 1fr;
+    }
+    .module-selector-box {
+        padding: 1rem;
+    }
+    .btn-module-switch .module-switch-text {
+        display: none;
+    }
+}
+
 
 
 
@@ -3628,39 +4009,42 @@ body.light-theme .sizing-calc-table tr {
             </div>
             
             <ul class="sidebar-menu">
-                <!-- SEÇÃO: GERAL -->
-                <li class="menu-section-label" data-i18n="section_overview" title="Geral">Geral</li>
-                <li class="menu-item active" data-view="dashboard" data-i18n-title="menu_dashboard_title" title="Dashboard Operacional">
+                <!-- SEÇÃO: GERAL (OPERAÇÕES) -->
+                <li class="menu-section-label" data-module="operacoes" data-i18n="section_overview" title="Geral">Geral</li>
+                <li class="menu-item active" data-module="operacoes" data-view="dashboard" data-i18n-title="menu_dashboard_title" title="Dashboard Operacional">
                     <i class="fa-solid fa-chart-pie"></i>
                     <span data-i18n="menu_dashboard">Dashboard</span>
                 </li>
-                <li class="menu-item" data-view="history" data-i18n-title="menu_history_title" title="Histórico de Volumes">
+                <li class="menu-item" data-module="operacoes" data-view="history" data-i18n-title="menu_history_title" title="Histórico de Volumes">
                     <i class="fa-solid fa-chart-line"></i>
                     <span data-i18n="menu_history">Histórico</span>
                 </li>
 
-                <!-- SEÇÃO: GESTÃO -->
-                <li class="menu-section-label" data-i18n="section_management" title="Gestão da Operação">Gestão</li>
-                <li class="menu-item" data-view="cadastros" data-i18n-title="menu_cadastros_title" title="Estrutura e Cadastros">
+                <!-- SEÇÃO: GESTÃO (OPERAÇÕES) -->
+                <li class="menu-section-label" data-module="operacoes" data-i18n="section_management" title="Gestão da Operação">Gestão</li>
+                <li class="menu-item" data-module="operacoes" data-view="cadastros" data-i18n-title="menu_cadastros_title" title="Estrutura e Cadastros">
                     <i class="fa-solid fa-address-book"></i>
                     <span data-i18n="menu_cadastros">Cadastros</span>
                 </li>
-                <li class="menu-item" data-view="balancing" data-i18n-title="menu_balancing_title" title="Balanceamento de Backlog" data-permissao="ADMIN">
+                <li class="menu-item" data-module="operacoes" data-view="balancing" data-i18n-title="menu_balancing_title" title="Balanceamento de Backlog" data-permissao="ADMIN">
                     <i class="fa-solid fa-scale-balanced"></i>
                     <span data-i18n="menu_balancing">Balanceamento</span>
                 </li>
-                <li class="menu-item" data-view="automations" data-i18n-title="menu_automations_title" title="Quadro de Automações (RPA)">
+                <li class="menu-item" data-module="operacoes" data-view="automations" data-i18n-title="menu_automations_title" title="Quadro de Automações (RPA)">
                     <i class="fa-solid fa-robot"></i>
                     <span data-i18n="menu_automations">Automações</span>
                 </li>
-                <li class="menu-item" data-view="sizing" data-i18n-title="menu_sizing_title" title="Redimensionamento de Capacidade">
+
+                <!-- SEÇÃO: ATENDIMENTO (ATENDIMENTO) -->
+                <li class="menu-section-label" data-module="atendimento" data-i18n="section_attendance" title="Canais de Atendimento">Atendimento</li>
+                <li class="menu-item" data-module="atendimento" data-view="sizing" data-i18n-title="menu_sizing_title" title="Redimensionamento de Capacidade">
                     <i class="fa-solid fa-calculator"></i>
                     <span data-i18n="menu_sizing">Redimensionamento</span>
                 </li>
 
-                <!-- SEÇÃO: ADMINISTRAÇÃO -->
-                <li class="menu-section-label admin-only" data-i18n="section_admin" title="Administração e Governança" data-permissao="ADMIN">Admin</li>
-                <li class="menu-item" data-view="access-control" data-permissao="ADMIN" data-i18n-title="menu_access_title" title="Controle de Acesso e Perfis">
+                <!-- SEÇÃO: ADMINISTRAÇÃO (OPERAÇÕES) -->
+                <li class="menu-section-label admin-only" data-module="operacoes" data-i18n="section_admin" title="Administração e Governança" data-permissao="ADMIN">Admin</li>
+                <li class="menu-item" data-module="operacoes" data-view="access-control" data-permissao="ADMIN" data-i18n-title="menu_access_title" title="Controle de Acesso e Perfis">
                     <i class="fa-solid fa-shield-halved"></i>
                     <span data-i18n="menu_access">Acesso</span>
                 </li>
@@ -3684,6 +4068,8 @@ body.light-theme .sizing-calc-table tr {
                         <nav class="breadcrumb" id="app-breadcrumb">
                             <span class="bc-app"><i class="fa-solid fa-chart-simple"></i> EmanaPay</span>
                             <span class="bc-sep">›</span>
+                            <span class="bc-module" id="bc-module-title">Operações</span>
+                            <span class="bc-sep">›</span>
                             <span class="bc-section" id="bc-section-title" data-i18n="section_overview">Geral</span>
                             <span class="bc-sep">›</span>
                             <span class="bc-page" id="bc-page-title" data-i18n="menu_dashboard">Dashboard</span>
@@ -3692,8 +4078,20 @@ body.light-theme .sizing-calc-table tr {
                         <p class="view-subtitle" id="app-view-subtitle" data-i18n="view_sub_dashboard">Visão operacional de volumes mensais, FTEs requeridos e capacidade por equipe.</p>
                     </div>
 
-                    <!-- Header Right Group: Country Selector + User Chip -->
+                    <!-- Header Right Group: Module Switcher + Country Selector + User Chip -->
                     <div class="header-right-group" style="display: flex; align-items: center; gap: 10px;">
+                        <!-- Module Switcher Trigger Button -->
+                        <button type="button" id="btn-switch-module" class="btn-module-switch mod-operacoes" onclick="openModuleSelectorModal()" title="Alternar entre Atendimento e Operações">
+                            <div class="module-switch-icon-badge" id="module-switch-badge">
+                                <i class="fa-solid fa-gears" id="module-switch-icon"></i>
+                            </div>
+                            <div class="module-switch-text">
+                                <span class="module-switch-caption" data-i18n="lbl_environment">Ambiente</span>
+                                <span class="module-switch-label" id="module-switch-label">Operações</span>
+                            </div>
+                            <i class="fa-solid fa-chevron-down module-switch-chevron"></i>
+                        </button>
+
                         <!-- Country Selector (Opção B - Header Dropdown) -->
                         <div class="country-selector-header" id="country-selector-header">
                             <button id="btn-country-active" class="btn-country-trigger" onclick="toggleCountryDropdown(event)" title="Selecionar Região / País">
@@ -5681,6 +6079,73 @@ body.light-theme .sizing-calc-table tr {
         </div>
     </div>
 
+    <!-- MODULE SELECTOR OVERLAY -->
+    <div id="module-selector-overlay" style="display: none;">
+        <div class="module-selector-box">
+            <button type="button" class="module-selector-close" id="btn-close-module-selector" onclick="closeModuleSelectorModal()" title="Fechar" style="display: none;">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <div class="module-selector-brand">
+                <span class="dot"><i class="fa-solid fa-chart-simple"></i></span>
+                <span>EmanaPay · Painel OPS</span>
+            </div>
+            <h2 class="module-selector-greet" id="module-selector-greet">Olá! Para onde vamos hoje?</h2>
+            <p class="module-selector-sub" id="module-selector-sub" data-i18n="module_selector_sub">Escolha o ambiente que deseja acessar. Você pode trocar a qualquer momento pelo topo da tela.</p>
+            <div class="module-user-chip">
+                <i class="fa-solid fa-user"></i>
+                <span id="module-user-email">usuario@exemplo.com</span>
+                <span class="role" id="module-user-role">ADMIN</span>
+                <span id="module-user-country">🇧🇷 Brasil</span>
+            </div>
+
+            <div class="module-cards">
+                <button type="button" class="module-card mod-atendimento" id="card-module-atendimento" onclick="selectModule('atendimento')">
+                    <span class="module-badge-soon" id="module-soon-badge-atendimento" style="display: none;" data-i18n="module_soon_badge">Disponível apenas Brasil</span>
+                    <div class="module-icon"><i class="fa-solid fa-headset"></i></div>
+                    <h3 data-i18n="module_atendimento_title">Atendimento</h3>
+                    <p data-i18n="module_atendimento_desc">Redimensionamento de capacidade dos canais de atendimento com Erlang C, NR17 e governança contratual.</p>
+                    <ul class="module-features">
+                        <li><i class="fa-solid fa-phone"></i> <span data-i18n="feature_voz">Voz</span></li>
+                        <li><i class="fa-solid fa-comments"></i> <span data-i18n="feature_chat">Chat</span></li>
+                        <li><i class="fa-solid fa-clipboard-list"></i> <span data-i18n="feature_backoffice">Backoffice</span></li>
+                        <li><i class="fa-solid fa-calculator"></i> <span data-i18n="feature_projecao">Projeção mensal de PAs</span></li>
+                    </ul>
+                    <div class="module-cta">
+                        <span data-i18n="module_cta_atendimento">Acessar Atendimento</span>
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </div>
+                </button>
+
+                <button type="button" class="module-card mod-operacoes" id="card-module-operacoes" onclick="selectModule('operacoes')">
+                    <div class="module-icon"><i class="fa-solid fa-gears"></i></div>
+                    <h3 data-i18n="module_operacoes_title">Operações</h3>
+                    <p data-i18n="module_operacoes_desc">Gestão de FTE e capacidade das equipes operacionais: processos, volumes, histórico e automações.</p>
+                    <ul class="module-features">
+                        <li><i class="fa-solid fa-chart-pie"></i> <span data-i18n="menu_dashboard">Dashboard</span></li>
+                        <li><i class="fa-solid fa-chart-line"></i> <span data-i18n="menu_history">Histórico</span></li>
+                        <li><i class="fa-solid fa-address-book"></i> <span data-i18n="menu_cadastros">Cadastros</span></li>
+                        <li><i class="fa-solid fa-scale-balanced"></i> <span data-i18n="menu_balancing">Balanceamento</span></li>
+                        <li><i class="fa-solid fa-robot"></i> <span data-i18n="menu_automations">Automações</span></li>
+                        <li><i class="fa-solid fa-shield-halved"></i> <span data-i18n="menu_access">Acesso</span></li>
+                    </ul>
+                    <div class="module-cta">
+                        <span data-i18n="module_cta_operacoes">Acessar Operações</span>
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </div>
+                </button>
+            </div>
+
+            <div class="module-selector-footer">
+                <a href="javascript:void(0)" onclick="document.getElementById('theme-toggle').click()">
+                    <i class="fa-solid fa-circle-half-stroke"></i> <span data-i18n="btn_toggle_theme">Alternar tema</span>
+                </a>
+                <a href="javascript:void(0)" onclick="handleLogout()">
+                    <i class="fa-solid fa-right-from-bracket"></i> <span data-i18n="btn_logout">Sair</span>
+                </a>
+            </div>
+        </div>
+    </div>
+
     <!-- AUTH OVERLAY -->
     <div id="auth-overlay" class="modal-overlay" style="display: flex; z-index: 9999;">
         <div class="modal-container" style="max-width: 400px; padding: 2rem;">
@@ -5961,6 +6426,9 @@ function aplicarPerfilDeAcesso() {
 
     // Controla visibilidade de RPA e Menus de acordo com a região/país
     applyCountryRpaVisibility();
+    if (typeof applyModuleVisibility === 'function' && currentModule) {
+        applyModuleVisibility();
+    }
 }
 
 function applyCountryRpaVisibility() {
@@ -6257,7 +6725,24 @@ const I18N = {
         modal_btn_cancel: 'Cancelar',
         toast_activity_added: 'Atividade adicionada com sucesso!',
         val_activity_name_required: 'Por favor, informe o nome da atividade.',
-        val_area_required: 'Por favor, selecione uma equipe / área.'
+        val_area_required: 'Por favor, selecione uma equipe / área.',
+        lbl_environment: 'Ambiente',
+        module_selector_greet: 'Olá, {nome}! Para onde vamos hoje?',
+        module_selector_sub: 'Escolha o ambiente que deseja acessar. Você pode trocar a qualquer momento pelo topo da tela.',
+        module_atendimento_title: 'Atendimento',
+        module_atendimento_desc: 'Redimensionamento de capacidade dos canais de atendimento com Erlang C, NR17 e governança contratual.',
+        module_operacoes_title: 'Operações',
+        module_operacoes_desc: 'Gestão de FTE e capacidade das equipes operacionais: processos, volumes, histórico e automações.',
+        module_cta_atendimento: 'Acessar Atendimento',
+        module_cta_operacoes: 'Acessar Operações',
+        module_soon_badge: 'Disponível apenas Brasil',
+        feature_voz: 'Voz',
+        feature_chat: 'Chat',
+        feature_backoffice: 'Backoffice',
+        feature_projecao: 'Projeção mensal de PAs',
+        section_attendance: 'Atendimento',
+        btn_toggle_theme: 'Alternar tema',
+        btn_logout: 'Sair'
     },
     'es-LatAm': {
         section_overview: 'General',
@@ -6466,7 +6951,24 @@ const I18N = {
         modal_btn_cancel: 'Cancelar',
         toast_activity_added: '¡Actividad agregada con éxito!',
         val_activity_name_required: 'Por favor, ingrese el nombre de la actividad.',
-        val_area_required: 'Por favor, seleccione un equipo / área.'
+        val_area_required: 'Por favor, seleccione un equipo / área.',
+        lbl_environment: 'Ambiente',
+        module_selector_greet: '¡Hola, {nome}! ¿A dónde vamos hoy?',
+        module_selector_sub: 'Elige el entorno al que deseas acceder. Puedes cambiar en cualquier momento desde la parte superior.',
+        module_atendimento_title: 'Atención',
+        module_atendimento_desc: 'Redimensionamiento de capacidad de los canales de atención con Erlang C, NR17 y gobernanza contractual.',
+        module_operacoes_title: 'Operaciones',
+        module_operacoes_desc: 'Gestión de FTE y capacidad de los equipos operativos: procesos, volúmenes, historial y automatizaciones.',
+        module_cta_atendimento: 'Acceder a Atención',
+        module_cta_operacoes: 'Acceder a Operaciones',
+        module_soon_badge: 'Disponible solo en Brasil',
+        feature_voz: 'Voz',
+        feature_chat: 'Chat',
+        feature_backoffice: 'Backoffice',
+        feature_projecao: 'Proyección mensual de PAs',
+        section_attendance: 'Atención',
+        btn_toggle_theme: 'Cambiar tema',
+        btn_logout: 'Cerrar sesión'
     }
 };
 
@@ -6572,6 +7074,19 @@ async function switchCountry(countryCode) {
     // 7. Re-renderizar todas as telas
     refreshCurrentUserAssignedTeam();
     refreshAllViews();
+
+    // Se o usuário estiver no módulo Atendimento e mudar para Hispana, redirecionar para Operações
+    if (countryCode === 'HISPANA' && currentModule === 'atendimento') {
+        currentModule = 'operacoes';
+        switchToView('dashboard');
+        showToast('Ambiente Atendimento disponível apenas para o Brasil. Redirecionado para Operações.', 'info', 4500);
+    }
+
+    // Se o overlay seletor estiver aberto, atualizar textos e estado
+    const moduleOverlay = document.getElementById('module-selector-overlay');
+    if (moduleOverlay && moduleOverlay.style.display !== 'none') {
+        showModuleSelector();
+    }
 
     const dict = I18N[COUNTRY_CONFIG[countryCode].locale] || I18N['pt-BR'];
     showToast(dict.toast_country_switched, 'info', 4000);
@@ -7388,6 +7903,9 @@ async function setupUserSession(user) {
         const hashView = (window.location.hash || '').replace('#/', '').trim();
         const targetView = (hashView && VIEW_META[hashView]) ? hashView : 'dashboard';
         switchToView(targetView);
+
+        // Sempre exibir o seletor de módulo após o login para escolha do ambiente
+        showModuleSelector();
     } catch (err) {
         alert('[DIAGNÓSTICO] Erro em setupUserSession: ' + (err.message || err));
         console.error('Erro em setupUserSession:', err);
@@ -8557,6 +9075,173 @@ function renderOrganogramFlowchart() {
 }
 
 // ============================================================
+// APP MODULES & ENVIRONMENT MANAGEMENT (ATENDIMENTO x OPERAÇÕES)
+// ============================================================
+const APP_MODULES = {
+    operacoes: {
+        key: 'operacoes',
+        name: 'Operações',
+        nameEs: 'Operaciones',
+        icon: 'fa-gears',
+        colorClass: 'mod-operacoes',
+        defaultView: 'dashboard',
+        views: ['dashboard', 'history', 'cadastros', 'balancing', 'automations', 'access-control']
+    },
+    atendimento: {
+        key: 'atendimento',
+        name: 'Atendimento',
+        nameEs: 'Atención',
+        icon: 'fa-headset',
+        colorClass: 'mod-atendimento',
+        defaultView: 'sizing',
+        views: ['sizing']
+    }
+};
+
+let currentModule = null; // 'operacoes' | 'atendimento'
+
+function getModuleForView(view) {
+    if (view === 'sizing') return 'atendimento';
+    return 'operacoes';
+}
+
+function updateModuleHeaderSwitcher() {
+    const btn = document.getElementById('btn-switch-module');
+    const label = document.getElementById('module-switch-label');
+    const icon = document.getElementById('module-switch-icon');
+    const bcModule = document.getElementById('bc-module-title');
+
+    const modKey = currentModule || 'operacoes';
+    const mod = APP_MODULES[modKey] || APP_MODULES.operacoes;
+    const displayName = currentCountry === 'HISPANA' ? mod.nameEs : mod.name;
+
+    if (label) label.textContent = displayName;
+    if (bcModule) bcModule.textContent = displayName;
+    if (icon) {
+        icon.className = `fa-solid ${mod.icon}`;
+    }
+    if (btn) {
+        btn.classList.remove('mod-operacoes', 'mod-atendimento');
+        btn.classList.add(mod.colorClass);
+    }
+}
+
+function applyModuleVisibility() {
+    if (!currentModule) return;
+
+    const isHsp = currentCountry === 'HISPANA';
+    const isAdmin = currentUser.perfil === 'ADMIN';
+
+    // 1. Filtrar itens do menu lateral e rótulos de seção de acordo com o módulo ativo
+    document.querySelectorAll('.sidebar-menu [data-module]').forEach(el => {
+        const itemModule = el.getAttribute('data-module');
+        if (itemModule === currentModule) {
+            // Verificar restrições de país (ex: Atendimento não permitido na Hispana)
+            if (isHsp && itemModule === 'atendimento') {
+                el.style.display = 'none';
+                return;
+            }
+            // Histórico, Balanceamento e Automações desativados na Hispana temporariamente
+            if (isHsp && el.dataset && (el.dataset.view === 'history' || el.dataset.view === 'balancing' || el.dataset.view === 'automations')) {
+                el.style.display = 'none';
+                return;
+            }
+            // Verificar permissão ADMIN
+            if (el.getAttribute('data-permissao') === 'ADMIN' && !isAdmin) {
+                el.style.display = 'none';
+                return;
+            }
+            el.style.display = (el.tagName === 'LI' && el.classList.contains('menu-section-label')) ? 'block' : 'flex';
+        } else {
+            el.style.display = 'none';
+        }
+    });
+
+    // 2. Atualizar botão e breadcrumb do seletor no header
+    updateModuleHeaderSwitcher();
+}
+
+function showModuleSelector() {
+    const overlay = document.getElementById('module-selector-overlay');
+    if (!overlay) return;
+
+    // Atualizar dados do usuário no chip do seletor
+    const emailEl = document.getElementById('module-user-email');
+    const roleEl = document.getElementById('module-user-role');
+    const countryEl = document.getElementById('module-user-country');
+    const greetEl = document.getElementById('module-selector-greet');
+    const closeBtn = document.getElementById('btn-close-module-selector');
+
+    const firstName = (currentUser.nome || 'Usuário').split(' ')[0];
+    if (greetEl) {
+        if (currentCountry === 'HISPANA') {
+            greetEl.textContent = `¡Hola, ${firstName}! ¿A dónde vamos hoy?`;
+        } else {
+            greetEl.textContent = `Olá, ${firstName}! Para onde vamos hoje?`;
+        }
+    }
+
+    if (emailEl) emailEl.textContent = currentUser.email || 'usuario@exemplo.com';
+    if (roleEl) {
+        roleEl.textContent = currentUser.perfil || 'CONSULTA';
+        roleEl.className = 'role role-' + (currentUser.perfil || 'consulta').toLowerCase();
+    }
+    if (countryEl) {
+        countryEl.textContent = currentCountry === 'HISPANA' ? '🌐 Hispana' : '🇧🇷 Brasil';
+    }
+
+    // Controle do card Atendimento para Hispana (desabilitado com badge)
+    const cardAtendimento = document.getElementById('card-module-atendimento');
+    const badgeAtendimento = document.getElementById('module-soon-badge-atendimento');
+    if (cardAtendimento) {
+        if (currentCountry === 'HISPANA') {
+            cardAtendimento.classList.add('is-disabled');
+            cardAtendimento.disabled = true;
+            if (badgeAtendimento) badgeAtendimento.style.display = 'inline-block';
+        } else {
+            cardAtendimento.classList.remove('is-disabled');
+            cardAtendimento.disabled = false;
+            if (badgeAtendimento) badgeAtendimento.style.display = 'none';
+        }
+    }
+
+    // Se o usuário já selecionou um módulo antes (abriu pelo botão do header), exibe botão de fechar
+    if (currentModule) {
+        if (closeBtn) closeBtn.style.display = 'inline-flex';
+    } else {
+        if (closeBtn) closeBtn.style.display = 'none';
+    }
+
+    overlay.style.display = 'flex';
+}
+
+function openModuleSelectorModal() {
+    showModuleSelector();
+}
+
+function closeModuleSelectorModal() {
+    if (!currentModule) return; // Escolha obrigatória no login
+    const overlay = document.getElementById('module-selector-overlay');
+    if (overlay) overlay.style.display = 'none';
+}
+
+function selectModule(moduleKey) {
+    if (moduleKey === 'atendimento' && currentCountry === 'HISPANA') {
+        showToast('O módulo Atendimento está disponível apenas para o Brasil no momento.', 'warning');
+        return;
+    }
+
+    currentModule = moduleKey;
+    const overlay = document.getElementById('module-selector-overlay');
+    if (overlay) overlay.style.display = 'none';
+
+    applyModuleVisibility();
+
+    const targetView = APP_MODULES[moduleKey]?.defaultView || 'dashboard';
+    switchToView(targetView);
+}
+
+// ============================================================
 // VIEW METADATA & BREADCRUMB / HEADER MANAGEMENT
 // ============================================================
 const VIEW_META = {
@@ -8604,11 +9289,23 @@ function updateViewHeader(view) {
     const sectionEl = document.getElementById('bc-section-title');
     const pageEl = document.getElementById('bc-page-title');
     const subtitleEl = document.getElementById('app-view-subtitle');
+    const bcModuleEl = document.getElementById('bc-module-title');
     
     if (titleEl) titleEl.textContent = meta.title;
     if (sectionEl) sectionEl.textContent = meta.section;
     if (pageEl) pageEl.textContent = meta.title;
     if (subtitleEl) subtitleEl.textContent = meta.subtitle;
+
+    const modKey = currentModule || getModuleForView(view);
+    if (bcModuleEl && APP_MODULES[modKey]) {
+        bcModuleEl.textContent = currentCountry === 'HISPANA' ? APP_MODULES[modKey].nameEs : APP_MODULES[modKey].name;
+    }
+
+    // Ocultar filtros globais de área/responsável na visão Atendimento (pois Canais têm parâmetros próprios)
+    const globalFiltersEl = document.getElementById('header-global-filters');
+    if (globalFiltersEl) {
+        globalFiltersEl.style.display = (modKey === 'atendimento') ? 'none' : 'flex';
+    }
 
     // Control visibility of action buttons per view
     const btnReset = document.getElementById('btn-reset-global-state');
@@ -8625,10 +9322,27 @@ function switchToView(view) {
     const targetEl = document.getElementById(`view-${view}`);
     if (!targetEl) view = 'dashboard';
 
+    // Auto-sync currentModule baseado na visão solicitada
+    const targetModule = getModuleForView(view);
+    if (currentModule !== targetModule) {
+        currentModule = targetModule;
+    }
+
+    // Se o seletor de módulos estiver aberto, fechar
+    const overlay = document.getElementById('module-selector-overlay');
+    if (overlay && overlay.style.display !== 'none') {
+        overlay.style.display = 'none';
+    }
+
+    // Aplicar isolamento do menu lateral e botão do header
+    applyModuleVisibility();
+
     // Verify RBAC access
     const menuItem = document.querySelector(`.sidebar-menu .menu-item[data-view="${view}"]`);
     if (menuItem && (menuItem.getAttribute('data-rbac-hidden') === 'true' || menuItem.style.display === 'none')) {
         view = 'dashboard';
+        currentModule = getModuleForView(view);
+        applyModuleVisibility();
     }
 
     // Update active menu item
@@ -9083,6 +9797,24 @@ function setupEventListeners() {
 
     safeAddListener('btn-print', 'click', () => {
         window.print();
+    });
+
+    // Module Selector Overlay backdrop and escape key listeners
+    const moduleOverlay = document.getElementById('module-selector-overlay');
+    if (moduleOverlay) {
+        moduleOverlay.addEventListener('click', (e) => {
+            if (e.target === moduleOverlay && currentModule) {
+                closeModuleSelectorModal();
+            }
+        });
+    }
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && currentModule) {
+            const overlay = document.getElementById('module-selector-overlay');
+            if (overlay && overlay.style.display !== 'none') {
+                closeModuleSelectorModal();
+            }
+        }
     });
 }
 
