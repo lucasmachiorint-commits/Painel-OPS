@@ -191,4 +191,59 @@ test.describe('Painel OPS - Seletor de Módulo (Atendimento x Operações) E2E',
     }
   });
 
+  test('8. Cliques na pagina e eventos de foco nao devem reabrir o seletor de ambiente', async ({ page }) => {
+    await page.evaluate(() => {
+      // @ts-ignore
+      currentUser = { nome: 'Lucas Machiori', email: 'lucas.machiori@natura.net', perfil: 'ADMIN', assignedTeam: '' };
+      // @ts-ignore
+      selectModule('operacoes');
+    });
+
+    const overlay = page.locator('#module-selector-overlay');
+    await expect(overlay).toBeHidden();
+
+    // Clicar em multiplos pontos do dashboard
+    await page.locator('#app-view-title').click();
+    await page.locator('body').click({ position: { x: 300, y: 200 } });
+    await page.locator('.sidebar-menu').click();
+    await page.waitForTimeout(300);
+
+    // O seletor deve permanecer estritamente oculto
+    await expect(overlay).toBeHidden();
+  });
+
+  test('9. Re-disparo de SIGNED_IN nao reinicia sessao nem reabre seletor', async ({ page }) => {
+    await page.evaluate(async () => {
+      // @ts-ignore
+      currentUser = { nome: 'Lucas Machiori', email: 'lucas.machiori@natura.net', perfil: 'ADMIN', assignedTeam: '' };
+      // @ts-ignore
+      selectModule('atendimento');
+      // @ts-ignore
+      window._sessionBootstrapped = true;
+      // @ts-ignore
+      window._authUserId = 'user-123';
+
+      // Simular re-chamada de setupUserSession pelo listener SIGNED_IN
+      // @ts-ignore
+      await setupUserSession({ id: 'user-123', email: 'lucas.machiori@natura.net' });
+    });
+
+    const overlay = page.locator('#module-selector-overlay');
+    await expect(overlay).toBeHidden();
+
+    // Deve permanecer na view de Atendimento
+    const sizingView = page.locator('#view-sizing');
+    await expect(sizingView).toBeVisible();
+  });
+
+  test('10. Recarregar a pagina (refresh/F5) deve exibir tela de login', async ({ page }) => {
+    // Recarregar a página
+    await page.reload();
+    await page.waitForLoadState('domcontentloaded');
+
+    // Tela de login deve estar visível
+    const authOverlay = page.locator('#auth-overlay');
+    await expect(authOverlay).toBeVisible();
+  });
+
 });
