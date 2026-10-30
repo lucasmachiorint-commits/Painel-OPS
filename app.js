@@ -208,6 +208,9 @@ function aplicarPerfilDeAcesso() {
 
     // Controla visibilidade de RPA e Menus de acordo com a região/país
     applyCountryRpaVisibility();
+    if (typeof applyModuleVisibility === 'function' && currentModule) {
+        applyModuleVisibility();
+    }
 }
 
 function applyCountryRpaVisibility() {
@@ -311,6 +314,8 @@ const I18N = {
         menu_balancing_title: 'Balanceamento de Backlog',
         menu_automations: 'Automações',
         menu_automations_title: 'Quadro de Automações (RPA)',
+        menu_sizing: 'Redimensionamento',
+        menu_sizing_title: 'Redimensionamento de Capacidade',
         menu_access: 'Acesso',
         menu_access_title: 'Controle de Acesso e Perfis',
         view_title_dashboard: 'Dashboard',
@@ -323,8 +328,35 @@ const I18N = {
         view_sub_balancing: 'Planejamento diário de backlog e comparação de capacidade alocada vs. necessária.',
         view_title_automations: 'Automações (RPA)',
         view_sub_automations: 'Quadro analítico de processos robotizados, FTEs absorvidos e horas economizadas.',
+        view_title_sizing: 'Redimensionamento de Capacidade',
+        view_sub_sizing: 'Dimensionamento de workforce (WFM) com Erlang C, premissas NR17 e governança contratual.',
         view_title_access: 'Controle de Acesso',
         view_sub_access: 'Gestão centralizada de usuários, atribuição de perfis (ADMIN/OPERADOR/CONSULTA) e vinculação de equipes.',
+        sizing_import_volumes: 'Importar Volumes (Excel)',
+        sizing_recalc: 'Recalcular',
+        sizing_restore_defaults: 'Padrões',
+        sizing_kpi_pas_voz: 'PAs N1 Voz',
+        sizing_kpi_pas_chat: 'PAs N1 Chat',
+        sizing_kpi_pas_bo: 'PAs N2 Backoffice',
+        sizing_kpi_total_pas: 'Total PAs Requeridas',
+        sizing_tab_voz: '1. N1 Voz (Erlang C)',
+        sizing_tab_chat: '2. N1 Chat (Paralelo)',
+        sizing_tab_bo: '3. N2 Backoffice (Linear)',
+        sizing_tab_gov: '4. Governança & Alertas',
+        sizing_lbl_vol_voz: 'Volume Mensal (Voz)',
+        sizing_lbl_tma_voz: 'TMA - Tempo Médio Atendimento',
+        sizing_lbl_sla_meta: 'Meta de Nível de Serviço (SLA)',
+        sizing_lbl_tme_max: 'TME Máximo Tolerado',
+        sizing_lbl_dmm: 'DMM (% Dia Maior Movimento)',
+        sizing_lbl_hmm: 'HMM (% Hora Maior Movimento)',
+        sizing_lbl_vol_chat: 'Volume Mensal (Chat)',
+        sizing_lbl_tma_chat: 'TMA Chat',
+        sizing_lbl_vol_bo: 'Volume Mensal (Backoffice)',
+        sizing_lbl_tma_bo: 'TMA Backoffice',
+        sizing_lbl_dias_uteis: 'Dias Úteis no Mês',
+        sizing_lbl_aumento_pct: 'Aumento % sobre Chamadas / Demanda',
+        sizing_lbl_vol_planejado: 'Volume Planejado Contratual',
+        sizing_lbl_mes_ref: 'Mês de Referência da Demanda',
         filter_area_title: 'Filtrar por Área / Equipe em todas as telas',
         filter_resp_title: 'Filtrar por Responsável em todas as telas',
         opt_all_areas: 'Todas as Áreas',
@@ -475,7 +507,24 @@ const I18N = {
         modal_btn_cancel: 'Cancelar',
         toast_activity_added: 'Atividade adicionada com sucesso!',
         val_activity_name_required: 'Por favor, informe o nome da atividade.',
-        val_area_required: 'Por favor, selecione uma equipe / área.'
+        val_area_required: 'Por favor, selecione uma equipe / área.',
+        lbl_environment: 'Ambiente',
+        module_selector_greet: 'Olá, {nome}! Para onde vamos hoje?',
+        module_selector_sub: 'Escolha o ambiente que deseja acessar. Você pode trocar a qualquer momento pelo topo da tela.',
+        module_atendimento_title: 'Atendimento',
+        module_atendimento_desc: 'Redimensionamento de capacidade dos canais de atendimento com Erlang C, NR17 e governança contratual.',
+        module_operacoes_title: 'Operações',
+        module_operacoes_desc: 'Gestão de FTE e capacidade das equipes operacionais: processos, volumes, histórico e automações.',
+        module_cta_atendimento: 'Acessar Atendimento',
+        module_cta_operacoes: 'Acessar Operações',
+        module_soon_badge: 'Disponível apenas Brasil',
+        feature_voz: 'Voz',
+        feature_chat: 'Chat',
+        feature_backoffice: 'Backoffice',
+        feature_projecao: 'Projeção mensal de PAs',
+        section_attendance: 'Atendimento',
+        btn_toggle_theme: 'Alternar tema',
+        btn_logout: 'Sair'
     },
     'es-LatAm': {
         section_overview: 'General',
@@ -491,6 +540,8 @@ const I18N = {
         menu_balancing_title: 'Balanceo de Backlog',
         menu_automations: 'Automatizaciones',
         menu_automations_title: 'Panel de Automatizaciones (RPA)',
+        menu_sizing: 'Redimensionamiento',
+        menu_sizing_title: 'Redimensionamiento de Capacidad',
         menu_access: 'Acceso',
         menu_access_title: 'Control de Acceso y Perfiles',
         view_title_dashboard: 'Tablero',
@@ -503,8 +554,35 @@ const I18N = {
         view_sub_balancing: 'Planificación diaria de backlog y comparación de capacidad asignada vs. requerida.',
         view_title_automations: 'Automatizaciones (RPA)',
         view_sub_automations: 'Panel analítico de procesos robotizados, FTEs absorbidos y horas ahorradas.',
+        view_title_sizing: 'Redimensionamiento de Capacidad',
+        view_sub_sizing: 'Dimensionamiento de workforce (WFM) con Erlang C, premisas NR17 y gobernanza contractual.',
         view_title_access: 'Control de Acceso',
         view_sub_access: 'Gestión centralizada de usuarios, perfiles (ADMIN/OPERADOR/CONSULTA) y vinculación de equipos.',
+        sizing_import_volumes: 'Importar Volúmenes (Excel)',
+        sizing_recalc: 'Recalcular',
+        sizing_restore_defaults: 'Valores Predeterminados',
+        sizing_kpi_pas_voz: 'PAs N1 Voz',
+        sizing_kpi_pas_chat: 'PAs N1 Chat',
+        sizing_kpi_pas_bo: 'PAs N2 Backoffice',
+        sizing_kpi_total_pas: 'Total PAs Requeridas',
+        sizing_tab_voz: '1. N1 Voz (Erlang C)',
+        sizing_tab_chat: '2. N1 Chat (Paralelo)',
+        sizing_tab_bo: '3. N2 Backoffice (Lineal)',
+        sizing_tab_gov: '4. Gobernanza y Alertas',
+        sizing_lbl_vol_voz: 'Volumen Mensual (Voz)',
+        sizing_lbl_tma_voz: 'TMA - Tiempo Medio Atención',
+        sizing_lbl_sla_meta: 'Meta de Nivel de Servicio (SLA)',
+        sizing_lbl_tme_max: 'TME Máximo Tolerado',
+        sizing_lbl_dmm: 'DMM (% Día Mayor Movimiento)',
+        sizing_lbl_hmm: 'HMM (% Hora Mayor Movimiento)',
+        sizing_lbl_vol_chat: 'Volumen Mensual (Chat)',
+        sizing_lbl_tma_chat: 'TMA Chat',
+        sizing_lbl_vol_bo: 'Volumen Mensual (Backoffice)',
+        sizing_lbl_tma_bo: 'TMA Backoffice',
+        sizing_lbl_dias_uteis: 'Días Hábiles en el Mes',
+        sizing_lbl_aumento_pct: 'Aumento % sobre Llamadas / Demanda',
+        sizing_lbl_vol_planejado: 'Volumen Planificado Contractual',
+        sizing_lbl_mes_ref: 'Mes de Referencia de la Demanda',
         filter_area_title: 'Filtrar por Área / Equipo en todas las vistas',
         filter_resp_title: 'Filtrar por Responsable en todas las vistas',
         opt_all_areas: 'Todas las Áreas',
@@ -655,7 +733,24 @@ const I18N = {
         modal_btn_cancel: 'Cancelar',
         toast_activity_added: '¡Actividad agregada con éxito!',
         val_activity_name_required: 'Por favor, ingrese el nombre de la actividad.',
-        val_area_required: 'Por favor, seleccione un equipo / área.'
+        val_area_required: 'Por favor, seleccione un equipo / área.',
+        lbl_environment: 'Ambiente',
+        module_selector_greet: '¡Hola, {nome}! ¿A dónde vamos hoy?',
+        module_selector_sub: 'Elige el entorno al que deseas acceder. Puedes cambiar en cualquier momento desde la parte superior.',
+        module_atendimento_title: 'Atención',
+        module_atendimento_desc: 'Redimensionamiento de capacidad de los canales de atención con Erlang C, NR17 y gobernanza contractual.',
+        module_operacoes_title: 'Operaciones',
+        module_operacoes_desc: 'Gestión de FTE y capacidad de los equipos operativos: procesos, volúmenes, historial y automatizaciones.',
+        module_cta_atendimento: 'Acceder a Atención',
+        module_cta_operacoes: 'Acceder a Operaciones',
+        module_soon_badge: 'Disponible solo en Brasil',
+        feature_voz: 'Voz',
+        feature_chat: 'Chat',
+        feature_backoffice: 'Backoffice',
+        feature_projecao: 'Proyección mensual de PAs',
+        section_attendance: 'Atención',
+        btn_toggle_theme: 'Cambiar tema',
+        btn_logout: 'Cerrar sesión'
     }
 };
 
@@ -762,6 +857,19 @@ async function switchCountry(countryCode) {
     refreshCurrentUserAssignedTeam();
     refreshAllViews();
 
+    // Se o usuário estiver no módulo Atendimento e mudar para Hispana, redirecionar para Operações
+    if (countryCode === 'HISPANA' && currentModule === 'atendimento') {
+        currentModule = 'operacoes';
+        switchToView('dashboard');
+        showToast('Ambiente Atendimento disponível apenas para o Brasil. Redirecionado para Operações.', 'info', 4500);
+    }
+
+    // Se o overlay seletor estiver aberto, atualizar textos e estado
+    const moduleOverlay = document.getElementById('module-selector-overlay');
+    if (moduleOverlay && moduleOverlay.style.display !== 'none') {
+        showModuleSelector();
+    }
+
     const dict = I18N[COUNTRY_CONFIG[countryCode].locale] || I18N['pt-BR'];
     showToast(dict.toast_country_switched, 'info', 4000);
 }
@@ -823,6 +931,11 @@ function applyI18n(locale) {
                 VIEW_META['access-control'].section = dict.section_admin;
                 VIEW_META['access-control'].subtitle = dict.view_sub_access;
             }
+            if (VIEW_META['sizing']) {
+                VIEW_META['sizing'].title = dict.view_title_sizing || 'Redimensionamiento de Capacidad';
+                VIEW_META['sizing'].section = dict.section_management || 'Gestión';
+                VIEW_META['sizing'].subtitle = dict.view_sub_sizing || 'Dimensionamiento de workforce (WFM) con Erlang C, premisas NR17 y gobernanza contractual.';
+            }
         } else {
             if (VIEW_META['dashboard']) {
                 VIEW_META['dashboard'].title = 'Dashboard';
@@ -848,6 +961,11 @@ function applyI18n(locale) {
                 VIEW_META['automations'].title = 'Automações (RPA)';
                 VIEW_META['automations'].section = 'Gestão';
                 VIEW_META['automations'].subtitle = 'Quadro analítico de processos robotizados, FTEs absorvidos e horas economizadas.';
+            }
+            if (VIEW_META['sizing']) {
+                VIEW_META['sizing'].title = 'Redimensionamento de Capacidade';
+                VIEW_META['sizing'].section = 'Gestão';
+                VIEW_META['sizing'].subtitle = 'Dimensionamento de workforce (WFM) com Erlang C, premissas NR17 e governança contratual.';
             }
             if (VIEW_META['access-control']) {
                 VIEW_META['access-control'].title = 'Controle de Acesso';
@@ -1560,6 +1678,9 @@ async function setupUserSession(user) {
         const hashView = (window.location.hash || '').replace('#/', '').trim();
         const targetView = (hashView && VIEW_META[hashView]) ? hashView : 'dashboard';
         switchToView(targetView);
+
+        // Sempre exibir o seletor de módulo após o login para escolha do ambiente
+        showModuleSelector();
     } catch (err) {
         alert('[DIAGNÓSTICO] Erro em setupUserSession: ' + (err.message || err));
         console.error('Erro em setupUserSession:', err);
@@ -1835,7 +1956,7 @@ function subscribeRealtime() {
             table: 'board_state',
             filter: `id=eq.${targetId}`
         }, (payload) => {
-            console.log(`[Realtime HML ${currentCountry}] Evento recebido via WebSocket:`, payload.eventType, payload);
+            console.log(`[Realtime ${currentCountry}] Evento recebido via WebSocket:`, payload.eventType, payload);
             
             const payloadData = payload.new || payload.record;
             if (payloadData && payloadData.data) {
@@ -1869,7 +1990,7 @@ function subscribeRealtime() {
             }
         })
         .subscribe((status, err) => {
-            console.log(`[Realtime HML ${currentCountry}] Status da inscrição:`, status, err || '');
+            console.log(`[Realtime ${currentCountry}] Status da inscrição:`, status, err || '');
             if (status === 'SUBSCRIBED') {
                 updateRealtimeStatusUI('SUBSCRIBED');
             } else if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
@@ -2012,8 +2133,6 @@ async function loadStateFromSupabase() {
     }
 }
 
-// IMPORTAR BASE DE DADOS COMPLETA DE PRODUÇÃO (PRD) PARA HOMOLOGAÇÃO (HML)
-
 function isRpaActivity(proc) {
     if (!proc) return false;
     if (currentCountry === 'HISPANA') return false;
@@ -2148,6 +2267,136 @@ function applyStateMigrations() {
         });
     } else {
         state.responsaveis = [];
+    }
+
+    // Migration for Sizing / WFM parameters
+    const defaultSizingParams = {
+        aumentoPctChamadas: 0,
+        volumeMensalVoz: 19912,
+        volAtendidas: 19215,
+        tmaVoz: 480,
+        slaMeta: 80,
+        nsMinimo: 60,
+        tmeMax: 20,
+        abandonoMax: 3.5,
+        dmmPercent: 5.62,
+        hmmPercent: 9.7,
+        shrinkageLanche: 10.5,
+        shrinkageTreinamento: 4.0,
+        shrinkageFeedback: 1.5,
+        shrinkageNR17: 17.0,
+        telasVoz: 1.0,
+        ajusteVoz: 0,
+        volumeMensalChat: 3000,
+        volAtendidasChat: 2895,
+        tmaChat: 480,
+        slaMetaChat: 80,
+        nsMinimoChat: 60,
+        tmeMaxChat: 20,
+        abandonoMaxChat: 3.5,
+        telasSimultaneas: 1.0,
+        telasChat: 1.0,
+        dmmPercentChat: 5.62,
+        hmmPercentChat: 9.7,
+        shrinkageLancheChat: 10.5,
+        shrinkageTreinamentoChat: 4.0,
+        shrinkageFeedbackChat: 1.5,
+        shrinkageNR17Chat: 17.0,
+        ajusteChat: 0,
+        volumeMensalBO: 500,
+        volAtendidasBO: 500,
+        tmaBO: 600,
+        diasUteis: 30,
+        diasAtendimento: 30,
+        cargaHorariaNominal: 380,
+        nr17BoPct: 10.53,
+        treinFbPct: 6.47,
+        eficienciaOcupacao: 70.0,
+        ajusteBo: 0,
+        safetyBuffer: 0,
+        volumePlanejado: 19912,
+        mesReferencia: '2026-11'
+    };
+
+    if (!state.sizingParams || typeof state.sizingParams !== 'object') {
+        state.sizingParams = Object.assign({}, defaultSizingParams);
+    } else {
+        for (const [k, v] of Object.entries(defaultSizingParams)) {
+            if (state.sizingParams[k] === undefined || state.sizingParams[k] === null) {
+                state.sizingParams[k] = v;
+            }
+        }
+    }
+
+    // Migração para Volume Atendidas editável em Voz, Chat e Backoffice
+    if (!state.sizingVolAtendidasEditable_v3) {
+        state.sizingVolAtendidasEditable_v3 = true;
+        if (state.sizingParams) {
+            if (state.sizingParams.volAtendidas === undefined || state.sizingParams.volAtendidas === null) {
+                state.sizingParams.volAtendidas = 19215;
+            }
+            if (state.sizingParams.volAtendidasChat === undefined || state.sizingParams.volAtendidasChat === null) {
+                state.sizingParams.volAtendidasChat = 2895;
+            }
+            if (state.sizingParams.volAtendidasBO === undefined || state.sizingParams.volAtendidasBO === null) {
+                state.sizingParams.volAtendidasBO = 500;
+            }
+        }
+    }
+
+    // Migração v4: Garantir inclusão de Backoffice e saneamento de Chat se ainda tiver o volume de Voz
+    if (!state.sizingBkoAlertsAndChatSync_v4) {
+        state.sizingBkoAlertsAndChatSync_v4 = true;
+        if (state.sizingParams) {
+            if (state.sizingParams.volumeMensalChat === 19912 || !state.sizingParams.volumeMensalChat) {
+                state.sizingParams.volumeMensalChat = 3000;
+                state.sizingParams.volAtendidasChat = 2895;
+            }
+            if (state.sizingParams.volAtendidasBO === undefined || state.sizingParams.volAtendidasBO === null || state.sizingParams.volAtendidasBO === 19215) {
+                state.sizingParams.volAtendidasBO = 500;
+            }
+        }
+    }
+
+    // Baseline de redimensionamento: Novembro/2026 como único mês ativo inicial, aberto para edição (sem coexistência de Dezembro)
+    if (!state.sizingNov26OnlyOpen_v2) {
+        state.sizingNov26OnlyOpen_v2 = true;
+        state.sizingNov26OnlyOpen_v1 = true;
+        state.sizingBaselineNov26 = true;
+        state.sizingHistory = {};
+        state.sizingConfirmedMonths = {};
+        state.sizingUnlockedMonths = {};
+        state.sizingCurrentMonth = '2026-11';
+        if (state.sizingParams) {
+            state.sizingParams.mesReferencia = '2026-11';
+            state.sizingParams.volumeMensalChat = 3000;
+            state.sizingParams.telasChat = 1.0;
+            state.sizingParams.telasSimultaneas = 1.0;
+        }
+    } else {
+        if (!state.sizingHistory || typeof state.sizingHistory !== 'object') {
+            state.sizingHistory = {};
+        }
+        if (!state.sizingConfirmedMonths || typeof state.sizingConfirmedMonths !== 'object') {
+            state.sizingConfirmedMonths = {};
+        }
+        if (!state.sizingUnlockedMonths || typeof state.sizingUnlockedMonths !== 'object') {
+            state.sizingUnlockedMonths = {};
+        }
+        // Remove quaisquer meses legados anteriores a 2026-11
+        Object.keys(state.sizingHistory).forEach(k => {
+            if (k < '2026-11') delete state.sizingHistory[k];
+        });
+        Object.keys(state.sizingConfirmedMonths).forEach(k => {
+            if (k < '2026-11') delete state.sizingConfirmedMonths[k];
+        });
+        Object.keys(state.sizingUnlockedMonths).forEach(k => {
+            if (k < '2026-11') delete state.sizingUnlockedMonths[k];
+        });
+        if (!state.sizingCurrentMonth || state.sizingCurrentMonth < '2026-11' || !/^\d{4}-\d{2}$/.test(state.sizingCurrentMonth)) {
+            state.sizingCurrentMonth = '2026-11';
+            if (state.sizingParams) state.sizingParams.mesReferencia = '2026-11';
+        }
     }
 }
 
@@ -2534,6 +2783,173 @@ function renderOrganogramFlowchart() {
 }
 
 // ============================================================
+// APP MODULES & ENVIRONMENT MANAGEMENT (ATENDIMENTO x OPERAÇÕES)
+// ============================================================
+const APP_MODULES = {
+    operacoes: {
+        key: 'operacoes',
+        name: 'Operações',
+        nameEs: 'Operaciones',
+        icon: 'fa-gears',
+        colorClass: 'mod-operacoes',
+        defaultView: 'dashboard',
+        views: ['dashboard', 'history', 'cadastros', 'balancing', 'automations', 'access-control']
+    },
+    atendimento: {
+        key: 'atendimento',
+        name: 'Atendimento',
+        nameEs: 'Atención',
+        icon: 'fa-headset',
+        colorClass: 'mod-atendimento',
+        defaultView: 'sizing',
+        views: ['sizing']
+    }
+};
+
+let currentModule = null; // 'operacoes' | 'atendimento'
+
+function getModuleForView(view) {
+    if (view === 'sizing') return 'atendimento';
+    return 'operacoes';
+}
+
+function updateModuleHeaderSwitcher() {
+    const btn = document.getElementById('btn-switch-module');
+    const label = document.getElementById('module-switch-label');
+    const icon = document.getElementById('module-switch-icon');
+    const bcModule = document.getElementById('bc-module-title');
+
+    const modKey = currentModule || 'operacoes';
+    const mod = APP_MODULES[modKey] || APP_MODULES.operacoes;
+    const displayName = currentCountry === 'HISPANA' ? mod.nameEs : mod.name;
+
+    if (label) label.textContent = displayName;
+    if (bcModule) bcModule.textContent = displayName;
+    if (icon) {
+        icon.className = `fa-solid ${mod.icon}`;
+    }
+    if (btn) {
+        btn.classList.remove('mod-operacoes', 'mod-atendimento');
+        btn.classList.add(mod.colorClass);
+    }
+}
+
+function applyModuleVisibility() {
+    if (!currentModule) return;
+
+    const isHsp = currentCountry === 'HISPANA';
+    const isAdmin = currentUser.perfil === 'ADMIN';
+
+    // 1. Filtrar itens do menu lateral e rótulos de seção de acordo com o módulo ativo
+    document.querySelectorAll('.sidebar-menu [data-module]').forEach(el => {
+        const itemModule = el.getAttribute('data-module');
+        if (itemModule === currentModule) {
+            // Verificar restrições de país (ex: Atendimento não permitido na Hispana)
+            if (isHsp && itemModule === 'atendimento') {
+                el.style.display = 'none';
+                return;
+            }
+            // Histórico, Balanceamento e Automações desativados na Hispana temporariamente
+            if (isHsp && el.dataset && (el.dataset.view === 'history' || el.dataset.view === 'balancing' || el.dataset.view === 'automations')) {
+                el.style.display = 'none';
+                return;
+            }
+            // Verificar permissão ADMIN
+            if (el.getAttribute('data-permissao') === 'ADMIN' && !isAdmin) {
+                el.style.display = 'none';
+                return;
+            }
+            el.style.display = (el.tagName === 'LI' && el.classList.contains('menu-section-label')) ? 'block' : 'flex';
+        } else {
+            el.style.display = 'none';
+        }
+    });
+
+    // 2. Atualizar botão e breadcrumb do seletor no header
+    updateModuleHeaderSwitcher();
+}
+
+function showModuleSelector() {
+    const overlay = document.getElementById('module-selector-overlay');
+    if (!overlay) return;
+
+    // Atualizar dados do usuário no chip do seletor
+    const emailEl = document.getElementById('module-user-email');
+    const roleEl = document.getElementById('module-user-role');
+    const countryEl = document.getElementById('module-user-country');
+    const greetEl = document.getElementById('module-selector-greet');
+    const closeBtn = document.getElementById('btn-close-module-selector');
+
+    const firstName = (currentUser.nome || 'Usuário').split(' ')[0];
+    if (greetEl) {
+        if (currentCountry === 'HISPANA') {
+            greetEl.textContent = `¡Hola, ${firstName}! ¿A dónde vamos hoy?`;
+        } else {
+            greetEl.textContent = `Olá, ${firstName}! Para onde vamos hoje?`;
+        }
+    }
+
+    if (emailEl) emailEl.textContent = currentUser.email || 'usuario@exemplo.com';
+    if (roleEl) {
+        roleEl.textContent = currentUser.perfil || 'CONSULTA';
+        roleEl.className = 'role role-' + (currentUser.perfil || 'consulta').toLowerCase();
+    }
+    if (countryEl) {
+        countryEl.textContent = currentCountry === 'HISPANA' ? '🌐 Hispana' : '🇧🇷 Brasil';
+    }
+
+    // Controle do card Atendimento para Hispana (desabilitado com badge)
+    const cardAtendimento = document.getElementById('card-module-atendimento');
+    const badgeAtendimento = document.getElementById('module-soon-badge-atendimento');
+    if (cardAtendimento) {
+        if (currentCountry === 'HISPANA') {
+            cardAtendimento.classList.add('is-disabled');
+            cardAtendimento.disabled = true;
+            if (badgeAtendimento) badgeAtendimento.style.display = 'inline-block';
+        } else {
+            cardAtendimento.classList.remove('is-disabled');
+            cardAtendimento.disabled = false;
+            if (badgeAtendimento) badgeAtendimento.style.display = 'none';
+        }
+    }
+
+    // Se o usuário já selecionou um módulo antes (abriu pelo botão do header), exibe botão de fechar
+    if (currentModule) {
+        if (closeBtn) closeBtn.style.display = 'inline-flex';
+    } else {
+        if (closeBtn) closeBtn.style.display = 'none';
+    }
+
+    overlay.style.display = 'flex';
+}
+
+function openModuleSelectorModal() {
+    showModuleSelector();
+}
+
+function closeModuleSelectorModal() {
+    if (!currentModule) return; // Escolha obrigatória no login
+    const overlay = document.getElementById('module-selector-overlay');
+    if (overlay) overlay.style.display = 'none';
+}
+
+function selectModule(moduleKey) {
+    if (moduleKey === 'atendimento' && currentCountry === 'HISPANA') {
+        showToast('O módulo Atendimento está disponível apenas para o Brasil no momento.', 'warning');
+        return;
+    }
+
+    currentModule = moduleKey;
+    const overlay = document.getElementById('module-selector-overlay');
+    if (overlay) overlay.style.display = 'none';
+
+    applyModuleVisibility();
+
+    const targetView = APP_MODULES[moduleKey]?.defaultView || 'dashboard';
+    switchToView(targetView);
+}
+
+// ============================================================
 // VIEW METADATA & BREADCRUMB / HEADER MANAGEMENT
 // ============================================================
 const VIEW_META = {
@@ -2566,6 +2982,11 @@ const VIEW_META = {
         title: 'Controle de Acesso',
         section: 'Administração',
         subtitle: 'Gestão centralizada de usuários, atribuição de perfis (ADMIN/OPERADOR/CONSULTA) e vinculação de equipes.'
+    },
+    'sizing': {
+        title: 'Redimensionamento de Capacidade',
+        section: 'Gestão',
+        subtitle: 'Dimensionamento de workforce (WFM) com Erlang C, premissas NR17 e governança contratual.'
     }
 };
 
@@ -2576,11 +2997,23 @@ function updateViewHeader(view) {
     const sectionEl = document.getElementById('bc-section-title');
     const pageEl = document.getElementById('bc-page-title');
     const subtitleEl = document.getElementById('app-view-subtitle');
+    const bcModuleEl = document.getElementById('bc-module-title');
     
     if (titleEl) titleEl.textContent = meta.title;
     if (sectionEl) sectionEl.textContent = meta.section;
     if (pageEl) pageEl.textContent = meta.title;
     if (subtitleEl) subtitleEl.textContent = meta.subtitle;
+
+    const modKey = currentModule || getModuleForView(view);
+    if (bcModuleEl && APP_MODULES[modKey]) {
+        bcModuleEl.textContent = currentCountry === 'HISPANA' ? APP_MODULES[modKey].nameEs : APP_MODULES[modKey].name;
+    }
+
+    // Ocultar filtros globais de área/responsável na visão Atendimento (pois Canais têm parâmetros próprios)
+    const globalFiltersEl = document.getElementById('header-global-filters');
+    if (globalFiltersEl) {
+        globalFiltersEl.style.display = (modKey === 'atendimento') ? 'none' : 'flex';
+    }
 
     // Control visibility of action buttons per view
     const btnReset = document.getElementById('btn-reset-global-state');
@@ -2588,8 +3021,8 @@ function updateViewHeader(view) {
     const btnPrint = document.getElementById('btn-print');
     
     if (btnReset) btnReset.style.display = (view === 'cadastros' && currentUser.perfil === 'ADMIN') ? 'inline-flex' : 'none';
-    if (btnExport) btnExport.style.display = (view === 'dashboard' || view === 'cadastros' || view === 'balancing' || view === 'automations' || view === 'history') ? 'inline-flex' : 'none';
-    if (btnPrint) btnPrint.style.display = (view === 'dashboard' || view === 'cadastros' || view === 'balancing' || view === 'automations' || view === 'history') ? 'inline-flex' : 'none';
+    if (btnExport) btnExport.style.display = (view === 'dashboard' || view === 'cadastros' || view === 'balancing' || view === 'automations' || view === 'history' || view === 'sizing') ? 'inline-flex' : 'none';
+    if (btnPrint) btnPrint.style.display = (view === 'dashboard' || view === 'cadastros' || view === 'balancing' || view === 'automations' || view === 'history' || view === 'sizing') ? 'inline-flex' : 'none';
 }
 
 function switchToView(view) {
@@ -2597,10 +3030,27 @@ function switchToView(view) {
     const targetEl = document.getElementById(`view-${view}`);
     if (!targetEl) view = 'dashboard';
 
+    // Auto-sync currentModule baseado na visão solicitada
+    const targetModule = getModuleForView(view);
+    if (currentModule !== targetModule) {
+        currentModule = targetModule;
+    }
+
+    // Se o seletor de módulos estiver aberto, fechar
+    const overlay = document.getElementById('module-selector-overlay');
+    if (overlay && overlay.style.display !== 'none') {
+        overlay.style.display = 'none';
+    }
+
+    // Aplicar isolamento do menu lateral e botão do header
+    applyModuleVisibility();
+
     // Verify RBAC access
     const menuItem = document.querySelector(`.sidebar-menu .menu-item[data-view="${view}"]`);
     if (menuItem && (menuItem.getAttribute('data-rbac-hidden') === 'true' || menuItem.style.display === 'none')) {
         view = 'dashboard';
+        currentModule = getModuleForView(view);
+        applyModuleVisibility();
     }
 
     // Update active menu item
@@ -2636,6 +3086,8 @@ function switchToView(view) {
         initHistoryView();
     } else if (view === 'access-control') {
         renderAccessControlView();
+    } else if (view === 'sizing') {
+        renderSizingView();
     }
 }
 
@@ -3053,6 +3505,24 @@ function setupEventListeners() {
 
     safeAddListener('btn-print', 'click', () => {
         window.print();
+    });
+
+    // Module Selector Overlay backdrop and escape key listeners
+    const moduleOverlay = document.getElementById('module-selector-overlay');
+    if (moduleOverlay) {
+        moduleOverlay.addEventListener('click', (e) => {
+            if (e.target === moduleOverlay && currentModule) {
+                closeModuleSelectorModal();
+            }
+        });
+    }
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && currentModule) {
+            const overlay = document.getElementById('module-selector-overlay');
+            if (overlay && overlay.style.display !== 'none') {
+                closeModuleSelectorModal();
+            }
+        }
     });
 }
 
@@ -6854,3 +7324,1687 @@ function renderAutomationsView() {
         tableBody.appendChild(tr);
     });
 }
+
+// ============================================================
+// REDIMENSIONAMENTO / WFM CAPACITY ENGINE
+// ============================================================
+
+// ERLANG B FORMULA (Loss Probability)
+function erlangB(m, A) {
+    if (A <= 0 || m <= 0) return 1.0;
+    let invB = 1.0;
+    for (let i = 1; i <= m; i++) {
+        invB = 1.0 + (i / A) * invB;
+    }
+    return 1.0 / invB;
+}
+
+// ERLANG C FORMULA (Waiting Probability Pw)
+function erlangCPw(m, A) {
+    if (A <= 0) return 0.0;
+    if (m <= A) return 1.0; // Instability: traffic exceeds server count
+    const B = erlangB(m, A);
+    const denom = m - A * (1.0 - B);
+    if (denom <= 0) return 1.0;
+    const pw = (m * B) / denom;
+    return Math.min(1.0, Math.max(0.0, pw));
+}
+
+// ERLANG C SERVICE LEVEL (Fraction of calls answered within targetWait seconds)
+function erlangCServiceLevel(m, A, targetWait, tma) {
+    if (A <= 0) return 1.0;
+    if (m <= A) return 0.0;
+    const pw = erlangCPw(m, A);
+    const exponent = - (m - A) * (targetWait / tma);
+    return Math.max(0.0, Math.min(1.0, 1.0 - pw * Math.exp(exponent)));
+}
+
+// FIND MINIMUM AGENTS LOGGED TO MEET SLA ITERATIVELY
+function findMinAgentsErlangC(A, targetSL, targetWait, tma) {
+    if (A <= 0) return 0;
+    const target = (targetSL || 80) / 100.0;
+    const minM = Math.max(1, Math.ceil(A));
+    const maxM = Math.max(minM + 150, Math.ceil(A * 3) + 20);
+    
+    for (let m = minM; m <= maxM; m++) {
+        const sl = erlangCServiceLevel(m, A, targetWait, tma);
+        if (sl >= target) {
+            return m;
+        }
+    }
+    return maxM;
+}
+
+// MOTOR 1: N1 VOZ
+function calcSizingN1Voz(p) {
+    const aumentoFactor = 1.0 + ((parseFloat(p.aumentoPctChamadas) || 0) / 100.0);
+    const volBase = Math.max(0, parseFloat(p.volumeMensalVoz) || 0);
+    const volEfetivo = Math.round(volBase * aumentoFactor);
+    
+    const abandonoMax = parseFloat(p.abandonoMax) || 3.5;
+    let volAtendidas;
+    if (p.volAtendidas !== undefined && p.volAtendidas !== null && !isNaN(p.volAtendidas) && p.volAtendidas >= 0) {
+        volAtendidas = Math.round(parseFloat(p.volAtendidas));
+    } else {
+        volAtendidas = Math.round(volEfetivo * (1.0 - (abandonoMax / 100.0)));
+    }
+    
+    const dmmPct = (parseFloat(p.dmmPercent) || 5.62) / 100.0;
+    const hmmPct = (parseFloat(p.hmmPercent) || 9.70) / 100.0;
+    const rawVolDMM = volEfetivo * dmmPct;
+    const volDMM = Math.floor(rawVolDMM);
+    const rawVolHMM = rawVolDMM * hmmPct;
+    const volHMM = Math.round(rawVolHMM);
+    
+    const tma = Math.max(1, parseFloat(p.tmaVoz) || 480);
+    const lambda = rawVolHMM / 3600.0;
+    const A = lambda * tma;
+    const erlang = Math.round(A);
+    
+    const targetSL = parseFloat(p.slaMeta) || 80;
+    const targetWait = parseFloat(p.tmeMax) || 20;
+    
+    let m = 0;
+    let achievedSL = 1.0;
+    let pw = 0.0;
+    
+    if (rawVolHMM > 0 && A > 0) {
+        m = findMinAgentsErlangC(A, targetSL, targetWait, tma);
+        achievedSL = erlangCServiceLevel(m, A, targetWait, tma);
+        pw = erlangCPw(m, A);
+    }
+    
+    const sLanche = parseFloat(p.shrinkageLanche) || 10.5;
+    const sTreino = parseFloat(p.shrinkageTreinamento) || 4.0;
+    const sFb = parseFloat(p.shrinkageFeedback) || 1.5;
+    const sNR17 = parseFloat(p.shrinkageNR17) || 17.0;
+    const totalShrinkPct = sLanche + sTreino + sFb + sNR17;
+    // Planilha original: divisor de PA's utiliza APENAS NR17: (1 - SOMA(B16))
+    const dispEfetiva = Math.max(0.01, 1.0 - (sNR17 / 100.0));
+    
+    const telas = Math.max(0.1, parseFloat(p.telasVoz !== undefined ? p.telasVoz : 1.0) || 1.0);
+    const pas = Math.ceil((m / telas) / dispEfetiva);
+    const ajuste = parseFloat(p.ajusteVoz) || 0;
+    const paContratada = Math.max(0, pas + ajuste);
+    // Planilha original: =(VolAtendidas / (PA_CONTRATADA * 2)) / 21
+    const chamadasOp = paContratada > 0 ? Math.round(volAtendidas / (paContratada * 2) / 21) : 0;
+    
+    return {
+        volBase,
+        volEfetivo,
+        volAtendidas,
+        dmmPct: dmmPct * 100,
+        hmmPct: hmmPct * 100,
+        volDMM,
+        volHMM,
+        erlang,
+        lambda,
+        A,
+        m,
+        telas,
+        achievedSL: achievedSL * 100,
+        pw: pw * 100,
+        sLanche,
+        sTreino,
+        sFb,
+        sNR17,
+        totalShrinkPct,
+        dispEfetiva: dispEfetiva * 100,
+        pas,
+        ajuste,
+        paContratada,
+        chamadasOp
+    };
+}
+
+// MOTOR 2: N1 CHAT
+function calcSizingN1Chat(p) {
+    const aumentoFactor = 1.0 + ((parseFloat(p.aumentoPctChamadas) || 0) / 100.0);
+    const volBase = Math.max(0, parseFloat(p.volumeMensalChat) || 0);
+    const volEfetivo = Math.round(volBase * aumentoFactor);
+    
+    const abandonoMax = parseFloat(p.abandonoMaxChat !== undefined ? p.abandonoMaxChat : p.abandonoMax) || 3.5;
+    let volAtendidas;
+    if (p.volAtendidasChat !== undefined && p.volAtendidasChat !== null && !isNaN(p.volAtendidasChat) && p.volAtendidasChat >= 0) {
+        volAtendidas = Math.round(parseFloat(p.volAtendidasChat));
+    } else {
+        volAtendidas = Math.round(volEfetivo * (1.0 - (abandonoMax / 100.0)));
+    }
+    
+    const dmmPct = (parseFloat(p.dmmPercentChat !== undefined ? p.dmmPercentChat : p.dmmPercent) || 5.62) / 100.0;
+    const hmmPct = (parseFloat(p.hmmPercentChat !== undefined ? p.hmmPercentChat : p.hmmPercent) || 9.70) / 100.0;
+    const rawVolDMM = volEfetivo * dmmPct;
+    const volDMM = Math.floor(rawVolDMM);
+    const rawVolHMM = rawVolDMM * hmmPct;
+    const volHMM = Math.round(rawVolHMM);
+    
+    const tma = Math.max(1, parseFloat(p.tmaChat) || 480);
+    const lambda = rawVolHMM / 3600.0;
+    const A = lambda * tma;
+    const erlang = Math.round(A);
+    
+    const targetSL = parseFloat(p.slaMetaChat !== undefined ? p.slaMetaChat : p.slaMeta) || 80;
+    const targetWait = parseFloat(p.tmeMaxChat !== undefined ? p.tmeMaxChat : p.tmeMax) || 20;
+    
+    let m = 0;
+    let achievedSL = 1.0;
+    let pw = 0.0;
+    
+    if (rawVolHMM > 0 && A > 0) {
+        m = findMinAgentsErlangC(A, targetSL, targetWait, tma);
+        achievedSL = erlangCServiceLevel(m, A, targetWait, tma);
+        pw = erlangCPw(m, A);
+    }
+    
+    const telas = Math.max(0.1, parseFloat(p.telasChat !== undefined ? p.telasChat : (p.telasSimultaneas || 1.0)) || 1.0);
+    const sLanche = parseFloat(p.shrinkageLancheChat !== undefined ? p.shrinkageLancheChat : p.shrinkageLanche) || 10.5;
+    const sTreino = parseFloat(p.shrinkageTreinamentoChat !== undefined ? p.shrinkageTreinamentoChat : p.shrinkageTreinamento) || 4.0;
+    const sFb = parseFloat(p.shrinkageFeedbackChat !== undefined ? p.shrinkageFeedbackChat : p.shrinkageFeedback) || 1.5;
+    const sNR17 = parseFloat(p.shrinkageNR17Chat !== undefined ? p.shrinkageNR17Chat : p.shrinkageNR17) || 17.0;
+    const totalShrinkPct = sLanche + sTreino + sFb + sNR17;
+    // Planilha original: divisor de PA's utiliza APENAS NR17: (1 - SOMA(B16))
+    const dispEfetiva = Math.max(0.01, 1.0 - (sNR17 / 100.0));
+    
+    const pas = Math.ceil((m / telas) / dispEfetiva);
+    const ajuste = parseFloat(p.ajusteChat) || 0;
+    const paContratada = Math.max(0, pas + ajuste);
+    // Planilha original: =(VolAtendidas / (PA_CONTRATADA * 2)) / 21
+    const chamadasOp = paContratada > 0 ? Math.round(volAtendidas / (paContratada * 2) / 21) : 0;
+    
+    return {
+        volBase,
+        volEfetivo,
+        volAtendidas,
+        dmmPct: dmmPct * 100,
+        hmmPct: hmmPct * 100,
+        volDMM,
+        volHMM,
+        erlang,
+        lambda,
+        A,
+        m,
+        telas,
+        achievedSL: achievedSL * 100,
+        pw: pw * 100,
+        sLanche,
+        sTreino,
+        sFb,
+        sNR17,
+        totalShrinkPct,
+        dispEfetiva: dispEfetiva * 100,
+        pas,
+        ajuste,
+        paContratada,
+        chamadasOp
+    };
+}
+
+// MOTOR 3: N2 BACKOFFICE (OFFLINE)
+function calcSizingN2Backoffice(p) {
+    const aumentoFactor = 1.0 + ((parseFloat(p.aumentoPctChamadas) || 0) / 100.0);
+    const volBase = Math.max(0, parseFloat(p.volumeMensalBO) || 0);
+    const volEfetivo = Math.round(volBase * aumentoFactor);
+    
+    // E8: Volume Dia = =E6/E7
+    const diasUteis = Math.max(1, parseFloat(p.diasUteis) || 30);
+    const volDiaExact = volEfetivo / diasUteis;
+    const volDia = Math.round(volDiaExact);
+    
+    // E15: TMA em Segundos & E14: TMA Real em Minutos
+    const tma = Math.max(1, parseFloat(p.tmaBO) || 600);
+    const tmaRealMin = tma / 60.0;
+    
+    // E17: Carga Horária Nominal (minutos)
+    const chNominalMin = parseFloat(p.cargaHorariaNominal) || 380;
+    
+    // E18: NR 17 (%) & E19: Carga Horária de trabalho (minutos)
+    const nr17Pct = parseFloat(p.nr17BoPct) || 10.53;
+    const nr17Ratio = (Math.abs(nr17Pct - 10.53) < 0.01 && chNominalMin === 380) ? (40.0 / 380.0) : (nr17Pct / 100.0);
+    const pausasNR17Min = chNominalMin * nr17Ratio;
+    const chTrabalhoMin = chNominalMin - pausasNR17Min;
+    
+    // E16: Dias de Atendimento & E20: Horas Mês
+    const diasAtend = Math.max(1, parseFloat(p.diasAtendimento) || 30);
+    const horasMesMin = chTrabalhoMin * diasAtend;
+    
+    // E21: Treinamento+FeedBack (%) & E22: Horas Produtivas (minutos)
+    const treinFbPct = parseFloat(p.treinFbPct) || 6.47;
+    const treinFbRatio = (Math.abs(treinFbPct - 6.47) < 0.01) ? (11.0 / 170.0) : (treinFbPct / 100.0);
+    const treinFbMin = chTrabalhoMin * treinFbRatio;
+    const horasProdutivasMin = chTrabalhoMin - treinFbMin;
+    
+    // E23: % deste tempo falando & E24: Carga Horária de trabalho Efetivo (minutos/segundos)
+    const eficienciaPct = (parseFloat(p.eficienciaOcupacao) || 70.0) / 100.0;
+    const chEfetivaMin = horasProdutivasMin * eficienciaPct;
+    const chEfetivaSeg = chEfetivaMin * 60.0;
+    
+    // E9: Prod. Máx. Operador/Dia = =E24/E14
+    const prodMaxDiaExact = tmaRealMin > 0 ? (chEfetivaMin / tmaRealMin) : 0;
+    const prodMaxDia = Math.round(prodMaxDiaExact);
+    
+    // E10: PA's Necessárias = =ARREDONDAR.PARA.CIMA(E8/E9/2;0)
+    let pas = 0;
+    if (prodMaxDiaExact > 0 && volDiaExact > 0) {
+        pas = Math.ceil((volDiaExact / prodMaxDiaExact) / 2);
+    }
+    
+    // E11: Ajuste & E12: PA CONTRATADA = =E10+E11
+    const ajuste = parseFloat(p.ajusteBo) || 0;
+    const paContratada = Math.max(0, pas + ajuste);
+    
+    // E13: CHAMADAS / OPERADOR = =E8/(E12*2)
+    const chamadasOp = paContratada > 0 ? Math.round(volDiaExact / (paContratada * 2)) : 0;
+    
+    const volAtendidas = (p.volAtendidasBO !== undefined && p.volAtendidasBO !== null && !isNaN(p.volAtendidasBO)) 
+        ? Math.round(parseFloat(p.volAtendidasBO)) 
+        : volEfetivo;
+    
+    return {
+        volBase,
+        volEfetivo,
+        volAtendidas,
+        diasUteis,
+        volDia,
+        prodMaxDia,
+        pas,
+        ajuste,
+        paContratada,
+        chamadasOp,
+        tma,
+        tmaRealMinFmt: minToHHMMSS(tma / 60),
+        diasAtend,
+        chNominalMin,
+        chNominalFmt: minToHHMMSS(chNominalMin),
+        nr17Pct,
+        chTrabalhoMin,
+        chTrabalhoFmt: minToHHMMSS(chTrabalhoMin),
+        horasMesMin,
+        horasMesFmt: minToHHMMSS(horasMesMin),
+        treinFbPct,
+        horasProdutivasMin,
+        horasProdutivasFmt: minToHHMMSS(horasProdutivasMin),
+        eficienciaPct: eficienciaPct * 100,
+        chEfetivaMin,
+        chEfetivaSeg,
+        chEfetivoFmt: minToHHMMSS(chEfetivaMin)
+    };
+}
+
+// HELPER: MINUTES TO HH:MM:SS
+function minToHHMMSS(min) {
+    if (isNaN(min) || min < 0) return '00:00:00';
+    const totalSec = Math.round(min * 60);
+    const h = Math.floor(totalSec / 3600);
+    const m = Math.floor((totalSec % 3600) / 60);
+    const s = totalSec % 60;
+    return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+}
+
+// MONTH LOCK & VERSIONING
+function isSizingMonthLocked(mesKey) {
+    if (!mesKey || !/^\d{4}-\d{2}$/.test(mesKey)) return false;
+    
+    // Se o mês estiver explicitamente desbloqueado para ajustes pelo usuário, não está travado
+    if (state.sizingUnlockedMonths && state.sizingUnlockedMonths[mesKey]) {
+        return false;
+    }
+    
+    // Se o mês estiver confirmado oficialmente, está travado
+    if (state.sizingConfirmedMonths && state.sizingConfirmedMonths[mesKey]) {
+        return true;
+    }
+    
+    const allMonths = Object.keys(state.sizingHistory || {}).filter(m => m >= '2026-11');
+    if (state.sizingCurrentMonth && state.sizingCurrentMonth >= '2026-11') {
+        allMonths.push(state.sizingCurrentMonth);
+    }
+    const validMonths = Array.from(new Set(allMonths.filter(m => /^\d{4}-\d{2}$/.test(m)))).sort();
+    if (validMonths.length === 0) return false;
+    const latestMonth = validMonths[validMonths.length - 1];
+    // Qualquer mês anterior ao mês mais recente projetado fica travado como histórico
+    return mesKey < latestMonth;
+}
+
+const MONTH_NAMES_SHORT = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
+function formatMonthName(mesKey) {
+    if (!mesKey || !/^\d{4}-\d{2}$/.test(mesKey)) return mesKey || 'Mês';
+    const [y, m] = mesKey.split('-').map(Number);
+    return `${MONTH_NAMES_SHORT[(m - 1) % 12]}/${String(y).slice(-2)}`;
+}
+function getMonthOnly(mesKey) {
+    if (!mesKey || !/^\d{4}-\d{2}$/.test(mesKey)) return 'Jan';
+    const m = parseInt(mesKey.split('-')[1], 10);
+    return MONTH_NAMES_SHORT[(m - 1) % 12] || 'Jan';
+}
+
+function onSizingMonthSelect(mesKey) {
+    if (!mesKey) return;
+    
+    // Salva o snapshot do mês que estava ativo somente se ele não estiver travado
+    if (!isSizingMonthLocked(state.sizingCurrentMonth)) {
+        saveCurrentSizingMonthSnapshot();
+    }
+    
+    state.sizingCurrentMonth = mesKey;
+    state.sizingParams.mesReferencia = mesKey;
+    
+    if (state.sizingHistory && state.sizingHistory[mesKey]) {
+        state.sizingParams = Object.assign({}, state.sizingParams, state.sizingHistory[mesKey]);
+    }
+    
+    renderSizingView();
+    showToast(`Projeção de ${formatMonthName(mesKey)} carregada!`, 'info', 2000);
+}
+
+let _sizingSyncBadgeTimer = null;
+function flashSizingSyncBadge() {
+    const badge = document.getElementById('sizing-sync-badge');
+    if (!badge) return;
+    badge.style.display = 'inline-flex';
+    badge.style.opacity = '1';
+    badge.style.transition = 'opacity 0.2s ease';
+    if (_sizingSyncBadgeTimer) clearTimeout(_sizingSyncBadgeTimer);
+    _sizingSyncBadgeTimer = setTimeout(() => {
+        if (badge) {
+            badge.style.transition = 'opacity 0.4s ease';
+            badge.style.opacity = '0';
+            setTimeout(() => {
+                if (badge && badge.style.opacity === '0') badge.style.display = 'none';
+            }, 400);
+        }
+    }, 1500);
+}
+
+function saveCurrentSizingMonthSnapshot() {
+    if (!state.sizingHistory) state.sizingHistory = {};
+    const mesKey = state.sizingCurrentMonth || state.sizingParams.mesReferencia || '2026-11';
+    state.sizingHistory[mesKey] = Object.assign({}, state.sizingParams, {
+        mesReferencia: mesKey,
+        dataAtualizacao: new Date().toISOString()
+    });
+    saveState();
+    flashSizingSyncBadge();
+}
+
+// CONFIRMAÇÃO OFICIAL DE PROJEÇÃO DE DEMANDA
+function openConfirmProjectionModal() {
+    const curMonth = state.sizingCurrentMonth || '2026-11';
+    
+    const titleEl = document.getElementById('modal-confirm-proj-month-name');
+    if (titleEl) {
+        titleEl.textContent = formatMonthName(curMonth);
+    }
+    
+    // Lê os valores finais calculados diretamente dos widgets
+    const vozVal = document.getElementById('widget-sizing-pas-voz')?.textContent || '0';
+    const chatVal = document.getElementById('widget-sizing-pas-chat')?.textContent || '0';
+    const boVal = document.getElementById('widget-sizing-pas-bo')?.textContent || '0';
+    const totalVal = document.getElementById('widget-sizing-total-pas')?.textContent || '0';
+    
+    const elVoz = document.getElementById('modal-confirm-summary-voz');
+    const elChat = document.getElementById('modal-confirm-summary-chat');
+    const elBO = document.getElementById('modal-confirm-summary-bo');
+    const elTotal = document.getElementById('modal-confirm-summary-total');
+    
+    if (elVoz) elVoz.textContent = vozVal;
+    if (elChat) elChat.textContent = chatVal;
+    if (elBO) elBO.textContent = boVal;
+    if (elTotal) elTotal.textContent = totalVal;
+    
+    const modal = document.getElementById('modal-confirm-sizing-projection');
+    if (modal) modal.style.display = 'flex';
+}
+
+function closeConfirmProjectionModal() {
+    const modal = document.getElementById('modal-confirm-sizing-projection');
+    if (modal) modal.style.display = 'none';
+}
+
+function confirmSizingProjection() {
+    const curMonth = state.sizingCurrentMonth || '2026-11';
+    
+    if (!state.sizingConfirmedMonths) state.sizingConfirmedMonths = {};
+    const confirmedUser = (typeof currentUser !== 'undefined' && currentUser && (currentUser.nome || currentUser.email)) 
+        ? (currentUser.nome || currentUser.email) 
+        : 'Operador';
+        
+    state.sizingConfirmedMonths[curMonth] = {
+        confirmedAt: new Date().toISOString(),
+        confirmedBy: confirmedUser
+    };
+    
+    // Salva o snapshot definitivo com o registro de confirmação
+    saveCurrentSizingMonthSnapshot();
+    
+    closeConfirmProjectionModal();
+    renderSizingView();
+    showToast(`Projeção de ${formatMonthName(curMonth)} confirmada e travada oficialmente!`, 'success', 3500);
+    
+    // Encadeia automaticamente a abertura para criação da projeção subsequente
+    setTimeout(() => {
+        openNewSizingModal();
+    }, 450);
+}
+
+function openNewSizingModal() {
+    // Considera apenas meses a partir de 2026-11
+    const allMonths = Object.keys(state.sizingHistory || {}).filter(m => m >= '2026-11');
+    if (state.sizingCurrentMonth && state.sizingCurrentMonth >= '2026-11') {
+        allMonths.push(state.sizingCurrentMonth);
+    }
+    const validMonths = Array.from(new Set(allMonths.filter(m => /^\d{4}-\d{2}$/.test(m)))).sort();
+    const latest = validMonths.length > 0 ? validMonths[validMonths.length - 1] : '2026-11';
+    
+    const [y, m] = latest.split('-').map(Number);
+    let nextM = m + 1;
+    let nextY = y;
+    if (nextM > 12) {
+        nextM = 1;
+        nextY += 1;
+    }
+    const defNext = `${nextY}-${String(nextM).padStart(2, '0')}`;
+    
+    const inputEl = document.getElementById('modal-input-new-sizing-month');
+    if (inputEl) {
+        inputEl.value = defNext;
+        inputEl.min = '2026-11';
+    }
+    
+    const tipEl = document.getElementById('modal-tip-new-sizing-month');
+    if (tipEl) {
+        tipEl.innerHTML = `Próximo mês sugerido: <strong>${formatMonthName(defNext)}</strong> (subsequente a ${formatMonthName(latest)})`;
+    }
+    
+    const modal = document.getElementById('modal-new-sizing-projection');
+    if (modal) modal.style.display = 'flex';
+}
+
+function closeNewSizingModal() {
+    const modal = document.getElementById('modal-new-sizing-projection');
+    if (modal) modal.style.display = 'none';
+}
+
+function confirmNewSizingMonth() {
+    const inputEl = document.getElementById('modal-input-new-sizing-month');
+    const mesKey = inputEl ? inputEl.value.trim() : '';
+    if (!/^\d{4}-\d{2}$/.test(mesKey)) {
+        showToast('Selecione um mês válido (formato AAAA-MM)!', 'warning', 3000);
+        return;
+    }
+    if (mesKey < '2026-11') {
+        showToast('O sistema só aceita projeções a partir de Novembro/2026!', 'warning', 3000);
+        return;
+    }
+    
+    if (state.sizingHistory && state.sizingHistory[mesKey]) {
+        showToast(`Projeção para ${formatMonthName(mesKey)} já existe no histórico!`, 'info', 3000);
+        closeNewSizingModal();
+        onSizingMonthSelect(mesKey);
+        return;
+    }
+    
+    // Salva o snapshot do mês atual antes de alternar para o novo
+    saveCurrentSizingMonthSnapshot();
+    
+    // Cria novo mês clonando parâmetros vigentes como base editável
+    if (!state.sizingHistory) state.sizingHistory = {};
+    state.sizingHistory[mesKey] = Object.assign({}, state.sizingParams, {
+        mesReferencia: mesKey,
+        dataCriacao: new Date().toISOString()
+    });
+    
+    state.sizingCurrentMonth = mesKey;
+    state.sizingParams = Object.assign({}, state.sizingHistory[mesKey]);
+    saveState();
+    
+    closeNewSizingModal();
+    renderSizingView();
+    showToast(`Nova projeção criada para ${formatMonthName(mesKey)}!`, 'success', 3500);
+}
+
+function promptNewSizingMonth() {
+    openNewSizingModal();
+}
+
+// ROLLBACK: DESCARTAR PROJEÇÃO VIGENTE (SE CRIADA POR ENGANO)
+function openConfirmDiscardModal() {
+    const curMonth = state.sizingCurrentMonth || '2026-11';
+    if (curMonth <= '2026-11') {
+        showToast('A projeção base de Novembro/2026 não pode ser descartada!', 'warning', 3000);
+        return;
+    }
+    
+    const allMonths = Object.keys(state.sizingHistory || {}).filter(m => m >= '2026-11');
+    allMonths.push(curMonth);
+    const sorted = Array.from(new Set(allMonths.filter(m => /^\d{4}-\d{2}$/.test(m)))).sort();
+    const prevMonth = sorted.filter(m => m < curMonth).pop() || '2026-11';
+    
+    const descEl = document.getElementById('modal-discard-desc');
+    if (descEl) {
+        descEl.innerHTML = `Deseja realmente descartar a projeção de <strong>${formatMonthName(curMonth)}</strong>? Esta ação removerá os dados deste período.`;
+    }
+    const tipEl = document.getElementById('modal-discard-tip');
+    if (tipEl) {
+        tipEl.innerHTML = `A projeção de <strong>${formatMonthName(prevMonth)}</strong> voltará a ser a projeção vigente e será reaberta para edição.`;
+    }
+    
+    const modal = document.getElementById('modal-confirm-discard-sizing');
+    if (modal) modal.style.display = 'flex';
+}
+
+function closeConfirmDiscardModal() {
+    const modal = document.getElementById('modal-confirm-discard-sizing');
+    if (modal) modal.style.display = 'none';
+}
+
+function confirmDiscardSizingProjection() {
+    const curMonth = state.sizingCurrentMonth || '2026-11';
+    if (curMonth <= '2026-11') {
+        closeConfirmDiscardModal();
+        return;
+    }
+    
+    // Remove do histórico, da confirmação e do rastreio de desbloqueio
+    if (state.sizingHistory) {
+        delete state.sizingHistory[curMonth];
+    }
+    if (state.sizingConfirmedMonths) {
+        delete state.sizingConfirmedMonths[curMonth];
+    }
+    if (state.sizingUnlockedMonths) {
+        delete state.sizingUnlockedMonths[curMonth];
+    }
+    
+    // Identifica o novo mês vigente (último restante)
+    const remaining = Object.keys(state.sizingHistory || {}).filter(m => m >= '2026-11').sort();
+    const newActiveMonth = remaining.length > 0 ? remaining[remaining.length - 1] : '2026-11';
+    
+    state.sizingCurrentMonth = newActiveMonth;
+    if (state.sizingHistory && state.sizingHistory[newActiveMonth]) {
+        state.sizingParams = Object.assign({}, state.sizingHistory[newActiveMonth]);
+    } else {
+        state.sizingParams.mesReferencia = newActiveMonth;
+    }
+    saveState();
+    
+    closeConfirmDiscardModal();
+    renderSizingView();
+    showToast(`Projeção de ${formatMonthName(curMonth)} descartada. ${formatMonthName(newActiveMonth)} reaberto como vigente!`, 'success', 3500);
+}
+
+// DESBLOQUEIO CONTROLADO DE HISTÓRICO PARA AJUSTES
+function unlockCurrentHistoricalMonth() {
+    const curMonth = state.sizingCurrentMonth || '2026-11';
+    if (!state.sizingUnlockedMonths) state.sizingUnlockedMonths = {};
+    state.sizingUnlockedMonths[curMonth] = true;
+    
+    renderSizingView();
+    showToast(`Projeção de ${formatMonthName(curMonth)} desbloqueada para ajustes!`, 'warning', 3000);
+}
+
+function relockCurrentHistoricalMonth() {
+    const curMonth = state.sizingCurrentMonth || '2026-11';
+    if (state.sizingUnlockedMonths) {
+        delete state.sizingUnlockedMonths[curMonth];
+    }
+    // Salva o snapshot com os novos ajustes realizados
+    saveCurrentSizingMonthSnapshot();
+    
+    renderSizingView();
+    showToast(`Ajustes em ${formatMonthName(curMonth)} concluídos e protegidos!`, 'success', 3000);
+}
+
+// ACCORDION TOGGLER FOR SIZING TECHNICAL BREAKDOWN
+function toggleSizingAccordion(accId) {
+    const body = document.getElementById(`body-${accId}`);
+    const arrow = document.getElementById(`arrow-${accId}`);
+    if (!body) return;
+    const isHidden = body.style.display === 'none' || (!body.style.display && getComputedStyle(body).display === 'none');
+    body.style.display = isHidden ? 'block' : 'none';
+    if (arrow) {
+        if (isHidden) arrow.classList.add('open');
+        else arrow.classList.remove('open');
+    }
+}
+
+// RESTORE DEFAULT PARAMETERS
+function resetSizingDefaults() {
+    if (!confirm('Deseja realmente restaurar todos os parâmetros de dimensionamento para os valores padrão da planilha?')) {
+        return;
+    }
+    
+    state.sizingParams = {
+        aumentoPctChamadas: 0,
+        volumeMensalVoz: 19912,
+        volAtendidas: 19215,
+        tmaVoz: 480,
+        slaMeta: 80,
+        nsMinimo: 60,
+        tmeMax: 20,
+        abandonoMax: 3.5,
+        dmmPercent: 5.62,
+        hmmPercent: 9.7,
+        shrinkageLanche: 10.5,
+        shrinkageTreinamento: 4.0,
+        shrinkageFeedback: 1.5,
+        shrinkageNR17: 17.0,
+        telasVoz: 1.0,
+        ajusteVoz: 0,
+        volumeMensalChat: 3000,
+        volAtendidasChat: 2895,
+        tmaChat: 480,
+        slaMetaChat: 80,
+        nsMinimoChat: 60,
+        tmeMaxChat: 20,
+        abandonoMaxChat: 3.5,
+        telasSimultaneas: 1.0,
+        telasChat: 1.0,
+        dmmPercentChat: 5.62,
+        hmmPercentChat: 9.7,
+        shrinkageLancheChat: 10.5,
+        shrinkageTreinamentoChat: 4.0,
+        shrinkageFeedbackChat: 1.5,
+        shrinkageNR17Chat: 17.0,
+        ajusteChat: 0,
+        volumeMensalBO: 500,
+        volAtendidasBO: 500,
+        tmaBO: 600,
+        diasUteis: 30,
+        diasAtendimento: 30,
+        cargaHorariaNominal: 380,
+        nr17BoPct: 10.53,
+        treinFbPct: 6.47,
+        eficienciaOcupacao: 70.0,
+        ajusteBo: 0,
+        safetyBuffer: 0,
+        volumePlanejado: 19912,
+        mesReferencia: state.sizingCurrentMonth || '2026-11'
+    };
+    
+    renderSizingView();
+    showToast('Parâmetros restaurados para o padrão da planilha!', 'info');
+}
+
+// FLASH HIGHLIGHT ON RECALCULATED CELLS
+function highlightCellUpdate(el) {
+    if (!el) return;
+    el.classList.remove('cell-recalculated-flash');
+    void el.offsetWidth;
+    el.classList.add('cell-recalculated-flash');
+}
+
+// RECALCULATE & UPDATE ALL SIZING RESULTS
+let _sizingDebounceTimer = null;
+
+function recalcSizing(fromInputs = true) {
+    if (!state.sizingParams) state.sizingParams = {};
+    const p = state.sizingParams;
+    
+    // Read from inputs if user edited form
+    if (fromInputs) {
+        const getNum = (id, fallback) => {
+            const el = document.getElementById(id);
+            if (!el) return fallback;
+            let valStr = String(el.value || '').trim();
+            if (!valStr) return fallback;
+            // Suporte resiliente a formatos BR com ponto de milhar (ex: 1.000 ou 10.270)
+            if (/^\d{1,3}(\.\d{3})+(,\d+)?$/.test(valStr)) {
+                valStr = valStr.replace(/\./g, '').replace(',', '.');
+            } else if (valStr.includes(',')) {
+                valStr = valStr.replace(',', '.');
+            }
+            const val = parseFloat(valStr);
+            return isNaN(val) ? fallback : val;
+        };
+        
+        const activeId = document.activeElement ? document.activeElement.id : '';
+
+        // QUADRO 1: VOZ
+        p.volumeMensalVoz = Math.max(0, getNum('input-sizing-vol-voz', p.volumeMensalVoz || 19912));
+        if (activeId === 'input-sizing-vol-voz' || activeId === 'input-sizing-abandono-max') {
+            const defAtendVoz = Math.round(p.volumeMensalVoz * (1.0 - ((parseFloat(p.abandonoMax) || 3.5) / 100.0)));
+            const elAtendVoz = document.getElementById('input-sizing-vol-atendidas');
+            if (elAtendVoz) elAtendVoz.value = defAtendVoz;
+            p.volAtendidas = defAtendVoz;
+        } else {
+            p.volAtendidas = Math.max(0, getNum('input-sizing-vol-atendidas', p.volAtendidas !== undefined ? p.volAtendidas : 19215));
+        }
+
+        p.tmaVoz = Math.max(1, getNum('input-sizing-tma-voz', p.tmaVoz || 480));
+        p.slaMeta = Math.min(100, Math.max(1, getNum('input-sizing-sla-meta', p.slaMeta || 80)));
+        p.nsMinimo = Math.min(100, Math.max(1, getNum('input-sizing-ns-minimo', p.nsMinimo || 60)));
+        p.tmeMax = Math.max(1, getNum('input-sizing-tme-max', p.tmeMax || 20));
+        p.abandonoMax = Math.min(100, Math.max(0, getNum('input-sizing-abandono-max', p.abandonoMax || 3.5)));
+        p.telasVoz = Math.max(0.1, getNum('input-sizing-telas-voz', p.telasVoz || 1.0));
+        p.dmmPercent = Math.min(100, Math.max(0.01, getNum('input-sizing-dmm', p.dmmPercent || 5.62)));
+        p.hmmPercent = Math.min(100, Math.max(0.01, getNum('input-sizing-hmm', p.hmmPercent || 9.7)));
+        p.shrinkageLanche = Math.min(99, Math.max(0, getNum('input-sizing-shrink-lanche', p.shrinkageLanche || 10.5)));
+        p.shrinkageTreinamento = Math.min(99, Math.max(0, getNum('input-sizing-shrink-treino', p.shrinkageTreinamento || 4.0)));
+        p.shrinkageFeedback = Math.min(99, Math.max(0, getNum('input-sizing-shrink-fb', p.shrinkageFeedback || 1.5)));
+        p.shrinkageNR17 = Math.min(99, Math.max(0, getNum('input-sizing-shrink-nr17', p.shrinkageNR17 || 17.0)));
+        p.ajusteVoz = getNum('input-sizing-ajuste-voz', p.ajusteVoz || 0);
+        
+        // QUADRO 2: CHAT
+        p.volumeMensalChat = Math.max(0, getNum('input-sizing-vol-chat', (p.volumeMensalChat !== undefined && p.volumeMensalChat !== null) ? p.volumeMensalChat : 3000));
+        if (activeId === 'input-sizing-vol-chat' || activeId === 'input-sizing-abandono-max-chat') {
+            const defAtendChat = Math.round(p.volumeMensalChat * (1.0 - ((parseFloat(p.abandonoMaxChat) || 3.5) / 100.0)));
+            const elAtendChat = document.getElementById('input-sizing-vol-atendidas-chat');
+            if (elAtendChat) elAtendChat.value = defAtendChat;
+            p.volAtendidasChat = defAtendChat;
+        } else {
+            p.volAtendidasChat = Math.max(0, getNum('input-sizing-vol-atendidas-chat', p.volAtendidasChat !== undefined ? p.volAtendidasChat : 2895));
+        }
+
+        p.tmaChat = Math.max(1, getNum('input-sizing-tma-chat', p.tmaChat || 480));
+        p.slaMetaChat = Math.min(100, Math.max(1, getNum('input-sizing-sla-meta-chat', p.slaMetaChat || 80)));
+        p.nsMinimoChat = Math.min(100, Math.max(1, getNum('input-sizing-ns-minimo-chat', p.nsMinimoChat || 60)));
+        p.tmeMaxChat = Math.max(1, getNum('input-sizing-tme-max-chat', p.tmeMaxChat || 20));
+        p.abandonoMaxChat = Math.min(100, Math.max(0, getNum('input-sizing-abandono-max-chat', p.abandonoMaxChat || 3.5)));
+        p.telasChat = Math.max(0.1, getNum('input-sizing-telas-chat', (p.telasChat !== undefined && p.telasChat !== null) ? p.telasChat : (p.telasSimultaneas || 1.0)));
+        p.telasSimultaneas = p.telasChat;
+        p.dmmPercentChat = Math.min(100, Math.max(0.01, getNum('input-sizing-dmm-chat', p.dmmPercentChat || 5.62)));
+        p.hmmPercentChat = Math.min(100, Math.max(0.01, getNum('input-sizing-hmm-chat', p.hmmPercentChat || 9.7)));
+        p.shrinkageLancheChat = Math.min(99, Math.max(0, getNum('input-sizing-shrink-lanche-chat', p.shrinkageLancheChat || 10.5)));
+        p.shrinkageTreinamentoChat = Math.min(99, Math.max(0, getNum('input-sizing-shrink-treino-chat', p.shrinkageTreinamentoChat || 4.0)));
+        p.shrinkageFeedbackChat = Math.min(99, Math.max(0, getNum('input-sizing-shrink-fb-chat', p.shrinkageFeedbackChat || 1.5)));
+        p.shrinkageNR17Chat = Math.min(99, Math.max(0, getNum('input-sizing-shrink-nr17-chat', p.shrinkageNR17Chat || 17.0)));
+        p.ajusteChat = getNum('input-sizing-ajuste-chat', p.ajusteChat || 0);
+        
+        // QUADRO 3: BKO
+        p.volumeMensalBO = Math.max(0, getNum('input-sizing-vol-bo', (p.volumeMensalBO !== undefined && p.volumeMensalBO !== null) ? p.volumeMensalBO : 500));
+        if (activeId === 'input-sizing-vol-bo') {
+            const defAtendBO = p.volumeMensalBO;
+            const elAtendBO = document.getElementById('input-sizing-vol-atendidas-bo');
+            if (elAtendBO) elAtendBO.value = defAtendBO;
+            p.volAtendidasBO = defAtendBO;
+        } else {
+            p.volAtendidasBO = Math.max(0, getNum('input-sizing-vol-atendidas-bo', p.volAtendidasBO !== undefined ? p.volAtendidasBO : 500));
+        }
+
+        p.diasUteis = Math.max(1, getNum('input-sizing-dias-uteis-bo', p.diasUteis || 30));
+        p.ajusteBo = getNum('input-sizing-ajuste-bo', p.ajusteBo || 0);
+        p.tmaBO = Math.max(1, getNum('input-sizing-tma-bo', p.tmaBO || 600));
+        p.diasAtendimento = Math.max(1, getNum('input-sizing-dias-atend', p.diasAtendimento || 30));
+        p.nr17BoPct = Math.min(99, Math.max(0, getNum('input-sizing-nr17-bo-pct', p.nr17BoPct || 10.53)));
+        p.treinFbPct = Math.min(99, Math.max(0, getNum('input-sizing-trein-fb-pct', p.treinFbPct || 6.47)));
+        p.eficienciaOcupacao = Math.min(100, Math.max(1, getNum('input-sizing-eficiencia', p.eficienciaOcupacao || 70.0)));
+        
+        p.aumentoPctChamadas = getNum('input-sizing-aumento-pct', p.aumentoPctChamadas || 0);
+        p.volumePlanejado = Math.max(0, getNum('input-sizing-vol-planejado', p.volumePlanejado || 19912));
+        p.safetyBuffer = Math.max(0, getNum('input-sizing-safety-buffer', p.safetyBuffer || 0));
+        
+        const elMes = document.getElementById('input-sizing-mes-ref');
+        if (elMes && elMes.value) {
+            p.mesReferencia = elMes.value;
+            state.sizingCurrentMonth = elMes.value;
+        }
+    }
+    
+    // Execute calculations
+    const resVoz = calcSizingN1Voz(p);
+    const resChat = calcSizingN1Chat(p);
+    const resBO = calcSizingN2Backoffice(p);
+    
+    // Update calculated results back in params object
+    p.volAtendidas = resVoz.volAtendidas;
+    p.volAtendidasChat = resChat.volAtendidas;
+    p.volAtendidasBO = resBO.volAtendidas;
+    
+    const safetyBuffer = Math.max(0, parseInt(p.safetyBuffer) || 0);
+    const totalPAs = resVoz.paContratada + resChat.paContratada + resBO.paContratada + safetyBuffer;
+    
+    const setInputVal = (id, val) => {
+        const el = document.getElementById(id);
+        if (el && val !== undefined && val !== null) {
+            if (document.activeElement === el) return;
+            const strVal = String(val);
+            if (el.value !== strVal) {
+                el.value = strVal;
+                highlightCellUpdate(el);
+            }
+        }
+    };
+    
+    const mesLabel = getMonthOnly(state.sizingCurrentMonth || p.mesReferencia || '2026-11');
+    
+    // Update calculated cells in Quadro 1 (Voz)
+    setInputVal('input-sizing-mes-label-voz', mesLabel);
+    setInputVal('input-sizing-vol-atendidas', resVoz.volAtendidas);
+    setInputVal('input-sizing-vol-dmm', resVoz.volDMM);
+    setInputVal('input-sizing-vol-hmm', resVoz.volHMM);
+    setInputVal('input-sizing-erlang', resVoz.erlang);
+    setInputVal('input-sizing-pas-voz', resVoz.pas);
+    setInputVal('input-sizing-pa-contratada-voz', resVoz.paContratada);
+    setInputVal('input-sizing-chamadas-op-voz', resVoz.chamadasOp);
+    
+    // Update calculated cells in Quadro 2 (Chat)
+    setInputVal('input-sizing-mes-label-chat', mesLabel);
+    setInputVal('input-sizing-vol-atendidas-chat', resChat.volAtendidas);
+    setInputVal('input-sizing-vol-dmm-chat', resChat.volDMM);
+    setInputVal('input-sizing-vol-hmm-chat', resChat.volHMM);
+    setInputVal('input-sizing-erlang-chat', resChat.erlang);
+    setInputVal('input-sizing-pas-chat', resChat.pas);
+    setInputVal('input-sizing-pa-contratada-chat', resChat.paContratada);
+    setInputVal('input-sizing-chamadas-op-chat', resChat.chamadasOp);
+    
+    // Update calculated cells in Quadro 3 (BKO)
+    setInputVal('input-sizing-mes-label-bo', mesLabel);
+    setInputVal('input-sizing-vol-atendidas-bo', p.volAtendidasBO !== undefined ? p.volAtendidasBO : resBO.volBase);
+    setInputVal('input-sizing-vol-dia-bo', resBO.volDia);
+    setInputVal('input-sizing-prod-max-dia', resBO.prodMaxDia);
+    setInputVal('input-sizing-pas-bo', resBO.pas);
+    setInputVal('input-sizing-pa-contratada-bo', resBO.paContratada);
+    setInputVal('input-sizing-chamadas-op-bo', resBO.chamadasOp);
+    setInputVal('input-sizing-tma-real-min', resBO.tmaRealMinFmt);
+    setInputVal('input-sizing-ch-nominal-fmt', resBO.chNominalFmt);
+    setInputVal('input-sizing-ch-trabalho', resBO.chTrabalhoFmt);
+    setInputVal('input-sizing-horas-mes', resBO.horasMesFmt);
+    setInputVal('input-sizing-horas-produtivas', resBO.horasProdutivasFmt);
+    setInputVal('input-sizing-ch-efetivo', resBO.chEfetivoFmt);
+
+    // Update individual desvio badges on quadros
+    const updateDesvioBadge = (badgeId, valReal, valPlan) => {
+        const elBadge = document.getElementById(badgeId);
+        if (!elBadge) return;
+        const diff = valReal - valPlan;
+        const pct = valPlan > 0 ? (diff / valPlan) * 100 : 0;
+        const sign = pct >= 0 ? '+' : '';
+        elBadge.textContent = `${sign}${pct.toFixed(1)}%`;
+        if (pct > 5.0) {
+            elBadge.style.color = '#ef4444';
+        } else if (pct < -5.0) {
+            elBadge.style.color = '#3b82f6';
+        } else {
+            elBadge.style.color = '#10b981';
+        }
+    };
+    updateDesvioBadge('sizing-desvio-badge-voz', resVoz.volAtendidas, resVoz.volBase);
+    updateDesvioBadge('sizing-desvio-badge-chat', resChat.volAtendidas, resChat.volBase);
+    updateDesvioBadge('sizing-desvio-badge-bo', p.volAtendidasBO !== undefined ? p.volAtendidasBO : resBO.volBase, resBO.volBase);
+    
+    // 1. Update KPI widgets
+    const elPasVoz = document.getElementById('widget-sizing-pas-voz');
+    const elSubVoz = document.getElementById('widget-sizing-sub-voz');
+    if (elPasVoz) elPasVoz.textContent = resVoz.paContratada;
+    if (elSubVoz) elSubVoz.textContent = `${resVoz.m} agentes logados (HMM: ${resVoz.volHMM} cham/h)`;
+    
+    const elPasChat = document.getElementById('widget-sizing-pas-chat');
+    const elSubChat = document.getElementById('widget-sizing-sub-chat');
+    if (elPasChat) elPasChat.textContent = resChat.paContratada;
+    if (elSubChat) elSubChat.textContent = `${resChat.m} agentes (${p.telasSimultaneas || 1} telas simul.)`;
+    
+    const elPasBO = document.getElementById('widget-sizing-pas-bo');
+    const elSubBO = document.getElementById('widget-sizing-sub-bo');
+    if (elPasBO) elPasBO.textContent = resBO.paContratada;
+    if (elSubBO) elSubBO.textContent = `${resBO.prodMaxDia} atend./dia por operador (${resBO.diasUteis}d úteis)`;
+    
+    const elTotalPas = document.getElementById('widget-sizing-total-pas');
+    const elTotalSub = document.getElementById('widget-sizing-total-sub');
+    if (elTotalPas) elTotalPas.textContent = totalPAs;
+    if (elTotalSub) elTotalSub.textContent = `Voz: ${resVoz.paContratada} | Chat: ${resChat.paContratada} | BKO: ${resBO.paContratada}`;
+    
+    // 2. Update Safety buffer slider value display
+    const elValBuffer = document.getElementById('sizing-val-safety-buffer');
+    if (elValBuffer) elValBuffer.textContent = `+${safetyBuffer} PAs extras`;
+    
+    // 3. Update Aumento % Chamadas banner and live preview
+    const aumentoPct = parseFloat(p.aumentoPctChamadas) || 0;
+    const elBanner = document.getElementById('sizing-aumento-banner');
+    if (elBanner) {
+        if (aumentoPct !== 0) {
+            elBanner.style.display = 'flex';
+            elBanner.innerHTML = `
+                <i class="fa-solid fa-arrow-trend-up" style="font-size: 1.25rem;"></i>
+                <div>
+                    <span><strong>Aumento de ${aumentoPct > 0 ? '+' : ''}${aumentoPct}% aplicado sobre os volumes base:</strong></span>
+                    <div style="font-size: 0.8rem; margin-top: 0.2rem; opacity: 0.95;">
+                        📞 Voz: ${resVoz.volBase.toLocaleString('pt-BR')} &rarr; <strong>${resVoz.volEfetivo.toLocaleString('pt-BR')}</strong> &bull;
+                        📋 Backoffice: ${resBO.volBase.toLocaleString('pt-BR')} &rarr; <strong>${resBO.volEfetivo.toLocaleString('pt-BR')}</strong>
+                    </div>
+                </div>
+            `;
+        } else {
+            elBanner.style.display = 'none';
+        }
+    }
+    
+    const elLivePrev = document.getElementById('sizing-aumento-live-preview');
+    if (elLivePrev) {
+        elLivePrev.innerHTML = `
+            <strong>Volumes Efetivos Calculados (${aumentoPct > 0 ? '+' : ''}${aumentoPct}%):</strong><br>
+            &bull; N1 Voz: <strong>${resVoz.volEfetivo.toLocaleString('pt-BR')}</strong> (base: ${resVoz.volBase.toLocaleString('pt-BR')})<br>
+            &bull; N2 Backoffice: <strong>${resBO.volEfetivo.toLocaleString('pt-BR')}</strong> (base: ${resBO.volBase.toLocaleString('pt-BR')})
+        `;
+    }
+    
+    // 4. Update Contractual & Governance Alerts
+    const alertsContainer = document.getElementById('sizing-alerts-container');
+    if (alertsContainer) {
+        alertsContainer.innerHTML = '';
+        
+        // Alert 1: Desvio Contratual (Threshold 5%) - Comparação entre Volume Atendidas (Realizado) e Volume Mês (Planejado)
+        const volPlanVoz = resVoz.volBase;
+        const volRealVoz = resVoz.volAtendidas;
+        const diffVolVoz = volRealVoz - volPlanVoz;
+        const diffPctVoz = volPlanVoz > 0 ? (diffVolVoz / volPlanVoz) * 100 : 0;
+
+        const volPlanChat = resChat.volBase;
+        const volRealChat = resChat.volAtendidas;
+        const diffVolChat = volRealChat - volPlanChat;
+        const diffPctChat = volPlanChat > 0 ? (diffVolChat / volPlanChat) * 100 : 0;
+
+        const volPlanBO = resBO.volBase;
+        const volRealBO = (resBO.volAtendidas !== undefined && resBO.volAtendidas !== null) ? resBO.volAtendidas : (p.volAtendidasBO !== undefined ? p.volAtendidasBO : resBO.volBase);
+        const diffVolBO = volRealBO - volPlanBO;
+        const diffPctBO = volPlanBO > 0 ? (diffVolBO / volPlanBO) * 100 : 0;
+
+        const volPlanTotal = volPlanVoz + volPlanChat + volPlanBO;
+        const volRealTotal = volRealVoz + volRealChat + volRealBO;
+        const diffVolTotal = volRealTotal - volPlanTotal;
+        const diffPctTotal = volPlanTotal > 0 ? (diffVolTotal / volPlanTotal) * 100 : 0;
+        
+        const mesRef = state.sizingCurrentMonth || p.mesReferencia || '2026-11';
+        const confData = state.sizingConfirmedMonths && state.sizingConfirmedMonths[mesRef];
+        let refFooterHtml = '';
+        if (confData && confData.confirmedAt) {
+            const d = new Date(confData.confirmedAt);
+            const dStr = d.toLocaleDateString('pt-BR');
+            const hStr = d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+            refFooterHtml = `
+                <div class="sizing-alert-ref">
+                    <i class="fa-solid fa-circle-check" style="color: var(--color-success); font-size: 0.85rem;"></i>
+                    <span>Ref.: Projeção de <strong>${formatMonthName(mesRef)}</strong> confirmada em <strong>${dStr} às ${hStr}</strong>${confData.confirmedBy ? ` (${confData.confirmedBy})` : ''}</span>
+                </div>
+            `;
+        } else {
+            refFooterHtml = `
+                <div class="sizing-alert-ref" style="opacity: 0.85;">
+                    <i class="fa-solid fa-pen-to-square" style="color: var(--color-primary); font-size: 0.85rem;"></i>
+                    <span>Ref.: Projeção de <strong>${formatMonthName(mesRef)}</strong> em edição (não confirmada)</span>
+                </div>
+            `;
+        }
+
+        const canalBreakdownHtml = `
+            <div style="display: flex; flex-wrap: wrap; gap: 1rem; margin: 0.45rem 0; font-size: 0.82rem; background: rgba(0,0,0,0.15); padding: 0.4rem 0.75rem; border-radius: 6px;">
+                <span>📞 <strong>Voz:</strong> ${volRealVoz.toLocaleString('pt-BR')} atendidas vs ${volPlanVoz.toLocaleString('pt-BR')} plan. (<strong>${diffPctVoz >= 0 ? '+' : ''}${diffPctVoz.toFixed(1)}%</strong>)</span>
+                <span>💬 <strong>Chat:</strong> ${volRealChat.toLocaleString('pt-BR')} atendidas vs ${volPlanChat.toLocaleString('pt-BR')} plan. (<strong>${diffPctChat >= 0 ? '+' : ''}${diffPctChat.toFixed(1)}%</strong>)</span>
+                <span>📋 <strong>Backoffice:</strong> ${volRealBO.toLocaleString('pt-BR')} atendidas vs ${volPlanBO.toLocaleString('pt-BR')} plan. (<strong>${diffPctBO >= 0 ? '+' : ''}${diffPctBO.toFixed(1)}%</strong>)</span>
+            </div>
+        `;
+        
+        let desvioCardHtml = '';
+        if (diffPctTotal > 5.0) {
+            desvioCardHtml = `
+                <div class="sizing-alert-card sizing-alert-warning">
+                    <div class="sizing-alert-icon"><i class="fa-solid fa-triangle-exclamation"></i></div>
+                    <div class="sizing-alert-content" style="flex: 1;">
+                        <h4>Alerta de Desvio Contratual Crítico (+${diffPctTotal.toFixed(1)}%)</h4>
+                        <p>
+                            O volume consolidado de <strong>${volRealTotal.toLocaleString('pt-BR')} chamadas/demandas atendidas</strong> excede o planejado de <strong>${volPlanTotal.toLocaleString('pt-BR')}</strong> em <strong>+${diffPctTotal.toFixed(1)}% (+${diffVolTotal.toLocaleString('pt-BR')} demandas)</strong>.
+                            ${canalBreakdownHtml}
+                            <span style="color: #fbbf24; font-weight: 600;">Ação recomendada:</span> Acionar plano de contingência e renegociar aditivo contratual com os parceiros.
+                        </p>
+                        ${refFooterHtml}
+                    </div>
+                </div>
+            `;
+        } else if (diffPctTotal < -5.0) {
+            desvioCardHtml = `
+                <div class="sizing-alert-card sizing-alert-info">
+                    <div class="sizing-alert-icon"><i class="fa-solid fa-circle-info"></i></div>
+                    <div class="sizing-alert-content" style="flex: 1;">
+                        <h4>Volume Abaixo do Planejado (${diffPctTotal.toFixed(1)}%)</h4>
+                        <p>
+                            O volume consolidado de <strong>${volRealTotal.toLocaleString('pt-BR')} chamadas/demandas atendidas</strong> está <strong>${Math.abs(diffPctTotal).toFixed(1)}% abaixo</strong> do teto planejado (${volPlanTotal.toLocaleString('pt-BR')}).
+                            ${canalBreakdownHtml}
+                            Oportunidade para rebalanceamento ou remanejamento de capacidade ociosa.
+                        </p>
+                        ${refFooterHtml}
+                    </div>
+                </div>
+            `;
+        } else {
+            desvioCardHtml = `
+                <div class="sizing-alert-card sizing-alert-success">
+                    <div class="sizing-alert-icon"><i class="fa-solid fa-circle-check"></i></div>
+                    <div class="sizing-alert-content" style="flex: 1;">
+                        <h4>Volume Dentro da Tolerância Contratual (&plusmn;5%)</h4>
+                        <p>
+                            O volume consolidado de <strong>${volRealTotal.toLocaleString('pt-BR')} chamadas/demandas atendidas</strong> apresenta desvio de <strong>${diffPctTotal >= 0 ? '+' : ''}${diffPctTotal.toFixed(1)}%</strong> em relação ao planejado (${volPlanTotal.toLocaleString('pt-BR')}), operando em conformidade com o SLA.
+                            ${canalBreakdownHtml}
+                        </p>
+                        ${refFooterHtml}
+                    </div>
+                </div>
+            `;
+        }
+        
+        // Alert 2: Gestão de Recursos e Capacidade (Acréscimo, Decréscimo ou Manutenção a partir da 2ª projeção)
+        let contrataCardHtml = '';
+        if (mesRef && /^\d{4}-\d{2}$/.test(mesRef)) {
+            const parts = mesRef.split('-');
+            const year = parseInt(parts[0], 10);
+            const month = parseInt(parts[1], 10);
+            
+            let m2Month = month - 2;
+            let m2Year = year;
+            if (m2Month <= 0) {
+                m2Month += 12;
+                m2Year -= 1;
+            }
+            const strMesRef = `${String(month).padStart(2, '0')}/${year}`;
+            const strMesM2 = `${String(m2Month).padStart(2, '0')}/${m2Year}`;
+
+            // Localiza meses anteriores para identificar se estamos na 1ª projeção (baseline) ou na 2ª em diante
+            const pastMonths = Object.keys(state.sizingHistory || {})
+                .filter(m => /^\d{4}-\d{2}$/.test(m) && m < mesRef)
+                .sort();
+            
+            // Se for o mês inicial (2026-11) ou não houver histórico de mês anterior:
+            if (pastMonths.length === 0 || mesRef === '2026-11') {
+                contrataCardHtml = `
+                    <div class="sizing-alert-card sizing-alert-info">
+                        <div class="sizing-alert-icon"><i class="fa-solid fa-users-gear"></i></div>
+                        <div class="sizing-alert-content" style="flex: 1;">
+                            <h4>Capacidade Operacional Base (Quadro Atual Alocado)</h4>
+                            <p>
+                                O mês de <strong>${strMesRef}</strong> consolida a capacidade do time atualmente alocado na operação com <strong>${totalPAs} PAs contratadas</strong> (📞 Voz: ${resVoz.paContratada} | 💬 Chat: ${resChat.paContratada} | 📋 Backoffice: ${resBO.paContratada}).
+                                Como a equipe já se encontra contratada e ativa para este baseline, <strong>não há necessidade de nova contratação</strong>.
+                                A apuração de <strong>acréscimo ou decréscimo</strong> de recursos será considerada <strong>a partir da 2ª projeção</strong> em relação a esta base.
+                            </p>
+                            ${refFooterHtml}
+                        </div>
+                    </div>
+                `;
+            } else {
+                // A partir da 2ª projeção: compara com o mês imediatamente anterior
+                const prevMonthKey = pastMonths[pastMonths.length - 1];
+                let prevParams = state.sizingHistory[prevMonthKey];
+                let prevTotalPAs = totalPAs;
+                let prevVozPAs = resVoz.paContratada;
+                let prevChatPAs = resChat.paContratada;
+                let prevBOPAs = resBO.paContratada;
+                
+                if (prevParams) {
+                    const prevResVoz = calcSizingN1Voz(prevParams);
+                    const prevResChat = calcSizingN1Chat(prevParams);
+                    const prevResBO = calcSizingN2Backoffice(prevParams);
+                    prevVozPAs = prevResVoz.paContratada;
+                    prevChatPAs = prevResChat.paContratada;
+                    prevBOPAs = prevResBO.paContratada;
+                    prevTotalPAs = prevVozPAs + prevChatPAs + prevBOPAs + (parseInt(prevParams.safetyBuffer) || 0);
+                }
+                
+                const diffPAs = totalPAs - prevTotalPAs;
+                const diffVoz = resVoz.paContratada - prevVozPAs;
+                const diffChat = resChat.paContratada - prevChatPAs;
+                const diffBO = resBO.paContratada - prevBOPAs;
+                const prevMonthLabel = formatMonthName(prevMonthKey);
+                
+                const breakdownVariacao = `
+                    <div style="display: flex; flex-wrap: wrap; gap: 1rem; margin: 0.45rem 0; font-size: 0.82rem; background: rgba(0,0,0,0.15); padding: 0.4rem 0.75rem; border-radius: 6px;">
+                        <span>📞 <strong>Voz:</strong> ${resVoz.paContratada} PAs (${diffVoz >= 0 ? '+' : ''}${diffVoz})</span>
+                        <span>💬 <strong>Chat:</strong> ${resChat.paContratada} PAs (${diffChat >= 0 ? '+' : ''}${diffChat})</span>
+                        <span>📋 <strong>Backoffice:</strong> ${resBO.paContratada} PAs (${diffBO >= 0 ? '+' : ''}${diffBO})</span>
+                    </div>
+                `;
+                
+                if (diffPAs > 0) {
+                    // Acréscimo: Necessidade real de contratação
+                    contrataCardHtml = `
+                        <div class="sizing-alert-card sizing-alert-warning">
+                            <div class="sizing-alert-icon"><i class="fa-solid fa-user-plus"></i></div>
+                            <div class="sizing-alert-content" style="flex: 1;">
+                                <h4>Necessidade de Acréscimo de Recursos (+${diffPAs} PAs)</h4>
+                                <p>
+                                    A projeção de <strong>${strMesRef}</strong> demanda <strong>${totalPAs} PAs</strong>, representando um acréscimo de <strong>+${diffPAs} PAs</strong> frente ao quadro contratado em ${prevMonthLabel} (${prevTotalPAs} PAs).
+                                    ${breakdownVariacao}
+                                    Para atender a essa ampliação de capacidade, o processo seletivo e treinamento de integração deve ocorrer com antecedência de <strong>45 dias (até ${strMesM2})</strong> para cumprimento da curva de aprendizado NR17.
+                                </p>
+                                ${refFooterHtml}
+                            </div>
+                        </div>
+                    `;
+                } else if (diffPAs < 0) {
+                    // Decréscimo: Nenhuma contratação necessária, mitigação de ociosidade
+                    contrataCardHtml = `
+                        <div class="sizing-alert-card sizing-alert-info">
+                            <div class="sizing-alert-icon"><i class="fa-solid fa-user-minus"></i></div>
+                            <div class="sizing-alert-content" style="flex: 1;">
+                                <h4>Decréscimo de Recursos / Ociosidade (-${Math.abs(diffPAs)} PAs)</h4>
+                                <p>
+                                    A projeção de <strong>${strMesRef}</strong> demanda <strong>${totalPAs} PAs</strong>, indicando uma redução de <strong>${Math.abs(diffPAs)} PAs</strong> em relação ao mês anterior (${prevMonthLabel}: ${prevTotalPAs} PAs).
+                                    ${breakdownVariacao}
+                                    <strong>Nenhuma contratação é necessária.</strong> Recomenda-se remanejamento de capacidade, realocação interna entre operações ou adequação de escalas para mitigar ociosidade de pessoal.
+                                </p>
+                                ${refFooterHtml}
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    // Quadro estável: Nenhuma alteração
+                    contrataCardHtml = `
+                        <div class="sizing-alert-card sizing-alert-success">
+                            <div class="sizing-alert-icon"><i class="fa-solid fa-circle-check"></i></div>
+                            <div class="sizing-alert-content" style="flex: 1;">
+                                <h4>Quadro de Recursos Estável (${totalPAs} PAs)</h4>
+                                <p>
+                                    A projeção de <strong>${strMesRef}</strong> mantém exatamente as <strong>${totalPAs} PAs contratadas</strong> em operação no mês anterior (${prevMonthLabel}).
+                                    ${breakdownVariacao}
+                                    <strong>Nenhuma contratação ou desmobilização é necessária</strong>, operando com total equilíbrio de capacidade operacional.
+                                </p>
+                                ${refFooterHtml}
+                            </div>
+                        </div>
+                    `;
+                }
+            }
+        }
+        
+        alertsContainer.innerHTML = desvioCardHtml + contrataCardHtml;
+    }
+    
+    // 5. Update Technical Detail Accordions
+    const elDetailVoz = document.getElementById('sizing-calc-detail-voz');
+    if (elDetailVoz) {
+        elDetailVoz.innerHTML = `
+            <div class="sizing-methodology-summary" style="margin-bottom: 1.25rem; padding: 0.9rem 1.2rem; background: rgba(235, 92, 39, 0.08); border-left: 4px solid var(--color-primary); border-radius: 6px; font-size: 0.83rem; color: var(--text-secondary); line-height: 1.6;">
+                <strong style="color: var(--color-primary); display: flex; align-items: center; gap: 0.4rem; margin-bottom: 0.4rem; font-size: 0.9rem;">
+                    <i class="fa-solid fa-calculator"></i> Memória Descritiva: Metodologia de Cálculo de Voz (Erlang C & NR 17)
+                </strong>
+                <span>A formulação de dimensionamento do canal <strong>Voz</strong> reproduz rigorosamente as regras da planilha de Engenharia de WFM:</span>
+                <ul style="margin: 0.4rem 0 0.2rem 1.2rem; padding: 0;">
+                    <li><strong>1. Demanda Efetiva e Atendidas:</strong> O Volume Mês base (${resVoz.volBase.toLocaleString('pt-BR')}) é multiplicado pela retenção esperada <code>(1 - Abandono)</code>, resultando em <strong>${resVoz.volAtendidas.toLocaleString('pt-BR')} chamadas atendidas</strong>.</li>
+                    <li><strong>2. Concentração de Picos (DMM & HMM):</strong> Aplica-se a concentração no Dia de Maior Movimento (<code>DMM = ${p.dmmPercent}%</code>) obtendo <strong>${resVoz.volDMM.toLocaleString('pt-BR')} chamadas/dia</strong> e a concentração na Hora de Maior Movimento (<code>HMM = ${p.hmmPercent}%</code>) apurando <strong>${resVoz.volHMM.toLocaleString('pt-BR')} chamadas/hora de pico</strong>.</li>
+                    <li><strong>3. Tráfego em Erlangs:</strong> A taxa de chegada de pico &lambda; = ${resVoz.lambda.toFixed(4)} cham/s multiplicada pelo TMA (${p.tmaVoz}s) gera a intensidade de tráfego de <strong>${resVoz.A.toFixed(2)} Erlangs</strong> (Erlang = ${resVoz.erlang}).</li>
+                    <li><strong>4. Modelo Erlang C:</strong> O algoritmo calcula a probabilidade de espera em fila Pw e encontra <strong>${resVoz.m} operadores logados teóricos</strong> necessários para entregar Nível de Serviço &ge; ${p.slaMeta}% com espera &le; ${p.tmeMax}s (SL real apurado: <strong>${resVoz.achievedSL.toFixed(2)}%</strong>).</li>
+                    <li><strong>5. Disponibilidade Regulamentar (NR 17) e Telas:</strong> Divide os agentes teóricos pelas telas simultâneas (${resVoz.telas.toFixed(1)}) e pela disponibilidade efetiva da NR 17 (<code>1 - 17% = 83%</code>), arredondando para cima: <code>&lceil; (m / Telas) / 0,83 &rceil;</code> = <strong>${resVoz.pas} PA's Necessárias</strong>.</li>
+                    <li><strong>6. PA Contratada e Chamadas/Operador:</strong> Soma o ajuste manual (${resVoz.ajuste}) fixando <strong>${resVoz.paContratada} PA CONTRATADA</strong> e calcula a produtividade diária por operador: <code>(Vol_Atendidas / (PA_Contratada &times; 2 turnos)) / 21 dias úteis</code> = <strong>${resVoz.chamadasOp} chamadas/operador</strong>.</li>
+                </ul>
+            </div>
+            <table class="sizing-calc-table">
+                <tr><td class="calc-label">Volume Mês (Direcionador Principal)</td><td class="calc-formula">B17 (Vol_Base)</td><td class="calc-val">${resVoz.volBase.toLocaleString('pt-BR')} chamadas</td></tr>
+                <tr><td class="calc-label">Taxa de Abandono Máxima</td><td class="calc-formula">B9 (Abandono_Max)</td><td class="calc-val">${p.abandonoMax}%</td></tr>
+                <tr><td class="calc-label">Volume Atendidas</td><td class="calc-formula">B18 (=B17 * (1 - B9))</td><td class="calc-val">${resVoz.volAtendidas.toLocaleString('pt-BR')} chamadas</td></tr>
+                <tr><td class="calc-label">DMM (MÉDIA 5)</td><td class="calc-formula">B19 (Concentração Dia Pico)</td><td class="calc-val">${p.dmmPercent}%</td></tr>
+                <tr><td class="calc-label">Volume DMM</td><td class="calc-formula">B20 (=B17 * B$19)</td><td class="calc-val">${resVoz.volDMM.toLocaleString('pt-BR')} chamadas</td></tr>
+                <tr><td class="calc-label">% HMM (Hora Maior Movimento)</td><td class="calc-formula">B12 (Concentração Hora Pico)</td><td class="calc-val">${p.hmmPercent}%</td></tr>
+                <tr><td class="calc-label">Volume HMM</td><td class="calc-formula">B21 (=B20 * B$12)</td><td class="calc-val">${resVoz.volHMM.toLocaleString('pt-BR')} chamadas/hora</td></tr>
+                <tr><td class="calc-label">TMA Mês (Tempo Médio Atendimento)</td><td class="calc-formula">B11 (TMA em segundos)</td><td class="calc-val">${p.tmaVoz}s</td></tr>
+                <tr><td class="calc-label">Taxa de Chegada (&lambda;)</td><td class="calc-formula">B21 / 3600s</td><td class="calc-val">${resVoz.lambda.toFixed(4)} cham/s</td></tr>
+                <tr><td class="calc-label">Erlang (Intensidade de Tráfego)</td><td class="calc-formula">B22 (=B21 * B$11 / 3600)</td><td class="calc-val">${resVoz.erlang} (${resVoz.A.toFixed(2)} Erlangs)</td></tr>
+                <tr><td class="calc-label">Agentes Teóricos Logados (m)</td><td class="calc-formula">Agents(B22; B6; B8; B11)</td><td class="calc-val" style="color: var(--color-primary); font-weight: 700;">${resVoz.m} operadores</td></tr>
+                <tr><td class="calc-label">Nível de Serviço Atingido (SL)</td><td class="calc-formula">1 - Pw * e^(-(m-A)*TME/TMA)</td><td class="calc-val">${resVoz.achievedSL.toFixed(2)}% (Meta: &ge; ${p.slaMeta}%)</td></tr>
+                <tr><td class="calc-label">Telas Simultâneas</td><td class="calc-formula">B10</td><td class="calc-val">${resVoz.telas.toFixed(1)}</td></tr>
+                <tr><td class="calc-label">Disponibilidade Efetiva NR 17</td><td class="calc-formula">1 - B16 (1 - 17%)</td><td class="calc-val">${resVoz.dispEfetiva.toFixed(1)}% (Total ref: ${resVoz.totalShrinkPct.toFixed(1)}%)</td></tr>
+                <tr style="background: rgba(245, 158, 11, 0.08);"><td class="calc-label" style="font-weight: 700; color: #f59e0b;">PA's Necessárias</td><td class="calc-formula" style="color: #f59e0b;">B23 (=ARREDONDAR.PARA.CIMA((m / B10)/(1-B16); 0))</td><td class="calc-val" style="color: #f59e0b; font-size: 1.1rem; font-weight: 800;">${resVoz.pas} PAs</td></tr>
+                <tr><td class="calc-label">Ajuste Manual</td><td class="calc-formula">B24 (Ajuste de contingência)</td><td class="calc-val">${resVoz.ajuste} PAs</td></tr>
+                <tr style="background: rgba(235, 92, 39, 0.12);"><td class="calc-label" style="font-weight: 700; color: #fff;">PA CONTRATADA (Voz)</td><td class="calc-formula" style="color: #fff;">B25 (=B23 + B24)</td><td class="calc-val" style="color: var(--color-primary); font-size: 1.18rem; font-weight: 800;">${resVoz.paContratada} PAs</td></tr>
+                <tr><td class="calc-label">CHAMADAS / OPERADOR</td><td class="calc-formula">B26 (=(B17*(1-B9)/(B25*2))/21)</td><td class="calc-val" style="color: var(--color-primary); font-weight: 700;">${resVoz.chamadasOp} chamadas/op</td></tr>
+            </table>
+        `;
+    }
+
+    const elDetailChat = document.getElementById('sizing-calc-detail-chat');
+    if (elDetailChat) {
+        elDetailChat.innerHTML = `
+            <div class="sizing-methodology-summary" style="margin-bottom: 1.25rem; padding: 0.9rem 1.2rem; background: rgba(229, 95, 145, 0.08); border-left: 4px solid var(--color-secondary); border-radius: 6px; font-size: 0.83rem; color: var(--text-secondary); line-height: 1.6;">
+                <strong style="color: var(--color-secondary); display: flex; align-items: center; gap: 0.4rem; margin-bottom: 0.4rem; font-size: 0.9rem;">
+                    <i class="fa-solid fa-calculator"></i> Memória Descritiva: Metodologia de Cálculo de Chat (Erlang C & NR 17)
+                </strong>
+                <span>A formulação de dimensionamento do canal <strong>Chat</strong> segue rigorosamente a mesma lógica matemática do canal Voz, aplicando a concorrência de telas e premissas contratuais:</span>
+                <ul style="margin: 0.4rem 0 0.2rem 1.2rem; padding: 0;">
+                    <li><strong>1. Demanda Efetiva e Atendidas:</strong> O Volume Mês base (${resChat.volBase.toLocaleString('pt-BR')}) é multiplicado pela retenção esperada <code>(1 - Abandono)</code>, resultando em <strong>${resChat.volAtendidas.toLocaleString('pt-BR')} atendimentos realizados</strong>.</li>
+                    <li><strong>2. Concentração de Picos (DMM & HMM):</strong> Aplica-se a concentração no Dia de Maior Movimento (<code>DMM = ${p.dmmPercentChat}%</code>) apurando <strong>${resChat.volDMM.toLocaleString('pt-BR')} conversas/dia</strong> e Hora de Maior Movimento (<code>HMM = ${p.hmmPercentChat}%</code>) apurando <strong>${resChat.volHMM.toLocaleString('pt-BR')} conversas/hora de pico</strong>.</li>
+                    <li><strong>3. Tráfego em Erlangs:</strong> A taxa de chegada de pico &lambda; = ${resChat.lambda.toFixed(4)} conv/s multiplicada pelo TMA (${p.tmaChat}s) gera a intensidade de tráfego de <strong>${resChat.A.toFixed(2)} Erlangs</strong> (Erlang = ${resChat.erlang}).</li>
+                    <li><strong>4. Modelo Erlang C:</strong> Apura <strong>${resChat.m} operadores logados teóricos</strong> necessários para garantir Nível de Serviço &ge; ${p.slaMetaChat}% com espera &le; ${p.tmeMaxChat}s (SL real: <strong>${resChat.achievedSL.toFixed(2)}%</strong>).</li>
+                    <li><strong>5. Disponibilidade Regulamentar (NR 17) e Telas:</strong> Divide os agentes teóricos pelas telas simultâneas (${resChat.telas.toFixed(1)}) e pela disponibilidade efetiva da NR 17 (<code>1 - 17% = 83%</code>), arredondando para cima: <code>&lceil; (m / Telas) / 0,83 &rceil;</code> = <strong>${resChat.pas} PA's Necessárias</strong>.</li>
+                    <li><strong>6. PA Contratada e Chamadas/Operador:</strong> Soma o ajuste manual (${resChat.ajuste}) resultando em <strong>${resChat.paContratada} PA CONTRATADA</strong> e apura a produtividade por operador: <code>(Vol_Atendidas / (PA_Contratada &times; 2 turnos)) / 21 dias úteis</code> = <strong>${resChat.chamadasOp} chamadas/operador</strong>.</li>
+                </ul>
+            </div>
+            <table class="sizing-calc-table">
+                <tr><td class="calc-label">Volume Mês (Direcionador Principal)</td><td class="calc-formula">C17 (Vol_Base)</td><td class="calc-val">${resChat.volBase.toLocaleString('pt-BR')} conversas</td></tr>
+                <tr><td class="calc-label">Taxa de Abandono Máxima</td><td class="calc-formula">C9 (Abandono_Max)</td><td class="calc-val">${p.abandonoMaxChat}%</td></tr>
+                <tr><td class="calc-label">Volume Atendidas</td><td class="calc-formula">C18 (=C17 * (1 - C9))</td><td class="calc-val">${resChat.volAtendidas.toLocaleString('pt-BR')} conversas</td></tr>
+                <tr><td class="calc-label">DMM (MÉDIA 5)</td><td class="calc-formula">C19 (Concentração Dia Pico)</td><td class="calc-val">${p.dmmPercentChat}%</td></tr>
+                <tr><td class="calc-label">Volume DMM</td><td class="calc-formula">C20 (=C17 * C$19)</td><td class="calc-val">${resChat.volDMM.toLocaleString('pt-BR')} conversas</td></tr>
+                <tr><td class="calc-label">% HMM (Hora Maior Movimento)</td><td class="calc-formula">C12 (Concentração Hora Pico)</td><td class="calc-val">${p.hmmPercentChat}%</td></tr>
+                <tr><td class="calc-label">Volume HMM</td><td class="calc-formula">C21 (=C20 * C$12)</td><td class="calc-val">${resChat.volHMM.toLocaleString('pt-BR')} conversas/hora</td></tr>
+                <tr><td class="calc-label">TMA Mês (Tempo Médio Atendimento)</td><td class="calc-formula">C11 (TMA em segundos)</td><td class="calc-val">${p.tmaChat}s</td></tr>
+                <tr><td class="calc-label">Taxa de Chegada (&lambda;)</td><td class="calc-formula">C21 / 3600s</td><td class="calc-val">${resChat.lambda.toFixed(4)} conv/s</td></tr>
+                <tr><td class="calc-label">Erlang (Intensidade de Tráfego)</td><td class="calc-formula">C22 (=C21 * C$11 / 3600)</td><td class="calc-val">${resChat.erlang} (${resChat.A.toFixed(2)} Erlangs)</td></tr>
+                <tr><td class="calc-label">Agentes Teóricos Logados (m)</td><td class="calc-formula">Agents(C22; C6; C8; C11)</td><td class="calc-val" style="color: var(--color-secondary); font-weight: 700;">${resChat.m} operadores</td></tr>
+                <tr><td class="calc-label">Nível de Serviço Atingido (SL)</td><td class="calc-formula">1 - Pw * e^(-(m-A)*TME/TMA)</td><td class="calc-val">${resChat.achievedSL.toFixed(2)}% (Meta: &ge; ${p.slaMetaChat}%)</td></tr>
+                <tr><td class="calc-label">Telas Simultâneas</td><td class="calc-formula">C10</td><td class="calc-val">${resChat.telas.toFixed(1)}</td></tr>
+                <tr><td class="calc-label">Disponibilidade Efetiva NR 17</td><td class="calc-formula">1 - C16 (1 - 17%)</td><td class="calc-val">${resChat.dispEfetiva.toFixed(1)}% (Total ref: ${resChat.totalShrinkPct.toFixed(1)}%)</td></tr>
+                <tr style="background: rgba(245, 158, 11, 0.08);"><td class="calc-label" style="font-weight: 700; color: #f59e0b;">PA's Necessárias</td><td class="calc-formula" style="color: #f59e0b;">C23 (=ARREDONDAR.PARA.CIMA((Agents/Telas)/(1-C16); 0))</td><td class="calc-val" style="color: #f59e0b; font-size: 1.1rem; font-weight: 800;">${resChat.pas} PAs</td></tr>
+                <tr><td class="calc-label">Ajuste Manual</td><td class="calc-formula">C24 (Ajuste de contingência)</td><td class="calc-val">${resChat.ajuste} PAs</td></tr>
+                <tr style="background: rgba(229, 95, 145, 0.12);"><td class="calc-label" style="font-weight: 700; color: #fff;">PA CONTRATADA (Chat)</td><td class="calc-formula" style="color: #fff;">C25 (=C23 + C24)</td><td class="calc-val" style="color: var(--color-secondary); font-size: 1.18rem; font-weight: 800;">${resChat.paContratada} PAs</td></tr>
+                <tr><td class="calc-label">CHAMADAS / OPERADOR</td><td class="calc-formula">C26 (=(C17*(1-C9)/(C25*2))/21)</td><td class="calc-val" style="color: var(--color-secondary); font-weight: 700;">${resChat.chamadasOp} chamadas/op</td></tr>
+            </table>
+        `;
+    }
+    
+    const elDetailBO = document.getElementById('sizing-calc-detail-bo');
+    if (elDetailBO) {
+        elDetailBO.innerHTML = `
+            <div class="sizing-methodology-summary" style="margin-bottom: 1.25rem; padding: 0.9rem 1.2rem; background: rgba(16, 185, 129, 0.08); border-left: 4px solid var(--color-success); border-radius: 6px; font-size: 0.83rem; color: var(--text-secondary); line-height: 1.6;">
+                <strong style="color: var(--color-success); display: flex; align-items: center; gap: 0.4rem; margin-bottom: 0.4rem; font-size: 0.9rem;">
+                    <i class="fa-solid fa-calculator"></i> Memória Descritiva: Metodologia de Cálculo de Backoffice (Capacidade Linear)
+                </strong>
+                <span>O dimensionamento de <strong>Backoffice</strong> utiliza a metodologia de produtividade efetiva por jornada de trabalho da planilha oficial:</span>
+                <ul style="margin: 0.4rem 0 0.2rem 1.2rem; padding: 0;">
+                    <li><strong>1. Volume Diário:</strong> O Volume Mês (${resBO.volEfetivo}) dividido pelos Dias Úteis (${resBO.diasUteis}) resulta em <strong>${resBO.volDia} demandas/dia</strong> (<code>E6 / E7</code>).</li>
+                    <li><strong>2. Deduções de Jornada (NR 17, Treinamento, Eficiência):</strong> Da jornada nominal de 380 min (${resBO.chNominalFmt}), deduzem-se 10,53% de pausas NR 17 (${resBO.chTrabalhoFmt} líquidos), treinamentos/feedback (6,47%) e aplica-se 70% de eficiência de ocupação, resultando em <strong>${resBO.chEfetivoFmt} de tempo efetivo de trabalho por operador/dia</strong>.</li>
+                    <li><strong>3. Produtividade Máxima Diária:</strong> Carga horária efetiva dividida pelo TMA Real (00:10:00) resulta em <strong>${resBO.prodMaxDia} demandas/dia por operador</strong> (<code>E24 / E14</code>).</li>
+                    <li><strong>4. PA's Necessárias:</strong> Demanda diária dividida pela produtividade máxima e por 2 turnos de atendimento, arredondando para cima: <code>&lceil; (Vol_Dia / Prod_Max) / 2 &rceil;</code> = <strong>${resBO.pas} PA's Necessárias</strong> (<code>E10</code>).</li>
+                    <li><strong>5. PA Contratada e Demandas/Operador:</strong> Soma o ajuste (${resBO.ajuste}) gerando <strong>${resBO.paContratada} PA CONTRATADA</strong> (<code>E12</code>) e apura as demandas por operador: <code>E8 / (E12 &times; 2)</code> = <strong>${resBO.chamadasOp} chamadas/operador</strong> (<code>E13</code>).</li>
+                </ul>
+            </div>
+            <table class="sizing-calc-table">
+                <tr><td class="calc-label">Volume Mensal Backoffice Efetivo</td><td class="calc-formula">Vol_Base &times; (1 + ${aumentoPct}%)</td><td class="calc-val">${resBO.volEfetivo.toLocaleString('pt-BR')} demandas</td></tr>
+                <tr><td class="calc-label">Dias Úteis no Mês</td><td class="calc-formula">Dias_Uteis</td><td class="calc-val">${resBO.diasUteis} dias</td></tr>
+                <tr><td class="calc-label">Volume Diário a Produzir</td><td class="calc-formula">E6 / E7 (Vol_Efetivo / Dias_Uteis)</td><td class="calc-val">${resBO.volDia} demandas/dia</td></tr>
+                <tr><td class="calc-label">Carga Horária Nominal</td><td class="calc-formula">Jornada Contratual</td><td class="calc-val">${resBO.chNominalMin} min (${resBO.chNominalFmt})</td></tr>
+                <tr><td class="calc-label">NR 17 (Pausas Regulamentares)</td><td class="calc-formula">${resBO.nr17Pct}% da jornada</td><td class="calc-val">${resBO.chTrabalhoFmt} líquidos</td></tr>
+                <tr><td class="calc-label">Horas Mês</td><td class="calc-formula">CH Trabalho &times; ${resBO.diasAtend} dias</td><td class="calc-val">${resBO.horasMesFmt}</td></tr>
+                <tr><td class="calc-label">Treinamento + Feedback</td><td class="calc-formula">${resBO.treinFbPct}% da jornada líq.</td><td class="calc-val">${resBO.horasProdutivasFmt} produtivas</td></tr>
+                <tr><td class="calc-label">% deste tempo falando (padrão de mercado)</td><td class="calc-formula">Eficiência (${resBO.eficienciaPct.toFixed(1)}%)</td><td class="calc-val">${resBO.chEfetivoFmt} efetivo</td></tr>
+                <tr><td class="calc-label">TMA Real em Minutos</td><td class="calc-formula">TMA_Seg / 60</td><td class="calc-val">${resBO.tmaRealMinFmt}</td></tr>
+                <tr><td class="calc-label">Prod. Máx. Operador/Dia</td><td class="calc-formula">E24 / E14 (CH_Efetiva / TMA_Real)</td><td class="calc-val" style="color: var(--color-success); font-weight: 700;">${resBO.prodMaxDia} demandas/dia</td></tr>
+                <tr><td class="calc-label">PA's Necessárias</td><td class="calc-formula">&lceil; (Vol_Dia / Prod_Max) / 2 &rceil;</td><td class="calc-val" style="color: var(--color-success); font-size: 1.05rem; font-weight: 700;">${resBO.pas} PAs</td></tr>
+                <tr><td class="calc-label">Ajuste Manual</td><td class="calc-formula">Ajuste</td><td class="calc-val">${resBO.ajuste} PAs</td></tr>
+                <tr style="background: rgba(16, 185, 129, 0.08);"><td class="calc-label" style="font-weight: 700; color: #fff;">PA CONTRATADA (BKO)</td><td class="calc-formula" style="color: #fff;">E10 + E11 (PA's Necessárias + Ajuste)</td><td class="calc-val" style="color: var(--color-success); font-size: 1.15rem; font-weight: 700;">${resBO.paContratada} PAs</td></tr>
+                <tr><td class="calc-label">CHAMADAS / OPERADOR</td><td class="calc-formula">E8 / (E12 &times; 2)</td><td class="calc-val" style="color: var(--color-success); font-weight: 700;">${resBO.chamadasOp} chamadas/op</td></tr>
+            </table>
+        `;
+    }
+    
+    // Save to persistent storage
+    saveCurrentSizingMonthSnapshot();
+}
+
+// RENDER SIZING VIEW (INITIAL POPULATION & EVENT HOOKING)
+function renderSizingView() {
+    if (!state.sizingParams) {
+        state.sizingParams = {
+            aumentoPctChamadas: 0,
+            volumeMensalVoz: 19912,
+            volAtendidas: 19215,
+            tmaVoz: 480,
+            slaMeta: 80,
+            nsMinimo: 60,
+            tmeMax: 20,
+            abandonoMax: 3.5,
+            dmmPercent: 5.62,
+            hmmPercent: 9.7,
+            shrinkageLanche: 10.5,
+            shrinkageTreinamento: 4.0,
+            shrinkageFeedback: 1.5,
+            shrinkageNR17: 17.0,
+            telasSimultaneas: 1.0,
+            ajusteVoz: 0,
+            volumeMensalChat: 3000,
+            volAtendidasChat: 2895,
+            tmaChat: 480,
+            volumeMensalBO: 500,
+            volAtendidasBO: 500,
+            tmaBO: 600,
+            diasUteis: 30,
+            diasAtendimento: 30,
+            cargaHorariaNominal: 380,
+            nr17BoPct: 10.53,
+            treinFbPct: 6.47,
+            eficienciaOcupacao: 70.0,
+            ajusteBo: 0,
+            safetyBuffer: 0,
+            volumePlanejado: 19912,
+            mesReferencia: '2026-11'
+        };
+    }
+    if (!state.sizingHistory) state.sizingHistory = {};
+    if (!state.sizingCurrentMonth || state.sizingCurrentMonth < '2026-11') {
+        state.sizingCurrentMonth = '2026-11';
+    }
+    
+    const curMonth = state.sizingCurrentMonth || '2026-11';
+    
+    // Coleta apenas meses a partir de Nov/2026 (sem histórico anterior a isso)
+    const monthSet = new Set(Object.keys(state.sizingHistory || {}).filter(m => m >= '2026-11'));
+    monthSet.add(curMonth);
+    monthSet.add('2026-11');
+    
+    const sortedMonths = Array.from(monthSet).filter(m => /^\d{4}-\d{2}$/.test(m)).sort();
+    const latestMonth = sortedMonths[sortedMonths.length - 1];
+    const isLatestMonth = (curMonth === latestMonth);
+    const isConfirmed = !!(state.sizingConfirmedMonths && state.sizingConfirmedMonths[curMonth]);
+    const isTemporarilyUnlocked = !!(state.sizingUnlockedMonths && state.sizingUnlockedMonths[curMonth]);
+    const isLocked = (!isLatestMonth || isConfirmed) && !isTemporarilyUnlocked;
+    
+    // 1. Render Month Selector & Status
+    const elSelect = document.getElementById('sizing-mes-select');
+    if (elSelect) {
+        elSelect.innerHTML = sortedMonths.map(m => {
+            const isConf = !!(state.sizingConfirmedMonths && state.sizingConfirmedMonths[m]);
+            const isLatest = (m === latestMonth);
+            const isUnl = !!(state.sizingUnlockedMonths && state.sizingUnlockedMonths[m]);
+            let icon = '🔒 ';
+            let statusTag = 'Histórico';
+            if (isUnl) {
+                icon = '⚠️ ';
+                statusTag = 'Reaberto';
+            } else if (isConf) {
+                icon = '✅ ';
+                statusTag = 'Confirmado';
+            } else if (isLatest) {
+                icon = '📝 ';
+                statusTag = 'Vigente';
+            }
+            const selected = (m === curMonth) ? 'selected' : '';
+            return `<option value="${m}" ${selected}>${icon}${formatMonthName(m)} (${statusTag})</option>`;
+        }).join('');
+    }
+    
+    // 2. Render Lock Status Badge
+    const elLockBadge = document.getElementById('sizing-lock-badge');
+    if (elLockBadge) {
+        if (isTemporarilyUnlocked) {
+            elLockBadge.className = 'sizing-lock-badge badge-reopened';
+            elLockBadge.innerHTML = '<i class="fa-solid fa-lock-open"></i> Reaberto para Ajustes (Histórico)';
+        } else if (isConfirmed) {
+            elLockBadge.className = 'sizing-lock-badge badge-confirmed';
+            elLockBadge.innerHTML = '<i class="fa-solid fa-circle-check"></i> Projeção Confirmada (Somente Leitura)';
+        } else if (isLocked) {
+            elLockBadge.className = 'sizing-lock-badge badge-locked';
+            elLockBadge.innerHTML = '<i class="fa-solid fa-lock"></i> Somente Visualização (Histórico)';
+        } else {
+            elLockBadge.className = 'sizing-lock-badge badge-open';
+            elLockBadge.innerHTML = '<i class="fa-solid fa-pen-to-square"></i> Aberto para edição (Vigente)';
+        }
+    }
+    
+    // 3. Render Action Buttons
+    const btnConfirmMonth = document.getElementById('btn-sizing-confirm-month');
+    if (btnConfirmMonth) {
+        if (isLatestMonth && !isConfirmed && !isTemporarilyUnlocked) {
+            btnConfirmMonth.style.display = 'inline-flex';
+        } else {
+            btnConfirmMonth.style.display = 'none';
+        }
+    }
+
+    const btnDiscard = document.getElementById('btn-sizing-discard-month');
+    if (btnDiscard) {
+        if (isLatestMonth && curMonth > '2026-11' && !isConfirmed) {
+            btnDiscard.style.display = 'inline-flex';
+        } else {
+            btnDiscard.style.display = 'none';
+        }
+    }
+    
+    // 4. Render History Banner and Action Buttons
+    const elHistoryBanner = document.getElementById('sizing-history-banner');
+    const elHistoryText = document.getElementById('sizing-history-banner-text');
+    const btnUnlock = document.getElementById('btn-sizing-unlock-history');
+    const btnRelock = document.getElementById('btn-sizing-relock-history');
+    
+    if (elHistoryBanner) {
+        if (isLocked || !isLatestMonth || isConfirmed) {
+            elHistoryBanner.style.display = 'flex';
+            if (isTemporarilyUnlocked) {
+                if (elHistoryText) {
+                    elHistoryText.innerHTML = `⚠️ Projeção de <strong>${formatMonthName(curMonth)}</strong> <strong>reaberta para edição</strong>. As alterações salvas atualizarão este período.`;
+                }
+                if (btnUnlock) btnUnlock.style.display = 'none';
+                if (btnRelock) btnRelock.style.display = 'inline-flex';
+            } else if (isConfirmed) {
+                const confInfo = state.sizingConfirmedMonths[curMonth];
+                const dataFmt = confInfo?.confirmedAt ? new Date(confInfo.confirmedAt).toLocaleString('pt-BR') : '';
+                if (elHistoryText) {
+                    elHistoryText.innerHTML = `✅ Projeção de <strong>${formatMonthName(curMonth)}</strong> <strong>confirmada e fechada</strong>${dataFmt ? ` em ${dataFmt}` : ''} (Somente Leitura).`;
+                }
+                if (btnUnlock) btnUnlock.style.display = 'inline-flex';
+                if (btnRelock) btnRelock.style.display = 'none';
+            } else {
+                if (elHistoryText) {
+                    elHistoryText.innerHTML = `Visualizando projeção histórica de <strong>${formatMonthName(curMonth)}</strong> (Somente Leitura).`;
+                }
+                if (btnUnlock) btnUnlock.style.display = 'inline-flex';
+                if (btnRelock) btnRelock.style.display = 'none';
+            }
+        } else {
+            elHistoryBanner.style.display = 'none';
+        }
+    }
+    
+    // 4. Fill form inputs from parameters
+    const p = state.sizingParams;
+    const setVal = (id, val) => {
+        const el = document.getElementById(id);
+        if (el && val !== undefined && val !== null) el.value = val;
+    };
+    
+    // QUADRO 1: VOZ
+    setVal('input-sizing-vol-voz', p.volumeMensalVoz);
+    setVal('input-sizing-vol-atendidas', p.volAtendidas);
+    setVal('input-sizing-tma-voz', p.tmaVoz);
+    setVal('input-sizing-sla-meta', p.slaMeta);
+    setVal('input-sizing-ns-minimo', p.nsMinimo);
+    setVal('input-sizing-tme-max', p.tmeMax);
+    setVal('input-sizing-abandono-max', p.abandonoMax);
+    setVal('input-sizing-telas-voz', p.telasVoz !== undefined ? p.telasVoz : 1.0);
+    setVal('input-sizing-dmm', p.dmmPercent);
+    setVal('input-sizing-hmm', p.hmmPercent);
+    setVal('input-sizing-shrink-lanche', p.shrinkageLanche);
+    setVal('input-sizing-shrink-treino', p.shrinkageTreinamento);
+    setVal('input-sizing-shrink-fb', p.shrinkageFeedback);
+    setVal('input-sizing-shrink-nr17', p.shrinkageNR17);
+    setVal('input-sizing-ajuste-voz', p.ajusteVoz);
+    
+    // QUADRO 2: CHAT
+    setVal('input-sizing-vol-chat', p.volumeMensalChat);
+    setVal('input-sizing-vol-atendidas-chat', p.volAtendidasChat);
+    setVal('input-sizing-tma-chat', p.tmaChat);
+    setVal('input-sizing-sla-meta-chat', p.slaMetaChat);
+    setVal('input-sizing-ns-minimo-chat', p.nsMinimoChat);
+    setVal('input-sizing-tme-max-chat', p.tmeMaxChat);
+    setVal('input-sizing-abandono-max-chat', p.abandonoMaxChat);
+    setVal('input-sizing-telas-chat', p.telasSimultaneas);
+    setVal('input-sizing-dmm-chat', p.dmmPercentChat);
+    setVal('input-sizing-hmm-chat', p.hmmPercentChat);
+    setVal('input-sizing-shrink-lanche-chat', p.shrinkageLancheChat);
+    setVal('input-sizing-shrink-treino-chat', p.shrinkageTreinamentoChat);
+    setVal('input-sizing-shrink-fb-chat', p.shrinkageFeedbackChat);
+    setVal('input-sizing-shrink-nr17-chat', p.shrinkageNR17Chat);
+    setVal('input-sizing-ajuste-chat', p.ajusteChat);
+    
+    // QUADRO 3: BKO
+    setVal('input-sizing-vol-bo', p.volumeMensalBO);
+    setVal('input-sizing-vol-atendidas-bo', p.volAtendidasBO !== undefined ? p.volAtendidasBO : p.volumeMensalBO);
+    setVal('input-sizing-dias-uteis-bo', p.diasUteis);
+    setVal('input-sizing-tma-bo', p.tmaBO);
+    setVal('input-sizing-dias-atend', p.diasAtendimento);
+    setVal('input-sizing-nr17-bo-pct', p.nr17BoPct);
+    setVal('input-sizing-trein-fb-pct', p.treinFbPct);
+    setVal('input-sizing-eficiencia', p.eficienciaOcupacao);
+    setVal('input-sizing-ajuste-bo', p.ajusteBo);
+    
+    setVal('input-sizing-aumento-pct', p.aumentoPctChamadas);
+    setVal('input-sizing-vol-planejado', p.volumePlanejado);
+    setVal('input-sizing-safety-buffer', p.safetyBuffer);
+    setVal('input-sizing-mes-ref', curMonth);
+    
+    // 5. Apply Lock State: disable all sheet inputs if month is locked
+    const sheetInputs = document.querySelectorAll('.sizing-sheet-table input');
+    sheetInputs.forEach(inp => {
+        inp.disabled = isLocked;
+    });
+    const btnReset = document.getElementById('btn-sizing-reset-defaults');
+    if (btnReset) btnReset.disabled = isLocked;
+    const btnImport = document.getElementById('btn-sizing-import-excel');
+    if (btnImport) btnImport.disabled = isLocked;
+    
+    // Setup event listeners if not already bound
+    setupSizingEventListeners();
+    
+    // Calculate and render all outputs
+    recalcSizing(false);
+}
+
+// SETUP EVENT LISTENERS FOR SIZING INPUTS & ACTIONS
+let _sizingListenersBound = false;
+
+function setupSizingEventListeners() {
+    if (_sizingListenersBound) return;
+    _sizingListenersBound = true;
+    
+    // Recalculate on any input, change, keyup, paste or blur event
+    const container = document.getElementById('view-sizing');
+    if (container) {
+        container.querySelectorAll('input:not([readonly])').forEach(input => {
+            const triggerRecalc = () => {
+                if (_sizingDebounceTimer) clearTimeout(_sizingDebounceTimer);
+                _sizingDebounceTimer = setTimeout(() => {
+                    recalcSizing(true);
+                }, 50);
+            };
+            input.addEventListener('input', triggerRecalc);
+            input.addEventListener('change', triggerRecalc);
+            input.addEventListener('keyup', triggerRecalc);
+            input.addEventListener('paste', () => setTimeout(() => recalcSizing(true), 10));
+            input.addEventListener('blur', () => recalcSizing(true));
+        });
+    }
+    
+    // Buttons
+    const btnImport = document.getElementById('btn-sizing-import-excel');
+    const fileInput = document.getElementById('sizing-file-input');
+    if (btnImport && fileInput) {
+        btnImport.addEventListener('click', () => {
+            fileInput.value = '';
+            fileInput.click();
+        });
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files && e.target.files[0]) {
+                importSizingVolumes(e.target.files[0]);
+            }
+        });
+    }
+    
+    const btnRecalc = document.getElementById('btn-sizing-recalc');
+    if (btnRecalc) {
+        btnRecalc.addEventListener('click', () => {
+            recalcSizing(true);
+            showToast('Dimensionamento recalculado com sucesso!', 'success', 2500);
+        });
+    }
+    
+    const btnReset = document.getElementById('btn-sizing-reset-defaults');
+    if (btnReset) {
+        btnReset.addEventListener('click', resetSizingDefaults);
+    }
+}
+
+// EXCEL / CSV IMPORTER FOR SIZING VOLUMES
+function importSizingVolumes(file) {
+    if (!verificarPermissao('OPERADOR')) {
+        alert('Acesso negado: Perfil OPERADOR ou ADMIN necessário.');
+        return;
+    }
+    if (!file) return;
+    
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        try {
+            const data = new Uint8Array(e.target.result);
+            const workbook = XLSX.read(data, { type: 'array' });
+            if (!workbook.SheetNames || workbook.SheetNames.length === 0) {
+                showToast('Erro: Nenhuma planilha encontrada no arquivo.', 'error');
+                return;
+            }
+            
+            const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+            const rows = XLSX.utils.sheet_to_json(firstSheet, { header: 1 });
+            if (!rows || rows.length < 2) {
+                showToast('Erro: A planilha deve conter cabeçalho e pelo menos uma linha de dados.', 'error');
+                return;
+            }
+            
+            let headerRowIdx = 0;
+            const normalize = s => String(s || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
+            
+            for (let r = 0; r < Math.min(6, rows.length); r++) {
+                const rCols = (rows[r] || []).map(normalize);
+                if (rCols.some(c => c.includes('voz') || c.includes('chat') || c.includes('backoffice') || c.includes('bko') || c.includes('volume') || c.includes('demanda'))) {
+                    headerRowIdx = r;
+                    break;
+                }
+            }
+            
+            const headers = (rows[headerRowIdx] || []).map(normalize);
+            const dataRow = rows[headerRowIdx + 1] || [];
+            
+            let updatedCount = 0;
+            const summary = [];
+            
+            headers.forEach((h, idx) => {
+                const val = dataRow[idx];
+                if (val === undefined || val === null || val === '') return;
+                const numVal = parseFloat(val);
+                
+                if (h.includes('voz') || (h.includes('volume') && h.includes('voz')) || h.includes('voice') || h.includes('telefone')) {
+                    if (!isNaN(numVal) && numVal >= 0) {
+                        state.sizingParams.volumeMensalVoz = Math.round(numVal);
+                        updatedCount++;
+                        summary.push(`Voz: ${Math.round(numVal).toLocaleString('pt-BR')}`);
+                    }
+                } else if (h.includes('backoffice') || h.includes('bko') || h.includes('bo') || h.includes('retaguarda') || h.includes('offline')) {
+                    if (!isNaN(numVal) && numVal >= 0) {
+                        state.sizingParams.volumeMensalBO = Math.round(numVal);
+                        updatedCount++;
+                        summary.push(`BKO: ${Math.round(numVal).toLocaleString('pt-BR')}`);
+                    }
+                } else if (h.includes('dias') || h.includes('uteis') || h.includes('dias uteis')) {
+                    if (!isNaN(numVal) && numVal > 0 && numVal <= 31) {
+                        state.sizingParams.diasUteis = Math.round(numVal);
+                        updatedCount++;
+                        summary.push(`Dias Úteis: ${Math.round(numVal)}`);
+                    }
+                } else if (h.includes('planej') || h.includes('meta') || h.includes('contrat')) {
+                    if (!isNaN(numVal) && numVal >= 0) {
+                        state.sizingParams.volumePlanejado = Math.round(numVal);
+                        updatedCount++;
+                        summary.push(`Planejado: ${Math.round(numVal).toLocaleString('pt-BR')}`);
+                    }
+                } else if (h.includes('aument') || h.includes('cresc') || h.includes('variac') || h.includes('delta')) {
+                    if (!isNaN(numVal)) {
+                        state.sizingParams.aumentoPctChamadas = numVal;
+                        updatedCount++;
+                        summary.push(`Aumento %: ${numVal}%`);
+                    }
+                } else if (h.includes('mes') || h.includes('periodo') || h.includes('referencia')) {
+                    const strVal = String(val).trim();
+                    if (/^\d{4}-\d{2}$/.test(strVal)) {
+                        state.sizingParams.mesReferencia = strVal;
+                        state.sizingCurrentMonth = strVal;
+                        updatedCount++;
+                        summary.push(`Mês: ${strVal}`);
+                    }
+                }
+            });
+            
+            if (updatedCount > 0) {
+                renderSizingView();
+                showToast(`✅ ${updatedCount} parâmetros importados da planilha! (${summary.join(', ')})`, 'success', 6000);
+            } else {
+                showToast('Aviso: Nenhuma coluna correspondente identificada na planilha.', 'warning', 8000);
+            }
+        } catch (err) {
+            console.error('[Import Sizing Error]', err);
+            showToast('Erro ao processar planilha: ' + err.message, 'error');
+        }
+    };
+    reader.readAsArrayBuffer(file);
+}
+

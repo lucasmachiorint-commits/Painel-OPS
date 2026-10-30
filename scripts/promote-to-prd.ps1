@@ -76,13 +76,14 @@ $prdApp = $prdApp.Replace("'board-changes-hml-hispana'", "'board-changes-hispana
 
 # 5g. Substituir logs com prefixo HML
 $prdApp = $prdApp.Replace('[Realtime HML]', '[Realtime]')
+$prdApp = $prdApp.Replace('[Realtime HML', '[Realtime')
 
 # 5h. Substituir mensagem de erro do Supabase Client
 $prdApp = $prdApp.Replace('Erro ao inicializar Supabase Client em HML:', 'Erro ao inicializar Supabase Client:')
 
 # 5i. Remover função importPrdDataToHml() inteira (exclusiva de HML)
+$prdApp = [regex]::Replace($prdApp, '(?s)// IMPORTAR BASE DE DADOS COMPLETA DE PRODU[^\r\n]*\r?\nasync function importPrdDataToHml\(\) \{.*?\n\}\r?\n\r?\n(?=function isRpaActivity)', '')
 $prdApp = [regex]::Replace($prdApp, '(?s)// IMPORT PRD DATA TO HML.*?function importPrdDataToHml\(\).*?\n\}\r?\n', '')
-# Fallback
 $prdApp = [regex]::Replace($prdApp, '(?s)async function importPrdDataToHml\(\) \{.*?\n\}\r?\n', '')
 
 [System.IO.File]::WriteAllText("$prdDir\app.js", $prdApp, $utf8NoBom)

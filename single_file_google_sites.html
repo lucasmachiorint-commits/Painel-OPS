@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
@@ -3978,13 +3978,8 @@ body.light-theme .btn-module-switch:hover {
 </style>
 </head>
 <body class="dark-theme">
-    <div id="hml-banner-fixed" style="position: fixed; top: 0; left: 0; right: 0; width: 100%; height: 32px; background: #f59e0b; color: #090d16; font-size: 11px; font-weight: 900; letter-spacing: 0.8px; text-transform: uppercase; display: flex; align-items: center; justify-content: center; gap: 12px; z-index: 999999; box-shadow: 0 4px 14px rgba(245,158,11,0.35); border-bottom: 2px solid #d97706;">
-        <span><i class="fa-solid fa-vial-circle-check text-slate-950 text-xs"></i> 🧪 AMBIENTE DE HOMOLOGAÇÃO (HML) — DADOS E FUNÇÕES EM TESTE</span>
-        <button id="btn-hml-sync-prd" onclick="importPrdDataToHml()" data-permissao="OPERADOR,ADMIN" style="background: rgba(9, 13, 22, 0.85); color: #fff; border: 1px solid rgba(255,255,255,0.25); font-size: 10px; font-weight: 700; text-transform: none; letter-spacing: normal; padding: 2px 10px; border-radius: 6px; cursor: pointer; display: inline-flex; align-items: center; gap: 5px; transition: all 0.2s;" onmouseover="this.style.background='#000'" onmouseout="this.style.background='rgba(9, 13, 22, 0.85)'" title="Copiar todos os dados atuais de Produção para HML">
-            <i class="fa-solid fa-cloud-arrow-down" style="color: #f59e0b;"></i> Copiar Dados de PRD
-        </button>
-    </div>
-    <div class="app-container" style="margin-top: 32px; height: calc(100vh - 32px); max-height: calc(100vh - 32px);">
+    
+    <div class="app-container">
         <!-- LEFT SIDEBAR -->
         <nav class="sidebar">
             <div class="sidebar-brand">
@@ -4258,9 +4253,7 @@ body.light-theme .btn-module-switch:hover {
                                     <button id="btn-cadastros-delete-selected" data-permissao="ADMIN" class="btn btn-secondary" style="background: rgba(244, 63, 94, 0.08); border: 1px solid #f43f5e; color: #f43f5e; display: none;">
                                         <i class="fa-solid fa-trash-can"></i> <span data-i18n="btn_delete_selected">Excluir Selecionados</span> (<span id="cadastros-selected-count">0</span>)
                                     </button>
-                                    <button id="btn-cadastros-sync-prd" onclick="importPrdDataToHml()" data-permissao="OPERADOR,ADMIN" class="btn btn-secondary hml-only" style="background: rgba(245, 158, 11, 0.1); border: 1px solid rgba(245, 158, 11, 0.4); color: #f59e0b;" data-i18n-title="btn_copy_prd_title" title="Importar base de dados atual de Produção para HML">
-                                        <i class="fa-solid fa-cloud-arrow-down"></i> <span data-i18n="btn_copy_prd">Copiar Dados de PRD</span>
-                                    </button>
+                                    
                                     <input type="file" id="cadastros-import-excel-file" accept=".xlsx, .xls, .csv" style="display: none;">
                                     <button id="btn-cadastros-import-excel" data-permissao="OPERADOR,ADMIN" class="btn btn-secondary" style="background: rgba(16, 185, 129, 0.08); border: 1px solid #10b981; color: #10b981;">
                                         <i class="fa-solid fa-file-import"></i> <span data-i18n="btn_import_activities">Importar Atividades</span>
@@ -6244,25 +6237,14 @@ window.addEventListener('error', function(event) {
 const SUPABASE_URL = 'https://maguyzjhldcgpcvkvkqe.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1hZ3V5empobGRjZ3Bjdmt2a3FlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQ2NTU0MDMsImV4cCI6MjEwMDIzMTQwM30.Ow9xruE1qAFTX3mqELERxrY3CRBOdV_n4MoXXhtt3Y8';
 
-// Configuração isolada de autenticação para Homologação (HML)
-const HML_AUTH_STORAGE_KEY = 'sb-painel-ops-hml-auth-token';
-const HML_ACTIVITY_STORAGE_KEY = 'painel_ops_hml_last_activity';
-const HML_SESSION_ACTIVE_KEY = 'painel_ops_hml_session_active';
 
 let supabaseClient = null;
 let realtimeChannel = null;
 if (window.supabase) {
     try {
-        supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
-            auth: {
-                storageKey: HML_AUTH_STORAGE_KEY,
-                persistSession: true,
-                autoRefreshToken: true,
-                detectSessionInUrl: true
-            }
-        });
+        supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
     } catch (err) {
-        console.warn('Erro ao inicializar Supabase Client em HML:', err);
+        console.warn('Erro ao inicializar Supabase Client:', err);
     }
 }
 
@@ -6502,8 +6484,8 @@ const COUNTRY_CONFIG = {
         name: 'Brasil',
         flag: '🇧🇷',
         locale: 'pt-BR',
-        boardStateId: 'hml_default',
-        realtimeChannel: 'board-changes-hml',
+        boardStateId: 'default',
+        realtimeChannel: 'board-changes',
         storageKey: 'capacity_fte_hub_state_BR'
     },
     'HISPANA': {
@@ -6511,8 +6493,8 @@ const COUNTRY_CONFIG = {
         name: 'Hispana (AR, MX, CO)',
         flag: '🌐',
         locale: 'es-LatAm',
-        boardStateId: 'hml_hispana',
-        realtimeChannel: 'board-changes-hml-hispana',
+        boardStateId: 'hispana_default',
+        realtimeChannel: 'board-changes-hispana',
         storageKey: 'capacity_fte_hub_state_HISPANA'
     }
 };
@@ -7345,14 +7327,7 @@ const EXAMPLE_PROCESSES = [
 function getSupabase() {
     if (!supabaseClient && window.supabase && typeof window.supabase.createClient === 'function') {
         try {
-            supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
-                auth: {
-                    storageKey: HML_AUTH_STORAGE_KEY,
-                    persistSession: true,
-                    autoRefreshToken: true,
-                    detectSessionInUrl: true
-                }
-            });
+            supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         } catch (err) {
             console.error('Erro ao inicializar Supabase Client:', err);
         }
@@ -7386,7 +7361,7 @@ const INACTIVITY_TIMEOUT_MS = 30 * 60 * 1000; // 30 minutos
 
 function recordUserActivity() {
     if (window._authUserId) {
-        localStorage.setItem(HML_ACTIVITY_STORAGE_KEY, String(Date.now()));
+        localStorage.setItem('painel_ops_last_activity', String(Date.now()));
     }
 }
 
@@ -7407,7 +7382,7 @@ function handleUserInteraction() {
 // Verificador periódico de inatividade
 setInterval(async () => {
     if (!window._authUserId) return;
-    const lastActivity = parseInt(localStorage.getItem(HML_ACTIVITY_STORAGE_KEY) || '0', 10);
+    const lastActivity = parseInt(localStorage.getItem('painel_ops_last_activity') || '0', 10);
     if (lastActivity > 0 && (Date.now() - lastActivity) > INACTIVITY_TIMEOUT_MS) {
         console.log('[Auth] Sessão expirada por inatividade (30 minutos).');
         await handleLogout(true);
@@ -7450,7 +7425,7 @@ async function handleLogin() {
         } else {
             const user = (data && data.session && data.session.user) ? data.session.user : (data ? data.user : null);
             if (user) {
-                sessionStorage.setItem(HML_SESSION_ACTIVE_KEY, 'true');
+                sessionStorage.setItem('painel_ops_session_active', 'true');
                 recordUserActivity();
                 // Forçar ocultação do overlay de login e exibição do painel principal
                 const overlay = document.getElementById('auth-overlay');
@@ -7522,7 +7497,7 @@ async function handleSignup() {
         } else {
             const user = (data && data.session && data.session.user) ? data.session.user : (data ? data.user : null);
             if (user) {
-                sessionStorage.setItem(HML_SESSION_ACTIVE_KEY, 'true');
+                sessionStorage.setItem('painel_ops_session_active', 'true');
                 recordUserActivity();
                 showAuthInfo("Conta criada e autenticada com sucesso!");
                 hideAuthOverlay();
@@ -7545,8 +7520,8 @@ async function handleSignup() {
 
 async function handleLogout(isAutoTimeout = false) {
     unsubscribeRealtime();
-    sessionStorage.removeItem(HML_SESSION_ACTIVE_KEY);
-    localStorage.removeItem(HML_ACTIVITY_STORAGE_KEY);
+    sessionStorage.removeItem('painel_ops_session_active');
+    localStorage.removeItem('painel_ops_last_activity');
     const client = getSupabase();
     if (client) {
         try {
@@ -7725,7 +7700,7 @@ async function handleSaveResetPassword() {
             }
             const user = (data && data.user) ? data.user : null;
             if (user) {
-                sessionStorage.setItem(HML_SESSION_ACTIVE_KEY, 'true');
+                sessionStorage.setItem('painel_ops_session_active', 'true');
                 recordUserActivity();
                 hideAuthOverlay();
                 await setupUserSession(user);
@@ -8010,14 +7985,14 @@ document.addEventListener('DOMContentLoaded', async () => {
                 showAuthOverlay();
                 setAuthViewMode('reset');
             } else {
-                const hasActiveSession = sessionStorage.getItem(HML_SESSION_ACTIVE_KEY) === 'true';
-                const lastActivity = parseInt(localStorage.getItem(HML_ACTIVITY_STORAGE_KEY) || '0', 10);
+                const hasActiveSession = sessionStorage.getItem('painel_ops_session_active') === 'true';
+                const lastActivity = parseInt(localStorage.getItem('painel_ops_last_activity') || '0', 10);
                 const isInactive = !hasActiveSession || lastActivity === 0 || (Date.now() - lastActivity) > INACTIVITY_TIMEOUT_MS;
 
                 if (isInactive) {
                     console.log('[Auth Init] Sessão inexistente ou expirada. Exibindo tela de login obrigatória.');
-                    sessionStorage.removeItem(HML_SESSION_ACTIVE_KEY);
-                    localStorage.removeItem(HML_ACTIVITY_STORAGE_KEY);
+                    sessionStorage.removeItem('painel_ops_session_active');
+                    localStorage.removeItem('painel_ops_last_activity');
                     try { await client.auth.signOut(); } catch (_) {}
                     window._authUserId = null;
                     showAuthOverlay();
@@ -8031,16 +8006,16 @@ document.addEventListener('DOMContentLoaded', async () => {
                         recordUserActivity();
                         await setupUserSession(session.user);
                     } else {
-                        sessionStorage.removeItem(HML_SESSION_ACTIVE_KEY);
+                        sessionStorage.removeItem('painel_ops_session_active');
                         showAuthOverlay();
                     }
                 }
             }
         } catch (sessionErr) {
             console.error('Erro ao recuperar sessão existente do Supabase:', sessionErr);
-            sessionStorage.removeItem(HML_SESSION_ACTIVE_KEY);
+            sessionStorage.removeItem('painel_ops_session_active');
             try {
-                localStorage.removeItem(HML_AUTH_STORAGE_KEY);
+                localStorage.removeItem('sb-maguyzjhldcgpcvkvkqe-auth-token');
                 const projName = SUPABASE_URL.split('//')[1]?.split('.')[0];
                 if (projName) {
                     localStorage.removeItem(`sb-${projName}-auth-token`);
@@ -8060,7 +8035,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                         showAuthOverlay();
                         setAuthViewMode('reset');
                     } else {
-                        const hasActiveSession = sessionStorage.getItem(HML_SESSION_ACTIVE_KEY) === 'true';
+                        const hasActiveSession = sessionStorage.getItem('painel_ops_session_active') === 'true';
                         if (hasActiveSession) {
                             recordUserActivity();
                             await setupUserSession(session.user);
@@ -8069,7 +8044,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                         }
                     }
                 } else if (event === 'SIGNED_OUT') {
-                    sessionStorage.removeItem(HML_SESSION_ACTIVE_KEY);
+                    sessionStorage.removeItem('painel_ops_session_active');
                     showAuthOverlay();
                 }
             });
@@ -8170,8 +8145,8 @@ function subscribeRealtime() {
 
     updateRealtimeStatusUI('CONNECTING');
 
-    const targetId = COUNTRY_CONFIG[currentCountry]?.boardStateId || 'hml_default';
-    const targetChannel = COUNTRY_CONFIG[currentCountry]?.realtimeChannel || 'board-changes-hml';
+    const targetId = COUNTRY_CONFIG[currentCountry]?.boardStateId || 'default';
+    const targetChannel = COUNTRY_CONFIG[currentCountry]?.realtimeChannel || 'board-changes';
 
     realtimeChannel = client
         .channel(targetChannel)
@@ -8181,7 +8156,7 @@ function subscribeRealtime() {
             table: 'board_state',
             filter: `id=eq.${targetId}`
         }, (payload) => {
-            console.log(`[Realtime HML ${currentCountry}] Evento recebido via WebSocket:`, payload.eventType, payload);
+            console.log(`[Realtime ${currentCountry}] Evento recebido via WebSocket:`, payload.eventType, payload);
             
             const payloadData = payload.new || payload.record;
             if (payloadData && payloadData.data) {
@@ -8215,7 +8190,7 @@ function subscribeRealtime() {
             }
         })
         .subscribe((status, err) => {
-            console.log(`[Realtime HML ${currentCountry}] Status da inscrição:`, status, err || '');
+            console.log(`[Realtime ${currentCountry}] Status da inscrição:`, status, err || '');
             if (status === 'SUBSCRIBED') {
                 updateRealtimeStatusUI('SUBSCRIBED');
             } else if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
@@ -8236,7 +8211,7 @@ function unsubscribeRealtime() {
     }
     realtimeChannel = null;
     updateRealtimeStatusUI('CLOSED');
-    console.log('[Realtime HML] Canal desconectado.');
+    console.log('[Realtime] Canal desconectado.');
 }
 
 // SUPABASE BOARD STATE PERSISTENCE
@@ -8248,7 +8223,7 @@ async function saveStateToSupabase() {
 
     try {
         const myUserId = window._authUserId;
-        const targetId = COUNTRY_CONFIG[currentCountry]?.boardStateId || 'hml_default';
+        const targetId = COUNTRY_CONFIG[currentCountry]?.boardStateId || 'default';
 
         const { error } = await client
             .from('board_state')
@@ -8293,7 +8268,7 @@ async function forceResetGlobalState() {
     if (!client) return;
 
     try {
-        const targetId = COUNTRY_CONFIG[currentCountry]?.boardStateId || 'hml_default';
+        const targetId = COUNTRY_CONFIG[currentCountry]?.boardStateId || 'default';
         const { data: { user } } = await client.auth.getUser();
         const { error } = await client
             .from('board_state')
@@ -8321,7 +8296,7 @@ async function loadStateFromSupabase() {
     if (!client) return false;
 
     try {
-        const targetId = COUNTRY_CONFIG[currentCountry]?.boardStateId || 'hml_default';
+        const targetId = COUNTRY_CONFIG[currentCountry]?.boardStateId || 'default';
         const { data, error } = await client
             .from('board_state')
             .select('data, updated_at')
@@ -8355,73 +8330,6 @@ async function loadStateFromSupabase() {
     } catch (err) {
         console.error('[Supabase Load Exception]', err);
         return false;
-    }
-}
-
-// IMPORTAR BASE DE DADOS COMPLETA DE PRODUÇÃO (PRD) PARA HOMOLOGAÇÃO (HML)
-async function importPrdDataToHml() {
-    if (!verificarPermissao('OPERADOR')) {
-        alert('Acesso negado: Perfil OPERADOR ou ADMIN necessário.');
-        return;
-    }
-    
-    const client = getSupabase();
-    if (!client) {
-        alert('Erro: Supabase não conectado.');
-        return;
-    }
-    
-    const confirmMsg = 'Deseja realmente importar todas as informações de PRODUÇÃO (PRD) para este ambiente de HOMOLOGAÇÃO (HML)?\n\n' +
-                       '⚠️ Todos os processos, responsáveis e equipes de HML serão substituídos pelo cenário atual de Produção para que você possa executar testes com dados reais.';
-    
-    if (!confirm(confirmMsg)) {
-        return;
-    }
-    
-    try {
-        showToast('Buscando dados atuais de Produção (PRD)...', 'info', 4000);
-        
-        const prdId = currentCountry === 'HISPANA' ? 'hispana' : 'default';
-        const { data, error } = await client
-            .from('board_state')
-            .select('data')
-            .eq('id', prdId)
-            .maybeSingle();
-            
-        if (error) {
-            console.error('[Import PRD Error]', error);
-            alert('Erro ao buscar dados de Produção no Supabase: ' + error.message);
-            return;
-        }
-        
-        if (!data || !data.data) {
-            alert('Nenhum dado encontrado no banco de Produção (PRD) para esta região.');
-            return;
-        }
-        
-        // Clona e migra estado de Produção
-        state = JSON.parse(JSON.stringify(data.data));
-        applyStateMigrations();
-        
-        // Salva diretamente em HML
-        saveState();
-        
-        refreshCurrentUserAssignedTeam();
-        aplicarPerfilDeAcesso();
-        renderAreaFilterOptions();
-        renderResponsavelFilterOptions();
-        renderCadastrosView();
-        renderTable();
-        renderBalancingTable();
-        renderReviewTable();
-        renderAutomationsView();
-        
-        showToast('Cenário de Produção (PRD) importado com sucesso para HML!', 'success', 6000);
-        alert('Sucesso! O cenário de Produção (PRD) foi copiado integralmente para este ambiente de Homologação (HML).');
-        
-    } catch (err) {
-        console.error('[Import PRD Exception]', err);
-        alert('Erro inesperado ao importar dados de Produção: ' + err.message);
     }
 }
 
