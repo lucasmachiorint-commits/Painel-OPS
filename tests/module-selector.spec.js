@@ -177,4 +177,18 @@ test.describe('Painel OPS - Seletor de Módulo (Atendimento x Operações) E2E',
     }
   });
 
+  test('7. Menu Balanceamento deve estar oculto em ambos os modulos e em todos os perfis', async ({ page }) => {
+    for (const perfil of ['ADMIN', 'OPERADOR', 'CONSULTA']) {
+      await page.evaluate((p) => {
+        // @ts-ignore
+        currentUser = { nome: 'Usuario Teste', email: 'teste@natura.net', perfil: p, assignedTeam: 'Backoffice' };
+        // @ts-ignore
+        selectModule('operacoes');
+      }, perfil);
+
+      const balancingMenuItem = page.locator('.sidebar-menu .menu-item[data-view="balancing"]');
+      await expect(balancingMenuItem).toBeHidden();
+    }
+  });
+
 });
