@@ -7529,6 +7529,9 @@ async function handleSignup() {
 
 async function handleLogout(isAutoTimeout = false) {
     unsubscribeRealtime();
+    window._sessionBootstrapped = false;
+    _sessionBootstrapping = false;
+    currentModule = null;
     sessionStorage.removeItem('painel_ops_session_active');
     localStorage.removeItem('painel_ops_last_activity');
     const client = getSupabase();
@@ -7822,11 +7825,21 @@ function hideAuthOverlay() {
     }
 }
 
+let _sessionBootstrapping = false;
+window._sessionBootstrapped = false;
+
 async function setupUserSession(user) {
     if (!user) {
         showAuthOverlay();
         return;
     }
+    
+    // Se a sessão já foi inicializada (ou está inicializando) para este usuário, evitar reexecução
+    if ((window._sessionBootstrapped || _sessionBootstrapping) && window._authUserId === user.id) {
+        recordUserActivity();
+        return;
+    }
+    _sessionBootstrapping = true;
     
     // Forçar ocultação do overlay de login
     const overlay = document.getElementById('auth-overlay');
@@ -7888,9 +7901,17 @@ async function setupUserSession(user) {
         const targetView = (hashView && VIEW_META[hashView]) ? hashView : 'dashboard';
         switchToView(targetView);
 
-        // Sempre exibir o seletor de módulo após o login para escolha do ambiente
-        showModuleSelector();
+        window._sessionBootstrapped = true;
+        _sessionBootstrapping = false;
+
+        // Se o usuário ainda não escolheu um módulo nesta sessão, exibir o seletor
+        if (!currentModule) {
+            showModuleSelector();
+        } else {
+            applyModuleVisibility();
+        }
     } catch (err) {
+        _sessionBootstrapping = false;
         alert('[DIAGNÓSTICO] Erro em setupUserSession: ' + (err.message || err));
         console.error('Erro em setupUserSession:', err);
     }
@@ -7994,42 +8015,23 @@ document.addEventListener('DOMContentLoaded', async () => {
                 showAuthOverlay();
                 setAuthViewMode('reset');
             } else {
-                const hasActiveSession = sessionStorage.getItem('painel_ops_session_active') === 'true';
-                const lastActivity = parseInt(localStorage.getItem('painel_ops_last_activity') || '0', 10);
-                const isInactive = !hasActiveSession || lastActivity === 0 || (Date.now() - lastActivity) > INACTIVITY_TIMEOUT_MS;
-
-                if (isInactive) {
-                    console.log('[Auth Init] Sessão inexistente ou expirada. Exibindo tela de login obrigatória.');
-                    sessionStorage.removeItem('painel_ops_session_active');
-                    localStorage.removeItem('painel_ops_last_activity');
-                    try { await client.auth.signOut(); } catch (_) {}
-                    window._authUserId = null;
-                    showAuthOverlay();
-                    if (hasActiveSession && lastActivity > 0) {
-                        showAuthInfo('Sua sessão expirou após 30 minutos de inatividade. Por favor, faça login.');
-                    }
-                } else {
-                    const { data } = await client.auth.getSession();
-                    const session = data ? data.session : null;
-                    if (session && session.user) {
-                        recordUserActivity();
-                        await setupUserSession(session.user);
-                    } else {
-                        sessionStorage.removeItem('painel_ops_session_active');
-                        showAuthOverlay();
-                    }
-                }
+                // Em recarregamento/atualização (F5) ou nova abertura: sempre exigir login
+                console.log('[Auth Init] Atualização de página ou nova abertura: exibindo tela de login obrigatória.');
+                sessionStorage.removeItem('painel_ops_session_active');
+                localStorage.removeItem('painel_ops_last_activity');
+                window._authUserId = null;
+                window._sessionBootstrapped = false;
+                _sessionBootstrapping = false;
+                currentModule = null;
+                try { await client.auth.signOut(); } catch (_) {}
+                showAuthOverlay();
             }
         } catch (sessionErr) {
-            console.error('Erro ao recuperar sessão existente do Supabase:', sessionErr);
+            console.error('Erro ao inicializar autenticação:', sessionErr);
             sessionStorage.removeItem('painel_ops_session_active');
-            try {
-                localStorage.removeItem('sb-maguyzjhldcgpcvkvkqe-auth-token');
-                const projName = SUPABASE_URL.split('//')[1]?.split('.')[0];
-                if (projName) {
-                    localStorage.removeItem(`sb-${projName}-auth-token`);
-                }
-            } catch (_) {}
+            window._sessionBootstrapped = false;
+            _sessionBootstrapping = false;
+            currentModule = null;
             showAuthOverlay();
         }
 
@@ -8047,12 +8049,17 @@ document.addEventListener('DOMContentLoaded', async () => {
                         const hasActiveSession = sessionStorage.getItem('painel_ops_session_active') === 'true';
                         if (hasActiveSession) {
                             recordUserActivity();
-                            await setupUserSession(session.user);
+                            if ((!window._sessionBootstrapped && !_sessionBootstrapping) || window._authUserId !== session.user.id) {
+                                await setupUserSession(session.user);
+                            }
                         } else {
                             showAuthOverlay();
                         }
                     }
                 } else if (event === 'SIGNED_OUT') {
+                    window._sessionBootstrapped = false;
+                    _sessionBootstrapping = false;
+                    currentModule = null;
                     sessionStorage.removeItem('painel_ops_session_active');
                     showAuthOverlay();
                 }
@@ -9244,20 +9251,20 @@ function switchToView(view) {
     const targetEl = document.getElementById(`view-${view}`);
     if (!targetEl) view = 'dashboard';
 
-    // Auto-sync currentModule baseado na visão solicitada
+    // Auto-sync currentModule apenas se já houver um módulo ativo selecionado
     const targetModule = getModuleForView(view);
-    if (currentModule !== targetModule) {
+    if (currentModule && currentModule !== targetModule) {
         currentModule = targetModule;
     }
 
-    // Se o seletor de módulos estiver aberto, fechar
-    const overlay = document.getElementById('module-selector-overlay');
-    if (overlay && overlay.style.display !== 'none') {
-        overlay.style.display = 'none';
+    // Se o seletor de módulos estiver aberto e já houver módulo ativo, fechar
+    if (currentModule) {
+        const overlay = document.getElementById('module-selector-overlay');
+        if (overlay && overlay.style.display !== 'none') {
+            overlay.style.display = 'none';
+        }
+        applyModuleVisibility();
     }
-
-    // Aplicar isolamento do menu lateral e botão do header
-    applyModuleVisibility();
 
     // Verify RBAC access
     const menuItem = document.querySelector(`.sidebar-menu .menu-item[data-view="${view}"]`);
