@@ -154,6 +154,11 @@ function aplicarPerfilDeAcesso() {
 
     // Varre todos os elementos com data-permissao
     document.querySelectorAll('[data-permissao]').forEach(el => {
+        if (el.dataset && el.dataset.view === 'balancing') {
+            el.style.display = 'none';
+            el.setAttribute('data-rbac-hidden', 'true');
+            return;
+        }
         const permitidos = el.getAttribute('data-permissao').split(',').map(s => s.trim());
         if (permitidos.includes(perfil)) {
             el.style.display = '';
@@ -234,10 +239,10 @@ function applyCountryRpaVisibility() {
         historyMenuItem.style.display = isHsp ? 'none' : '';
     }
 
-    // 2. Menu lateral de Balanceamento / Balanceo (desativado temporariamente para Hispana)
+    // 2. Menu lateral de Balanceamento / Balanceo (desativado/ocultado globalmente)
     const balancingMenuItem = document.querySelector('.sidebar-menu .menu-item[data-view="balancing"]');
     if (balancingMenuItem) {
-        balancingMenuItem.style.display = isHsp ? 'none' : (isAdmin ? '' : 'none');
+        balancingMenuItem.style.display = 'none';
     }
 
     // 3. Menu lateral de Automações (RPA) (desativado para Hispana)
@@ -2878,7 +2883,7 @@ const APP_MODULES = {
         icon: 'fa-gears',
         colorClass: 'mod-operacoes',
         defaultView: 'dashboard',
-        views: ['dashboard', 'history', 'cadastros', 'balancing', 'automations', 'access-control']
+        views: ['dashboard', 'history', 'cadastros', 'automations', 'access-control']
     },
     atendimento: {
         key: 'atendimento',
@@ -2934,8 +2939,13 @@ function applyModuleVisibility() {
                 el.style.display = 'none';
                 return;
             }
-            // Histórico, Balanceamento e Automações desativados na Hispana temporariamente
-            if (isHsp && el.dataset && (el.dataset.view === 'history' || el.dataset.view === 'balancing' || el.dataset.view === 'automations')) {
+            // Balanceamento desativado/ocultado globalmente
+            if (el.dataset && el.dataset.view === 'balancing') {
+                el.style.display = 'none';
+                return;
+            }
+            // Histórico e Automações desativados na Hispana temporariamente
+            if (isHsp && el.dataset && (el.dataset.view === 'history' || el.dataset.view === 'automations')) {
                 el.style.display = 'none';
                 return;
             }
@@ -3111,7 +3121,7 @@ function updateViewHeader(view) {
 }
 
 function switchToView(view) {
-    if (!view) view = 'dashboard';
+    if (!view || view === 'balancing') view = 'dashboard';
     const targetEl = document.getElementById(`view-${view}`);
     if (!targetEl) view = 'dashboard';
 

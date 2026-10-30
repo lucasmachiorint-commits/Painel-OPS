@@ -3949,6 +3949,11 @@ body.light-theme .btn-module-switch:hover {
     }
 }
 
+/* Ocultacao do menu de Balanceamento */
+.sidebar-menu .menu-item[data-view="balancing"] {
+    display: none !important;
+}
+
 
 
 
