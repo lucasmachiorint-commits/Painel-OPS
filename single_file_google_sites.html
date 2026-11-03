@@ -16510,37 +16510,46 @@ async function handleExcelUpload(canalKey, inputEl) {
         } else {
             // CANAIS DE IA (CHAT, WHATSAPP, URA)
             const inputMes = document.getElementById('input-' + canalKey.toLowerCase() + '-mes');
-            const mesRef = inputMes?.value || '2026-08';
-            const volumeMap = {}; // { 'produto|motivo|submotivo': qtd }
+            const defaultMes = inputMes?.value || '2026-08';
+            const volumeMap = {}; // { 'mes|produto|motivo|submotivo': qtd }
+            const mesesIdentificados = new Set();
 
             for (const row of rawRows) {
-                // Normaliza chaves
+                // Normaliza chaves da linha para lowercase
                 const rowNorm = {};
                 for (const [k, v] of Object.entries(row)) {
                     rowNorm[k.trim().toLowerCase()] = v;
                 }
 
-                const motivo = rowNorm['motivo'] || rowNorm['motivo_contato'] || rowNorm['use_case'] || '';
+                // Extrai chave do motivo: WhatsApp usa 'faq', Chat/URA usam 'motivo' ou 'use_case'
+                const motivo = rowNorm['faq'] || rowNorm['motivo'] || rowNorm['motivo_contato'] || rowNorm['use_case'] || rowNorm['usecase'] || '';
+
+                // Extrai data se presente na linha
+                const dt = parseDiagDate(rowNorm['createdat'] || rowNorm['created_at'] || rowNorm['time'] || rowNorm['data'] || rowNorm['updatedat']);
+                const rowMes = formatDiagYearMonth(dt);
+                const mesRef = rowMes || defaultMes;
+
                 if (motivo) {
+                    mesesIdentificados.add(mesRef);
                     const dePara = diagLookupDePara(canalKey, motivo, '', '');
                     if (dePara.unmapped) {
                         unmappedDiscovered.push({ canal: canalKey, motivo, tipo: '', sub: '' });
                     }
                     if (dePara.produto !== 'Não se Aplica') {
-                        const key = `${dePara.produto}|${dePara.motivo}|${dePara.submotivo}`;
+                        const key = `${mesRef}|${dePara.produto}|${dePara.motivo}|${dePara.submotivo}`;
                         volumeMap[key] = (volumeMap[key] || 0) + 1;
                         totalImportados++;
                     }
                 }
             }
 
-            const existingVolumes = DiagStorage.getVolume().filter(v => !(v.canal === canalKey && v.mes === mesRef));
+            const existingVolumes = DiagStorage.getVolume().filter(v => !(v.canal === canalKey && mesesIdentificados.has(v.mes)));
             for (const [key, vol] of Object.entries(volumeMap)) {
-                const [prod, mot, sub] = key.split('|');
+                const [mes, prod, mot, sub] = key.split('|');
                 existingVolumes.push({
                     id: 'vol_' + Math.random().toString(36).substring(2, 9),
                     canal: canalKey,
-                    mes: mesRef,
+                    mes: mes,
                     produto: prod,
                     motivo: mot,
                     submotivo: sub,
@@ -16549,9 +16558,10 @@ async function handleExcelUpload(canalKey, inputEl) {
             }
             DiagStorage.saveVolume(existingVolumes);
 
+            const displayMeses = Array.from(mesesIdentificados).sort().join(', ') || defaultMes;
             DiagStorage.addImportacaoLog({
                 canal: canalKey,
-                mes_referencia: mesRef,
+                mes_referencia: displayMeses,
                 total_linhas: rawRows.length,
                 volume_total: totalImportados,
                 tickets_processados: 0,

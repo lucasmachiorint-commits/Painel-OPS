@@ -172,4 +172,38 @@ test.describe('Módulo Diagnóstico do Cliente - Atendimento E2E', () => {
     await page.screenshot({ path: ARTIFACTS_DIR + '/diag_importacao_bases.png', fullPage: true });
   });
 
+  test('6. Deve processar amostra real de WhatsApp mapeando motivos via coluna faq', async ({ page }) => {
+    const res = await page.evaluate(() => {
+      // @ts-ignore
+      const sample = [
+        { faq: 'CARTAO_CREDITO_DADOS', createdat: '02/11/2026 15:26:28' },
+        { faq: 'CARTAO_CREDITO_ACORDO', createdat: '01/11/2026 13:26:04' },
+        { faq: 'CONTA_PAGAMENTO', createdat: '01/11/2026 11:28:58' },
+        { faq: 'CONTA_FUNCIONALIDADES_VENDAS', createdat: '01/11/2026 11:20:53' },
+        { faq: 'PEP_CONSULTAR_LIMITE_CREDITO', createdat: '01/11/2026 10:02:14' },
+        { faq: 'CARTAO_CREDITO_FATURA', createdat: '01/11/2026 06:08:22' },
+        { faq: 'PEP_ENCARGOS', createdat: '03/11/2026 10:46:19' },
+        { faq: 'CARTAO_CREDITO_TARIFAS', createdat: '03/11/2026 10:43:52' },
+        { faq: 'TRANSACOES_PAGAMENTO_BOLETO', createdat: '03/11/2026 10:12:49' },
+        { faq: 'CONTA_PAGAMENTO', createdat: '03/11/2026 10:10:20' },
+        { faq: 'APP_VALIDACAO_DISPOSITIVO', createdat: '03/11/2026 10:09:35' },
+        { faq: 'APP_VALIDACAO_DISPOSITIVO', createdat: '03/11/2026 10:08:55' }
+      ];
+
+      let mappedCount = 0;
+      sample.forEach(row => {
+        // @ts-ignore
+        const dePara = diagLookupDePara('WHATSAPP', row.faq, '', '');
+        if (dePara && !dePara.unmapped && dePara.produto !== 'Não se Aplica') {
+          mappedCount++;
+        }
+      });
+
+      return { total: sample.length, mapped: mappedCount };
+    });
+
+    expect(res.total).toBe(12);
+    expect(res.mapped).toBe(12);
+  });
+
 });
