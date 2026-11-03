@@ -85,6 +85,17 @@
                     <span data-i18n="menu_sizing">Redimensionamento</span>
                 </li>
 
+                <!-- SEÇÃO: DIAGNÓSTICO DO CLIENTE (ATENDIMENTO) -->
+                <li class="menu-section-label" data-module="atendimento" title="Diagnóstico do Cliente">Diagnóstico</li>
+                <li class="menu-item" data-module="atendimento" data-view="diag-dashboard" title="Dashboard Diagnóstico do Cliente (Volumetria e Efetividade)">
+                    <i class="fa-solid fa-chart-line"></i>
+                    <span>Diagnóstico do Cliente</span>
+                </li>
+                <li class="menu-item" data-module="atendimento" data-view="diag-import" title="Importação de Bases e Gestão do De-Para" data-permissao="OPERADOR,ADMIN">
+                    <i class="fa-solid fa-file-excel"></i>
+                    <span>Importação de Bases</span>
+                </li>
+
                 <!-- SEÇÃO: ADMINISTRAÇÃO (OPERAÇÕES) -->
                 <li class="menu-section-label admin-only" data-module="operacoes" data-i18n="section_admin" title="Administração e Governança" data-permissao="ADMIN">Admin</li>
                 <li class="menu-item" data-module="operacoes" data-view="access-control" data-permissao="ADMIN" data-i18n-title="menu_access_title" title="Controle de Acesso e Perfis">
@@ -1615,6 +1626,614 @@
                     </section>
                 </div>
 
+                <!-- ========================================== -->
+                <!-- DIAGNÓSTICO DO CLIENTE: DASHBOARD VIEW     -->
+                <!-- ========================================== -->
+                <div id="view-diag-dashboard" class="tab-view" style="display: none;">
+                    <!-- TOP PANEL: CABEÇALHO & SUB-NAV (VOLUMETRIA x EFETIVIDADE) -->
+                    <section class="panel glass-panel" style="margin-bottom: 1.5rem; padding: 1.25rem 1.75rem;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+                            <div>
+                                <h3 class="panel-title" style="margin-bottom: 0.35rem; display: flex; align-items: center; gap: 0.6rem; font-size: 1.35rem;">
+                                    <i class="fa-solid fa-stethoscope" style="color: var(--color-primary);"></i>
+                                    <span>Diagnóstico do Cliente</span>
+                                </h3>
+                                <p style="font-size: 0.85rem; color: var(--text-secondary); margin: 0;">
+                                    Visão consolidada de fechamento mensal: dinâmica de volumetria por produto/motivo e efetividade de atendimento (SLA 7 dias).
+                                </p>
+                            </div>
+                            <!-- SUB-NAVEGAÇÃO: VOLUMETRIA x EFETIVIDADE -->
+                            <div class="diag-subnav-container" style="display: flex; gap: 0.5rem; background: rgba(0,0,0,0.25); padding: 0.35rem; border-radius: 10px; border: 1px solid var(--border-color);">
+                                <button type="button" class="btn btn-secondary diag-subnav-btn active" id="btn-diag-tab-vol" onclick="switchDiagSubView('volumetria')" style="padding: 0.5rem 1.1rem; border-radius: 8px; font-weight: 600; font-size: 0.85rem;">
+                                    <i class="fa-solid fa-chart-pie" style="margin-right: 0.4rem;"></i> Volumetria
+                                </button>
+                                <button type="button" class="btn btn-secondary diag-subnav-btn" id="btn-diag-tab-efet" onclick="switchDiagSubView('efetividade')" style="padding: 0.5rem 1.1rem; border-radius: 8px; font-weight: 600; font-size: 0.85rem;">
+                                    <i class="fa-solid fa-stopwatch" style="margin-right: 0.4rem;"></i> Efetividade (SLA 7 dias)
+                                </button>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- ============================================== -->
+                    <!-- SUB-VIEW 1: VOLUMETRIA                         -->
+                    <!-- ============================================== -->
+                    <div id="diag-subview-volumetria">
+                        <!-- BARRA DE FILTROS: VOLUMETRIA -->
+                        <section class="panel glass-panel" style="margin-bottom: 1.5rem; padding: 1rem 1.5rem;">
+                            <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem;">
+                                <div style="display: flex; align-items: center; flex-wrap: wrap; gap: 1rem;">
+                                    <!-- Filtro Mês -->
+                                    <div class="filter-group" style="display: flex; align-items: center; gap: 0.5rem;">
+                                        <label for="filter-diag-mes" style="font-size: 0.8rem; font-weight: 600; color: var(--text-secondary); text-transform: uppercase;">
+                                            <i class="fa-solid fa-calendar-days" style="color: var(--color-primary); margin-right: 0.25rem;"></i> Mês:
+                                        </label>
+                                        <select id="filter-diag-mes" class="diag-select" onchange="renderDiagVolumetria()" style="padding: 0.45rem 0.85rem; border-radius: 8px; border: 1px solid var(--border-color); background: rgba(255,255,255,0.05); color: var(--text-primary); font-size: 0.85rem; outline: none;">
+                                            <!-- Populado dinamicamente com os meses carregados -->
+                                        </select>
+                                    </div>
+
+                                    <!-- Filtro Canal -->
+                                    <div class="filter-group" style="display: flex; align-items: center; gap: 0.5rem;">
+                                        <label for="filter-diag-canal" style="font-size: 0.8rem; font-weight: 600; color: var(--text-secondary); text-transform: uppercase;">
+                                            <i class="fa-solid fa-network-wired" style="color: var(--color-primary); margin-right: 0.25rem;"></i> Canal:
+                                        </label>
+                                        <select id="filter-diag-canal" class="diag-select" onchange="renderDiagVolumetria()" style="padding: 0.45rem 0.85rem; border-radius: 8px; border: 1px solid var(--border-color); background: rgba(255,255,255,0.05); color: var(--text-primary); font-size: 0.85rem; outline: none;">
+                                            <option value="all">Todos os Canais</option>
+                                            <option value="LIGACOES">Central de Atendimento (Ligações)</option>
+                                            <option value="CHAT">IA - Chat</option>
+                                            <option value="WHATSAPP">IA - WhatsApp</option>
+                                            <option value="URA">IA - URA</option>
+                                        </select>
+                                    </div>
+
+                                    <!-- Filtro Produto -->
+                                    <div class="filter-group" style="display: flex; align-items: center; gap: 0.5rem;">
+                                        <label for="filter-diag-produto" style="font-size: 0.8rem; font-weight: 600; color: var(--text-secondary); text-transform: uppercase;">
+                                            <i class="fa-solid fa-box-open" style="color: var(--color-primary); margin-right: 0.25rem;"></i> Produto:
+                                        </label>
+                                        <select id="filter-diag-produto" class="diag-select" onchange="renderDiagVolumetria()" style="padding: 0.45rem 0.85rem; border-radius: 8px; border: 1px solid var(--border-color); background: rgba(255,255,255,0.05); color: var(--text-primary); font-size: 0.85rem; outline: none;">
+                                            <option value="all">Todos os Produtos</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <!-- Busca Rápida -->
+                                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                    <div style="position: relative;">
+                                        <i class="fa-solid fa-magnifying-glass" style="position: absolute; left: 0.75rem; top: 50%; transform: translateY(-50%); font-size: 0.8rem; color: var(--text-muted);"></i>
+                                        <input type="text" id="filter-diag-search" oninput="renderDiagVolumetria()" placeholder="Buscar produto ou motivo..." style="padding: 0.45rem 0.85rem 0.45rem 2rem; border-radius: 8px; border: 1px solid var(--border-color); background: rgba(255,255,255,0.05); color: var(--text-primary); font-size: 0.85rem; outline: none; width: 220px;">
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+
+                        <!-- KPI CARDS: VOLUMETRIA -->
+                        <div class="widget-grid" style="grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">
+                            <div class="stat-card glass-panel" style="padding: 1.25rem;">
+                                <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                                    <div>
+                                        <span style="font-size: 0.75rem; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px;">Volume Mês Vigente</span>
+                                        <p class="widget-value" id="kpi-diag-vol-total" style="font-size: 2rem; font-weight: 700; margin: 0.35rem 0 0.2rem 0; color: #fff;">0</p>
+                                        <span class="widget-sub" id="kpi-diag-vol-mes-label" style="font-size: 0.78rem; color: var(--text-muted);">Mês selecionado</span>
+                                    </div>
+                                    <div style="width: 42px; height: 42px; border-radius: 10px; background: rgba(235,92,39,0.15); display: flex; align-items: center; justify-content: center; color: var(--color-primary); font-size: 1.15rem;">
+                                        <i class="fa-solid fa-phone-volume"></i>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="stat-card glass-panel" style="padding: 1.25rem;">
+                                <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                                    <div>
+                                        <span style="font-size: 0.75rem; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px;">Variação M vs M-1</span>
+                                        <p class="widget-value" id="kpi-diag-vol-var" style="font-size: 2rem; font-weight: 700; margin: 0.35rem 0 0.2rem 0; color: #10b981;">0.0%</p>
+                                        <span class="widget-sub" id="kpi-diag-vol-var-sub" style="font-size: 0.78rem; color: var(--text-muted);">comparado ao mês anterior</span>
+                                    </div>
+                                    <div style="width: 42px; height: 42px; border-radius: 10px; background: rgba(16,185,129,0.15); display: flex; align-items: center; justify-content: center; color: #10b981; font-size: 1.15rem;">
+                                        <i class="fa-solid fa-arrow-trend-up"></i>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="stat-card glass-panel" style="padding: 1.25rem;">
+                                <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                                    <div>
+                                        <span style="font-size: 0.75rem; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px;">Canal Mais Acionado</span>
+                                        <p class="widget-value" id="kpi-diag-top-canal" style="font-size: 1.4rem; font-weight: 700; margin: 0.35rem 0 0.2rem 0; color: #fff;">-</p>
+                                        <span class="widget-sub" id="kpi-diag-top-canal-sub" style="font-size: 0.78rem; color: var(--text-muted);">0 contatos (0.0%)</span>
+                                    </div>
+                                    <div style="width: 42px; height: 42px; border-radius: 10px; background: rgba(59,130,246,0.15); display: flex; align-items: center; justify-content: center; color: #3b82f6; font-size: 1.15rem;">
+                                        <i class="fa-solid fa-headset"></i>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="stat-card glass-panel" style="padding: 1.25rem;">
+                                <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                                    <div>
+                                        <span style="font-size: 0.75rem; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px;">Maior Motivo de Contato</span>
+                                        <p class="widget-value" id="kpi-diag-top-motivo" style="font-size: 1.2rem; font-weight: 700; margin: 0.35rem 0 0.2rem 0; color: #fff; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 200px;">-</p>
+                                        <span class="widget-sub" id="kpi-diag-top-motivo-sub" style="font-size: 0.78rem; color: var(--text-muted);">0 contatos</span>
+                                    </div>
+                                    <div style="width: 42px; height: 42px; border-radius: 10px; background: rgba(168,85,247,0.15); display: flex; align-items: center; justify-content: center; color: #a855f7; font-size: 1.15rem;">
+                                        <i class="fa-solid fa-list-check"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- GRÁFICOS: VOLUMETRIA (COMPOSIÇÃO & HISTÓRICO 3 MESES) -->
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(420px, 1fr)); gap: 1.5rem; margin-bottom: 1.5rem;">
+                            <!-- Gráfico 1: Composição por Motivo -->
+                            <section class="panel glass-panel" style="padding: 1.25rem;">
+                                <h3 class="panel-title" style="margin-bottom: 1rem; font-size: 1rem; display: flex; justify-content: space-between; align-items: center;">
+                                    <span><i class="fa-solid fa-chart-pie" style="color: var(--color-primary); margin-right: 0.4rem;"></i> Composição de Volume por Motivo (%)</span>
+                                </h3>
+                                <div style="height: 280px; position: relative;">
+                                    <canvas id="chart-diag-composicao"></canvas>
+                                </div>
+                            </section>
+
+                            <!-- Gráfico 2: Evolução 3 Meses por Canal -->
+                            <section class="panel glass-panel" style="padding: 1.25rem;">
+                                <h3 class="panel-title" style="margin-bottom: 1rem; font-size: 1rem; display: flex; justify-content: space-between; align-items: center;">
+                                    <span><i class="fa-solid fa-chart-column" style="color: var(--color-primary); margin-right: 0.4rem;"></i> Evolução dos Últimos 3 Meses por Canal</span>
+                                </h3>
+                                <div style="height: 280px; position: relative;">
+                                    <canvas id="chart-diag-historico-canais"></canvas>
+                                </div>
+                            </section>
+                        </div>
+
+                        <!-- TABELA HIERÁRQUICA DE VOLUMETRIA (3 MESES + COMPOSIÇÃO) -->
+                        <section class="panel glass-panel" style="padding: 1.25rem;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.5rem;">
+                                <div>
+                                    <h3 class="panel-title" style="margin: 0; font-size: 1.1rem; display: flex; align-items: center; gap: 0.5rem;">
+                                        <i class="fa-solid fa-table-list" style="color: var(--color-primary);"></i>
+                                        <span>Dinâmica de Volume por Produto, Motivo e Submotivo</span>
+                                    </h3>
+                                    <p style="font-size: 0.8rem; color: var(--text-secondary); margin: 0.2rem 0 0 0;">
+                                        Histórico dos últimos 3 meses, percentual de composição e variação M vs M-1. Clique nas linhas para detalhar.
+                                    </p>
+                                </div>
+                                <div style="display: flex; gap: 0.5rem;">
+                                    <button type="button" class="btn btn-secondary" onclick="expandAllDiagTree()" style="font-size: 0.8rem; padding: 0.35rem 0.75rem;">
+                                        <i class="fa-solid fa-angles-down" style="margin-right: 0.3rem;"></i> Expandir Tudo
+                                    </button>
+                                    <button type="button" class="btn btn-secondary" onclick="collapseAllDiagTree()" style="font-size: 0.8rem; padding: 0.35rem 0.75rem;">
+                                        <i class="fa-solid fa-angles-up" style="margin-right: 0.3rem;"></i> Recolher Tudo
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="table-responsive" style="max-height: 600px; overflow-y: auto;">
+                                <table class="fte-table" id="table-diag-volumetria">
+                                    <thead>
+                                        <tr>
+                                            <th style="width: 44%; text-align: left;">PRODUTO / MOTIVO / SUBMOTIVO</th>
+                                            <th id="th-diag-m2" style="width: 11%; text-align: right;">M-2</th>
+                                            <th id="th-diag-m1" style="width: 11%; text-align: right;">M-1</th>
+                                            <th id="th-diag-m0" style="width: 11%; text-align: right;">MÊS ATUAL</th>
+                                            <th style="width: 11%; text-align: right;">VARIAÇÃO (M/M-1)</th>
+                                            <th style="width: 12%; text-align: right;">COMPOSIÇÃO (%)</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="tbody-diag-volumetria">
+                                        <!-- Populado dinamicamente via JS -->
+                                    </tbody>
+                                    <tfoot>
+                                        <tr class="total-row" id="tfoot-diag-volumetria">
+                                            <td style="font-weight: 700;">TOTAL CONSOLIDADO</td>
+                                            <td id="tfoot-diag-m2" style="text-align: right; font-weight: 700;">0</td>
+                                            <td id="tfoot-diag-m1" style="text-align: right; font-weight: 700;">0</td>
+                                            <td id="tfoot-diag-m0" style="text-align: right; font-weight: 700;">0</td>
+                                            <td id="tfoot-diag-var" style="text-align: right; font-weight: 700;">0.0%</td>
+                                            <td style="text-align: right; font-weight: 700;">100.0%</td>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                            </div>
+                        </section>
+                    </div>
+
+                    <!-- ============================================== -->
+                    <!-- SUB-VIEW 2: EFETIVIDADE (SLA DE 7 DIAS)        -->
+                    <!-- ============================================== -->
+                    <div id="diag-subview-efetividade" style="display: none;">
+                        <!-- BARRA DE FILTROS: EFETIVIDADE -->
+                        <section class="panel glass-panel" style="margin-bottom: 1.5rem; padding: 1rem 1.5rem;">
+                            <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem;">
+                                <div style="display: flex; align-items: center; flex-wrap: wrap; gap: 1rem;">
+                                    <!-- Filtro Ano -->
+                                    <div class="filter-group" style="display: flex; align-items: center; gap: 0.5rem;">
+                                        <label for="filter-diag-efet-ano" style="font-size: 0.8rem; font-weight: 600; color: var(--text-secondary); text-transform: uppercase;">
+                                            <i class="fa-solid fa-calendar" style="color: var(--color-primary); margin-right: 0.25rem;"></i> Ano:
+                                        </label>
+                                        <select id="filter-diag-efet-ano" class="diag-select" onchange="renderDiagEfetividade()" style="padding: 0.45rem 0.85rem; border-radius: 8px; border: 1px solid var(--border-color); background: rgba(255,255,255,0.05); color: var(--text-primary); font-size: 0.85rem; outline: none;">
+                                            <option value="2026">2026</option>
+                                            <option value="2025">2025</option>
+                                        </select>
+                                    </div>
+
+                                    <!-- Filtro Grupo Responsável -->
+                                    <div class="filter-group" style="display: flex; align-items: center; gap: 0.5rem;">
+                                        <label for="filter-diag-efet-grupo" style="font-size: 0.8rem; font-weight: 600; color: var(--text-secondary); text-transform: uppercase;">
+                                            <i class="fa-solid fa-users-gear" style="color: var(--color-primary); margin-right: 0.25rem;"></i> Grupo do Ticket:
+                                        </label>
+                                        <select id="filter-diag-efet-grupo" class="diag-select" onchange="renderDiagEfetividade()" style="padding: 0.45rem 0.85rem; border-radius: 8px; border: 1px solid var(--border-color); background: rgba(255,255,255,0.05); color: var(--text-primary); font-size: 0.85rem; outline: none;">
+                                            <option value="all">Todos os Grupos</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <!-- Parâmetro Meta de SLA -->
+                                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                    <span style="font-size: 0.85rem; color: var(--text-secondary);">Meta de Atingimento:</span>
+                                    <span style="background: rgba(16,185,129,0.15); border: 1px solid #10b981; color: #10b981; padding: 0.25rem 0.65rem; border-radius: 6px; font-weight: 700; font-size: 0.88rem;">
+                                        96,10% (SLA ≤ 7 dias)
+                                    </span>
+                                </div>
+                            </div>
+                        </section>
+
+                        <!-- KPI CARDS: EFETIVIDADE -->
+                        <div class="widget-grid" style="grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">
+                            <div class="stat-card glass-panel" style="padding: 1.25rem;">
+                                <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                                    <div>
+                                        <span style="font-size: 0.75rem; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px;">SLA Acumulado Ano</span>
+                                        <p class="widget-value" id="kpi-diag-sla-pct" style="font-size: 2rem; font-weight: 700; margin: 0.35rem 0 0.2rem 0; color: #10b981;">0.00%</p>
+                                        <span class="widget-sub" id="kpi-diag-sla-status" style="font-size: 0.78rem; color: var(--text-muted);">Meta: 96,10%</span>
+                                    </div>
+                                    <div id="kpi-diag-sla-icon-box" style="width: 42px; height: 42px; border-radius: 10px; background: rgba(16,185,129,0.15); display: flex; align-items: center; justify-content: center; color: #10b981; font-size: 1.15rem;">
+                                        <i class="fa-solid fa-bullseye"></i>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="stat-card glass-panel" style="padding: 1.25rem;">
+                                <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                                    <div>
+                                        <span style="font-size: 0.75rem; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px;">Total Atendido no Prazo</span>
+                                        <p class="widget-value" id="kpi-diag-tickets-noprazo" style="font-size: 2rem; font-weight: 700; margin: 0.35rem 0 0.2rem 0; color: #fff;">0</p>
+                                        <span class="widget-sub" style="font-size: 0.78rem; color: var(--text-muted);">Fechados em até 7 dias corridos</span>
+                                    </div>
+                                    <div style="width: 42px; height: 42px; border-radius: 10px; background: rgba(16,185,129,0.15); display: flex; align-items: center; justify-content: center; color: #10b981; font-size: 1.15rem;">
+                                        <i class="fa-solid fa-circle-check"></i>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="stat-card glass-panel" style="padding: 1.25rem;">
+                                <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                                    <div>
+                                        <span style="font-size: 0.75rem; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px;">Atendidos Fora do Prazo</span>
+                                        <p class="widget-value" id="kpi-diag-tickets-foraprazo" style="font-size: 2rem; font-weight: 700; margin: 0.35rem 0 0.2rem 0; color: #f43f5e;">0</p>
+                                        <span class="widget-sub" style="font-size: 0.78rem; color: var(--text-muted);">Acima de 7 dias corridos</span>
+                                    </div>
+                                    <div style="width: 42px; height: 42px; border-radius: 10px; background: rgba(244,63,94,0.15); display: flex; align-items: center; justify-content: center; color: #f43f5e; font-size: 1.15rem;">
+                                        <i class="fa-solid fa-triangle-exclamation"></i>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="stat-card glass-panel" style="padding: 1.25rem;">
+                                <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                                    <div>
+                                        <span style="font-size: 0.75rem; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px;">Total de Tickets Analisados</span>
+                                        <p class="widget-value" id="kpi-diag-tickets-total" style="font-size: 2rem; font-weight: 700; margin: 0.35rem 0 0.2rem 0; color: #fff;">0</p>
+                                        <span class="widget-sub" style="font-size: 0.78rem; color: var(--text-muted);">Base Central de Atendimento</span>
+                                    </div>
+                                    <div style="width: 42px; height: 42px; border-radius: 10px; background: rgba(235,92,39,0.15); display: flex; align-items: center; justify-content: center; color: var(--color-primary); font-size: 1.15rem;">
+                                        <i class="fa-solid fa-ticket"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- GRÁFICO: EFETIVIDADE MÊS A MÊS x META -->
+                        <section class="panel glass-panel" style="margin-bottom: 1.5rem; padding: 1.25rem;">
+                            <h3 class="panel-title" style="margin-bottom: 1rem; font-size: 1rem; display: flex; justify-content: space-between; align-items: center;">
+                                <span><i class="fa-solid fa-chart-line" style="color: var(--color-primary); margin-right: 0.4rem;"></i> Evolução do % de Atendimento no Prazo (SLA ≤ 7 dias) x Meta (96,10%)</span>
+                            </h3>
+                            <div style="height: 300px; position: relative;">
+                                <canvas id="chart-diag-efetividade"></canvas>
+                            </div>
+                        </section>
+
+                        <!-- TABELAS: ACUMULADO POR MÊS E POR GRUPO RESPONSÁVEL -->
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(480px, 1fr)); gap: 1.5rem; margin-bottom: 1.5rem;">
+                            <!-- Tabela 1: Acumulado Ano por Mês -->
+                            <section class="panel glass-panel" style="padding: 1.25rem;">
+                                <h3 class="panel-title" style="margin-bottom: 0.75rem; font-size: 1.05rem;">
+                                    <i class="fa-solid fa-calendar-check" style="color: var(--color-primary); margin-right: 0.4rem;"></i>
+                                    <span>Efetividade Mensal e Acumulada no Ano</span>
+                                </h3>
+                                <div class="table-responsive" style="max-height: 450px; overflow-y: auto;">
+                                    <table class="fte-table" id="table-diag-efet-meses">
+                                        <thead>
+                                            <tr>
+                                                <th style="width: 22%;">MÊS</th>
+                                                <th style="width: 19%; text-align: right;">NO PRAZO</th>
+                                                <th style="width: 19%; text-align: right;">FORA DO PRAZO</th>
+                                                <th style="width: 20%; text-align: right;">TOTAL</th>
+                                                <th style="width: 20%; text-align: right;">% NO PRAZO</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="tbody-diag-efet-meses">
+                                            <!-- Populado dinamicamente -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </section>
+
+                            <!-- Tabela 2: Por Grupo Responsável -->
+                            <section class="panel glass-panel" style="padding: 1.25rem;">
+                                <h3 class="panel-title" style="margin-bottom: 0.75rem; font-size: 1.05rem;">
+                                    <i class="fa-solid fa-users-viewfinder" style="color: var(--color-primary); margin-right: 0.4rem;"></i>
+                                    <span>Efetividade por Grupo Responsável</span>
+                                </h3>
+                                <div class="table-responsive" style="max-height: 450px; overflow-y: auto;">
+                                    <table class="fte-table" id="table-diag-efet-grupos">
+                                        <thead>
+                                            <tr>
+                                                <th style="width: 38%;">GRUPO DO TICKET</th>
+                                                <th style="width: 15%; text-align: right;">NO PRAZO</th>
+                                                <th style="width: 15%; text-align: right;">FORA</th>
+                                                <th style="width: 16%; text-align: right;">TOTAL</th>
+                                                <th style="width: 16%; text-align: right;">% NO PRAZO</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="tbody-diag-efet-grupos">
+                                            <!-- Populado dinamicamente -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </section>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ========================================== -->
+                <!-- DIAGNÓSTICO DO CLIENTE: IMPORTAÇÃO VIEW    -->
+                <!-- ========================================== -->
+                <div id="view-diag-import" class="tab-view" style="display: none;">
+                    <!-- TOP PANEL -->
+                    <section class="panel glass-panel" style="margin-bottom: 1.5rem; padding: 1.25rem 1.75rem;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+                            <div>
+                                <h3 class="panel-title" style="margin-bottom: 0.35rem; display: flex; align-items: center; gap: 0.6rem; font-size: 1.35rem;">
+                                    <i class="fa-solid fa-file-excel" style="color: #10b981;"></i>
+                                    <span>Importação de Bases - Diagnóstico do Cliente</span>
+                                </h3>
+                                <p style="font-size: 0.85rem; color: var(--text-secondary); margin: 0;">
+                                    Carregue as planilhas Excel (.xlsx/.xls) de cada um dos 4 canais de atendimento e gerencie as regras do motor De-Para.
+                                </p>
+                            </div>
+                            <div style="display: flex; gap: 0.5rem;">
+                                <button type="button" class="btn btn-secondary" onclick="switchToView('diag-dashboard')" style="font-size: 0.85rem;">
+                                    <i class="fa-solid fa-arrow-left" style="margin-right: 0.3rem;"></i> Voltar ao Dashboard
+                                </button>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- MATRIZ DE COBERTURA DOS MESES (2026) -->
+                    <section class="panel glass-panel" style="margin-bottom: 1.5rem; padding: 1.25rem;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                            <h3 class="panel-title" style="font-size: 1.05rem; margin: 0;">
+                                <i class="fa-solid fa-calendar-check" style="color: var(--color-primary); margin-right: 0.4rem;"></i>
+                                <span>Matriz de Carga dos Meses (2026)</span>
+                            </h3>
+                            <span style="font-size: 0.78rem; color: var(--text-muted);">Status atualizado em tempo real</span>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="fte-table" id="table-diag-coverage" style="font-size: 0.82rem;">
+                                <thead>
+                                    <tr>
+                                        <th style="width: 22%;">CANAL</th>
+                                        <th>JAN</th><th>FEV</th><th>MAR</th><th>ABR</th><th>MAI</th><th>JUN</th>
+                                        <th>JUL</th><th>AGO</th><th>SET</th><th>OUT</th><th>NOV</th><th>DEZ</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tbody-diag-coverage">
+                                    <!-- Populado dinamicamente com badges de status -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </section>
+
+                    <!-- SEÇÃO: 4 CARDS DE UPLOAD EXCEL -->
+                    <section class="panel glass-panel" style="margin-bottom: 1.5rem; padding: 1.25rem;">
+                        <h3 class="panel-title" style="font-size: 1.05rem; margin-bottom: 1.25rem;">
+                            <i class="fa-solid fa-cloud-arrow-up" style="color: var(--color-primary); margin-right: 0.4rem;"></i>
+                            <span>Carregar Planilha Mensal por Canal (Excel .xlsx / .xls)</span>
+                        </h3>
+
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.25rem;">
+                            <!-- CARD 1: TABELÃO (CENTRAL / LIGAÇÕES) -->
+                            <div class="diag-upload-card" id="card-upload-tabelao" style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); border-radius: 12px; padding: 1.25rem; display: flex; flex-direction: column; justify-content: space-between;">
+                                <div>
+                                    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.75rem;">
+                                        <span style="font-weight: 700; font-size: 0.95rem; color: #fff; display: flex; align-items: center; gap: 0.4rem;">
+                                            <i class="fa-solid fa-phone" style="color: #eb5c27;"></i> Tabelão (Ligações)
+                                        </span>
+                                        <span class="badge-channel" style="background: rgba(235,92,39,0.15); color: #eb5c27; padding: 0.2rem 0.5rem; border-radius: 6px; font-size: 0.7rem; font-weight: 600;">Central</span>
+                                    </div>
+                                    <p style="font-size: 0.78rem; color: var(--text-secondary); margin-bottom: 1rem;">
+                                        Base de chamados da central telefônica. Alimenta volumetria e apuração do SLA de 7 dias.
+                                    </p>
+                                    
+                                    <div style="margin-bottom: 0.75rem;">
+                                        <label style="font-size: 0.75rem; color: var(--text-muted); display: block; margin-bottom: 0.3rem;">Tipo de Carga:</label>
+                                        <select id="select-tabelao-tipo-carga" onchange="toggleTabelaoMode()" style="width: 100%; padding: 0.4rem 0.6rem; border-radius: 6px; border: 1px solid var(--border-color); background: rgba(0,0,0,0.3); color: var(--text-primary); font-size: 0.8rem;">
+                                            <option value="mensal">Carga Mensal</option>
+                                            <option value="historico">Carga Histórica 2026 (Ano Todo)</option>
+                                        </select>
+                                    </div>
+
+                                    <div id="wrapper-tabelao-mes" style="margin-bottom: 1rem;">
+                                        <label style="font-size: 0.75rem; color: var(--text-muted); display: block; margin-bottom: 0.3rem;">Mês de Referência:</label>
+                                        <input type="month" id="input-tabelao-mes" value="2026-08" style="width: 100%; padding: 0.4rem 0.6rem; border-radius: 6px; border: 1px solid var(--border-color); background: rgba(0,0,0,0.3); color: var(--text-primary); font-size: 0.8rem;">
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <input type="file" id="file-upload-tabelao" accept=".xlsx,.xls,.csv" style="display: none;" onchange="handleExcelUpload('LIGACOES', this)">
+                                    <button type="button" class="btn btn-primary" onclick="document.getElementById('file-upload-tabelao').click()" style="width: 100%; justify-content: center; font-size: 0.85rem; padding: 0.6rem;">
+                                        <i class="fa-solid fa-file-excel" style="margin-right: 0.4rem;"></i> Selecionar Excel
+                                    </button>
+                                    <div id="status-upload-tabelao" style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.5rem; text-align: center;">Aguardando arquivo</div>
+                                </div>
+                            </div>
+
+                            <!-- CARD 2: IA - CHAT -->
+                            <div class="diag-upload-card" id="card-upload-chat" style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); border-radius: 12px; padding: 1.25rem; display: flex; flex-direction: column; justify-content: space-between;">
+                                <div>
+                                    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.75rem;">
+                                        <span style="font-weight: 700; font-size: 0.95rem; color: #fff; display: flex; align-items: center; gap: 0.4rem;">
+                                            <i class="fa-solid fa-comments" style="color: #3b82f6;"></i> IA - Chat
+                                        </span>
+                                        <span class="badge-channel" style="background: rgba(59,130,246,0.15); color: #3b82f6; padding: 0.2rem 0.5rem; border-radius: 6px; font-size: 0.7rem; font-weight: 600;">Chatbot</span>
+                                    </div>
+                                    <p style="font-size: 0.78rem; color: var(--text-secondary); margin-bottom: 1rem;">
+                                        Arquivo export_monitoring_chat do mês vigente com tabulações automáticas.
+                                    </p>
+                                    
+                                    <div style="margin-bottom: 1rem;">
+                                        <label style="font-size: 0.75rem; color: var(--text-muted); display: block; margin-bottom: 0.3rem;">Mês de Referência:</label>
+                                        <input type="month" id="input-chat-mes" value="2026-08" style="width: 100%; padding: 0.4rem 0.6rem; border-radius: 6px; border: 1px solid var(--border-color); background: rgba(0,0,0,0.3); color: var(--text-primary); font-size: 0.8rem;">
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <input type="file" id="file-upload-chat" accept=".xlsx,.xls,.csv" style="display: none;" onchange="handleExcelUpload('CHAT', this)">
+                                    <button type="button" class="btn btn-primary" onclick="document.getElementById('file-upload-chat').click()" style="width: 100%; justify-content: center; font-size: 0.85rem; padding: 0.6rem;">
+                                        <i class="fa-solid fa-file-excel" style="margin-right: 0.4rem;"></i> Selecionar Excel
+                                    </button>
+                                    <div id="status-upload-chat" style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.5rem; text-align: center;">Aguardando arquivo</div>
+                                </div>
+                            </div>
+
+                            <!-- CARD 3: IA - WHATSAPP -->
+                            <div class="diag-upload-card" id="card-upload-whatsapp" style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); border-radius: 12px; padding: 1.25rem; display: flex; flex-direction: column; justify-content: space-between;">
+                                <div>
+                                    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.75rem;">
+                                        <span style="font-weight: 700; font-size: 0.95rem; color: #fff; display: flex; align-items: center; gap: 0.4rem;">
+                                            <i class="fa-brands fa-whatsapp" style="color: #10b981;"></i> IA - WhatsApp
+                                        </span>
+                                        <span class="badge-channel" style="background: rgba(16,185,129,0.15); color: #10b981; padding: 0.2rem 0.5rem; border-radius: 6px; font-size: 0.7rem; font-weight: 600;">WhatsApp</span>
+                                    </div>
+                                    <p style="font-size: 0.78rem; color: var(--text-secondary); margin-bottom: 1rem;">
+                                        Arquivo export_monitoring_whatsapp do mês vigente com tabulações automáticas.
+                                    </p>
+                                    
+                                    <div style="margin-bottom: 1rem;">
+                                        <label style="font-size: 0.75rem; color: var(--text-muted); display: block; margin-bottom: 0.3rem;">Mês de Referência:</label>
+                                        <input type="month" id="input-whatsapp-mes" value="2026-08" style="width: 100%; padding: 0.4rem 0.6rem; border-radius: 6px; border: 1px solid var(--border-color); background: rgba(0,0,0,0.3); color: var(--text-primary); font-size: 0.8rem;">
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <input type="file" id="file-upload-whatsapp" accept=".xlsx,.xls,.csv" style="display: none;" onchange="handleExcelUpload('WHATSAPP', this)">
+                                    <button type="button" class="btn btn-primary" onclick="document.getElementById('file-upload-whatsapp').click()" style="width: 100%; justify-content: center; font-size: 0.85rem; padding: 0.6rem;">
+                                        <i class="fa-solid fa-file-excel" style="margin-right: 0.4rem;"></i> Selecionar Excel
+                                    </button>
+                                    <div id="status-upload-whatsapp" style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.5rem; text-align: center;">Aguardando arquivo</div>
+                                </div>
+                            </div>
+
+                            <!-- CARD 4: IA - URA -->
+                            <div class="diag-upload-card" id="card-upload-ura" style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); border-radius: 12px; padding: 1.25rem; display: flex; flex-direction: column; justify-content: space-between;">
+                                <div>
+                                    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.75rem;">
+                                        <span style="font-weight: 700; font-size: 0.95rem; color: #fff; display: flex; align-items: center; gap: 0.4rem;">
+                                            <i class="fa-solid fa-robot" style="color: #a855f7;"></i> IA - URA
+                                        </span>
+                                        <span class="badge-channel" style="background: rgba(168,85,247,0.15); color: #a855f7; padding: 0.2rem 0.5rem; border-radius: 6px; font-size: 0.7rem; font-weight: 600;">Voz Virtual</span>
+                                    </div>
+                                    <p style="font-size: 0.78rem; color: var(--text-secondary); margin-bottom: 1rem;">
+                                        Arquivo export_monitoring_ura do mês vigente com intenções e motivos de voz.
+                                    </p>
+                                    
+                                    <div style="margin-bottom: 1rem;">
+                                        <label style="font-size: 0.75rem; color: var(--text-muted); display: block; margin-bottom: 0.3rem;">Mês de Referência:</label>
+                                        <input type="month" id="input-ura-mes" value="2026-08" style="width: 100%; padding: 0.4rem 0.6rem; border-radius: 6px; border: 1px solid var(--border-color); background: rgba(0,0,0,0.3); color: var(--text-primary); font-size: 0.8rem;">
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <input type="file" id="file-upload-ura" accept=".xlsx,.xls,.csv" style="display: none;" onchange="handleExcelUpload('URA', this)">
+                                    <button type="button" class="btn btn-primary" onclick="document.getElementById('file-upload-ura').click()" style="width: 100%; justify-content: center; font-size: 0.85rem; padding: 0.6rem;">
+                                        <i class="fa-solid fa-file-excel" style="margin-right: 0.4rem;"></i> Selecionar Excel
+                                    </button>
+                                    <div id="status-upload-ura" style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.5rem; text-align: center;">Aguardando arquivo</div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- SEÇÃO: GESTÃO DO MOTOR DE-PARA -->
+                    <section class="panel glass-panel" style="margin-bottom: 1.5rem; padding: 1.25rem;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; flex-wrap: wrap; gap: 0.75rem;">
+                            <div>
+                                <h3 class="panel-title" style="font-size: 1.05rem; margin: 0; display: flex; align-items: center; gap: 0.5rem;">
+                                    <i class="fa-solid fa-shuffle" style="color: var(--color-primary);"></i>
+                                    <span>Motor De-Para de Normalização</span>
+                                </h3>
+                                <p style="font-size: 0.8rem; color: var(--text-secondary); margin: 0.2rem 0 0 0;">
+                                    Mapeamento das tabulações originais para Produto, Motivo e Submotivo padronizados.
+                                </p>
+                            </div>
+                            <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                                <input type="file" id="file-upload-depara" accept=".xlsx,.xls,.csv" style="display: none;" onchange="handleDeParaUpload(this)">
+                                <button type="button" class="btn btn-secondary" onclick="document.getElementById('file-upload-depara').click()" style="font-size: 0.85rem;">
+                                    <i class="fa-solid fa-file-import" style="margin-right: 0.3rem;"></i> Importar De-Para (Excel)
+                                </button>
+                                <button type="button" class="btn btn-secondary" onclick="exportDeParaToExcel()" style="font-size: 0.85rem;">
+                                    <i class="fa-solid fa-file-export" style="margin-right: 0.3rem;"></i> Exportar De-Para (Excel)
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- SUB-TABS DO DE-PARA: IA x CENTRAL x NÃO MAPEADOS -->
+                        <div style="display: flex; gap: 0.5rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem; margin-bottom: 1rem;">
+                            <button type="button" class="btn btn-secondary active" id="btn-depara-tab-ia" onclick="switchDeParaTab('IA')" style="font-size: 0.82rem; padding: 0.4rem 0.85rem;">
+                                Regras de IA (<span id="count-depara-ia">0</span>)
+                            </button>
+                            <button type="button" class="btn btn-secondary" id="btn-depara-tab-central" onclick="switchDeParaTab('CENTRAL')" style="font-size: 0.82rem; padding: 0.4rem 0.85rem;">
+                                Regras Central (<span id="count-depara-central">0</span>)
+                            </button>
+                            <button type="button" class="btn btn-secondary" id="btn-depara-tab-unmapped" onclick="switchDeParaTab('UNMAPPED')" style="font-size: 0.82rem; padding: 0.4rem 0.85rem; color: #f43f5e;">
+                                ⚠️ Pendências / Não Mapeados (<span id="count-depara-unmapped">0</span>)
+                            </button>
+                        </div>
+
+                        <!-- BUSCA DE REGRAS -->
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.5rem;">
+                            <input type="text" id="input-search-depara" oninput="renderDeParaTable()" placeholder="Buscar regra por origem ou destino..." style="padding: 0.45rem 0.85rem; border-radius: 8px; border: 1px solid var(--border-color); background: rgba(255,255,255,0.05); color: var(--text-primary); font-size: 0.85rem; outline: none; width: 300px;">
+                            <span id="label-depara-total-regras" style="font-size: 0.8rem; color: var(--text-muted);">Carregando regras...</span>
+                        </div>
+
+                        <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
+                            <table class="fte-table" id="table-diag-depara" style="font-size: 0.82rem;">
+                                <thead>
+                                    <tr>
+                                        <th style="width: 35%;">CHAVE DE ORIGEM</th>
+                                        <th style="width: 20%;">PRODUTO DESTINO</th>
+                                        <th style="width: 22%;">MOTIVO DESTINO</th>
+                                        <th style="width: 23%;">SUBMOTIVO DESTINO</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tbody-diag-depara">
+                                    <!-- Populado dinamicamente -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </section>
+                </div>
+
                 <!-- HISTORY VIEW -->
                 <div id="view-history" class="tab-view" style="display: none;">
                     <!-- TOP CONTROL CARD -->
@@ -2148,10 +2767,10 @@
                     <h3 data-i18n="module_atendimento_title">Atendimento</h3>
                     <p data-i18n="module_atendimento_desc">Redimensionamento de capacidade dos canais de atendimento com Erlang C, NR17 e governança contratual.</p>
                     <ul class="module-features">
-                        <li><i class="fa-solid fa-phone"></i> <span data-i18n="feature_voz">Voz</span></li>
-                        <li><i class="fa-solid fa-comments"></i> <span data-i18n="feature_chat">Chat</span></li>
-                        <li><i class="fa-solid fa-clipboard-list"></i> <span data-i18n="feature_backoffice">Backoffice</span></li>
-                        <li><i class="fa-solid fa-calculator"></i> <span data-i18n="feature_projecao">Projeção mensal de PAs</span></li>
+                        <li><i class="fa-solid fa-calculator"></i> <span data-i18n="feature_projecao">Redimensionamento de PAs</span></li>
+                        <li><i class="fa-solid fa-chart-pie"></i> <span>Diagnóstico: Volumetria</span></li>
+                        <li><i class="fa-solid fa-stopwatch"></i> <span>Diagnóstico: Efetividade</span></li>
+                        <li><i class="fa-solid fa-file-excel"></i> <span>Cargas Excel & De-Para</span></li>
                     </ul>
                     <div class="module-cta">
                         <span data-i18n="module_cta_atendimento">Acessar Atendimento</span>

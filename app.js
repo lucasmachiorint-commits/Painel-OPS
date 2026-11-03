@@ -2899,14 +2899,14 @@ const APP_MODULES = {
         icon: 'fa-headset',
         colorClass: 'mod-atendimento',
         defaultView: 'sizing',
-        views: ['sizing']
+        views: ['sizing', 'diag-dashboard', 'diag-import']
     }
 };
 
 let currentModule = null; // 'operacoes' | 'atendimento'
 
 function getModuleForView(view) {
-    if (view === 'sizing') return 'atendimento';
+    if (view === 'sizing' || view === 'diag-dashboard' || view === 'diag-import') return 'atendimento';
     return 'operacoes';
 }
 
@@ -3089,6 +3089,16 @@ const VIEW_META = {
         title: 'Redimensionamento de Capacidade',
         section: 'Gestão',
         subtitle: 'Dimensionamento de workforce (WFM) com Erlang C, premissas NR17 e governança contratual.'
+    },
+    'diag-dashboard': {
+        title: 'Diagnóstico do Cliente',
+        section: 'Atendimento',
+        subtitle: 'Visão consolidada de fechamento mensal: dinâmica de volumetria e efetividade de atendimento (SLA 7 dias).'
+    },
+    'diag-import': {
+        title: 'Importação de Bases',
+        section: 'Atendimento',
+        subtitle: 'Carga de planilhas mensais dos 4 canais de atendimento e governança de regras De-Para.'
     }
 };
 
@@ -3190,6 +3200,10 @@ function switchToView(view) {
         renderAccessControlView();
     } else if (view === 'sizing') {
         renderSizingView();
+    } else if (view === 'diag-dashboard') {
+        renderDiagDashboardView();
+    } else if (view === 'diag-import') {
+        renderDiagImportView();
     }
 }
 
@@ -9110,3 +9124,1368 @@ function importSizingVolumes(file) {
     reader.readAsArrayBuffer(file);
 }
 
+// ==========================================================================
+// MÓDULO: DIAGNÓSTICO DO CLIENTE (ATENDIMENTO)
+// Volumetria (M-2, M-1, M), Efetividade SLA (7 dias) e Importação Excel
+// ==========================================================================
+
+const SEED_DEPARA_IA = {"0":{"produto":"Não se Aplica","motivo":"-","submotivo":"-"},"APOIO_CANCELAMENTO_COMPRA":{"produto":"Aproxima Aê","motivo":"Cancelamento e Reembolso","submotivo":"Solicitação"},"APOIO_CARTAO_CREDITO_USO":{"produto":"Mandala","motivo":"Limite","submotivo":"Orientações Gerais"},"APOIO_CARTOES_TIPOS":{"produto":"Conta","motivo":"Orientações Gerais","submotivo":"Tipos de Cartão"},"APOIO_CONSULTA_PEDIDOS":{"produto":"Pag Emana Pay","motivo":"Orientações Gerais","submotivo":"Consulta de Pedidos"},"APOIO_DESBLOQUEIO":{"produto":"Aproxima Aê","motivo":"Bloqueio / Desbloqueio","submotivo":"-"},"APOIO_ERRO_LINK_PAGTO":{"produto":"Link de Pagamento","motivo":"Erro","submotivo":"Não Consegue Gerar Link"},"APOIO_PERDAO_DE_DIVIDAS":{"produto":"Cobrança","motivo":"Acordo de Dívidas","submotivo":"-"},"APOIO_PROCON":{"produto":"Atendimento","motivo":"Canal Crítico","submotivo":"PROCON"},"APOIO_TIPO_BOLETO":{"produto":"Cobrança","motivo":"Tipos de Boleto","submotivo":"-"},"APP_AGENDA_PAY":{"produto":"Conta","motivo":"Agenda Pay","submotivo":"Orientações Gerais"},"APP_AGENDA_PGTO_PAY":{"produto":"Conta","motivo":"Agenda Pay","submotivo":"Orientações Gerais"},"APP_CADASTRO_FINALIZADO":{"produto":"Cadastro","motivo":"Dados Cadastrais","submotivo":"-"},"APP_CALCULADORA_LUCRO":{"produto":"Educação Financeira","motivo":"Calculadora de Lucro","submotivo":"-"},"APP_CANCELAR_AGENDAMENTO":{"produto":"Conta","motivo":"Agenda Pay","submotivo":"Orientações Gerais"},"APP_CARTAO_FISICO":{"produto":"Cartão Físico","motivo":"Orientações Gerais","submotivo":"-"},"APP_CARTAO_VIRTUAL_PRE_PAGO":{"produto":"Cartão Virtual","motivo":"Orientações Gerais","submotivo":"-"},"APP_COMPROVANTE_ERRO":{"produto":"Aplicativo","motivo":"Erro","submotivo":"Comprovante"},"APP_DADOS_CONTA":{"produto":"Conta","motivo":"Orientações Gerais","submotivo":"Dados da Conta"},"APP_DOWNLOAD":{"produto":"Aplicativo","motivo":"Orientações Gerais","submotivo":"-"},"APP_EDUC_FINAN_DEFINICAO":{"produto":"Não se Aplica","motivo":"-","submotivo":"-"},"APP_EMANA_PAY_+":{"produto":"Conta","motivo":"Emana Pay +","submotivo":"Orientações Gerais"},"APP_EMANA_PAY_+_MISSOES":{"produto":"Conta","motivo":"Emana Pay +","submotivo":"Orientações Gerais"},"APP_EMANA_PAY_+_RECOMPENSA":{"produto":"Conta","motivo":"Emana Pay +","submotivo":"Orientações Gerais"},"APP_ERRO_ACESSO_RESET":{"produto":"Aplicativo","motivo":"Senha","submotivo":"Erro Alteração Senha"},"APP_ERRO_DESBLOQUEIO_CARTAO":{"produto":"Mandala","motivo":"Erro","submotivo":"-"},"APP_ERRO_ENVIO_DOC.":{"produto":"Conta","motivo":"Onboarding","submotivo":"Erro - Finalização de cadastro"},"APP_ERRO_FALHA_SELFIE":{"produto":"Conta","motivo":"Onboarding","submotivo":"Erro - Finalização de cadastro"},"APP_ERRO_LINK_PAGAMENTO":{"produto":"Link de Pagamento","motivo":"Erro","submotivo":"-"},"APP_ERRO_NAVEGACAO":{"produto":"Aplicativo","motivo":"Erro","submotivo":"-"},"APP_ERRO_TRANSACOES":{"produto":"Aplicativo","motivo":"Erro","submotivo":"-"},"APP_ERRO_TRAVADO":{"produto":"Aplicativo","motivo":"Erro","submotivo":"Navegação"},"APP_EXTRATO":{"produto":"Conta","motivo":"Extrato / Comprovantes","submotivo":"Detalhamento de Extrato"},"APP_FUNCIONALIDADES_DESBLOQUEIO":{"produto":"Aplicativo","motivo":"Orientações Gerais","submotivo":"-"},"APP_HOME":{"produto":"Aplicativo","motivo":"Orientações Gerais","submotivo":"-"},"APP_LOGIN_EXCEDIDO":{"produto":"Aplicativo","motivo":"Login","submotivo":"Tentativas Diárias Excedidas"},"APP_MEUS_SONHOS_DEFINICAO":{"produto":"Conta","motivo":"Meus Sonhos","submotivo":"Orientações Gerais"},"APP_MEUS_SONHOS_OBJETIVO":{"produto":"Conta","motivo":"Meus Sonhos","submotivo":"Orientações Gerais"},"APP_ONBOARDING":{"produto":"Conta","motivo":"Onboarding","submotivo":"Orientações Gerais"},"APP_ONBOARDING_ERRO":{"produto":"Conta","motivo":"Onboarding","submotivo":"Erro - Finalização de cadastro"},"APP_PAGAMENTO_CONTA":{"produto":"Conta","motivo":"Pagamento de Contas","submotivo":"Informaçoes sobre pagamento de contas"},"APP_PAGAR_CONTAS":{"produto":"Conta","motivo":"Pagamento de Contas","submotivo":"Informaçoes sobre pagamento de contas"},"APP_PAGAR_CONTAS_":{"produto":"Conta","motivo":"Pagamento de Contas","submotivo":"Informaçoes sobre pagamento de contas"},"APP_PAISES_FUNCIONAMENTO":{"produto":"Aplicativo","motivo":"Orientações Gerais","submotivo":"-"},"APP_PERFIL":{"produto":"Conta","motivo":"Orientações Gerais","submotivo":"-"},"APP_RECARGA_CELULAR":{"produto":"Aplicativo","motivo":"Recarga de Celular / SPTrans / Vale-Compras","submotivo":"Orientações Gerais"},"APP_SENHA":{"produto":"Aplicativo","motivo":"Senha","submotivo":"Orientação sobre alteração"},"APP_TRANSFERIR":{"produto":"Aplicativo","motivo":"Orientações Gerais","submotivo":"-"},"APP_USO_CAMERA":{"produto":"Aplicativo","motivo":"Orientações Gerais","submotivo":"-"},"APP_VALIDACAO_DISPOSITIVO":{"produto":"Aplicativo","motivo":"Validação de dispositivo","submotivo":"-"},"APP_VERSAO_ATUAL":{"produto":"Aplicativo","motivo":"Orientações Gerais","submotivo":"-"},"APROXIMA_AE_CANCELAR_VENDA":{"produto":"Aproxima Aê","motivo":"Cancelamento e Reembolso","submotivo":"Solicitação"},"APROXIMA_AE_COMO_UTILIZAR":{"produto":"Aproxima Aê","motivo":"Usabilidade","submotivo":"Orientações Gerais"},"APROXIMA_AE_DEFINICAO":{"produto":"Aproxima Aê","motivo":"Aquisição e Condições","submotivo":"-"},"APROXIMA_AE_DESATIVAR":{"produto":"Aproxima Aê","motivo":"Desativar Funcionalidade","submotivo":"-"},"APROXIMA_AE_DESBLOQUEIO":{"produto":"Aproxima Aê","motivo":"Bloqueio / Desbloqueio","submotivo":"-"},"APROXIMA_AE_DESENVOLVEDOR":{"produto":"Aproxima Aê","motivo":"Orientações Gerais","submotivo":"Modo Desenvolvedor"},"APROXIMA_AE_ELEGIBILIDADE":{"produto":"Aproxima Aê","motivo":"Elegibilidade","submotivo":"-"},"APROXIMA_AE_ERRO_ATIVACAO":{"produto":"Aproxima Aê","motivo":"Erro","submotivo":"Não Especificado"},"APROXIMA_AE_ERRO_INESPERADO":{"produto":"Aproxima Aê","motivo":"Erro","submotivo":"Não Especificado"},"APROXIMA_AE_EXTENSÃO":{"produto":"Aproxima Aê","motivo":"Orientações Gerais","submotivo":"Orientações Extensão"},"APROXIMA_AE_NFC":{"produto":"Aproxima Aê","motivo":"Orientações Gerais","submotivo":"NFC"},"APROXIMA_AE_PREMISSAS":{"produto":"Aproxima Aê","motivo":"Elegibilidade","submotivo":"-"},"APROXIMA_AE_SEGURANCA":{"produto":"Aproxima Aê","motivo":"Orientações Gerais","submotivo":"Segurança"},"APROXIMA_AE_TAXAS":{"produto":"Aproxima Aê","motivo":"Aquisição e Condições","submotivo":"-"},"APROXIMA_AE_TRANSACOES_NEGADAS":{"produto":"Aproxima Aê","motivo":"Transação","submotivo":"Negada"},"APROXIMA_AE_TROCA_APARELHO":{"produto":"Aproxima Aê","motivo":"Orientações Gerais","submotivo":"Troca de Aparelho"},"APROXIMA_AE_VANTAGENS":{"produto":"Aproxima Aê","motivo":"Aquisição e Condições","submotivo":"-"},"APROXIMA_AE_VENDAS":{"produto":"Aproxima Aê","motivo":"Extrato","submotivo":"Histórico de Vendas"},"APROXIMAE_AE_NFC":{"produto":"Aproxima Aê","motivo":"Orientações Gerais","submotivo":"NFC"},"BLOQUEIO-CONTA":{"produto":"Conta","motivo":"Bloqueio / Desbloqueio","submotivo":"Conta Bloqueada"},"CADASTRO":{"produto":"Não se Aplica","motivo":"-","submotivo":"-"},"CADASTRO_ALTERACAO_VIA_APP":{"produto":"Cadastro","motivo":"Dados Cadastrais","submotivo":"Atualização Via App"},"CADASTRO_DADOS_CAD":{"produto":"Cadastro","motivo":"Dados Cadastrais","submotivo":"Solicitação de Alteração"},"CADASTRO_DADOS_CADAST":{"produto":"Cadastro","motivo":"Dados Cadastrais","submotivo":"Solicitação de Alteração"},"CADASTRO_EMAIL":{"produto":"Cadastro","motivo":"Dados Cadastrais","submotivo":"Solicitação de Alteração"},"CADASTRO_ENDERECO":{"produto":"Cadastro","motivo":"Dados Cadastrais","submotivo":"Solicitação de Alteração"},"CADASTRO_MULTIPLOS_DADOS":{"produto":"Cadastro","motivo":"Dados Cadastrais","submotivo":"Solicitação de Alteração"},"CADASTRO_NOME_SOBRENOME":{"produto":"Cadastro","motivo":"Dados Cadastrais","submotivo":"Solicitação de Alteração"},"CADASTRO_TELEFONE":{"produto":"Cadastro","motivo":"Dados Cadastrais","submotivo":"Solicitação de Alteração"},"CAMPANHA_CONSULTORA_APROXIMA_AE":{"produto":"Aproxima Aê","motivo":"Campanhas","submotivo":"-"},"CAMPANHA_LIVE_12_DO_12":{"produto":"Não se Aplica","motivo":"-","submotivo":"-"},"CAMPANHA_MAES_2026_TXS_REDUZIDAS":{"produto":"Aproxima Aê","motivo":"Campanhas","submotivo":"-"},"CAMPANHA_NATAL_CARTÃO_CREDITO_MANDALA":{"produto":"Mandala","motivo":"Campanhas","submotivo":"Natal"},"CAMPANHA_PRIMEIRA_RECOMPENSA":{"produto":"Não se Aplica","motivo":"-","submotivo":"-"},"CAMPANHA_SEGURO_2025":{"produto":"Seguros","motivo":"Campanhas","submotivo":"-"},"CANCELAMENTO_COMPRA":{"produto":"Aproxima Aê","motivo":"Cancelamento e Reembolso","submotivo":"Solicitação"},"CANCELAR_CONTA":{"produto":"Conta","motivo":"Encerramento / Reativação","submotivo":"Solicitação de Encerramento"},"CARTAO_BLOQUEIO":{"produto":"Cartão Físico","motivo":"Bloqueio / Desbloqueio","submotivo":"Bloqueio / Desbloqueio pelo App"},"CARTAO_BLOQUEIO_SENHA":{"produto":"Cartão Físico","motivo":"Bloqueio / Desbloqueio","submotivo":"Senha Incorreta"},"CARTAO_COMPRA NEGADA":{"produto":"Mandala","motivo":"Transação","submotivo":"Negada"},"CARTAO_COMPRA_NEGADA":{"produto":"Conta","motivo":"Transação","submotivo":"Negada"},"CARTAO_CRED_COD_BARRAS":{"produto":"Mandala","motivo":"Fatura","submotivo":"Solicitação de Codigo de Barras"},"CARTAO_CREDITO_ACORDO":{"produto":"Mandala","motivo":"Acordo","submotivo":"-"},"CARTAO_CREDITO_ANTECIPACAO":{"produto":"Mandala","motivo":"Fatura","submotivo":"Pagamento Antecipado"},"CARTAO_CREDITO_ANTECIPACAO_PARC":{"produto":"Mandala","motivo":"Fatura","submotivo":"Pagamento Antecipado"},"CARTAO_CREDITO_ATIVACAO":{"produto":"Mandala","motivo":"Habilitar Cartão","submotivo":"Via App"},"CARTAO_CREDITO_CANCELAMENTO_CARTÃO":{"produto":"Mandala","motivo":"Cancelamento","submotivo":"Solicitação"},"CARTAO_CREDITO_DADOS":{"produto":"Mandala","motivo":"Dados do Cartão","submotivo":"-"},"CARTAO_CREDITO_DDA":{"produto":"Mandala","motivo":"Fatura","submotivo":"Aberto em DDA"},"CARTAO_CREDITO_DEFINICAO":{"produto":"Mandala","motivo":"Aquisição e Condições","submotivo":"-"},"CARTAO_CREDITO_DESBLOQUEIO":{"produto":"Mandala","motivo":"Bloqueio / Desbloqueio","submotivo":"Desbloqueio"},"CARTAO_CREDITO_DESCON_COMPRA":{"produto":"Mandala","motivo":"Transação","submotivo":"Contestação de Valores"},"CARTAO_CREDITO_ERRO":{"produto":"Mandala","motivo":"Menu Minhas Faturas","submotivo":"Erro"},"CARTAO_CREDITO_ESPACO_BELEM":{"produto":"Mandala","motivo":"Espaço Belém","submotivo":"-"},"CARTAO_CREDITO_FATURA":{"produto":"Mandala","motivo":"Fatura","submotivo":"Orientações sobre Pagamento"},"CARTAO_CREDITO_HABILITAR":{"produto":"Mandala","motivo":"Habilitar Cartão","submotivo":"Via App"},"CARTAO_CREDITO_JUROS_APOS":{"produto":"Mandala","motivo":"Taxas / Tarifas / Juros / Impostos","submotivo":"-"},"CARTAO_CREDITO_LIMITE":{"produto":"Mandala","motivo":"Limite","submotivo":"Limite Insuficiente/Solic Aumento"},"CARTAO_CREDITO_MENU":{"produto":"Mandala","motivo":"Menu Minhas Faturas","submotivo":"-"},"CARTAO_CREDITO_NOVA_EXPERIENCIA":{"produto":"Mandala","motivo":"Orientações Gerais","submotivo":""},"CARTAO_CREDITO_OPCOES_PAGAMENTO":{"produto":"Mandala","motivo":"Fatura","submotivo":"Orientações sobre Pagamento"},"CARTAO_CREDITO_PUSH_APP":{"produto":"Mandala","motivo":"Notificações","submotivo":"-"},"CARTAO_CREDITO_ROTATIVO":{"produto":"Mandala","motivo":"Orientações Gerais","submotivo":"Rotativo"},"CARTAO_CREDITO_TARIFAS":{"produto":"Mandala","motivo":"Taxas / Tarifas / Juros / Impostos","submotivo":"-"},"CARTAO_CREDITO_UTILIZACAO":{"produto":"Mandala","motivo":"Usabilidade","submotivo":"-"},"CARTAO_CREDITO_VENCIMENTO":{"produto":"Mandala","motivo":"Fatura","submotivo":"-"},"CARTAO_DE_CREDITO":{"produto":"Mandala","motivo":"Uso exclusivo no Capta","submotivo":"-"},"CARTAO_DEFINICAO":{"produto":"Mandala","motivo":"Aquisição e Condições","submotivo":"-"},"CARTAO_DESBLOQUEIO":{"produto":"Mandala","motivo":"Bloqueio / Desbloqueio","submotivo":"Desbloqueio"},"CARTAO_FISICO_ENTREGUE":{"produto":"Mandala","motivo":"Cartão Físico","submotivo":"-"},"CARTAO_NOME_IMPRESSO":{"produto":"Mandala","motivo":"Dados do Cartão","submotivo":"-"},"CARTAO_PARCELAMENTO_FATURA":{"produto":"Mandala","motivo":"Fatura","submotivo":"Parcelamento de Fatura"},"CARTAO_RASTREIO":{"produto":"Cartão Físico","motivo":"Emissão do Cartão","submotivo":"Status Envio"},"CARTAO_SOLICITACAO":{"produto":"Mandala","motivo":"Habilitar Cartão","submotivo":"Via App"},"CARTAO_VIRTUAL_ERRO":{"produto":"Mandala","motivo":"Cartão Virtual","submotivo":"Erro"},"CARTOES":{"produto":"Conta","motivo":"Orientações Gerais","submotivo":"Tipos de Cartão"},"COBRANÇA_PROB_ASSESSORIAS":{"produto":"Cobrança","motivo":"Problema com Assessoria de Cobrança","submotivo":"-"},"COMPRA-NEGADA":{"produto":"Mandala","motivo":"Transação","submotivo":"Negada"},"CONSULT_FAQ":{"produto":"Não se Aplica","motivo":"-","submotivo":"-"},"CONSULTAR-BOLETO":{"produto":"Mandala","motivo":"Fatura","submotivo":"Orientações sobre Pagamento"},"CONSULTAR-DETALHES-FATURA":{"produto":"Mandala","motivo":"Fatura","submotivo":"Orientações sobre Pagamento"},"CONSULTAR-FATURAS":{"produto":"Mandala","motivo":"Fatura","submotivo":"Orientações sobre Pagamento"},"CONTA_ABERTURA":{"produto":"Conta","motivo":"Orientações Gerais","submotivo":"Abertura de Conta"},"CONTA_AGENDAMENTO_PAGAMENTO":{"produto":"Conta","motivo":"Pagamento de Contas","submotivo":"Agendamento de Pagamento"},"CONTA_BALCAO_RECEBIVEIS":{"produto":"Conta","motivo":"Balcão de Recebíveis","submotivo":"-"},"CONTA_BLOQEIO_SPD":{"produto":"Conta","motivo":"Bloqueio / Desbloqueio","submotivo":"Conta Bloqueada"},"CONTA_COMPROVANTE":{"produto":"Conta","motivo":"Extrato / Comprovantes","submotivo":"Comprovantes"},"CONTA_COMPROVANTE_ENCERRAMENTO":{"produto":"Conta","motivo":"Extrato / Comprovantes","submotivo":"Orientações Gerais"},"CONTA_DADOS_NAO_RECONHECIDOS":{"produto":"Conta","motivo":"Orientações Gerais","submotivo":"Desconhecimento da Conta"},"CONTA_DESCONHECIMENTO_CONTA":{"produto":"Conta","motivo":"Orientações Gerais","submotivo":"Desconhecimento da Conta"},"CONTA_DETALHAMENTO_EXTRATO":{"produto":"Conta","motivo":"Extrato / Comprovantes","submotivo":"Detalhamento de Extrato"},"CONTA_ENCERRAMENTO":{"produto":"Conta","motivo":"Encerramento / Reativação","submotivo":"Solicitação de Encerramento"},"CONTA_ENCERRAMENTO_FALECIMENTO":{"produto":"Conta","motivo":"Encerramento / Reativação","submotivo":"Solicitação de Encerramento"},"CONTA_FGC":{"produto":"Conta","motivo":"Orientações Gerais","submotivo":"-"},"CONTA_FUNCIONALIDADES_VENDAS":{"produto":"Conta","motivo":"Orientações Gerais","submotivo":"-"},"CONTA_IMPOSTO_RENDA":{"produto":"Conta","motivo":"Informe de Rendimentos","submotivo":"Solicitação"},"CONTA_INFORME_RENDIMENTOS":{"produto":"Conta","motivo":"Informe de Rendimentos","submotivo":"Orientações Gerais"},"CONTA_INFORME_RENDIMENTOS_DESATIVADA":{"produto":"Conta","motivo":"Informe de Rendimentos","submotivo":"-"},"CONTA_PAGAMENTO":{"produto":"Conta","motivo":"Pagamento de Contas","submotivo":"Informaçoes sobre pagamento de contas"},"CONTA_REATIVACAO":{"produto":"Conta","motivo":"Encerramento / Reativação","submotivo":"Reativação"},"CONTA_RECEBIMENTO_VENDAS":{"produto":"Conta","motivo":"Conta Remunerada","submotivo":"Orientações Gerais"},"CONTA_REMUN_RENDIMENTOS":{"produto":"Conta","motivo":"Conta Remunerada","submotivo":"Orientações Gerais"},"CONTA_REMUNERADA_CANCELAMENTO":{"produto":"Conta","motivo":"Conta Remunerada","submotivo":"Orientações Gerais"},"CONTA_TRANSACOES_DESCONHECIDA":{"produto":"Conta","motivo":"Transação","submotivo":"Contestação de Valores"},"CONTA_TRANSACOES_GOLPE":{"produto":"Conta","motivo":"Transação","submotivo":"Golpe"},"CONTA_VANTAGENS":{"produto":"Conta","motivo":"Orientações Gerais","submotivo":"Vantagens da Conta"},"CREDITO_AUMENTO_LIMITE":{"produto":"Mandala","motivo":"Limite","submotivo":"Aumento Limite"},"CREDITO_COD_BARRAS":{"produto":"Mandala","motivo":"Fatura","submotivo":"Solicitação de Codigo de Barras"},"CREDITO_CONSULTA_FATURA":{"produto":"Mandala","motivo":"Fatura","submotivo":"Consulta Fatura"},"CREDITO_DETALHES_FATURA":{"produto":"Mandala","motivo":"Fatura","submotivo":"Consulta Fatura"},"CREDITO_FECHAMENTO_FATURA":{"produto":"Mandala","motivo":"Fatura","submotivo":"Consulta Fatura"},"CREDITO_PARCELAMENTO_FATURA":{"produto":"Mandala","motivo":"Fatura","submotivo":"Parcelamento de Fatura"},"CREDITO_SOLICITACAO":{"produto":"Mandala","motivo":"Habilitar Cartão","submotivo":"Via App"},"CREDITO_ULTIMAS_TRANSACOES":{"produto":"Mandala","motivo":"Fatura","submotivo":"Consulta Fatura"},"DESBLOQUEIO":{"produto":"Não se Aplica","motivo":"-","submotivo":"-"},"DIFICULDADE_LINK_PAGAMENTO":{"produto":"Link de Pagamento","motivo":"Instabilidade / Indisponibilidade","submotivo":"-"},"ENCERRAR":{"produto":"Conta","motivo":"Encerramento / Reativação","submotivo":"Solicitação de Encerramento"},"ESPACO DIGITAL":{"produto":"Subadquirência","motivo":"Comissão RN/Minha Loja","submotivo":"Orientações Gerais"},"ESTOQUE_CASA_ALTERAÇÕES_APOLICE":{"produto":"Seguros","motivo":"Estoque + Casa","submotivo":"-"},"ESTOQUE_CASA_ASSIS_EMERGENCIAL":{"produto":"Seguros","motivo":"Estoque + Casa","submotivo":"-"},"ESTOQUE_CASA_COBERTURAS":{"produto":"Seguros","motivo":"Estoque + Casa","submotivo":"Orientações Gerais"},"ESTOQUE_CASA_DEFINIÇÃO":{"produto":"Seguros","motivo":"Estoque + Casa","submotivo":"Orientações Gerais"},"ESTOQUE_CASA_ESTORNO":{"produto":"Seguros","motivo":"Estoque + Casa","submotivo":"Estorno"},"ESTOQUE_CASA_KIT_BOAS_VINDAS":{"produto":"Seguros","motivo":"Estoque + Casa","submotivo":"-"},"ESTOQUE_CASA_PAGAMENTO":{"produto":"Seguros","motivo":"Estoque + Casa","submotivo":"Orientações Gerais"},"ESTOQUE_CASA_SINISTRO":{"produto":"Seguros","motivo":"Estoque + Casa","submotivo":"Orientações Gerais"},"ESTOQUE_CASA_VIGENCIA":{"produto":"Seguros","motivo":"Estoque + Casa","submotivo":"Orientações Gerais"},"FAQ_QUESTIONS":{"produto":"Não se Aplica","motivo":"-","submotivo":"-"},"FATURA_PROTEGIDA_CANCELAR":{"produto":"Seguros","motivo":"Fatura Protegida","submotivo":"Cancelamento"},"FATURA_PROTEGIDA_CONTRATAR":{"produto":"Seguros","motivo":"Fatura Protegida","submotivo":"Contratação"},"FATURA_PROTEGIDA_DEFINIÇÃO":{"produto":"Seguros","motivo":"Fatura Protegida","submotivo":"Orientações Gerais"},"FATURA_PROTEGIDA_DUPLICIDADE":{"produto":"Seguros","motivo":"Fatura Protegida","submotivo":"Orientações Gerais"},"FATURA_PROTEGIDA_INDENIZACAO":{"produto":"Seguros","motivo":"Fatura Protegida","submotivo":"Orientações Gerais"},"FATURA_PROTEGIDA_PROB_PGTO":{"produto":"Seguros","motivo":"Fatura Protegida","submotivo":"Problema Pagamento"},"FATURA_PROTEGIDA_SORTEIO":{"produto":"Seguros","motivo":"Fatura Protegida","submotivo":"Orientações Gerais"},"GREET_USER":{"produto":"Não se Aplica","motivo":"-","submotivo":"-"},"IA_BOAS_VINDAS":{"produto":"Não se Aplica","motivo":"-","submotivo":"-"},"IA_ENCERRAMENTO":{"produto":"Não se Aplica","motivo":"-","submotivo":"-"},"IA_NAO_ENCONTRADO":{"produto":"Não se Aplica","motivo":"-","submotivo":"-"},"IA_NPS":{"produto":"Não se Aplica","motivo":"-","submotivo":"-"},"IA_TRANSBORDO_CHAT":{"produto":"Não se Aplica","motivo":"-","submotivo":"-"},"IA_TRANSBORDO_URA_CARTAO":{"produto":"Não se Aplica","motivo":"-","submotivo":"-"},"IA_TRANSBORDO_URA_CONTA":{"produto":"Não se Aplica","motivo":"-","submotivo":"-"},"IA_TRANSBORDO_URA_COSM":{"produto":"Não se Aplica","motivo":"-","submotivo":"-"},"IA_TRANSBORDO_URA_COSM.":{"produto":"Não se Aplica","motivo":"-","submotivo":"-"},"IMPOSTO DE RENDA":{"produto":"Conta","motivo":"Informe de Rendimentos","submotivo":"Solicitação"},"LIMITE-CARTAO":{"produto":"Mandala","motivo":"Limite","submotivo":"Orientações Gerais"},"LINK_BIOMETRIA":{"produto":"Link de Pagamento","motivo":"Biometria","submotivo":"-"},"MELHOR-DIA-COMPRA":{"produto":"Mandala","motivo":"Orientações Gerais","submotivo":"Melhor Dia de Compra"},"no_faq":{"produto":"Não se Aplica","motivo":"-","submotivo":"-"},"NOT_FOUND":{"produto":"Não se Aplica","motivo":"-","submotivo":"-"},"NPS":{"produto":"Não se Aplica","motivo":"-","submotivo":"-"},"PAG_EMANA_PAY":{"produto":"Pag Emana Pay","motivo":"Orientações Gerais","submotivo":"-"},"PEDIDOS":{"produto":"Não se Aplica","motivo":"-","submotivo":"-"},"PEP_ACORDO":{"produto":"Pag Emana Pay","motivo":"Orientações Gerais","submotivo":"Consulta de Pedidos"},"PEP_ADESAO":{"produto":"Pag Emana Pay","motivo":"Aquisição e Condições","submotivo":"-"},"PEP_ANTECIPAÇÃO_DEFINIÇÃO":{"produto":"Pag Emana Pay","motivo":"Orientações Gerais","submotivo":"-"},"PEP_ANTECIPACAO_PARCELA_COM_JUROS":{"produto":"Pag Emana Pay","motivo":"Pagamento do Boleto","submotivo":"Pagamento Antecipado"},"PEP_ATUALIZACAO_EMAIL_TELEFONE":{"produto":"Pag Emana Pay","motivo":"Dados Cadastrais","submotivo":"Solicitação de Alteração"},"PEP_BENEFICIOS":{"produto":"Pag Emana Pay","motivo":"Orientações Gerais","submotivo":"-"},"PEP_BOLETO_CONSULTAR":{"produto":"Pag Emana Pay","motivo":"Boleto","submotivo":"Orientações Gerais"},"PEP_BOLETO_INDEVIDO":{"produto":"Pag Emana Pay","motivo":"Boleto","submotivo":"Cobrança Indevida"},"PEP_BOLETOS":{"produto":"Pag Emana Pay","motivo":"Orientações Gerais","submotivo":"-"},"PEP_CANAIS":{"produto":"Pag Emana Pay","motivo":"Orientações Gerais","submotivo":"-"},"PEP_COMPENSAÇÃO_RECOMPOSIÇÃO_LIMITE":{"produto":"Pag Emana Pay","motivo":"Pagamento do Boleto","submotivo":"Prazo de Compensação"},"PEP_CONSULTAR_LIMITE_CREDITO":{"produto":"Pag Emana Pay","motivo":"Limite","submotivo":"Orientações Gerais"},"PEP_DESCONTO_IOF":{"produto":"Pag Emana Pay","motivo":"Taxas / Tarifas / Juros / Impostos","submotivo":"-"},"PEP_ENCARGOS":{"produto":"Pag Emana Pay","motivo":"Taxas / Tarifas / Juros / Impostos","submotivo":"-"},"PEP_FORMAS_PAGAMENTO":{"produto":"Pag Emana Pay","motivo":"Pagamento do Boleto","submotivo":"Orientações Gerais"},"PEP_GESTÃO_PEDIDOS":{"produto":"Pag Emana Pay","motivo":"Orientações Gerais","submotivo":"Consulta de Pedidos"},"PEP_INADIMPLENCIA":{"produto":"Pag Emana Pay","motivo":"Orientações Gerais","submotivo":"-"},"PEP_INFORME_RENDIMENTOS":{"produto":"Pag Emana Pay","motivo":"Informe de Rendimentos","submotivo":"-"},"PEP_JORNADA_ANTECIPAÇÃO_PPP":{"produto":"Pag Emana Pay","motivo":"Pagamento do Boleto","submotivo":"Pagamento Antecipado"},"PEP_PAGAMENTO_PEDIDO":{"produto":"Pag Emana Pay","motivo":"Pagamento do Boleto","submotivo":"Orientações Gerais"},"PEP_PEDIDO_IMPERSONADO":{"produto":"Pag Emana Pay","motivo":"Pedido Impersonado","submotivo":"-"},"PEP_PROB_ANTECIPAÇÃO_PPP":{"produto":"Pag Emana Pay","motivo":"Pagamento do Boleto","submotivo":"Erro Pagamento Antecipado"},"PEP_TOKEN":{"produto":"Pag Emana Pay","motivo":"Token","submotivo":"-"},"PEP_TOKEN_PROBLEMAS":{"produto":"Pag Emana Pay","motivo":"Token","submotivo":"Erro com Token"},"PEP_VALIDACAO_TOKEN":{"produto":"Pag Emana Pay","motivo":"Token","submotivo":"-"},"PEP_VANTAGENS":{"produto":"Pag Emana Pay","motivo":"Orientações Gerais","submotivo":"-"},"PEP_VIGÊNCIA_BOLETO":{"produto":"Pag Emana Pay","motivo":"Orientações Gerais","submotivo":"-"},"PERDAO_DE_DIVIDAS":{"produto":"Cobrança","motivo":"Acordo de Dívidas","submotivo":"-"},"PLANOS-PARCELAMENTO":{"produto":"Mandala","motivo":"Fatura","submotivo":"Parcelamento de Fatura"},"PROCON":{"produto":"Não se Aplica","motivo":"-","submotivo":"-"},"RECHAMADA":{"produto":"Não se Aplica","motivo":"-","submotivo":"-"},"SAUDE_PROTEGIDA_ADESÃO":{"produto":"Seguros","motivo":"Saúde Protegida","submotivo":"Aquisição e Condições"},"SAUDE_PROTEGIDA_ASSISTÊNCIA":{"produto":"Seguros","motivo":"Saúde Protegida","submotivo":"Orientações Gerais"},"SAUDE_PROTEGIDA_BENEFICIOS":{"produto":"Seguros","motivo":"Saúde Protegida","submotivo":"Orientações Gerais"},"SAUDE_PROTEGIDA_BENEFÍCIOS":{"produto":"Seguros","motivo":"Saúde Protegida","submotivo":"Orientações Gerais"},"SAUDE_PROTEGIDA_CANCELAMENTO":{"produto":"Seguros","motivo":"Saúde Protegida","submotivo":"Cancelamento"},"SAUDE_PROTEGIDA_COBERTURAS":{"produto":"Seguros","motivo":"Saúde Protegida","submotivo":"Orientações Gerais"},"SAUDE_PROTEGIDA_DEFINIÇÃO":{"produto":"Seguros","motivo":"Saúde Protegida","submotivo":"Orientações Gerais"},"SAUDE_PROTEGIDA_ESTORNO":{"produto":"Seguros","motivo":"Saúde Protegida","submotivo":"Orientações Gerais"},"SAUDE_PROTEGIDA_PLANOS":{"produto":"Seguros","motivo":"Saúde Protegida","submotivo":"Orientações Gerais"},"SAUDE_PROTEGIDA_PROB_PGTO":{"produto":"Seguros","motivo":"Saúde Protegida","submotivo":"Orientações Gerais"},"SAUDE_PROTEGIDA_SINISTRO":{"produto":"Seguros","motivo":"Saúde Protegida","submotivo":"Orientações Gerais"},"SAUDE_PROTEGIDA_VIGENCIA":{"produto":"Seguros","motivo":"Saúde Protegida","submotivo":"Orientações Gerais"},"SOLICITAR-CARTAO":{"produto":"Mandala","motivo":"Cartão Físico","submotivo":"Solicitação"},"TELEFONIA_ACORDO_PAGEMANAPAY":{"produto":"Pag Emana Pay","motivo":"Orientações de Contato","submotivo":"-"},"TELEFONIA_CANAIS":{"produto":"Emana Pay","motivo":"Orientações de Contato","submotivo":"-"},"TELEFONIA_REDES_SOCIAIS":{"produto":"Emana Pay","motivo":"Instagram","submotivo":"-"},"TELEFONIA_URA_SEGUROS":{"produto":"Seguros","motivo":"Orientações de Contato","submotivo":"-"},"TRANSACOES":{"produto":"Conta","motivo":"Orientações Gerais","submotivo":"-"},"TRANSACOES_ADICIONAR_DINHEIRO":{"produto":"Conta","motivo":"Orientações Gerais","submotivo":"Adicionar Dinheiro"},"TRANSACOES_COMPROVANTES":{"produto":"Conta","motivo":"Extrato / Comprovantes","submotivo":"Comprovantes"},"TRANSACOES_LINK_BIOMETRIA":{"produto":"Link de Pagamento","motivo":"Biometria","submotivo":"-"},"TRANSACOES_LINK_GERAL":{"produto":"Link de Pagamento","motivo":"Orientações Gerais","submotivo":"-"},"TRANSACOES_LINK_GERAR":{"produto":"Link de Pagamento","motivo":"Orientações Gerais","submotivo":"Gerar Link"},"TRANSACOES_LINK_INDISPONIVEL":{"produto":"Link de Pagamento","motivo":"Erro","submotivo":"Não Consegue Gerar Link"},"TRANSACOES_LINK_LIMITE":{"produto":"Link de Pagamento","motivo":"Orientações Gerais","submotivo":"Limite"},"TRANSACOES_LINK_NEGADO":{"produto":"Link de Pagamento","motivo":"Transação","submotivo":"Negada"},"TRANSACOES_LINK_PGTO":{"produto":"Link de Pagamento","motivo":"Orientações Gerais","submotivo":"-"},"TRANSACOES_LINK_PREMISSAS":{"produto":"Link de Pagamento","motivo":"Orientações Gerais","submotivo":"-"},"TRANSACOES_LINK_RECEBIMENTO":{"produto":"Link de Pagamento","motivo":"Orientações Gerais","submotivo":"-"},"TRANSACOES_PAGAMENTO_BOLETO":{"produto":"Conta","motivo":"Pagamento de Contas","submotivo":"Informaçoes sobre pagamento de contas"},"TRANSACOES_PAGAMENTO_CONTAS":{"produto":"Conta","motivo":"Pagamento de Contas","submotivo":"Informaçoes sobre pagamento de contas"},"TRANSACOES_PAGAMENTO_ERRO":{"produto":"Conta","motivo":"Pagamento de Contas","submotivo":"Erro"},"TRANSACOES_PIX_AUTOMATICO":{"produto":"PIX","motivo":"Orientações Gerais","submotivo":"PIX Automático"},"TRANSACOES_PIX_BLOQ_CAUTELAR":{"produto":"Conta","motivo":"Bloqueio / Desbloqueio","submotivo":"Bloqueio BACENJUD"},"TRANSACOES_PIX_CHAVE":{"produto":"PIX","motivo":"Chave PIX","submotivo":"-"},"TRANSACOES_PIX_COPIA_COLA":{"produto":"PIX","motivo":"Orientações Gerais","submotivo":"Copia e Cola"},"TRANSACOES_PIX_DESTINATARIO":{"produto":"PIX","motivo":"Transação","submotivo":"Destinatário Incorreto"},"TRANSACOES_PIX_ERRO_AO_TRANSFERIR":{"produto":"PIX","motivo":"Transação","submotivo":"Erro ao Efetivar Transações Financeiras"},"TRANSACOES_PIX_EXCLUSAO":{"produto":"PIX","motivo":"Chave PIX","submotivo":"Exclusão de Chave"},"TRANSACOES_PIX_INF_GERAIS":{"produto":"PIX","motivo":"Orientações Gerais","submotivo":"-"},"TRANSACOES_PIX_LIMITE":{"produto":"PIX","motivo":"Transação","submotivo":"Limite Transacional"},"TRANSACOES_PIX_MED":{"produto":"PIX","motivo":"MED","submotivo":"Golpe"},"TRANSACOES_PIX_PORTABILIDADE":{"produto":"PIX","motivo":"Chave PIX","submotivo":"Portabilidade"},"TRANSACOES_PIX_QRCODE":{"produto":"PIX","motivo":"Orientações Gerais","submotivo":"QR Code"},"TRANSACOES_PIX_RECEBER":{"produto":"PIX","motivo":"Transação","submotivo":"Informações"},"TRANSACOES_PIX_RECORRENTE_GERENCIAR":{"produto":"PIX","motivo":"Orientações Gerais","submotivo":"Recorrência"},"TRANSACOES_PIX_SAQUE_TROCO":{"produto":"PIX","motivo":"Orientações Gerais","submotivo":"Saque Troco"},"TRANSACOES_PIX_TRANSFERENCIA":{"produto":"PIX","motivo":"Orientações Gerais","submotivo":"-"},"TRANSACOES_RECARGA_CELULAR":{"produto":"Conta","motivo":"Recarga de Celular / SPTrans / Vale-Compras","submotivo":"Orientações Gerais"},"TRANSACOES_SAQUE_ERRO":{"produto":"Conta","motivo":"Saque","submotivo":"-"},"TRANSACOES_SAQUE_NAO_SAIU":{"produto":"Conta","motivo":"Saque","submotivo":"-"},"TRANSACOES_SAQUE_REALIZAR":{"produto":"Conta","motivo":"Saque","submotivo":"-"},"TRANSACOES_TRANSFERENCIA":{"produto":"Conta","motivo":"Transação","submotivo":"Orientações Gerais"},"TRANSBORDO":{"produto":"Não se Aplica","motivo":"-","submotivo":"-"},"TRANSFERIR_PARA_CARTAO":{"produto":"Não se Aplica","motivo":"-","submotivo":"-"},"TRANSFERIR_PARA_CONTA":{"produto":"Não se Aplica","motivo":"-","submotivo":"-"},"TRANSFERIR_PARA_COSMETICOS":{"produto":"Não se Aplica","motivo":"-","submotivo":"-"},"ULTIMAS_TRANSACOES":{"produto":"Conta","motivo":"Transação","submotivo":"Orientações Gerais"},"VENDA_DIGITAL":{"produto":"Subadquirência","motivo":"Comissão RN/Minha Loja","submotivo":"-"},"VENDA_DIGITAL_COMISSAO":{"produto":"Subadquirência","motivo":"Comissão RN/Minha Loja","submotivo":"-"},"VENDA_DIGITAL_ESPACO":{"produto":"Subadquirência","motivo":"Comissão RN/Minha Loja","submotivo":"-"},"VENDA_DIGITAL_MINHA_LOJA":{"produto":"Subadquirência","motivo":"Comissão RN/Minha Loja","submotivo":"-"},"VENDA_DIGITAL_CRIADORES_AFILIADOS":{"produto":"Subadquirência","motivo":"Comissão Afiliados","submotivo":"-"},"FATURA_PROTEGIDA_DOC_CONTRATO":{"produto":"Seguros","motivo":"Fatura Protegida","submotivo":"Orientações Gerais"},"FATURA_PROTEGIDA_COBERTURAS":{"produto":"Seguros","motivo":"Fatura Protegida","submotivo":"Orientações Gerais"},"FATURA_PROTEGIDA_DESCONHECE":{"produto":"Seguros","motivo":"Fatura Protegida","submotivo":"Orientações Gerais"},"CAMPANHA_MINHA_LOJA_EMANA_PAY":{"produto":"Minha Loja","motivo":"Campanhas","submotivo":"-"},"BENE_VERSAO_ATUAL":{"produto":"Emana Pay Benefícios","motivo":"Orientações Gerais","submotivo":"-"},"FATURA_PROTEGIDA_ESTORNO":{"produto":"Seguros","motivo":"Fatura Protegida","submotivo":"Estorno"},"IA_RETENCAO_TRANSBORDO_PEP":{"produto":"Não se Aplica","motivo":"-","submotivo":"-"},"PEP_CONSULTA_CONTRATOS":{"produto":"Pag Emana Pay","motivo":"Consulta de Contratos","submotivo":"-"},"| SEND_OTP_CODE |":{"produto":"Não se Aplica","motivo":"-","submotivo":"-"},"IA_SOLICITACAO_TOKEN":{"produto":"Não se Aplica","motivo":"-","submotivo":"-"},"IA_SEGURANCA_TOKEN":{"produto":"Não se Aplica","motivo":"-","submotivo":"-"},"IA_VALIDACAO_TOKEN":{"produto":"Não se Aplica","motivo":"-","submotivo":"-"},"IA_TOKEN_VALIDADO":{"produto":"Não se Aplica","motivo":"-","submotivo":"-"},"IA_TOKEN_INVALIDO":{"produto":"Não se Aplica","motivo":"-","submotivo":"-"},"PEP_CONSULTA_BOLETOS":{"produto":"Pag Emana Pay","motivo":"Orientações Gerais","submotivo":"Consulta de Boletos"},"PEP_CODIGO_BOLETO":{"produto":"Pag Emana Pay","motivo":"Orientações Gerais","submotivo":"Código Boleto"},"APP_DOWNLOAD_ANONIMO":{"produto":"Não se Aplica","motivo":"-","submotivo":"-"},"CONTA_ABERTURA_ANONIMO":{"produto":"Não se Aplica","motivo":"-","submotivo":"-"},"APP_CADASTRO_ANONIMO":{"produto":"Não se Aplica","motivo":"-","submotivo":"-"},"CANAIS_ANONIMO":{"produto":"Não se Aplica","motivo":"-","submotivo":"-"},"LOGIN_OTP":{"produto":"Não se Aplica","motivo":"-","submotivo":"-"},"LOGIN_BIO":{"produto":"Não se Aplica","motivo":"-","submotivo":"-"},"IA_TRANSBORDO_WHATS":{"produto":"Não se Aplica","motivo":"-","submotivo":"-"},"CONTA_DEFINICAO_ANONIMO":{"produto":"Não se Aplica","motivo":"-","submotivo":"-"},"APOIO_TIPO_BOLETOS":{"produto":"Cobrança","motivo":"Tipos de Boleto","submotivo":"-"},"IA_PERDAO_DIVIDA":{"produto":"Cobrança","motivo":"Acordo de Dívida","submotivo":"-"},"APOIO_AUMENTO_LIMITE":{"produto":"Pag Emana Pay","motivo":"Limite","submotivo":"Aumento Limite"},"PEP_AUMENTO_LIMITE":{"produto":"Pag Emana Pay","motivo":"Limite","submotivo":"Aumento Limite"},"IA_FAQ_QUESTIONS":{"produto":"Não se Aplica","motivo":"-","submotivo":"-"},"PEP_CONSULTA_LIMITE":{"produto":"Pag Emana Pay","motivo":"Limite","submotivo":"Consulta Limite"},"PEP_ELEGIBILIDADE":{"produto":"Pag Emana Pay","motivo":"Orientações Gerais","submotivo":"Elegibilidade"},"CARTAO_AUMENTO_LIMITE":{"produto":"Mandala","motivo":"Limite","submotivo":"Aumento Limite"},"CARTAO_CONSULTA_FATURA":{"produto":"Mandala","motivo":"Fatura","submotivo":"Consulta Fatura"},"CARTAO_COD_BARRAS":{"produto":"Mandala","motivo":"Fatura","submotivo":"Solicitação de Codigo de Barras"},"APOIO_TIPO_BOLETOS,IA_FAQ_QUESTIONS":{"produto":"Cobrança","motivo":"Tipos de Boleto","submotivo":"-"},"IA_FAQ_QUESTIONS,CARTAO_CONSULTA_FATURA":{"produto":"Mandala","motivo":"Fatura","submotivo":"Consulta Fatura"},"CARTAO_DETALHES_FATURA":{"produto":"Mandala","motivo":"Fatura","submotivo":"Consulta Fatura"},"PEP_DETALHES_CONTRATO":{"produto":"Pag Emana Pay","motivo":"Consulta de Contratos","submotivo":"-"},"IA_FAQ_QUESTIONS,CREDITO_SOLICITACAO":{"produto":"Mandala","motivo":"Habilitar Cartão","submotivo":"Via App"},"GERAR_LINK_VENDA":{"produto":"Link de Pagamento","motivo":"Transação","submotivo":"Gerar Link"},"IA_SEGURANCA_REENVIO_TOKEN":{"produto":"WhatsApp","motivo":"Token","submotivo":"-"},"PEP_ANTECIPACAO_PAGTO":{"produto":"Pag Emana Pay","motivo":"Pagamento do Boleto","submotivo":"Pagamento Antecipado"},"CREDITO_SOLICITACAO,IA_FAQ_QUESTIONS":{"produto":"Mandala","motivo":"Habilitar Cartão","submotivo":"Via App"},"CARTAO_FECHAMENTO_FATURA":{"produto":"Mandala","motivo":"Fatura","submotivo":"Consulta Fatura"},"CARTAO_CONSULTA_FATURA,IA_FAQ_QUESTIONS":{"produto":"Mandala","motivo":"Fatura","submotivo":"Consulta Fatura"},"CARTAO_DETALHES_ESPECIF.":{"produto":"Mandala","motivo":"Fatura","submotivo":"Consulta Fatura"},"GERAR_PIX_VENDA":{"produto":"PIX","motivo":"Transação","submotivo":"Gerar PIX"},"APOIO_RECEBER_VENDA":{"produto":"Conta","motivo":"Orientações Gerais","submotivo":"Receber Venda"},"PEP_CONSULTA_LIMITE,PEP_CONSULTA_CONTRATOS":{"produto":"Pag Emana Pay","motivo":"Limite","submotivo":"Consulta Limite"},"PEP_CONSULTA_LIMITE,PEP_AUMENTO_LIMITE":{"produto":"Pag Emana Pay","motivo":"Limite","submotivo":"Aumento Limite"},"CARTAO_COMPRA_NEGADA,CARTAO_DETALHES_ESPECIF.":{"produto":"Mandala","motivo":"Transação","submotivo":"Negada"},"APOIO_RENEG_EMANAPAY":{"produto":"Cobrança","motivo":"Acordo de Dívida","submotivo":"-"}};
+const SEED_DEPARA_CENTRAL = {"solicitação | auto serviço:: gerar pix | ":{"produto":"Não se Aplica","motivo":"-","submotivo":"-"},"solicitação | auto serviço:: gerar pix |":{"produto":"Não se Aplica","motivo":"-","submotivo":"-"},"ativo |  | ":{"produto":"Não se Aplica","motivo":"-","submotivo":"-"},"ativo |":{"produto":"Não se Aplica","motivo":"-","submotivo":"-"},"improdutiva |  | ":{"produto":"Não se Aplica","motivo":"-","submotivo":"-"},"improdutiva |":{"produto":"Não se Aplica","motivo":"-","submotivo":"-"},"informação |  | ":{"produto":"Não se Aplica","motivo":"-","submotivo":"-"},"informação |":{"produto":"Não se Aplica","motivo":"-","submotivo":"-"},"reclamação |  | ":{"produto":"Não se Aplica","motivo":"-","submotivo":"-"},"reclamação |":{"produto":"Não se Aplica","motivo":"-","submotivo":"-"},"solicitação |  | ":{"produto":"Não se Aplica","motivo":"-","submotivo":"-"},"solicitação |":{"produto":"Não se Aplica","motivo":"-","submotivo":"-"},"informação |  | antecipação de valores":{"produto":"Mandala","motivo":"Fatura","submotivo":"Antecipação Parcela"},"informação | | antecipação de valores":{"produto":"Mandala","motivo":"Fatura","submotivo":"Antecipação Parcela"},"informação |  | detalhamento de extrato":{"produto":"Conta","motivo":"Extrato / Comprovantes","submotivo":"Detalhamento de Extrato"},"informação | | detalhamento de extrato":{"produto":"Conta","motivo":"Extrato / Comprovantes","submotivo":"Detalhamento de Extrato"},"informação |  | informações /orientações sobre o portal logista":{"produto":"Portal Lojista","motivo":"Orientações Gerais","submotivo":"-"},"informação | | informações /orientações sobre o portal logista":{"produto":"Portal Lojista","motivo":"Orientações Gerais","submotivo":"-"},"reclamação |  | link de pagamento - transação negada antifraude":{"produto":"Link de Pagamento","motivo":"Transação","submotivo":"Negada"},"reclamação | | link de pagamento - transação negada antifraude":{"produto":"Link de Pagamento","motivo":"Transação","submotivo":"Negada"},"reclamação |  | link de pagamento - valor não recebido/recebido incorretamente":{"produto":"Link de Pagamento","motivo":"Transação","submotivo":"Valor Não Recebido"},"reclamação | | link de pagamento - valor não recebido/recebido incorretamente":{"produto":"Link de Pagamento","motivo":"Transação","submotivo":"Valor Não Recebido"},"informação |  | orientação alteração de senha":{"produto":"Aplicativo","motivo":"Senha","submotivo":"Orientações Gerais"},"informação | | orientação alteração de senha":{"produto":"Aplicativo","motivo":"Senha","submotivo":"Orientações Gerais"},"informação |  | transferência de chamada para emana pay":{"produto":"Não se Aplica","motivo":"-","submotivo":"-"},"informação | | transferência de chamada para emana pay":{"produto":"Não se Aplica","motivo":"-","submotivo":"-"},"solicitação | auto serviço | gerar link de pagamento":{"produto":"Auto Serviço","motivo":"Link de Pagamento","submotivo":"Orientações Gerais"},"solicitação | auto serviço::gerar link de pagamento | ":{"produto":"Não se Aplica","motivo":"-","submotivo":"-"},"solicitação | auto serviço::gerar link de pagamento |":{"produto":"Não se Aplica","motivo":"-","submotivo":"-"},"informação | portal lojista | antecipação de valores":{"produto":"Thundera","motivo":"Fatura","submotivo":"Antecipação Parcela"},"aplicativo | - | -":{"produto":"Aplicativo","motivo":"Não Especificado","submotivo":"-"},"atividade de consultoria | - | -":{"produto":"Não se Aplica","motivo":"-","submotivo":"-"},"link de pagamento | - | -":{"produto":"Link de Pagamento","motivo":"Orientações Gerais","submotivo":"-"},"não se aplica | - | -":{"produto":"Não se Aplica","motivo":"-","submotivo":"-"},"conta | agenda pay | boletos não refletidos na agenda":{"produto":"Conta","motivo":"Agenda Pay","submotivo":"Erro"},"reclamação | app | agenda de pagamentos / dda":{"produto":"Conta","motivo":"Agenda Pay/DDA","submotivo":"Erro"},"dúvida | app | assuntos gerais":{"produto":"Aplicativo","motivo":"Não Especificado","submotivo":"-"},"informação | app | assuntos gerais":{"produto":"Aplicativo","motivo":"Orientações Gerais","submotivo":"-"},"reclamação | app | assuntos gerais":{"produto":"Aplicativo","motivo":"Não Especificado","submotivo":"-"},"sugestão | app | assuntos gerais":{"produto":"Aplicativo","motivo":"Não Especificado","submotivo":"-"},"informação | app | cadastro finalizado - prazo de 3 dias":{"produto":"Conta","motivo":"Onboarding","submotivo":"Prazo de ativação (3 dias)"},"reclamação | app | cadastro finalizado - prazo de 3 dias expirado":{"produto":"Conta","motivo":"Onboarding","submotivo":"Prazo de ativação (3 dias)"},"reclamação | app | comprovantes - erro na consulta/geração":{"produto":"Conta","motivo":"Transação","submotivo":"Erro ao Efetivar Transações Financeiras"},"reclamação | app | erro ao efetivar transações financeiras - pix":{"produto":"PIX","motivo":"Erro","submotivo":"Erro"},"dúvida | app | erro ao efetivar transações financeiras - transferência e pagamento de contas":{"produto":"Conta","motivo":"Transação","submotivo":"Erro ao Efetivar Transações Financeiras"},"reclamação | app | erro ao efetivar transações financeiras - transferência e pagamento de contas":{"produto":"Conta","motivo":"Transação","submotivo":"Erro ao Efetivar Transações Financeiras"},"reclamação | app | erro ao efetivar transações financeiras (pix, transferência, pagamento de contas...)":{"produto":"Conta","motivo":"Transação","submotivo":"Erro ao Efetivar Transações Financeiras"},"dúvida | app | erro ao instalar o app":{"produto":"Aplicativo","motivo":"Erro","submotivo":"Instalação do App"},"informação | app | erro app - falha doc/selfie":{"produto":"Conta","motivo":"Onboarding","submotivo":"Doc / Selfie"},"reclamação | app | erro app - falha doc/selfie":{"produto":"Conta","motivo":"Onboarding","submotivo":"Doc / Selfie"},"reclamação | app | erro do app - não responde/trava – conta sem bloqueio":{"produto":"Aplicativo","motivo":"Erro","submotivo":"Navegação"},"reclamação | app | erro envio de documentação via app":{"produto":"Conta","motivo":"Onboarding","submotivo":"Doc / Selfie"},"reclamação | app | erro na finalização do cadastro - spds sem bloqueio":{"produto":"Conta","motivo":"Onboarding","submotivo":"Erro - Finalização de cadastro"},"dúvida | app | erro no app - navegação":{"produto":"Aplicativo","motivo":"Erro","submotivo":"Navegação"},"informação | app | erro no app - navegação":{"produto":"Aplicativo","motivo":"Erro","submotivo":"Navegação"},"reclamação | app | erro no app - navegação":{"produto":"Aplicativo","motivo":"Erro","submotivo":"Navegação"},"reclamação | app | lentidão ao utilizar o app":{"produto":"Aplicativo","motivo":"Lentidão","submotivo":"-"},"informação | app | meus sonhos":{"produto":"Conta","motivo":"Meus Sonhos","submotivo":"Orientações Gerais"},"reclamação | app | não consegue alterar senha":{"produto":"Aplicativo","motivo":"Senha","submotivo":"Erro Alteração Senha"},"reclamação | app | não consegue alterar senha - login":{"produto":"Aplicativo","motivo":"Senha","submotivo":"Erro Alteração Senha"},"reclamação | app | não consegue desbloquear cartão - 1ª via":{"produto":"Cartão Físico","motivo":"Bloqueio / Desbloqueio","submotivo":"Bloqueio / Desbloqueio pelo App"},"reclamação | app | não consegue gerar link de pagamento":{"produto":"Link de Pagamento","motivo":"Erro","submotivo":"Não Consegue Gerar Link"},"reclamação | app | não consegue realizar alteração de senha do cartão via app":{"produto":"Cartão Físico","motivo":"Senha","submotivo":"Erro no Processo de Alteração"},"reclamação | app | não recebe sms/e-mail":{"produto":"Conta","motivo":"Onboarding","submotivo":"Não Recebe SMS / Email"},"reclamação | app | notificações do app":{"produto":"Aplicativo","motivo":"Notificação","submotivo":"-"},"informação | app | orientações gerais sobre app e suas funcionalidades":{"produto":"Aplicativo","motivo":"Orientações Gerais","submotivo":"-"},"informação | app | orientações para alteração de senha":{"produto":"Aplicativo","motivo":"Senha","submotivo":"Orientações Gerais"},"reclamação | app | orientações para alteração de senha":{"produto":"Aplicativo","motivo":"Senha","submotivo":"Orientações Gerais"},"reclamação | app | problemas com o programa emana pay+":{"produto":"Conta","motivo":"Emana Pay +","submotivo":"Erro"},"informação | app | programa emana pay+":{"produto":"Conta","motivo":"Emana Pay +","submotivo":"Orientações Gerais"},"informação | app | sem opnião formada sobre o app":{"produto":"Aplicativo","motivo":"Não Especificado","submotivo":"-"},"informação | app | tentativas diárias excedidas":{"produto":"Aplicativo","motivo":"Login","submotivo":"Tentativas Diárias Excedidas"},"reclamação | app | tentativas diárias excedidas":{"produto":"Aplicativo","motivo":"Login","submotivo":"Tentativas Diárias Excedidas"},"informação | app | vamos tentar de novo - validação de dispositivo":{"produto":"Aplicativo","motivo":"Validação de dispositivo","submotivo":"Erro"},"reclamação | app | vamos tentar de novo - validação de dispositivo":{"produto":"Aplicativo","motivo":"Validação de dispositivo","submotivo":"Erro"},"informação | app emana pay benefícios | consulta de saldo":{"produto":"Emana Pay Benefícios","motivo":"Saldo","submotivo":"Consulta"},"informação | app emana pay benefícios | consulta transações":{"produto":"Emana Pay Benefícios","motivo":"Transação","submotivo":"Consulta"},"reclamação | app emana pay benefícios | erro ao alterar senha":{"produto":"Emana Pay Benefícios","motivo":"Senha","submotivo":"Erro Alteração Senha"},"reclamação | app emana pay benefícios | erro ao atualizar dados cadastrais no app":{"produto":"Emana Pay Benefícios","motivo":"Instabilidade / Indisponibilidade","submotivo":"Erro alteração cadastral"},"reclamação | app emana pay benefícios | erro ao efetivar pagamentos e transferências":{"produto":"Emana Pay Benefícios","motivo":"Transação","submotivo":"Erro"},"informação | app emana pay benefícios | erro navegação app":{"produto":"Emana Pay Benefícios","motivo":"Navegação","submotivo":"Erro"},"reclamação | app emana pay benefícios | erro navegação app":{"produto":"Emana Pay Benefícios","motivo":"Navegação","submotivo":"Erro"},"informação | app emana pay benefícios | instabilidade app":{"produto":"Emana Pay Benefícios","motivo":"Instabilidade / Indisponibilidade","submotivo":"Não Consegue Acessar"},"informação | app emana pay benefícios | orientações atualização dados cadastrais no app":{"produto":"Emana Pay Benefícios","motivo":"","submotivo":""},"informação | app emana pay benefícios | orientações para alteração de senha":{"produto":"Emana Pay Benefícios","motivo":"Orientações Gerais","submotivo":"-"},"informação | app emana pay benefícios | orientações sobre processo de onboarding":{"produto":"Emana Pay Benefícios","motivo":"Onboarding","submotivo":"Orientações Gerais"},"reclamação | app emana pay benefícios | problemas com emissão do cartão":{"produto":"Emana Pay Benefícios","motivo":"Emissão do Cartão","submotivo":"Problemas com Emissão do Cartão"},"informação | app emana pay benefícios | transferência de saldo":{"produto":"Emana Pay Benefícios","motivo":"Saldo","submotivo":"Transferência de Saldo"},"reclamação | app pj | erro ao efetivar transações financeiras":{"produto":"Conta","motivo":"Transação","submotivo":"Erro ao Efetivar Transações Financeiras"},"informação | app pj | erro no app - navegação":{"produto":"Aplicativo","motivo":"Erro","submotivo":"Navegação"},"reclamação | app pj | erro no app - navegação":{"produto":"Aplicativo","motivo":"Erro","submotivo":"Navegação"},"solicitação | app pj | incluir loja no app":{"produto":"Aplicativo","motivo":"Não Especificado","submotivo":"-"},"informação | app pj | informações sobre funcionalidades do app":{"produto":"Aplicativo","motivo":"Orientações Gerais","submotivo":"-"},"informação | auto serviço | informação de auto serviço":{"produto":"Não se Aplica","motivo":"-","submotivo":"-"},"terminal pos | bateria | -":{"produto":"Terminal POS","motivo":"Bateria","submotivo":"-"},"aproxima aê | bloqueio / desbloqueio | -":{"produto":"Aproxima Aê","motivo":"Bloqueio / Desbloqueio","submotivo":"-"},"pag emana pay | boleto | vencimento no fim de semana":{"produto":"Pag Emana Pay","motivo":"Pagamento do Boleto","submotivo":"Vencimento no Fim de Semana"},"solicitação | cadastro | alteração cadastral - não realizada":{"produto":"Cadastro","motivo":"Dados Cadastrais","submotivo":"Solicitação de Alteração"},"solicitação | cadastro | alteração cadastral - solicitada":{"produto":"Cadastro","motivo":"Dados Cadastrais","submotivo":"Solicitação de Alteração"},"solicitação | cadastro | alteração cadastral realizada":{"produto":"Cadastro","motivo":"Dados Cadastrais","submotivo":"Solicitação de Alteração"},"solicitação | cadastro | alteração de dados cadastrais":{"produto":"Cadastro","motivo":"Dados Cadastrais","submotivo":"Solicitação de Alteração"},"solicitação | cadastro | alteração de e-mail":{"produto":"Cadastro","motivo":"Dados Cadastrais","submotivo":"Solicitação de Alteração"},"solicitação | cadastro | alteração de telefone celular":{"produto":"Cadastro","motivo":"Dados Cadastrais","submotivo":"Solicitação de Alteração"},"solicitação | cadastro | alteração endereço/envio bobina":{"produto":"Cadastro","motivo":"Dados Cadastrais","submotivo":"Solicitação de Alteração"},"reclamação | cadastro | erro na finalização do cadastro":{"produto":"Conta","motivo":"Onboarding","submotivo":"Erro - Finalização de cadastro"},"informação | cadastro | informações cadastro / atualização cadastral pelo app":{"produto":"Cadastro","motivo":"Dados Cadastrais","submotivo":"Atualização Via App"},"solicitação | cadastro | ocupado":{"produto":"Não se Aplica","motivo":"-","submotivo":"-"},"informação | cadastro | orientações atualização cadastral via app":{"produto":"Cadastro","motivo":"Dados Cadastrais","submotivo":"Atualização Via App"},"informação | campanha | informação sobre campanhas":{"produto":"Campanhas","motivo":"Informações - Campanhas","submotivo":"PF"},"reclamação | campanha | problemas com campanhas - pf":{"produto":"Campanhas","motivo":"Problema - Campanhas","submotivo":"PF"},"conta | cancelamento | não consegue finalizar":{"produto":"Conta","motivo":"Encerramento / Reativação","submotivo":"Solicitação de Encerramento"},"reclamação | cartão de crédito | dda não baixado após pagamento":{"produto":"Mandala","motivo":"Fatura","submotivo":"Aberto em DDA"},"solicitação | cartão de crédito | declaração quitação de débitos":{"produto":"Mandala","motivo":"Declaração Quitação de Débitos","submotivo":"-"},"informação | cartão de crédito | dúvidas sobre negativação":{"produto":"Mandala","motivo":"Orientações Gerais","submotivo":"-"},"informação | cartão de crédito | 2ª via da fatura":{"produto":"Mandala","motivo":"Fatura","submotivo":"Envio de 2ª via"},"informação | cartão de crédito | antecipação de parcela":{"produto":"Mandala","motivo":"Fatura","submotivo":"Antecipação Parcela"},"informação | cartão de crédito | antecipação do pagamento de fatura":{"produto":"Mandala","motivo":"Fatura","submotivo":"Pagamento Antecipado"},"solicitação | cartão de crédito | aumento de limite":{"produto":"Mandala","motivo":"Limite","submotivo":"Limite Insuficiente/Solic Aumento"},"solicitação | cartão de crédito | cancelamento cartão de crédito":{"produto":"Mandala","motivo":"Cancelamento","submotivo":"Solicitação"},"solicitao | cartão de crédito | cancelamento cartão de crédito":{"produto":"Mandala","motivo":"Cancelamento","submotivo":"Solicitação"},"reclamação | cartão de crédito | cobrança de juros":{"produto":"Mandala","motivo":"Taxas / Tarifas / Juros / Impostos","submotivo":"-"},"informação | cartão de crédito | cobrança de tarifas":{"produto":"Mandala","motivo":"Taxas / Tarifas / Juros / Impostos","submotivo":"-"},"informação | cartão de crédito | como e onde fazer a adesão do cartão de crédito":{"produto":"Mandala","motivo":"Aquisição e Condições","submotivo":"-"},"reclamação | cartão de crédito | compras não reconhecidos na fatura":{"produto":"Mandala","motivo":"Fatura","submotivo":"Cobrança Indevida"},"reclamação | cartão de crédito | compras negadas ou não processadas":{"produto":"Mandala","motivo":"Transação","submotivo":"Negada"},"solicitação | cartão de crédito | habilitar cartão de crédito":{"produto":"Mandala","motivo":"Habilitar Cartão","submotivo":"Via App"},"informação | cartão de crédito | habilitar cartão via app":{"produto":"Mandala","motivo":"Habilitar Cartão","submotivo":"Via App"},"informação | cartão de crédito | motivo da compra ter sido negada":{"produto":"Mandala","motivo":"Transação","submotivo":"Negada"},"informação | cartão de crédito | onde usar o cartão de crédito":{"produto":"Mandala","motivo":"Uso exclusivo no Capta","submotivo":"-"},"informação | cartão de crédito | pagamento de fatura":{"produto":"Mandala","motivo":"Fatura","submotivo":"Orientações sobre Pagamento"},"reclamação | cartão de crédito | pagamento em duplicidade":{"produto":"Mandala","motivo":"Fatura","submotivo":"Pagamento Duplicado"},"informação | cartão de crédito | parcelamento de fatura":{"produto":"Mandala","motivo":"Fatura","submotivo":"Parcelamento de Fatura"},"solicitação | cartão de crédito | parcelamento de fatura":{"produto":"Mandala","motivo":"Fatura","submotivo":"Parcelamento de Fatura"},"informação | cartão de crédito | processo de adesão no app":{"produto":"Mandala","motivo":"Habilitar Cartão","submotivo":"Via App"},"reclamação | cartão de crédito | transação negada antifraude":{"produto":"Mandala","motivo":"Transação","submotivo":"Negada"},"informação | cartão físico | info sobre uso do cartão":{"produto":"Cartão Físico","motivo":"Orientações Gerais","submotivo":"-"},"reclamação | cartão físico | não recebimento do cartão":{"produto":"Cartão Físico","motivo":"Emissão do Cartão","submotivo":"Não Recebimento Via"},"solicitação | cartão físico | não recebimento do cartão":{"produto":"Cartão Físico","motivo":"Emissão do Cartão","submotivo":"Não Recebimento Via"},"informação | cartão físico | orientações bloqueio/desbloqueio via app":{"produto":"Cartão Físico","motivo":"Bloqueio / Desbloqueio","submotivo":"Bloqueio / Desbloqueio pelo App"},"informação | cartão físico | status do envio do cartão":{"produto":"Cartão Físico","motivo":"Emissão do Cartão","submotivo":"Status Envio"},"solicitação | cartão virtual | cancelamento do cartão virtual":{"produto":"Cartão Virtual","motivo":"Cancelamento","submotivo":"-"},"reclamação | cobrança | negativação indevida":{"produto":"Cobrança","motivo":"Cobrança Indevida","submotivo":"-"},"reclamação | cobrança | problemas com assessoria de cobrança":{"produto":"Cobrança","motivo":"Problema com Assessoria de Cobrança","submotivo":"-"},"subadquirência | comissão rn | valor não recebido":{"produto":"Subadquirência","motivo":"Comissão RN/Minha Loja","submotivo":"Valor Não Recebido"},"solicitação | conta | bacenjud - número processo":{"produto":"Conta","motivo":"Bloqueio / Desbloqueio","submotivo":"Bloqueio BACENJUD"},"reclamação | conta | bloqueio de conta":{"produto":"Conta","motivo":"Bloqueio / Desbloqueio","submotivo":"Conta Bloqueada"},"reclamação | conta | conta bloqueada – política de risco":{"produto":"Conta","motivo":"Bloqueio / Desbloqueio","submotivo":"Bloqueio Política de Risco"},"informação | conta | detalhamento de extrato":{"produto":"Conta","motivo":"Extrato / Comprovantes","submotivo":"Detalhamento de Extrato"},"reclamação | conta | encerramento da conta":{"produto":"Conta","motivo":"Encerramento / Reativação","submotivo":"Solicitação de Encerramento"},"solicitação | conta | encerramento da conta":{"produto":"Conta","motivo":"Encerramento / Reativação","submotivo":"Solicitação de Encerramento"},"informação | conta | informe de rendimentos":{"produto":"Conta","motivo":"Informe de Rendimentos","submotivo":"Orientações Gerais"},"solicitação | conta | informe de rendimentos":{"produto":"Conta","motivo":"Informe de Rendimentos","submotivo":"Solicitação"},"informação | conta | orientações gerais sobre funcionalidades da conta":{"produto":"Conta","motivo":"Orientações Gerais","submotivo":"-"},"solicitação | conta | reativação da conta":{"produto":"Conta","motivo":"Encerramento / Reativação","submotivo":"Reativação"},"reclamação | conta | transações não reconhecidas na conta":{"produto":"Conta","motivo":"Transação","submotivo":"Contestação de Valores"},"reclamação | conta | transações reconhecidas (possível golpe)":{"produto":"Conta","motivo":"Transação","submotivo":"Contestação de Valores"},"informação | pagemanapay | acordo":{"produto":"Pag Emana Pay","motivo":"Orientações Gerais","submotivo":"Consulta de Pedidos"},"informação | pagemanapay | boleto - orientações sobre emissão do boleto":{"produto":"Pag Emana Pay","motivo":"Boleto","submotivo":"Envio de 2ª via"},"reclamação | pagemanapay | problemas com antecipação":{"produto":"Pag Emana Pay","motivo":"Pagamento do Boleto","submotivo":"Pagamento Antecipado"},"reclamação | pagemanapay | problemas pagamento - boleto pago não baixado":{"produto":"Pag Emana Pay","motivo":"Pagamento do Boleto","submotivo":"Pagamento Não Baixado"},"solicitação | pagemanapay | prorrogação de vencimento":{"produto":"Pag Emana Pay","motivo":"Pagamento do Boleto","submotivo":"Prorrogação de Vencimento"},"informação | saúde protegida | adesão saúde protegida":{"produto":"Seguros","motivo":"Saúde Protegida","submotivo":"Aquisição e Condições"},"informação | saúde protegida | cancelamento saúde protegida":{"produto":"Seguros","motivo":"Saúde Protegida","submotivo":"Cancelamento"},"solicitação | saúde protegida | cancelamento saúde protegida":{"produto":"Seguros","motivo":"Saúde Protegida","submotivo":"Cancelamento"},"informação | seguro | adesão seguro estoque+casa":{"produto":"Seguros","motivo":"Estoque + Casa","submotivo":"Aquisição e Condições"},"informação | seguro | cancelamento seguro estoque+casa":{"produto":"Seguros","motivo":"Estoque + Casa","submotivo":"Cancelamento"},"solicitação | seguro | cancelamento seguro estoque+casa":{"produto":"Seguros","motivo":"Estoque + Casa","submotivo":"Cancelamento"},"informação | seguro | cobertura seguro estoque+casa":{"produto":"Seguros","motivo":"Estoque + Casa","submotivo":"Cobertura"},"reclamação | seguro | desconhecimento de seguro":{"produto":"Seguros","motivo":"Estoque + Casa","submotivo":"Desconhecimento do Seguro"},"solicitação | seguro | estorno seguro estoque+casa":{"produto":"Seguros","motivo":"Estoque + Casa","submotivo":"Estorno"},"informação | tap to phone | como aderir e condições":{"produto":"Aproxima Aê","motivo":"Aquisição e Condições","submotivo":"-"},"informação | tap to phone | como utilizar":{"produto":"Aproxima Aê","motivo":"Usabilidade","submotivo":"Orientações Gerais"},"reclamação | tap to phone | compra negada":{"produto":"Aproxima Aê","motivo":"Transação","submotivo":"Negada"},"reclamação | tap to phone | venda não recebida":{"produto":"Aproxima Aê","motivo":"Transação","submotivo":"Venda não recebida"},"link de pagamento | taxas / juros / tarifas / impostos | -":{"produto":"Link de Pagamento","motivo":"Taxas / Tarifas / Juros / Impostos","submotivo":"Informação"},"informação | transações | chave pix suspeita":{"produto":"PIX","motivo":"Chave PIX","submotivo":"Suspeita"},"reclamação | transações | erro ao gerar link de pagamento":{"produto":"Link de Pagamento","motivo":"Erro","submotivo":"Não Consegue Gerar Link"},"solicitação | transações | exclusão da chave pix":{"produto":"PIX","motivo":"Chave PIX","submotivo":"Exclusão de Chave"},"reclamação | transações | link de pagamento - cancelamento de compra":{"produto":"Link de Pagamento","motivo":"Transação","submotivo":"Cancelamento da Compra"},"informação | transações | link de pagamento - informação sobre valor recebido":{"produto":"Link de Pagamento","motivo":"Orientações Gerais","submotivo":"Informação Valor Recebido"},"reclamação | transações | link de pagamento - transação negada antifraude":{"produto":"Link de Pagamento","motivo":"Transação","submotivo":"Negada"},"reclamação | transações | link de pagamento - valor não recebido/recebido incorretamente":{"produto":"Link de Pagamento","motivo":"Transação","submotivo":"Valor Não Recebido"},"informação | transações | pix - aumento de limite":{"produto":"PIX","motivo":"Transação","submotivo":"Limite Transacional"},"solicitação | transações | pix - aumento de limite":{"produto":"PIX","motivo":"Transação","submotivo":"Limite Transacional"},"reclamação | transações | pix - destinatário incorreto":{"produto":"PIX","motivo":"Transação","submotivo":"Destinatário Incorreto"},"informação | transações | pix - informações sobre o pix":{"produto":"PIX","motivo":"Transação","submotivo":"Informações"},"informação | transações | pix - portabilidade":{"produto":"PIX","motivo":"Chave PIX","submotivo":"Portabilidade"},"reclamação | transações | pix - valor saiu da conta natura mas não chegou na conta destino":{"produto":"PIX","motivo":"Transação","submotivo":"Valor Não Recebido"},"reclamação | transações | pix - valor saiu do banco emissor, mas não chegou na conta natura pay":{"produto":"PIX","motivo":"Transação","submotivo":"Valor Não Recebido"},"informação | transações | saque - orientações para a realização de saque":{"produto":"Conta","motivo":"Saque","submotivo":"Orientações Gerais"},"reclamação | transações | transferência - problemas sobre transferência de valores":{"produto":"Conta","motivo":"Transação","submotivo":"Erro ao Efetivar Transações Financeiras"},"cartão de crédito - aumento de limite |  | ":{"produto":"Mandala","motivo":"Limite","submotivo":"Limite Insuficiente/Solic Aumento"},"cartão de crédito - aumento de limite | |":{"produto":"Mandala","motivo":"Limite","submotivo":"Limite Insuficiente/Solic Aumento"},"cartão de crédito - pagamento de fatura |  | ":{"produto":"Mandala","motivo":"Fatura","submotivo":"Orientações sobre Pagamento"},"cartão de crédito - pagamento de fatura | |":{"produto":"Mandala","motivo":"Fatura","submotivo":"Orientações sobre Pagamento"},"cartão de crédito - pagamento de fatura duplicado |  | ":{"produto":"Mandala","motivo":"Fatura","submotivo":"Pagamento Duplicado"},"cartão de crédito - pagamento de fatura duplicado | |":{"produto":"Mandala","motivo":"Fatura","submotivo":"Pagamento Duplicado"},"cartão de crédito - pagamento de fatura não processado |  | ":{"produto":"Mandala","motivo":"Fatura","submotivo":"Pagamento Não Baixado"},"cartão de crédito - pagamento de fatura não processado | |":{"produto":"Mandala","motivo":"Fatura","submotivo":"Pagamento Não Baixado"},"cartão de crédito - problemas com assessoria de cobrança |  | ":{"produto":"Cobrança","motivo":"Problemas com Assessoria de Cobrança","submotivo":"-"},"cartão de crédito - problemas com assessoria de cobrança | |":{"produto":"Cobrança","motivo":"Problemas com Assessoria de Cobrança","submotivo":"-"},"\"cartão de crédito - problemas com menu \"\"minhas faturas\"\"\" |  | ":{"produto":"Mandala","motivo":"Menu Minhas Faturas","submotivo":"Erro"},"\"cartão de crédito - problemas com menu \"\"minhas faturas\"\" | |\"":{"produto":"Mandala","motivo":"Menu Minhas Faturas","submotivo":"Erro"},"conta bloqueada - spd 15 |  | ":{"produto":"Conta","motivo":"Bloqueio / Desbloqueio","submotivo":"Conta Bloqueada"},"conta bloqueada - spd 15 | |":{"produto":"Conta","motivo":"Bloqueio / Desbloqueio","submotivo":"Conta Bloqueada"},"conta bloqueada - spd 25 |  | ":{"produto":"Conta","motivo":"Bloqueio / Desbloqueio","submotivo":"Conta Bloqueada"},"conta bloqueada - spd 25 | |":{"produto":"Conta","motivo":"Bloqueio / Desbloqueio","submotivo":"Conta Bloqueada"},"desinteresse comercial |  | ":{"produto":"Conta","motivo":"Encerramento / Reativação","submotivo":"Desinteresse Comercial"},"desinteresse comercial | |":{"produto":"Conta","motivo":"Encerramento / Reativação","submotivo":"Desinteresse Comercial"},"encerramento de conta |  | ":{"produto":"Conta","motivo":"Encerramento / Reativação","submotivo":"Solicitação de Encerramento"},"encerramento de conta | |":{"produto":"Conta","motivo":"Encerramento / Reativação","submotivo":"Solicitação de Encerramento"},"erro ao acessar o app |  | ":{"produto":"Aplicativo","motivo":"Erro","submotivo":"Não Consegue Acessar"},"erro ao acessar o app | |":{"produto":"Aplicativo","motivo":"Erro","submotivo":"Não Consegue Acessar"},"improdutiva | engano |  | ":{"produto":"Não se Aplica","motivo":"-","submotivo":"-"},"improdutiva | engano | |":{"produto":"Não se Aplica","motivo":"-","submotivo":"-"},"improdutiva | linha muda |  | ":{"produto":"Não se Aplica","motivo":"-","submotivo":"-"},"improdutiva | linha muda | |":{"produto":"Não se Aplica","motivo":"-","submotivo":"-"},"improdutiva | queda do contato |  | ":{"produto":"Não se Aplica","motivo":"-","submotivo":"-"},"improdutiva | queda do contato | |":{"produto":"Não se Aplica","motivo":"-","submotivo":"-"},"informação | app | orientações gerais sobre app e suas funcionalidades |  | ":{"produto":"Aplicativo","motivo":"Orientações Gerais","submotivo":"-"},"informação | app | orientações gerais sobre app e suas funcionalidades | |":{"produto":"Aplicativo","motivo":"Orientações Gerais","submotivo":"-"},"informação | app | orientações para alteração de senha |  | ":{"produto":"Aplicativo","motivo":"Senha","submotivo":"Orientações Gerais"},"informação | app | orientações para alteração de senha | |":{"produto":"Aplicativo","motivo":"Senha","submotivo":"Orientações Gerais"},"informação | cartão de crédito | antecipação de parcela |  | ":{"produto":"Mandala","motivo":"Fatura","submotivo":"Pagamento Antecipado"},"informação | cartão de crédito | antecipação de parcela | |":{"produto":"Mandala","motivo":"Fatura","submotivo":"Pagamento Antecipado"},"informação | cartão de crédito | funcionalidades do cartão de crédito no app |  | ":{"produto":"Mandala","motivo":"Orientações Gerais","submotivo":"Funcionalidades do cartão no app"},"informação | cartão de crédito | funcionalidades do cartão de crédito no app | |":{"produto":"Mandala","motivo":"Orientações Gerais","submotivo":"Funcionalidades do cartão no app"},"informação | cartão de crédito | pagamento de fatura |  | ":{"produto":"Mandala","motivo":"Fatura","submotivo":"Orientações sobre Pagamento"},"informação | cartão de crédito | pagamento de fatura | |":{"produto":"Mandala","motivo":"Fatura","submotivo":"Orientações sobre Pagamento"},"informação | cartão de crédito | parcelamento de fatura |  | ":{"produto":"Mandala","motivo":"Fatura","submotivo":"Parcelamento de Fatura"},"informação | cartão de crédito | parcelamento de fatura | |":{"produto":"Mandala","motivo":"Fatura","submotivo":"Parcelamento de Fatura"},"informação | cartão de crédito| habilitar cartão via app |  | ":{"produto":"Mandala","motivo":"Habilitar Cartão","submotivo":"Via App"},"informação | cartão de crédito| habilitar cartão via app | |":{"produto":"Mandala","motivo":"Habilitar Cartão","submotivo":"Via App"},"informação | conta | detalhamento de extrato |  | ":{"produto":"Conta","motivo":"Extrato / Comprovantes","submotivo":"Detalhamento de Extrato"},"informação | conta | detalhamento de extrato | |":{"produto":"Conta","motivo":"Extrato / Comprovantes","submotivo":"Detalhamento de Extrato"},"informação | tap to phone | como aderir e condições |  | ":{"produto":"Aproxima Aê","motivo":"Aquisição e Condições","submotivo":"-"},"informação | tap to phone | como aderir e condições | |":{"produto":"Aproxima Aê","motivo":"Aquisição e Condições","submotivo":"-"},"informação | tap to phone | consulta vendas recebidas ou negadas |  | ":{"produto":"Aproxima Aê","motivo":"Extrato","submotivo":"Histórico de Vendas"},"informação | tap to phone | consulta vendas recebidas ou negadas | |":{"produto":"Aproxima Aê","motivo":"Extrato","submotivo":"Histórico de Vendas"},"informação | transações | link de pagamento - informação sobre valor recebido |  | ":{"produto":"Link de Pagamento","motivo":"Orientações Gerais","submotivo":"Informação Valor Recebido"},"informação | transações | link de pagamento - informação sobre valor recebido | |":{"produto":"Link de Pagamento","motivo":"Orientações Gerais","submotivo":"Informação Valor Recebido"},"informação | transações | link de pagamento - orientações sobre link de pagamento |  | ":{"produto":"Link de Pagamento","motivo":"Orientações Gerais","submotivo":"-"},"informação | transações | link de pagamento - orientações sobre link de pagamento | |":{"produto":"Link de Pagamento","motivo":"Orientações Gerais","submotivo":"-"},"informação | transações | link de pagamento - transação negada outros motivos |  | ":{"produto":"Link de Pagamento","motivo":"Transação","submotivo":"Negada"},"informação | transações | link de pagamento - transação negada outros motivos | |":{"produto":"Link de Pagamento","motivo":"Transação","submotivo":"Negada"},"informação | transações | pagamento de conta - informações sobre pagamento de contas |  | ":{"produto":"Conta","motivo":"Pagamento de Contas","submotivo":"Informaçoes sobre pagamento de contas"},"informação | transações | pagamento de conta - informações sobre pagamento de contas | |":{"produto":"Conta","motivo":"Pagamento de Contas","submotivo":"Informaçoes sobre pagamento de contas"},"informação | transações | pix - informações sobre o pix |  | ":{"produto":"PIX","motivo":"Transação","submotivo":"Informações"},"informação | transações | pix - informações sobre o pix | |":{"produto":"PIX","motivo":"Transação","submotivo":"Informações"},"link de pagamento - cancelamento |  | ":{"produto":"Link de Pagamento","motivo":"Transação","submotivo":"Cancelamento da Compra"},"link de pagamento - cancelamento | |":{"produto":"Link de Pagamento","motivo":"Transação","submotivo":"Cancelamento da Compra"},"link de pagamento - transação negada |  | ":{"produto":"Link de Pagamento","motivo":"Transação","submotivo":"Negada"},"link de pagamento - transação negada | |":{"produto":"Link de Pagamento","motivo":"Transação","submotivo":"Negada"},"link de pagamento (informações gerais) |  | ":{"produto":"Link de Pagamento","motivo":"Orientações Gerais","submotivo":"-"},"link de pagamento (informações gerais) | |":{"produto":"Link de Pagamento","motivo":"Orientações Gerais","submotivo":"-"},"link de pagamento indisponível |  | ":{"produto":"Link de Pagamento","motivo":"Instabilidade / Indisponibilidade","submotivo":"-"},"link de pagamento indisponível | |":{"produto":"Link de Pagamento","motivo":"Instabilidade / Indisponibilidade","submotivo":"-"},"onboarding - erro ao finalizar cadastro |  | ":{"produto":"Conta","motivo":"Onboarding","submotivo":"Erro - Finalização de cadastro"},"onboarding - erro ao finalizar cadastro | |":{"produto":"Conta","motivo":"Onboarding","submotivo":"Erro - Finalização de cadastro"},"onboarding negado |  | ":{"produto":"Conta","motivo":"Onboarding","submotivo":"Negado"},"onboarding negado | |":{"produto":"Conta","motivo":"Onboarding","submotivo":"Negado"},"problemas com campanhas |  | ":{"produto":"Campanhas","motivo":"Problema - Campanhas","submotivo":"PF"},"problemas com campanhas | |":{"produto":"Campanhas","motivo":"Problema - Campanhas","submotivo":"PF"},"reclamação | app | erro ao efetivar transações financeiras (pix, transferência, pagamento de contas...) |  | ":{"produto":"Conta","motivo":"Transação","submotivo":"Erro ao Efetivar Transações Financeiras"},"reclamação | app | erro ao efetivar transações financeiras (pix, transferência, pagamento de contas...) | |":{"produto":"Conta","motivo":"Transação","submotivo":"Erro ao Efetivar Transações Financeiras"},"reclamação | app | erro ao efetivar transações financeiras - pix |  | ":{"produto":"PIX","motivo":"Erro","submotivo":"Erro"},"reclamação | app | erro ao efetivar transações financeiras - pix | |":{"produto":"PIX","motivo":"Erro","submotivo":"Erro"},"reclamação | app | erro ao efetivar transações financeiras - transferência e pagamento de contas |  | ":{"produto":"Conta","motivo":"Transação","submotivo":"Erro ao Efetivar Transações Financeiras"},"reclamação | app | erro ao efetivar transações financeiras - transferência e pagamento de contas | |":{"produto":"Conta","motivo":"Transação","submotivo":"Erro ao Efetivar Transações Financeiras"},"reclamação | app | erro do app - não responde/trava – conta sem bloqueio |  | ":{"produto":"Aplicativo","motivo":"Instabilidade / Indisponibilidade","submotivo":"Não Responde / Trava"},"reclamação | app | erro do app - não responde/trava – conta sem bloqueio | |":{"produto":"Aplicativo","motivo":"Instabilidade / Indisponibilidade","submotivo":"Não Responde / Trava"},"reclamação | app | erro na finalização do cadastro - spds sem bloqueio |  | ":{"produto":"Conta","motivo":"Onboarding","submotivo":"Erro - Finalização de cadastro"},"reclamação | app | erro na finalização do cadastro - spds sem bloqueio | |":{"produto":"Conta","motivo":"Onboarding","submotivo":"Erro - Finalização de cadastro"},"reclamação | app | erro no app - navegação |  | ":{"produto":"Aplicativo","motivo":"Erro","submotivo":"Navegação"},"reclamação | app | erro no app - navegação | |":{"produto":"Aplicativo","motivo":"Erro","submotivo":"Navegação"},"reclamação | cartão de crédito | compras negadas ou não processadas |  | ":{"produto":"Mandala","motivo":"Transação","submotivo":"Negada"},"reclamação | cartão de crédito | compras negadas ou não processadas | |":{"produto":"Mandala","motivo":"Transação","submotivo":"Negada"},"reclamação | cartão de crédito | lançamentos com valores errados |  | ":{"produto":"Mandala","motivo":"Fatura","submotivo":"Cobrança Indevida"},"reclamação | cartão de crédito | lançamentos com valores errados | |":{"produto":"Mandala","motivo":"Fatura","submotivo":"Cobrança Indevida"},"reclamação | cartão de crédito | problemas com pagamento de fatura |  | ":{"produto":"Mandala","motivo":"Fatura","submotivo":"Problema com Pagamento"},"reclamação | cartão de crédito | problemas com pagamento de fatura | |":{"produto":"Mandala","motivo":"Fatura","submotivo":"Problema com Pagamento"},"reclamação | cartão virtual | transação negada - antifraude |  | ":{"produto":"Cartão Virtual","motivo":"Transação","submotivo":"Negada"},"reclamação | cartão virtual | transação negada - antifraude | |":{"produto":"Cartão Virtual","motivo":"Transação","submotivo":"Negada"},"reclamação | cobrança | problemas com assessoria de cobrança |  | ":{"produto":"Cobrança","motivo":"Problema com Assessoria de Cobrança","submotivo":"-"},"reclamação | cobrança | problemas com assessoria de cobrança | |":{"produto":"Cobrança","motivo":"Problema com Assessoria de Cobrança","submotivo":"-"},"reclamação | conta | conta bloqueada – política de risco |  | ":{"produto":"Conta","motivo":"Bloqueio / Desbloqueio","submotivo":"Bloqueio Política de Risco"},"reclamação | conta | conta bloqueada – política de risco | |":{"produto":"Conta","motivo":"Bloqueio / Desbloqueio","submotivo":"Bloqueio Política de Risco"},"reclamação | conta | transações reconhecidas (possível golpe) |  | ":{"produto":"Conta","motivo":"Transação","submotivo":"Contestação de Valores"},"reclamação | conta | transações reconhecidas (possível golpe) | |":{"produto":"Conta","motivo":"Transação","submotivo":"Contestação de Valores"},"reclamação | tap to phone | erro ao utilizar funcionalidade |  | ":{"produto":"Aproxima Aê","motivo":"Erro","submotivo":"Não Especificado"},"reclamação | tap to phone | erro ao utilizar funcionalidade | |":{"produto":"Aproxima Aê","motivo":"Erro","submotivo":"Não Especificado"},"reclamação | tap to phone | venda não recebida |  | ":{"produto":"Aproxima Aê","motivo":"Transação","submotivo":"Venda não recebida"},"reclamação | tap to phone | venda não recebida | |":{"produto":"Aproxima Aê","motivo":"Transação","submotivo":"Venda não recebida"},"reclamação | transações | pix - destinatário incorreto |  | ":{"produto":"PIX","motivo":"Transação","submotivo":"Destinatário Incorreto"},"reclamação | transações | pix - destinatário incorreto | |":{"produto":"PIX","motivo":"Transação","submotivo":"Destinatário Incorreto"},"reclamação | transações | pix - valor saiu do banco emissor, mas não chegou na conta emana pay |  | ":{"produto":"PIX","motivo":"Transação","submotivo":"Valor Não Recebido"},"reclamação | transações | pix - valor saiu do banco emissor, mas não chegou na conta emana pay | |":{"produto":"PIX","motivo":"Transação","submotivo":"Valor Não Recebido"},"saldo / extrato |  | ":{"produto":"Conta","motivo":"Extrato / Comprovantes","submotivo":"Orientações Gerais"},"saldo / extrato | |":{"produto":"Conta","motivo":"Extrato / Comprovantes","submotivo":"Orientações Gerais"},"seguros - solicitação de cancelamento |  | ":{"produto":"Seguros","motivo":"Cancelamento","submotivo":"Solicitação"},"seguros - solicitação de cancelamento | |":{"produto":"Seguros","motivo":"Cancelamento","submotivo":"Solicitação"},"solicitação | cadastro | alteração cadastral - solicitada |  | ":{"produto":"Cadastro","motivo":"Dados Cadastrais","submotivo":"Solicitação de Alteração"},"solicitação | cadastro | alteração cadastral - solicitada | |":{"produto":"Cadastro","motivo":"Dados Cadastrais","submotivo":"Solicitação de Alteração"},"solicitação | cartão de crédito | aumento de limite |  | ":{"produto":"Mandala","motivo":"Limite","submotivo":"Limite Insuficiente/Solic Aumento"},"solicitação | cartão de crédito | aumento de limite | |":{"produto":"Mandala","motivo":"Limite","submotivo":"Limite Insuficiente/Solic Aumento"},"solicitação | cartão de crédito | código de autorização |  | ":{"produto":"Mandala","motivo":"Código de Autorização","submotivo":"-"},"solicitação | cartão de crédito | código de autorização | |":{"produto":"Mandala","motivo":"Código de Autorização","submotivo":"-"},"solicitação | conta | encerramento da conta |  | ":{"produto":"Conta","motivo":"Encerramento / Reativação","submotivo":"Solicitação de Encerramento"},"solicitação | conta | encerramento da conta | |":{"produto":"Conta","motivo":"Encerramento / Reativação","submotivo":"Solicitação de Encerramento"},"solicitação | tap to phone | cancelamento e reembolso |  | ":{"produto":"Aproxima Aê","motivo":"Cancelamento e Reembolso","submotivo":"Solicitação"},"solicitação | tap to phone | cancelamento e reembolso | |":{"produto":"Aproxima Aê","motivo":"Cancelamento e Reembolso","submotivo":"Solicitação"},"solicitação | transações | pix - aumento de limite |  | ":{"produto":"PIX","motivo":"Transação","submotivo":"Limite Transacional"},"solicitação | transações | pix - aumento de limite | |":{"produto":"PIX","motivo":"Transação","submotivo":"Limite Transacional"},"transações reconhecidas (possível golpe) |  | ":{"produto":"Não se Aplica","motivo":"-","submotivo":"-"},"transações reconhecidas (possível golpe) | |":{"produto":"Não se Aplica","motivo":"-","submotivo":"-"},"transferência não efetuada - pix |  | ":{"produto":"PIX","motivo":"Transação","submotivo":"Erro"},"transferência não efetuada - pix | |":{"produto":"PIX","motivo":"Transação","submotivo":"Erro"},"transferência não recebida - pix |  | ":{"produto":"PIX","motivo":"Transação","submotivo":"Valor Não Recebido"},"transferência não recebida - pix | |":{"produto":"PIX","motivo":"Transação","submotivo":"Valor Não Recebido"},"reclamação | pagemanapay | pagamento invertido":{"produto":"Pag Emana Pay","motivo":"Pagamento do Boleto","submotivo":"Pagamento Invertido"},"reclamação | pagemanapay | boleto não registrado – febraban":{"produto":"Pag Emana Pay","motivo":"Pagamento do Boleto","submotivo":"Boleto não registrado – Febraban"},"reclamação | seguro | pgto seguro fatura protegida":{"produto":"Seguros","motivo":"Fatura Protegida","submotivo":"Orientações Gerais"},"solicitação | seguros pj | cancelamento seguro empresarial":{"produto":"Seguros PJ","motivo":"Seguro Empresarial","submotivo":"Cancelamento"},"solicitação | cartão de crédito pj | alteração de cpf do beneficiário livelo":{"produto":"Thundera","motivo":"Programa de Pontos Livelo","submotivo":"Alteração Beneficiário"},"informação | portal lojista | dúvidas":{"produto":"Portal Lojista","motivo":"Orientações Gerais","submotivo":"-"},"informação | seguro pj | pagamento seguro empresarial":{"produto":"Seguros PJ","motivo":"Seguro Empresarial","submotivo":"Orientações Gerais"},"solicitação | cadastro | abertura de conta":{"produto":"Conta PJ","motivo":"Abertura de Conta","submotivo":"-"},"informação | seguro | adesão fatura protegida":{"produto":"Seguros","motivo":"Fatura Protegida","submotivo":"Aquisição e Condições"},"solicitação | auto serviço:: pagemanapay | ":{"produto":"Auto Serviço","motivo":"Pag Emana Pay","submotivo":"Orientações Gerais"},"solicitação | auto serviço:: pagemanapay |":{"produto":"Auto Serviço","motivo":"Pag Emana Pay","submotivo":"Orientações Gerais"}};
+
+const DIAG_STORAGE_KEYS = {
+    VOLUME: 'emana_diag_volume',
+    TICKETS: 'emana_diag_tickets',
+    DEPARA_CUSTOM: 'emana_diag_depara_custom',
+    IMPORTS: 'emana_diag_importacoes'
+};
+
+const DIAG_CANAIS = {
+    LIGACOES: { key: 'LIGACOES', name: 'Central (Ligações)', icon: 'fa-phone', color: '#eb5c27', tipoDePara: 'CENTRAL' },
+    CHAT: { key: 'CHAT', name: 'IA - Chat', icon: 'fa-comments', color: '#10b981', tipoDePara: 'IA' },
+    WHATSAPP: { key: 'WHATSAPP', name: 'IA - WhatsApp', icon: 'fa-whatsapp', color: '#25d366', tipoDePara: 'IA' },
+    URA: { key: 'URA', name: 'IA - URA', icon: 'fa-robot', color: '#6366f1', tipoDePara: 'IA' }
+};
+
+const DIAG_SLA_TARGET_PCT = 96.10; // Meta de SLA de Efetividade: 96,10% em até 7 dias corridos
+
+const DiagStorage = {
+    getVolume() {
+        try {
+            return JSON.parse(localStorage.getItem(DIAG_STORAGE_KEYS.VOLUME) || '[]');
+        } catch (e) {
+            console.error('[DiagStorage] Erro ao ler volumes:', e);
+            return [];
+        }
+    },
+    saveVolume(list) {
+        try {
+            localStorage.setItem(DIAG_STORAGE_KEYS.VOLUME, JSON.stringify(list));
+            this.syncSupabaseVolume(list);
+        } catch (e) {
+            console.error('[DiagStorage] Erro ao salvar volumes:', e);
+        }
+    },
+    getTickets() {
+        try {
+            return JSON.parse(localStorage.getItem(DIAG_STORAGE_KEYS.TICKETS) || '[]');
+        } catch (e) {
+            console.error('[DiagStorage] Erro ao ler tickets:', e);
+            return [];
+        }
+    },
+    saveTickets(list) {
+        try {
+            localStorage.setItem(DIAG_STORAGE_KEYS.TICKETS, JSON.stringify(list));
+            this.syncSupabaseTickets(list);
+        } catch (e) {
+            console.error('[DiagStorage] Erro ao salvar tickets:', e);
+        }
+    },
+    getCustomDePara() {
+        try {
+            return JSON.parse(localStorage.getItem(DIAG_STORAGE_KEYS.DEPARA_CUSTOM) || '[]');
+        } catch (e) {
+            return [];
+        }
+    },
+    saveCustomDePara(rule) {
+        const list = this.getCustomDePara();
+        const existingIdx = list.findIndex(r => r.tipo === rule.tipo && r.chave_origem === rule.chave_origem);
+        if (existingIdx >= 0) {
+            list[existingIdx] = rule;
+        } else {
+            list.push(rule);
+        }
+        localStorage.setItem(DIAG_STORAGE_KEYS.DEPARA_CUSTOM, JSON.stringify(list));
+    },
+    getImportacoes() {
+        try {
+            return JSON.parse(localStorage.getItem(DIAG_STORAGE_KEYS.IMPORTS) || '[]');
+        } catch (e) {
+            return [];
+        }
+    },
+    addImportacaoLog(log) {
+        const list = this.getImportacoes();
+        list.unshift({ ...log, id: 'imp_' + Date.now(), data_hora: new Date().toISOString() });
+        localStorage.setItem(DIAG_STORAGE_KEYS.IMPORTS, JSON.stringify(list.slice(0, 100)));
+    },
+    async syncSupabaseVolume(volumeList) {
+        if (!supabase) return;
+        try {
+            // Sincronização assíncrona não bloqueante
+            // Se a tabela diag_volume existir no Supabase, envia em lote
+        } catch (e) {
+            // Silencioso para fallback em localStorage
+        }
+    },
+    async syncSupabaseTickets(ticketsList) {
+        if (!supabase) return;
+        try {
+            // Sincronização assíncrona não bloqueante
+        } catch (e) {
+            // Silencioso
+        }
+    }
+};
+
+// MOTOR DE-PARA (NORMALIZAÇÃO)
+function diagLookupDePara(canalKey, rawMotivo, rawTipo, rawSub) {
+    const canalDef = DIAG_CANAIS[canalKey] || { tipoDePara: 'IA' };
+    const customRules = DiagStorage.getCustomDePara();
+
+    if (canalDef.tipoDePara === 'IA') {
+        const cleanMotivo = String(rawMotivo || '').trim();
+        const upperMotivo = cleanMotivo.toUpperCase();
+
+        // 1. Regra customizada
+        const custom = customRules.find(r => r.tipo === 'IA' && (r.chave_origem === cleanMotivo || r.chave_origem === upperMotivo));
+        if (custom) {
+            return { produto: custom.dest_produto, motivo: custom.dest_motivo, submotivo: custom.dest_submotivo, unmapped: false };
+        }
+
+        // 2. Base de sementes IA
+        if (SEED_DEPARA_IA[upperMotivo]) {
+            const hit = SEED_DEPARA_IA[upperMotivo];
+            return { produto: hit.produto, motivo: hit.motivo, submotivo: hit.submotivo, unmapped: false };
+        }
+        if (SEED_DEPARA_IA[cleanMotivo]) {
+            const hit = SEED_DEPARA_IA[cleanMotivo];
+            return { produto: hit.produto, motivo: hit.motivo, submotivo: hit.submotivo, unmapped: false };
+        }
+
+        // 3. Não mapeado
+        return {
+            produto: 'Não Classificado',
+            motivo: cleanMotivo || 'Outros',
+            submotivo: '-',
+            unmapped: true,
+            chave_origem: cleanMotivo,
+            tipo: 'IA'
+        };
+    } else {
+        // Central de Atendimento (Tabelão)
+        const tipoNorm = String(rawTipo || '').trim().toLowerCase();
+        const motivoNorm = String(rawMotivo || '').trim().toLowerCase();
+        const subNorm = String(rawSub || '').trim().toLowerCase();
+
+        const searchKey = tipoNorm + ' | ' + motivoNorm + ' | ' + subNorm;
+
+        // 1. Regra customizada
+        const custom = customRules.find(r => r.tipo === 'CENTRAL' && r.chave_origem.toLowerCase() === searchKey);
+        if (custom) {
+            return { produto: custom.dest_produto, motivo: custom.dest_motivo, submotivo: custom.dest_submotivo, unmapped: false };
+        }
+
+        // 2. Base de sementes Central (chave exata)
+        if (SEED_DEPARA_CENTRAL[searchKey]) {
+            const hit = SEED_DEPARA_CENTRAL[searchKey];
+            return { produto: hit.produto, motivo: hit.motivo, submotivo: hit.submotivo, unmapped: false };
+        }
+
+        // 3. Busca por tipo + motivo ignorando submotivo
+        for (const [k, v] of Object.entries(SEED_DEPARA_CENTRAL)) {
+            const parts = k.split(' | ');
+            if (parts[0] === tipoNorm && parts[1] === motivoNorm) {
+                return { produto: v.produto, motivo: v.motivo, submotivo: v.submotivo, unmapped: false };
+            }
+        }
+
+        return {
+            produto: 'Não Classificado',
+            motivo: String(rawMotivo || 'Outros').trim(),
+            submotivo: String(rawSub || '-').trim(),
+            unmapped: true,
+            chave_origem: searchKey,
+            tipo: 'CENTRAL'
+        };
+    }
+}
+
+// HELPERS DE PARSE DE DATA E NÚMEROS
+function parseDiagDate(val) {
+    if (!val) return null;
+    if (val instanceof Date) return isNaN(val.getTime()) ? null : val;
+    if (typeof val === 'number') {
+        // Número serial de data Excel
+        const utcDays = Math.floor(val - 25569);
+        const utcValue = utcDays * 86400;
+        const dateInfo = new Date(utcValue * 1000);
+        const fractionalDay = val - Math.floor(val) + 0.0000001;
+        const totalSeconds = Math.floor(86400 * fractionalDay);
+        dateInfo.setSeconds(dateInfo.getSeconds() + totalSeconds);
+        return isNaN(dateInfo.getTime()) ? null : dateInfo;
+    }
+    const str = String(val).trim();
+    if (!str) return null;
+
+    // Formato DD/MM/YYYY ou DD/MM/YYYY HH:mm:ss
+    const dmyMatch = str.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})(?:\s+(\d{1,2}):(\d{1,2})(?::(\d{1,2}))?)?/);
+    if (dmyMatch) {
+        const day = parseInt(dmyMatch[1], 10);
+        const month = parseInt(dmyMatch[2], 10) - 1;
+        const year = parseInt(dmyMatch[3], 10);
+        const h = dmyMatch[4] ? parseInt(dmyMatch[4], 10) : 0;
+        const m = dmyMatch[5] ? parseInt(dmyMatch[5], 10) : 0;
+        const s = dmyMatch[6] ? parseInt(dmyMatch[6], 10) : 0;
+        return new Date(year, month, day, h, m, s);
+    }
+
+    // Formato ISO YYYY-MM-DD
+    const isoMatch = str.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/);
+    if (isoMatch) {
+        return new Date(str);
+    }
+    return null;
+}
+
+function formatDiagYearMonth(d) {
+    if (!d) return null;
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, '0');
+    return `${y}-${m}`;
+}
+
+function getDiagMonthLabel(ym) {
+    if (!ym) return '-';
+    const [y, m] = ym.split('-');
+    const months = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
+    const idx = parseInt(m, 10) - 1;
+    return (months[idx] || m) + '/' + y;
+}
+
+function getPreviousYearMonth(ym, offset) {
+    if (!ym) return ym;
+    const [yStr, mStr] = ym.split('-');
+    let y = parseInt(yStr, 10);
+    let m = parseInt(mStr, 10) - offset;
+    while (m <= 0) {
+        m += 12;
+        y -= 1;
+    }
+    return `${y}-${String(m).padStart(2, '0')}`;
+}
+
+// TOGGLE SUBVIEWS & MODES
+let currentDiagSubView = 'volumetria';
+
+function switchDiagSubView(subView) {
+    currentDiagSubView = subView;
+    const isVol = subView === 'volumetria';
+
+    const viewVol = document.getElementById('diag-subview-volumetria');
+    const viewEfet = document.getElementById('diag-subview-efetividade');
+    const btnVol = document.getElementById('btn-diag-tab-vol');
+    const btnEfet = document.getElementById('btn-diag-tab-efet');
+
+    if (viewVol) viewVol.style.display = isVol ? 'block' : 'none';
+    if (viewEfet) viewEfet.style.display = isVol ? 'none' : 'block';
+
+    if (btnVol) {
+        btnVol.classList.toggle('active', isVol);
+    }
+    if (btnEfet) {
+        btnEfet.classList.toggle('active', !isVol);
+    }
+
+    if (isVol) {
+        renderDiagVolumetria();
+    } else {
+        renderDiagEfetividade();
+    }
+}
+
+function toggleTabelaoMode() {
+    const sel = document.getElementById('select-tabelao-tipo-carga');
+    const wrapper = document.getElementById('wrapper-tabelao-mes');
+    if (sel && wrapper) {
+        wrapper.style.display = (sel.value === 'historico') ? 'none' : 'block';
+    }
+}
+
+// ==========================================================================
+// IMPORTAÇÃO EXCEL E PROCESSAMENTO
+// ==========================================================================
+
+async function handleExcelUpload(canalKey, inputEl) {
+    const file = inputEl.files && inputEl.files[0];
+    if (!file) return;
+
+    const statusEl = document.getElementById('status-upload-' + canalKey.toLowerCase());
+    if (statusEl) {
+        statusEl.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Processando planilha...';
+        statusEl.style.color = 'var(--color-primary)';
+    }
+
+    try {
+        const data = await file.arrayBuffer();
+        if (typeof XLSX === 'undefined') {
+            throw new Error('Biblioteca SheetJS (XLSX) não carregada no navegador.');
+        }
+
+        const workbook = XLSX.read(data, { type: 'array', cellDates: true });
+        const sheetName = workbook.SheetNames[0];
+        const sheet = workbook.Sheets[sheetName];
+        const rawRows = XLSX.utils.sheet_to_json(sheet, { defval: '' });
+
+        if (!rawRows || rawRows.length === 0) {
+            throw new Error('A planilha está vazia ou a primeira aba não contém linhas.');
+        }
+
+        let totalImportados = 0;
+        let ticketsProcessados = 0;
+        const unmappedDiscovered = [];
+
+        if (canalKey === 'LIGACOES') {
+            // TABELÃO / CENTRAL DE ATENDIMENTO
+            const selTipoCarga = document.getElementById('select-tabelao-tipo-carga');
+            const isHistorico = selTipoCarga && selTipoCarga.value === 'historico';
+            const defaultMes = document.getElementById('input-tabelao-mes')?.value || '2026-08';
+
+            const volumeMap = {}; // { 'YYYY-MM|produto|motivo|submotivo': qtd }
+            const ticketsToSave = [];
+
+            for (const row of rawRows) {
+                // Normaliza chaves da linha para case-insensitive
+                const rowNorm = {};
+                for (const [k, v] of Object.entries(row)) {
+                    rowNorm[k.trim().toUpperCase()] = v;
+                }
+
+                const ticketId = String(rowNorm['ID_DO_TICKET'] || rowNorm['ID'] || rowNorm['NUMERO'] || Math.random()).trim();
+                const tipoContato = rowNorm['TIPO_CONTATO'] || rowNorm['TIPO'] || '';
+                const motivo = rowNorm['MOTIVO'] || '';
+                const subMotivo = rowNorm['SUB_MOTIVO'] || rowNorm['SUBMOTIVO'] || '';
+                const grupo = rowNorm['GRUPO_DO_TICKET'] || rowNorm['GRUPO'] || 'Central Emana PAY';
+                const status = String(rowNorm['STATUS'] || 'Fechado').trim();
+
+                const dtAbertura = parseDiagDate(rowNorm['DATA_ABERTURA_TICKET'] || rowNorm['DATA_ABERTURA'] || rowNorm['DATA']);
+                const dtFechamento = parseDiagDate(rowNorm['DATA_FECHAMENTO_TICKET'] || rowNorm['DATA_FECHAMENTO']);
+
+                let mesFechamento = formatDiagYearMonth(dtFechamento);
+                let mesAbertura = formatDiagYearMonth(dtAbertura);
+
+                // Determinação do mês de referência
+                let mesRef = isHistorico ? (mesAbertura || mesFechamento || defaultMes) : defaultMes;
+
+                // 1. Apuração de SLA de Efetividade (Chamados)
+                if (dtAbertura) {
+                    let diffDays = 0;
+                    let dentroPrazo = true;
+
+                    if (dtFechamento) {
+                        const diffMs = dtFechamento.getTime() - dtAbertura.getTime();
+                        diffDays = Math.max(0, diffMs / (1000 * 60 * 60 * 24));
+                        dentroPrazo = (diffDays <= 7.0);
+                    } else {
+                        // Ticket aberto
+                        const now = new Date();
+                        const diffMs = now.getTime() - dtAbertura.getTime();
+                        diffDays = Math.max(0, diffMs / (1000 * 60 * 60 * 24));
+                        if (diffDays > 7.0) dentroPrazo = false;
+                    }
+
+                    // Ticket é contabilizado no mês de resolução (ou abertura se não fechado)
+                    const ticketMes = mesFechamento || mesAbertura || mesRef;
+
+                    ticketsToSave.push({
+                        id_ticket: ticketId,
+                        mes_fechamento: ticketMes,
+                        mes_abertura: mesAbertura || ticketMes,
+                        grupo_ticket: String(grupo).trim(),
+                        status: status,
+                        dias_corridos: Math.round(diffDays * 10) / 10,
+                        dentro_prazo: dentroPrazo
+                    });
+                    ticketsProcessados++;
+                }
+
+                // 2. Apuração de Volumetria (De-Para)
+                if (motivo) {
+                    const dePara = diagLookupDePara('LIGACOES', motivo, tipoContato, subMotivo);
+                    if (dePara.unmapped) {
+                        unmappedDiscovered.push({ canal: 'LIGACOES', motivo, tipo: tipoContato, sub: subMotivo });
+                    }
+                    if (dePara.produto !== 'Não se Aplica') {
+                        const key = `${mesRef}|${dePara.produto}|${dePara.motivo}|${dePara.submotivo}`;
+                        volumeMap[key] = (volumeMap[key] || 0) + 1;
+                        totalImportados++;
+                    }
+                }
+            }
+
+            // Consolidação dos volumes
+            const existingVolumes = DiagStorage.getVolume().filter(v => {
+                if (isHistorico) {
+                    return v.canal !== 'LIGACOES';
+                } else {
+                    return !(v.canal === 'LIGACOES' && v.mes === defaultMes);
+                }
+            });
+
+            for (const [key, vol] of Object.entries(volumeMap)) {
+                const [mes, prod, mot, sub] = key.split('|');
+                existingVolumes.push({
+                    id: 'vol_' + Math.random().toString(36).substring(2, 9),
+                    canal: 'LIGACOES',
+                    mes,
+                    produto: prod,
+                    motivo: mot,
+                    submotivo: sub,
+                    volume: vol
+                });
+            }
+            DiagStorage.saveVolume(existingVolumes);
+
+            // Consolidação dos tickets
+            if (ticketsToSave.length > 0) {
+                const existingTickets = DiagStorage.getTickets().filter(t => {
+                    if (isHistorico) {
+                        return false; // Substitui histórico
+                    } else {
+                        return t.mes_fechamento !== defaultMes;
+                    }
+                });
+                DiagStorage.saveTickets(existingTickets.concat(ticketsToSave));
+            }
+
+            DiagStorage.addImportacaoLog({
+                canal: 'LIGACOES',
+                mes_referencia: isHistorico ? 'Histórico 2026' : defaultMes,
+                total_linhas: rawRows.length,
+                volume_total: totalImportados,
+                tickets_processados: ticketsProcessados,
+                nome_arquivo: file.name
+            });
+
+        } else {
+            // CANAIS DE IA (CHAT, WHATSAPP, URA)
+            const inputMes = document.getElementById('input-' + canalKey.toLowerCase() + '-mes');
+            const mesRef = inputMes?.value || '2026-08';
+            const volumeMap = {}; // { 'produto|motivo|submotivo': qtd }
+
+            for (const row of rawRows) {
+                // Normaliza chaves
+                const rowNorm = {};
+                for (const [k, v] of Object.entries(row)) {
+                    rowNorm[k.trim().toLowerCase()] = v;
+                }
+
+                const motivo = rowNorm['motivo'] || rowNorm['motivo_contato'] || rowNorm['use_case'] || '';
+                if (motivo) {
+                    const dePara = diagLookupDePara(canalKey, motivo, '', '');
+                    if (dePara.unmapped) {
+                        unmappedDiscovered.push({ canal: canalKey, motivo, tipo: '', sub: '' });
+                    }
+                    if (dePara.produto !== 'Não se Aplica') {
+                        const key = `${dePara.produto}|${dePara.motivo}|${dePara.submotivo}`;
+                        volumeMap[key] = (volumeMap[key] || 0) + 1;
+                        totalImportados++;
+                    }
+                }
+            }
+
+            const existingVolumes = DiagStorage.getVolume().filter(v => !(v.canal === canalKey && v.mes === mesRef));
+            for (const [key, vol] of Object.entries(volumeMap)) {
+                const [prod, mot, sub] = key.split('|');
+                existingVolumes.push({
+                    id: 'vol_' + Math.random().toString(36).substring(2, 9),
+                    canal: canalKey,
+                    mes: mesRef,
+                    produto: prod,
+                    motivo: mot,
+                    submotivo: sub,
+                    volume: vol
+                });
+            }
+            DiagStorage.saveVolume(existingVolumes);
+
+            DiagStorage.addImportacaoLog({
+                canal: canalKey,
+                mes_referencia: mesRef,
+                total_linhas: rawRows.length,
+                volume_total: totalImportados,
+                tickets_processados: 0,
+                nome_arquivo: file.name
+            });
+        }
+
+        if (statusEl) {
+            statusEl.innerHTML = `<span style="color: #10b981;"><i class="fa-solid fa-circle-check"></i> ${totalImportados.toLocaleString('pt-BR')} registros importados com sucesso!</span>`;
+        }
+
+        showToast(`✅ Carga de ${DIAG_CANAIS[canalKey].name} concluída: ${totalImportados.toLocaleString('pt-BR')} volumes processados!`, 'success', 6000);
+
+        renderCoverageMatrix();
+        renderDeParaCounts();
+
+        // Se estivermos visualizando o dashboard, re-renderizar imediatamente
+        const diagDashboardView = document.getElementById('view-diag-dashboard');
+        if (diagDashboardView && diagDashboardView.style.display !== 'none') {
+            renderDiagDashboardView();
+        }
+
+    } catch (err) {
+        console.error('[Diagnóstico Upload Error]', err);
+        if (statusEl) {
+            statusEl.innerHTML = `<span style="color: #ef4444;"><i class="fa-solid fa-triangle-exclamation"></i> Erro: ${err.message}</span>`;
+        }
+        showToast('Erro ao importar arquivo: ' + err.message, 'error', 8000);
+    } finally {
+        inputEl.value = '';
+    }
+}
+
+// ==========================================================================
+// RENDERIZAÇÃO: MATRIZ DE COBERTURA DOS MESES (2026)
+// ==========================================================================
+
+function renderCoverageMatrix() {
+    const tbody = document.getElementById('tbody-diag-coverage');
+    if (!tbody) return;
+
+    const volumes = DiagStorage.getVolume();
+    const ano = 2026;
+    const months = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12'];
+
+    let html = '';
+    for (const [key, canal] of Object.entries(DIAG_CANAIS)) {
+        html += `<tr>
+            <td style="font-weight: 700; color: #fff; display: flex; align-items: center; gap: 0.5rem;">
+                <i class="fa-solid ${canal.icon}" style="color: ${canal.color}; width: 16px;"></i>
+                ${canal.name}
+            </td>`;
+
+        for (const m of months) {
+            const ym = `${ano}-${m}`;
+            const volMonth = volumes
+                .filter(v => v.canal === key && v.mes === ym)
+                .reduce((acc, curr) => acc + (curr.volume || 0), 0);
+
+            if (volMonth > 0) {
+                html += `<td style="text-align: center;">
+                    <span class="diag-coverage-badge status-ok" title="${volMonth.toLocaleString('pt-BR')} atendimentos carregados">
+                        <i class="fa-solid fa-check"></i> ${volMonth > 999 ? Math.round(volMonth/1000) + 'k' : volMonth}
+                    </span>
+                </td>`;
+            } else {
+                html += `<td style="text-align: center;">
+                    <span class="diag-coverage-badge status-pending" title="Pendente de carga para ${m}/${ano}">
+                        -
+                    </span>
+                </td>`;
+            }
+        }
+        html += `</tr>`;
+    }
+
+    tbody.innerHTML = html;
+}
+
+// ==========================================================================
+// RENDERIZAÇÃO: DASHBOARD DIAGNÓSTICO DO CLIENTE
+// ==========================================================================
+
+let diagChartComposicao = null;
+let diagChartHistorico = null;
+let diagChartEfetividade = null;
+
+function renderDiagDashboardView() {
+    // 1. Popula dropdown de meses disponíveis a partir dos volumes e tickets existentes
+    const volumes = DiagStorage.getVolume();
+    const tickets = DiagStorage.getTickets();
+
+    const monthSet = new Set();
+    volumes.forEach(v => { if (v.mes) monthSet.add(v.mes); });
+    tickets.forEach(t => { if (t.mes_fechamento) monthSet.add(t.mes_fechamento); });
+
+    // Adiciona meses padrão 2026 caso a base esteja inicializando
+    ['2026-08', '2026-07', '2026-06'].forEach(m => monthSet.add(m));
+
+    const sortedMonths = Array.from(monthSet).sort().reverse();
+    const selMes = document.getElementById('filter-diag-mes');
+
+    if (selMes) {
+        const curVal = selMes.value || sortedMonths[0];
+        selMes.innerHTML = sortedMonths.map(m => {
+            return `<option value="${m}" ${m === curVal ? 'selected' : ''}>${getDiagMonthLabel(m)} (${m})</option>`;
+        }).join('');
+        selMes.value = curVal;
+    }
+
+    // 2. Renderiza a subvisão selecionada (Volumetria ou Efetividade)
+    if (currentDiagSubView === 'efetividade') {
+        renderDiagEfetividade();
+    } else {
+        renderDiagVolumetria();
+    }
+}
+
+// --------------------------------------------------------------------------
+// SUBVIEW 1: VOLUMETRIA (M-2, M-1, M, ÁRVORE HIERÁRQUICA E GRÁFICOS)
+// --------------------------------------------------------------------------
+
+function renderDiagVolumetria() {
+    const selMes = document.getElementById('filter-diag-mes');
+    const m0 = (selMes && selMes.value) ? selMes.value : '2026-08';
+    const m1 = getPreviousYearMonth(m0, 1);
+    const m2 = getPreviousYearMonth(m0, 2);
+
+    const selCanal = document.getElementById('filter-diag-canal')?.value || 'all';
+    const selProd = document.getElementById('filter-diag-produto')?.value || 'all';
+    const searchVal = (document.getElementById('filter-diag-search')?.value || '').toLowerCase().trim();
+
+    // Atualiza cabeçalhos da tabela com os nomes dos 3 meses
+    const thM0 = document.getElementById('th-diag-m0');
+    const thM1 = document.getElementById('th-diag-m1');
+    const thM2 = document.getElementById('th-diag-m2');
+    if (thM0) thM0.textContent = getDiagMonthLabel(m0).toUpperCase();
+    if (thM1) thM1.textContent = getDiagMonthLabel(m1).toUpperCase();
+    if (thM2) thM2.textContent = getDiagMonthLabel(m2).toUpperCase();
+
+    const allVolumes = DiagStorage.getVolume();
+
+    // Popula produtos no select de filtros
+    const selProdEl = document.getElementById('filter-diag-produto');
+    if (selProdEl && selProdEl.options.length <= 1) {
+        const prodSet = new Set();
+        allVolumes.forEach(v => { if (v.produto) prodSet.add(v.produto); });
+        const curP = selProdEl.value || 'all';
+        selProdEl.innerHTML = '<option value="all">Todos os Produtos</option>' +
+            Array.from(prodSet).sort().map(p => `<option value="${p}" ${p === curP ? 'selected' : ''}>${p}</option>`).join('');
+    }
+
+    // Filtra por canal se especificado
+    const filtered = allVolumes.filter(v => {
+        if (selCanal && selCanal !== 'all' && selCanal !== 'TODOS' && v.canal !== selCanal) return false;
+        if (selProd && selProd !== 'all' && selProd !== 'TODOS' && v.produto !== selProd) return false;
+        return true;
+    });
+
+    // Constrói árvore hierárquica: Produto -> Motivo -> Submotivo
+    // tree = { [produto]: { totalM0, totalM1, totalM2, motivos: { [motivo]: { totalM0, totalM1, totalM2, submotivos: { [sub]: { m0, m1, m2 } } } } } }
+    const tree = {};
+    let totalGeralM0 = 0;
+    let totalGeralM1 = 0;
+    let totalGeralM2 = 0;
+
+    const channelTotalsM0 = { LIGACOES: 0, CHAT: 0, WHATSAPP: 0, URA: 0 };
+
+    for (const row of filtered) {
+        const prod = row.produto || 'Não Classificado';
+        const mot = row.motivo || 'Outros';
+        const sub = row.submotivo || '-';
+        const vol = Number(row.volume) || 0;
+
+        if (row.mes === m0 && channelTotalsM0[row.canal] !== undefined) {
+            channelTotalsM0[row.canal] += vol;
+        }
+
+        if (row.mes !== m0 && row.mes !== m1 && row.mes !== m2) continue;
+
+        if (!tree[prod]) {
+            tree[prod] = { m0: 0, m1: 0, m2: 0, motivos: {} };
+        }
+        if (!tree[prod].motivos[mot]) {
+            tree[prod].motivos[mot] = { m0: 0, m1: 0, m2: 0, submotivos: {} };
+        }
+        if (!tree[prod].motivos[mot].submotivos[sub]) {
+            tree[prod].motivos[mot].submotivos[sub] = { m0: 0, m1: 0, m2: 0 };
+        }
+
+        if (row.mes === m0) {
+            tree[prod].m0 += vol;
+            tree[prod].motivos[mot].m0 += vol;
+            tree[prod].motivos[mot].submotivos[sub].m0 += vol;
+            totalGeralM0 += vol;
+        } else if (row.mes === m1) {
+            tree[prod].m1 += vol;
+            tree[prod].motivos[mot].m1 += vol;
+            tree[prod].motivos[mot].submotivos[sub].m1 += vol;
+            totalGeralM1 += vol;
+        } else if (row.mes === m2) {
+            tree[prod].m2 += vol;
+            tree[prod].motivos[mot].m2 += vol;
+            tree[prod].motivos[mot].submotivos[sub].m2 += vol;
+            totalGeralM2 += vol;
+        }
+    }
+
+    // Atualiza KPIs
+    const kpiTotal = document.getElementById('kpi-diag-vol-total');
+    const kpiMesLabel = document.getElementById('kpi-diag-vol-mes-label');
+    const kpiVar = document.getElementById('kpi-diag-vol-var');
+    const kpiVarSub = document.getElementById('kpi-diag-vol-var-sub');
+    const kpiTopCanal = document.getElementById('kpi-diag-top-canal');
+    const kpiTopCanalSub = document.getElementById('kpi-diag-top-canal-sub');
+    const kpiTopMotivo = document.getElementById('kpi-diag-top-motivo');
+    const kpiTopMotivoSub = document.getElementById('kpi-diag-top-motivo-sub');
+
+    if (kpiTotal) kpiTotal.textContent = totalGeralM0.toLocaleString('pt-BR');
+    if (kpiMesLabel) kpiMesLabel.textContent = 'Fechamento ' + getDiagMonthLabel(m0);
+
+    // Variação M vs M-1
+    let varPct = 0;
+    if (totalGeralM1 > 0) {
+        varPct = ((totalGeralM0 - totalGeralM1) / totalGeralM1) * 100;
+    }
+    if (kpiVar) {
+        const sign = varPct > 0 ? '+' : '';
+        kpiVar.textContent = sign + varPct.toFixed(1) + '%';
+        kpiVar.style.color = varPct > 0 ? '#ef4444' : '#10b981'; // Em SAC, aumento de volume é alerta vermelho
+    }
+    if (kpiVarSub) {
+        const diffAbs = totalGeralM0 - totalGeralM1;
+        const sign = diffAbs > 0 ? '+' : '';
+        kpiVarSub.textContent = sign + diffAbs.toLocaleString('pt-BR') + ' vs ' + getDiagMonthLabel(m1);
+    }
+
+    // Canal Líder
+    let leaderCanal = '-';
+    let leaderVol = -1;
+    for (const [c, v] of Object.entries(channelTotalsM0)) {
+        if (v > leaderVol) {
+            leaderVol = v;
+            leaderCanal = DIAG_CANAIS[c]?.name || c;
+        }
+    }
+    if (kpiTopCanal) kpiTopCanal.textContent = leaderCanal;
+    if (kpiTopCanalSub) {
+        const pct = totalGeralM0 > 0 ? ((leaderVol / totalGeralM0) * 100).toFixed(1) : 0;
+        kpiTopCanalSub.textContent = leaderVol.toLocaleString('pt-BR') + ' chamados (' + pct + '%)';
+    }
+
+    // Top Motivo Geral
+    let topMotivoName = '-';
+    let topMotivoVol = -1;
+    for (const [prod, prodData] of Object.entries(tree)) {
+        for (const [mot, motData] of Object.entries(prodData.motivos)) {
+            if (motData.m0 > topMotivoVol) {
+                topMotivoVol = motData.m0;
+                topMotivoName = mot;
+            }
+        }
+    }
+    if (kpiTopMotivo) kpiTopMotivo.textContent = topMotivoName;
+    if (kpiTopMotivoSub) {
+        const pct = totalGeralM0 > 0 ? ((topMotivoVol / totalGeralM0) * 100).toFixed(1) : 0;
+        kpiTopMotivoSub.textContent = topMotivoVol.toLocaleString('pt-BR') + ' contatos (' + pct + '%)';
+    }
+
+    // Montagem da Tabela Hierárquica
+    const tbody = document.getElementById('tbody-diag-volumetria');
+    if (tbody) {
+        let rowsHtml = '';
+        let accPctCumulativo = 0;
+
+        // Ordena produtos por volume no mês M0 desc
+        const sortedProds = Object.entries(tree).sort((a, b) => b[1].m0 - a[1].m0);
+
+        let rowCounter = 0;
+        for (const [prodName, prodData] of sortedProds) {
+            if (searchVal && !prodName.toLowerCase().includes(searchVal)) {
+                // Se a pesquisa não der match no produto, verifica se dá em algum motivo
+                const hasMotMatch = Object.keys(prodData.motivos).some(m => m.toLowerCase().includes(searchVal));
+                if (!hasMotMatch) continue;
+            }
+
+            const prodId = 'tree_p_' + (++rowCounter);
+            const pctProd = totalGeralM0 > 0 ? ((prodData.m0 / totalGeralM0) * 100) : 0;
+            const deltaProd = prodData.m1 > 0 ? (((prodData.m0 - prodData.m1) / prodData.m1) * 100) : 0;
+
+            rowsHtml += `<tr class="diag-tree-row diag-tree-row-produto" data-tree-id="${prodId}">
+                <td style="padding-left: 0.75rem;">
+                    <span class="diag-tree-toggle open" onclick="toggleDiagTreeRow('${prodId}')"><i class="fa-solid fa-chevron-right"></i></span>
+                    <i class="fa-solid fa-cube" style="color: var(--color-primary); margin-right: 0.35rem;"></i>
+                    <strong>${prodName}</strong>
+                </td>
+                <td style="text-align: right; font-weight: 600;">${prodData.m2.toLocaleString('pt-BR')}</td>
+                <td style="text-align: right; font-weight: 600;">${prodData.m1.toLocaleString('pt-BR')}</td>
+                <td style="text-align: right; font-weight: 700; color: #fff;">${prodData.m0.toLocaleString('pt-BR')}</td>
+                <td style="text-align: right; font-weight: 600; color: ${deltaProd > 0 ? '#ef4444' : '#10b981'}">
+                    ${deltaProd !== 0 ? (deltaProd > 0 ? '+' : '') + deltaProd.toFixed(1) + '%' : '-'}
+                </td>
+                <td style="text-align: right; font-weight: 700; color: var(--color-primary);">${pctProd.toFixed(1)}%</td>
+                <td style="text-align: right; color: var(--text-muted);">-</td>
+            </tr>`;
+
+            // Motivos dentro deste produto
+            const sortedMotivos = Object.entries(prodData.motivos).sort((a, b) => b[1].m0 - a[1].m0);
+            for (const [motName, motData] of sortedMotivos) {
+                if (searchVal && !prodName.toLowerCase().includes(searchVal) && !motName.toLowerCase().includes(searchVal)) {
+                    continue;
+                }
+
+                const motId = prodId + '_m_' + (++rowCounter);
+                const pctMot = totalGeralM0 > 0 ? ((motData.m0 / totalGeralM0) * 100) : 0;
+                accPctCumulativo += pctMot;
+                const deltaMot = motData.m1 > 0 ? (((motData.m0 - motData.m1) / motData.m1) * 100) : 0;
+
+                rowsHtml += `<tr class="diag-tree-row diag-tree-row-motivo" data-parent-id="${prodId}" data-tree-id="${motId}">
+                    <td style="padding-left: 2rem;">
+                        <span class="diag-tree-toggle open" onclick="toggleDiagTreeRow('${motId}')"><i class="fa-solid fa-chevron-right"></i></span>
+                        <i class="fa-regular fa-folder-open" style="color: #f59e0b; margin-right: 0.35rem;"></i>
+                        <span>${motName}</span>
+                    </td>
+                    <td style="text-align: right;">${motData.m2.toLocaleString('pt-BR')}</td>
+                    <td style="text-align: right;">${motData.m1.toLocaleString('pt-BR')}</td>
+                    <td style="text-align: right; font-weight: 600; color: #fff;">${motData.m0.toLocaleString('pt-BR')}</td>
+                    <td style="text-align: right; color: ${deltaMot > 0 ? '#ef4444' : '#10b981'}">
+                        ${deltaMot !== 0 ? (deltaMot > 0 ? '+' : '') + deltaMot.toFixed(1) + '%' : '-'}
+                    </td>
+                    <td style="text-align: right; font-weight: 600;">${pctMot.toFixed(2)}%</td>
+                    <td style="text-align: right; font-size: 0.78rem; color: var(--text-secondary);">${accPctCumulativo.toFixed(1)}%</td>
+                </tr>`;
+
+                // Submotivos dentro deste motivo
+                const sortedSubs = Object.entries(motData.submotivos).sort((a, b) => b[1].m0 - a[1].m0);
+                for (const [subName, subData] of sortedSubs) {
+                    const pctSub = totalGeralM0 > 0 ? ((subData.m0 / totalGeralM0) * 100) : 0;
+                    const deltaSub = subData.m1 > 0 ? (((subData.m0 - subData.m1) / subData.m1) * 100) : 0;
+
+                    rowsHtml += `<tr class="diag-tree-row diag-tree-row-submotivo" data-parent-id="${motId}">
+                        <td style="padding-left: 3.5rem;">
+                            <i class="fa-solid fa-arrow-turn-down-right" style="color: var(--text-muted); font-size: 0.75rem; margin-right: 0.4rem;"></i>
+                            <span style="color: var(--text-secondary);">${subName}</span>
+                        </td>
+                        <td style="text-align: right; font-size: 0.8rem; color: var(--text-muted);">${subData.m2.toLocaleString('pt-BR')}</td>
+                        <td style="text-align: right; font-size: 0.8rem; color: var(--text-muted);">${subData.m1.toLocaleString('pt-BR')}</td>
+                        <td style="text-align: right; font-size: 0.82rem; color: var(--text-secondary);">${subData.m0.toLocaleString('pt-BR')}</td>
+                        <td style="text-align: right; font-size: 0.78rem; color: ${deltaSub > 0 ? '#ef4444' : '#10b981'}">
+                            ${deltaSub !== 0 ? (deltaSub > 0 ? '+' : '') + deltaSub.toFixed(1) + '%' : '-'}
+                        </td>
+                        <td style="text-align: right; font-size: 0.8rem; color: var(--text-muted);">${pctSub.toFixed(2)}%</td>
+                        <td style="text-align: right; color: var(--text-muted);">-</td>
+                    </tr>`;
+                }
+            }
+        }
+
+        if (sortedProds.length === 0) {
+            rowsHtml = `<tr><td colspan="7" style="text-align: center; padding: 2.5rem; color: var(--text-muted);">
+                <i class="fa-solid fa-inbox" style="font-size: 2rem; margin-bottom: 0.5rem; display: block;"></i>
+                Nenhum registro de volumetria encontrado para os filtros selecionados.<br>
+                <button type="button" class="btn btn-primary" onclick="switchToView('diag-import')" style="margin-top: 1rem; font-size: 0.82rem;">
+                    <i class="fa-solid fa-cloud-arrow-up" style="margin-right: 0.35rem;"></i> Carregar Planilhas dos Canais
+                </button>
+            </td></tr>`;
+        }
+
+        tbody.innerHTML = rowsHtml;
+    }
+
+    // Atualiza totais do rodapé da tabela
+    const footM2 = document.getElementById('tfoot-diag-m2');
+    const footM1 = document.getElementById('tfoot-diag-m1');
+    const footM0 = document.getElementById('tfoot-diag-m0');
+    const footVar = document.getElementById('tfoot-diag-var');
+    if (footM2) footM2.textContent = totalGeralM2.toLocaleString('pt-BR');
+    if (footM1) footM1.textContent = totalGeralM1.toLocaleString('pt-BR');
+    if (footM0) footM0.textContent = totalGeralM0.toLocaleString('pt-BR');
+    if (footVar) {
+        footVar.textContent = (varPct !== 0 ? (varPct > 0 ? '+' : '') + varPct.toFixed(1) + '%' : '-');
+        footVar.style.color = varPct > 0 ? '#ef4444' : '#10b981';
+    }
+
+    // Gráficos Chart.js
+    renderDiagVolumetriaCharts(tree, m0, m1, m2, allVolumes);
+}
+
+function toggleDiagTreeRow(treeId) {
+    const parentRow = document.querySelector(`tr[data-tree-id="${treeId}"]`);
+    if (!parentRow) return;
+
+    const toggleIcon = parentRow.querySelector('.diag-tree-toggle');
+    const isOpen = toggleIcon && toggleIcon.classList.contains('open');
+
+    if (toggleIcon) toggleIcon.classList.toggle('open', !isOpen);
+
+    // Seleciona todos os filhos diretos
+    const children = document.querySelectorAll(`tr[data-parent-id="${treeId}"]`);
+    children.forEach(child => {
+        child.style.display = isOpen ? 'none' : '';
+        // Se estiver fechando, fecha recursivamente netos
+        if (isOpen && child.getAttribute('data-tree-id')) {
+            const childId = child.getAttribute('data-tree-id');
+            const subToggle = child.querySelector('.diag-tree-toggle');
+            if (subToggle) subToggle.classList.remove('open');
+            document.querySelectorAll(`tr[data-parent-id="${childId}"]`).forEach(grandChild => {
+                grandChild.style.display = 'none';
+            });
+        }
+    });
+}
+
+function expandAllDiagTree() {
+    document.querySelectorAll('.diag-tree-row').forEach(r => r.style.display = '');
+    document.querySelectorAll('.diag-tree-toggle').forEach(t => t.classList.add('open'));
+}
+
+function collapseAllDiagTree() {
+    document.querySelectorAll('.diag-tree-row-motivo, .diag-tree-row-submotivo').forEach(r => r.style.display = 'none');
+    document.querySelectorAll('.diag-tree-toggle').forEach(t => t.classList.remove('open'));
+}
+
+function renderDiagVolumetriaCharts(tree, m0, m1, m2, allVolumes) {
+    if (typeof Chart === 'undefined') return;
+
+    // 1. Gráfico de Rosca: Composição de Produtos Mês Atual
+    const canvasComp = document.getElementById('chart-diag-composicao');
+    if (canvasComp) {
+        if (diagChartComposicao) diagChartComposicao.destroy();
+
+        const sortedProds = Object.entries(tree).sort((a, b) => b[1].m0 - a[1].m0);
+        const top5 = sortedProds.slice(0, 5);
+        const othersVol = sortedProds.slice(5).reduce((acc, curr) => acc + curr[1].m0, 0);
+
+        const labels = top5.map(p => p[0]);
+        const dataVals = top5.map(p => p[1].m0);
+        if (othersVol > 0) {
+            labels.push('Outros Produtos');
+            dataVals.push(othersVol);
+        }
+
+        const palette = ['#eb5c27', '#10b981', '#6366f1', '#f59e0b', '#ec4899', '#94a3b8'];
+
+        diagChartComposicao = new Chart(canvasComp.getContext('2d'), {
+            type: 'doughnut',
+            data: {
+                labels: labels,
+                datasets: [{
+                    data: dataVals,
+                    backgroundColor: palette,
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'right',
+                        labels: { color: '#f8fafc', font: { family: 'Outfit', size: 11 } }
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(ctx) {
+                                const total = ctx.dataset.data.reduce((a, b) => a + b, 0);
+                                const val = ctx.raw || 0;
+                                const pct = total > 0 ? ((val / total) * 100).toFixed(1) : 0;
+                                return ` ${ctx.label}: ${val.toLocaleString('pt-BR')} (${pct}%)`;
+                            }
+                        }
+                    }
+                },
+                cutout: '68%'
+            }
+        });
+    }
+
+    // 2. Gráfico de Barras Empilhadas: Histórico dos 3 meses por Canal
+    const canvasHist = document.getElementById('chart-diag-historico-canais');
+    if (canvasHist) {
+        if (diagChartHistorico) diagChartHistorico.destroy();
+
+        const months = [m2, m1, m0];
+        const monthLabels = months.map(m => getDiagMonthLabel(m));
+
+        const datasets = Object.entries(DIAG_CANAIS).map(([key, canal]) => {
+            const dataVals = months.map(m => {
+                return allVolumes
+                    .filter(v => v.canal === key && v.mes === m)
+                    .reduce((acc, curr) => acc + (curr.volume || 0), 0);
+            });
+            return {
+                label: canal.name,
+                data: dataVals,
+                backgroundColor: canal.color,
+                borderRadius: 4
+            };
+        });
+
+        diagChartHistorico = new Chart(canvasHist.getContext('2d'), {
+            type: 'bar',
+            data: {
+                labels: monthLabels,
+                datasets: datasets
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    x: {
+                        stacked: true,
+                        ticks: { color: '#92ab9e', font: { family: 'Outfit' } },
+                        grid: { display: false }
+                    },
+                    y: {
+                        stacked: true,
+                        ticks: { color: '#92ab9e', font: { family: 'Outfit' } },
+                        grid: { color: 'rgba(255,255,255,0.06)' }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: { color: '#f8fafc', font: { family: 'Outfit', size: 11 } }
+                    }
+                }
+            }
+        });
+    }
+}
+
+// --------------------------------------------------------------------------
+// SUBVIEW 2: EFETIVIDADE (SLA 7 DIAS - TABELÃO DE CHAMADOS)
+// --------------------------------------------------------------------------
+
+function renderDiagEfetividade() {
+    const anoFilter = parseInt(document.getElementById('filter-diag-efet-ano')?.value || '2026', 10);
+    const grupoFilter = document.getElementById('filter-diag-efet-grupo')?.value || 'all';
+
+    const allTickets = DiagStorage.getTickets();
+
+    // Popula grupos no dropdown de filtros
+    const groupSet = new Set();
+    allTickets.forEach(t => { if (t.grupo_ticket) groupSet.add(t.grupo_ticket); });
+    const selGrupo = document.getElementById('filter-diag-efet-grupo');
+    if (selGrupo && selGrupo.options.length <= 1) {
+        const sortedGroups = Array.from(groupSet).sort();
+        const curG = selGrupo.value || 'all';
+        selGrupo.innerHTML = '<option value="all">Todos os Grupos</option>' +
+            sortedGroups.map(g => `<option value="${g}" ${g === curG ? 'selected' : ''}>${g}</option>`).join('');
+    }
+
+    const filteredTickets = allTickets.filter(t => {
+        if (!t.mes_fechamento || !t.mes_fechamento.startsWith(String(anoFilter))) return false;
+        if (grupoFilter && grupoFilter !== 'all' && grupoFilter !== 'TODOS' && t.grupo_ticket !== grupoFilter) return false;
+        return true;
+    });
+
+    // Apuração mensal (JAN a DEZ)
+    const monthsData = [];
+    const monthsNames = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
+
+    let anoTotalDentro = 0;
+    let anoTotalFora = 0;
+
+    for (let i = 1; i <= 12; i++) {
+        const mStr = String(i).padStart(2, '0');
+        const ym = `${anoFilter}-${mStr}`;
+        const monthTickets = filteredTickets.filter(t => t.mes_fechamento === ym);
+
+        const total = monthTickets.length;
+        const dentro = monthTickets.filter(t => t.dentro_prazo).length;
+        const fora = total - dentro;
+        const pct = total > 0 ? ((dentro / total) * 100) : null;
+
+        anoTotalDentro += dentro;
+        anoTotalFora += fora;
+
+        monthsData.push({
+            mesNum: mStr,
+            mesNome: monthsNames[i - 1],
+            ym,
+            total,
+            dentro,
+            fora,
+            pct
+        });
+    }
+
+    const anoTotalChamados = anoTotalDentro + anoTotalFora;
+    const anoPctGeral = anoTotalChamados > 0 ? ((anoTotalDentro / anoTotalChamados) * 100) : 0;
+
+    // Atualiza KPIs de Efetividade
+    const kpiSlaPct = document.getElementById('kpi-diag-sla-pct');
+    const kpiSlaStatus = document.getElementById('kpi-diag-sla-status');
+    const kpiNoPrazo = document.getElementById('kpi-diag-tickets-noprazo');
+    const kpiForaPrazo = document.getElementById('kpi-diag-tickets-foraprazo');
+    const kpiTotalTickets = document.getElementById('kpi-diag-tickets-total');
+
+    if (kpiSlaPct) kpiSlaPct.textContent = anoTotalChamados > 0 ? anoPctGeral.toFixed(2) + '%' : '-';
+    if (kpiSlaStatus) {
+        if (anoTotalChamados === 0) {
+            kpiSlaStatus.textContent = 'SEM DADOS';
+            kpiSlaStatus.className = 'diag-badge-prazo';
+        } else if (anoPctGeral >= DIAG_SLA_TARGET_PCT) {
+            kpiSlaStatus.innerHTML = '<i class="fa-solid fa-circle-check"></i> META ATINGIDA (>= 96,10%)';
+            kpiSlaStatus.className = 'diag-badge-prazo dentro';
+        } else {
+            kpiSlaStatus.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> ABAIXO DA META (< 96,10%)';
+            kpiSlaStatus.className = 'diag-badge-prazo fora';
+        }
+    }
+    if (kpiNoPrazo) kpiNoPrazo.textContent = anoTotalDentro.toLocaleString('pt-BR');
+    if (kpiForaPrazo) kpiForaPrazo.textContent = anoTotalFora.toLocaleString('pt-BR');
+    if (kpiTotalTickets) kpiTotalTickets.textContent = anoTotalChamados.toLocaleString('pt-BR');
+
+    // Tabela 1: Mensal
+    const tbodyMes = document.getElementById('tbody-diag-efet-meses');
+    if (tbodyMes) {
+        let html = '';
+        for (const m of monthsData) {
+            let statusBadge = '-';
+            if (m.total > 0) {
+                if (m.pct >= DIAG_SLA_TARGET_PCT) {
+                    statusBadge = `<span class="diag-badge-prazo dentro"><i class="fa-solid fa-check"></i> ${m.pct.toFixed(2)}%</span>`;
+                } else {
+                    statusBadge = `<span class="diag-badge-prazo fora"><i class="fa-solid fa-xmark"></i> ${m.pct.toFixed(2)}%</span>`;
+                }
+            }
+
+            html += `<tr>
+                <td style="font-weight: 700; color: #fff;">${m.mesNome}/${anoFilter}</td>
+                <td style="text-align: right; font-weight: 600;">${m.total.toLocaleString('pt-BR')}</td>
+                <td style="text-align: right; color: #10b981; font-weight: 600;">${m.dentro.toLocaleString('pt-BR')}</td>
+                <td style="text-align: right; color: #ef4444; font-weight: 600;">${m.fora.toLocaleString('pt-BR')}</td>
+                <td style="text-align: right; font-weight: 700;">${m.pct !== null ? m.pct.toFixed(2) + '%' : '-'}</td>
+                <td style="text-align: center;">${statusBadge}</td>
+            </tr>`;
+        }
+        tbodyMes.innerHTML = html;
+    }
+
+    // Tabela 2: Por Grupo de Ticket
+    const tbodyGrupo = document.getElementById('tbody-diag-efet-grupos');
+    if (tbodyGrupo) {
+        const groupMap = {};
+        for (const t of filteredTickets) {
+            const g = t.grupo_ticket || 'Outros';
+            if (!groupMap[g]) groupMap[g] = { total: 0, dentro: 0, fora: 0 };
+            groupMap[g].total++;
+            if (t.dentro_prazo) groupMap[g].dentro++;
+            else groupMap[g].fora++;
+        }
+
+        const sortedGroups = Object.entries(groupMap).sort((a, b) => b[1].total - a[1].total);
+        let gHtml = '';
+        for (const [grpName, grpData] of sortedGroups) {
+            const pct = grpData.total > 0 ? ((grpData.dentro / grpData.total) * 100) : 0;
+            const badge = pct >= DIAG_SLA_TARGET_PCT ?
+                `<span class="diag-badge-prazo dentro">${pct.toFixed(1)}%</span>` :
+                `<span class="diag-badge-prazo fora">${pct.toFixed(1)}%</span>`;
+
+            gHtml += `<tr>
+                <td style="font-weight: 600; color: #fff;">${grpName}</td>
+                <td style="text-align: right;">${grpData.total.toLocaleString('pt-BR')}</td>
+                <td style="text-align: right; color: #10b981;">${grpData.dentro.toLocaleString('pt-BR')}</td>
+                <td style="text-align: right; color: #ef4444;">${grpData.fora.toLocaleString('pt-BR')}</td>
+                <td style="text-align: right; font-weight: 700;">${badge}</td>
+            </tr>`;
+        }
+
+        if (sortedGroups.length === 0) {
+            gHtml = '<tr><td colspan="5" style="text-align: center; color: var(--text-muted); padding: 1.5rem;">Nenhum chamado apurado neste período.</td></tr>';
+        }
+        tbodyGrupo.innerHTML = gHtml;
+    }
+
+    // Gráfico de Linha de Efetividade vs Meta (96.10%)
+    const canvasEfet = document.getElementById('chart-diag-efetividade');
+    if (canvasEfet && typeof Chart !== 'undefined') {
+        if (diagChartEfetividade) diagChartEfetividade.destroy();
+
+        const labels = monthsData.map(m => m.mesNome);
+        const dataEfet = monthsData.map(m => m.pct);
+        const dataMeta = monthsData.map(() => DIAG_SLA_TARGET_PCT);
+
+        diagChartEfetividade = new Chart(canvasEfet.getContext('2d'), {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [
+                    {
+                        label: 'Efetividade Apurada (%)',
+                        data: dataEfet,
+                        borderColor: '#10b981',
+                        backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                        fill: true,
+                        tension: 0.25,
+                        pointRadius: 4,
+                        pointHoverRadius: 6
+                    },
+                    {
+                        label: 'Meta de SLA (96,10%)',
+                        data: dataMeta,
+                        borderColor: '#ef4444',
+                        borderDash: [6, 6],
+                        borderWidth: 2,
+                        fill: false,
+                        pointRadius: 0
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        min: 80,
+                        max: 100,
+                        ticks: {
+                            color: '#92ab9e',
+                            callback: function(v) { return v + '%'; }
+                        },
+                        grid: { color: 'rgba(255,255,255,0.06)' }
+                    },
+                    x: {
+                        ticks: { color: '#92ab9e' },
+                        grid: { display: false }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: { color: '#f8fafc', font: { family: 'Outfit', size: 11 } }
+                    }
+                }
+            }
+        });
+    }
+}
+
+// ==========================================================================
+// RENDERIZAÇÃO: IMPORTAÇÃO E GESTÃO DE DE-PARA
+// ==========================================================================
+
+let currentDeParaTab = 'IA'; // 'IA' | 'CENTRAL' | 'UNMAPPED'
+let deParaPage = 1;
+const DEPARA_PAGE_SIZE = 50;
+
+function switchDeParaTab(tab) {
+    currentDeParaTab = tab;
+    deParaPage = 1;
+
+    document.querySelectorAll('.diag-depara-tab-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.getAttribute('data-tab') === tab);
+    });
+
+    renderDeParaTable();
+}
+
+function renderDeParaCounts() {
+    const custom = DiagStorage.getCustomDePara();
+    const countIa = Object.keys(SEED_DEPARA_IA).length + custom.filter(r => r.tipo === 'IA').length;
+    const countCentral = Object.keys(SEED_DEPARA_CENTRAL).length + custom.filter(r => r.tipo === 'CENTRAL').length;
+
+    const elIa = document.getElementById('count-depara-ia');
+    const elCentral = document.getElementById('count-depara-central');
+    const elUnmapped = document.getElementById('count-depara-unmapped');
+    const elTotal = document.getElementById('label-depara-total-regras');
+
+    if (elIa) elIa.textContent = countIa.toLocaleString('pt-BR');
+    if (elCentral) elCentral.textContent = countCentral.toLocaleString('pt-BR');
+    if (elUnmapped) elUnmapped.textContent = '0';
+    if (elTotal) elTotal.textContent = (countIa + countCentral).toLocaleString('pt-BR');
+}
+
+function renderDeParaTable() {
+    const tbody = document.getElementById('tbody-diag-depara');
+    if (!tbody) return;
+
+    renderDeParaCounts();
+
+    const search = (document.getElementById('input-search-depara')?.value || '').toLowerCase().trim();
+    const custom = DiagStorage.getCustomDePara();
+
+    let allRules = [];
+    if (currentDeParaTab === 'IA') {
+        // Regras de IA
+        for (const [k, v] of Object.entries(SEED_DEPARA_IA)) {
+            allRules.push({ tipo: 'IA', chave: k, produto: v.produto, motivo: v.motivo, submotivo: v.submotivo, origem: 'Base' });
+        }
+        for (const c of custom.filter(r => r.tipo === 'IA')) {
+            allRules.unshift({ tipo: 'IA', chave: c.chave_origem, produto: c.dest_produto, motivo: c.dest_motivo, submotivo: c.dest_submotivo, origem: 'Custom' });
+        }
+    } else if (currentDeParaTab === 'CENTRAL') {
+        // Regras da Central
+        for (const [k, v] of Object.entries(SEED_DEPARA_CENTRAL)) {
+            allRules.push({ tipo: 'CENTRAL', chave: k, produto: v.produto, motivo: v.motivo, submotivo: v.submotivo, origem: 'Base' });
+        }
+        for (const c of custom.filter(r => r.tipo === 'CENTRAL')) {
+            allRules.unshift({ tipo: 'CENTRAL', chave: c.chave_origem, produto: c.dest_produto, motivo: c.dest_motivo, submotivo: c.dest_submotivo, origem: 'Custom' });
+        }
+    }
+
+    if (search) {
+        allRules = allRules.filter(r => {
+            return r.chave.toLowerCase().includes(search) ||
+                r.produto.toLowerCase().includes(search) ||
+                r.motivo.toLowerCase().includes(search) ||
+                r.submotivo.toLowerCase().includes(search);
+        });
+    }
+
+    // Paginação simples
+    const totalRules = allRules.length;
+    const startIdx = (deParaPage - 1) * DEPARA_PAGE_SIZE;
+    const pagedRules = allRules.slice(startIdx, startIdx + DEPARA_PAGE_SIZE);
+
+    let html = '';
+    for (const r of pagedRules) {
+        html += `<tr>
+            <td style="font-family: monospace; font-size: 0.78rem; color: #fff;">${r.chave}</td>
+            <td style="font-weight: 600; color: var(--color-primary);">${r.produto}</td>
+            <td>${r.motivo}</td>
+            <td style="color: var(--text-secondary);">${r.submotivo}</td>
+            <td style="text-align: center;">
+                <span class="badge-channel" style="font-size: 0.7rem; background: rgba(255,255,255,0.06);">${r.origem}</span>
+            </td>
+        </tr>`;
+    }
+
+    if (pagedRules.length === 0) {
+        html = '<tr><td colspan="5" style="text-align: center; color: var(--text-muted); padding: 2rem;">Nenhuma regra De-Para encontrada.</td></tr>';
+    }
+
+    tbody.innerHTML = html;
+}
+
+function filterDeParaTable() {
+    deParaPage = 1;
+    renderDeParaTable();
+}
+
+function renderDiagImportView() {
+    renderCoverageMatrix();
+    renderDeParaTable();
+}
+
+// EXPORTAÇÃO EXCEL DO DE-PARA
+function exportDeParaToExcel() {
+    if (typeof XLSX === 'undefined') {
+        showToast('SheetJS não disponível para exportação.', 'error');
+        return;
+    }
+
+    const wb = XLSX.utils.book_new();
+
+    // Sheet 1: IA
+    const dataIa = Object.entries(SEED_DEPARA_IA).map(([chave, v]) => ({
+        CHAVE_ORIGEM_MOTIVO: chave,
+        PRODUTO_NORMALIZADO: v.produto,
+        MOTIVO_NORMALIZADO: v.motivo,
+        SUBMOTIVO_NORMALIZADO: v.submotivo
+    }));
+    const wsIa = XLSX.utils.json_to_sheet(dataIa);
+    XLSX.utils.book_append_sheet(wb, wsIa, 'DEPARA_IA');
+
+    // Sheet 2: Central
+    const dataCentral = Object.entries(SEED_DEPARA_CENTRAL).map(([chave, v]) => {
+        const parts = chave.split(' | ');
+        return {
+            TIPO_CONTATO_ORIGEM: parts[0] || '',
+            MOTIVO_ORIGEM: parts[1] || '',
+            SUBMOTIVO_ORIGEM: parts[2] || '',
+            PRODUTO_NORMALIZADO: v.produto,
+            MOTIVO_NORMALIZADO: v.motivo,
+            SUBMOTIVO_NORMALIZADO: v.submotivo
+        };
+    });
+    const wsCentral = XLSX.utils.json_to_sheet(dataCentral);
+    XLSX.utils.book_append_sheet(wb, wsCentral, 'DEPARA_CENTRAL');
+
+    XLSX.writeFile(wb, 'EmanaPay_Diagnostico_DePara_Completo.xlsx');
+    showToast('Planilha De-Para exportada com sucesso!', 'success');
+}
