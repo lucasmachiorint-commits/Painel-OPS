@@ -66,20 +66,59 @@ CREATE TABLE IF NOT EXISTS diag_depara (
 
 CREATE INDEX IF NOT EXISTS idx_diag_depara_lookup ON diag_depara(env, tipo_origem, chave_origem);
 
--- 4. Tabela de Histórico de Importações (Controle de cobertura de meses)
+-- 4. Tabela de Histórico de Importações (Controle de cobertura de meses e bloqueio de uploads)
 CREATE TABLE IF NOT EXISTS diag_importacoes (
     id BIGSERIAL PRIMARY KEY,
     env TEXT NOT NULL DEFAULT 'hml',
-    mes_ref TEXT NOT NULL,           -- 'AAAA-MM'
+    mes_ref TEXT NOT NULL,           -- 'AAAA-MM' (ex: '2026-08' ou 'Histórico 2026')
     canal TEXT NOT NULL,             -- 'LIGACOES', 'CHAT', 'WHATSAPP', 'URA'
     nome_arquivo TEXT NOT NULL,
     total_linhas INTEGER NOT NULL DEFAULT 0,
+    volume_total INTEGER NOT NULL DEFAULT 0,
+    tickets_processados INTEGER NOT NULL DEFAULT 0,
     usuario_email TEXT,
-    data_importacao TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    CONSTRAINT uq_diag_importacao_mes_canal UNIQUE (env, mes_ref, canal)
+    usuario_nome TEXT DEFAULT '',
+    status TEXT NOT NULL DEFAULT 'ATIVA', -- 'ATIVA' ou 'EXCLUIDA'
+    excluido_por TEXT,
+    excluido_em TIMESTAMPTZ,
+    data_importacao TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
--- 5. Tabela de Configurações do Diagnóstico (Metas e parâmetros globais)
+-- Adiciona colunas caso a tabela já tenha sido criada anteriormente
+ALTER TABLE diag_importacoes ADD COLUMN IF NOT EXISTS volume_total INTEGER NOT NULL DEFAULT 0;
+ALTER TABLE diag_importacoes ADD COLUMN IF NOT EXISTS tickets_processados INTEGER NOT NULL DEFAULT 0;
+ALTER TABLE diag_importacoes ADD COLUMN IF NOT EXISTS usuario_nome TEXT DEFAULT '';
+ALTER TABLE diag_importacoes ADD COLUMN IF NOT EXISTS status TEXT NOT NULL DEFAULT 'ATIVA';
+ALTER TABLE diag_importacoes ADD COLUMN IF NOT EXISTS excluido_por TEXT;
+ALTER TABLE diag_importacoes ADD COLUMN IF NOT EXISTS excluido_em TIMESTAMPTZ;
+
+-- Remove constraint estrita antiga se existir (para permitir exclusão e nova carga)
+ALTER TABLE diag_importacoes DROP CONSTRAINT IF EXISTS uq_diag_importacao_mes_canal;
+
+-- Índice único parcial garantindo apenas 1 carga ATIVA por canal e mês
+CREATE UNIQUE INDEX IF NOT EXISTS uq_diag_importacao_ativa 
+ON diag_importacoes (env, mes_ref, canal) 
+WHERE (status = 'ATIVA');
+
+CREATE INDEX IF NOT EXISTS idx_diag_importacoes_lookup 
+ON diag_importacoes(env, canal, mes_ref, status);
+
+-- 5. Tabela de Auditoria de Ações Administrativas (Exclusões de cargas e meses)
+CREATE TABLE IF NOT EXISTS diag_audit_log (
+    id BIGSERIAL PRIMARY KEY,
+    env TEXT NOT NULL DEFAULT 'hml',
+    acao TEXT NOT NULL,              -- 'EXCLUSAO_CARGA', 'EXCLUSAO_MES', 'EXCLUSAO_BASE_COMPLETA', 'UPLOAD_CARGA'
+    canal TEXT,
+    mes_ref TEXT,
+    detalhes TEXT,
+    usuario_email TEXT,
+    usuario_nome TEXT,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_diag_audit_env ON diag_audit_log(env, created_at DESC);
+
+-- 6. Tabela de Configurações do Diagnóstico (Metas e parâmetros globais)
 CREATE TABLE IF NOT EXISTS diag_config (
     env TEXT PRIMARY KEY,
     meta_sla_pct NUMERIC(5,2) NOT NULL DEFAULT 96.10,
@@ -101,9 +140,10 @@ ALTER TABLE diag_volume ENABLE ROW LEVEL SECURITY;
 ALTER TABLE diag_tickets ENABLE ROW LEVEL SECURITY;
 ALTER TABLE diag_depara ENABLE ROW LEVEL SECURITY;
 ALTER TABLE diag_importacoes ENABLE ROW LEVEL SECURITY;
+ALTER TABLE diag_audit_log ENABLE ROW LEVEL SECURITY;
 ALTER TABLE diag_config ENABLE ROW LEVEL SECURITY;
 
--- Políticas de Leitura: Permitida para qualquer usuário autenticado ou anon do painel
+-- Políticas de Leitura e Escrita
 DO $$ 
 BEGIN
     DROP POLICY IF EXISTS "Leitura diag_volume" ON diag_volume;
@@ -129,6 +169,12 @@ BEGIN
     
     DROP POLICY IF EXISTS "Gravacao diag_importacoes" ON diag_importacoes;
     CREATE POLICY "Gravacao diag_importacoes" ON diag_importacoes FOR ALL USING (true) WITH CHECK (true);
+
+    DROP POLICY IF EXISTS "Leitura diag_audit_log" ON diag_audit_log;
+    CREATE POLICY "Leitura diag_audit_log" ON diag_audit_log FOR SELECT USING (true);
+    
+    DROP POLICY IF EXISTS "Gravacao diag_audit_log" ON diag_audit_log;
+    CREATE POLICY "Gravacao diag_audit_log" ON diag_audit_log FOR ALL USING (true) WITH CHECK (true);
 
     DROP POLICY IF EXISTS "Leitura diag_config" ON diag_config;
     CREATE POLICY "Leitura diag_config" ON diag_config FOR SELECT USING (true);

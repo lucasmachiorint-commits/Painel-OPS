@@ -4099,6 +4099,49 @@ body.light-theme .btn-module-switch:hover {
     border: 1px solid rgba(239, 68, 68, 0.3);
 }
 
+/* ==========================================================================
+   DIAGNÓSTICO: CARDS STATUS PILLS & ADMIN CONTROLS
+   ========================================================================== */
+.diag-card-status-pill {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.35rem 0.6rem;
+    border-radius: 6px;
+    font-size: 0.72rem;
+    font-weight: 600;
+    line-height: 1.2;
+    word-break: break-word;
+}
+.diag-card-status-pill.pending {
+    background: rgba(255, 255, 255, 0.04);
+    color: var(--text-muted);
+    border: 1px dashed rgba(255, 255, 255, 0.15);
+}
+.diag-card-status-pill.loaded {
+    background: rgba(16, 185, 129, 0.12);
+    color: #10b981;
+    border: 1px solid rgba(16, 185, 129, 0.35);
+}
+.diag-btn-danger-subtle {
+    background: rgba(239, 68, 68, 0.12);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    color: #f87171;
+    cursor: pointer;
+    border-radius: 6px;
+    padding: 0.3rem 0.6rem;
+    font-size: 0.75rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    transition: all 0.2s ease;
+}
+.diag-btn-danger-subtle:hover {
+    background: #ef4444;
+    color: #fff;
+    border-color: #ef4444;
+}
+
 </style>
 </head>
 <body class="dark-theme">
@@ -6102,10 +6145,17 @@ body.light-theme .btn-module-switch:hover {
 
                     <!-- SEÇÃO: 4 CARDS DE UPLOAD EXCEL -->
                     <section class="panel glass-panel" style="margin-bottom: 1.5rem; padding: 1.25rem;">
-                        <h3 class="panel-title" style="font-size: 1.05rem; margin-bottom: 1.25rem;">
-                            <i class="fa-solid fa-cloud-arrow-up" style="color: var(--color-primary); margin-right: 0.4rem;"></i>
-                            <span>Carregar Planilha Mensal por Canal (Excel .xlsx / .xls)</span>
-                        </h3>
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; flex-wrap: wrap; gap: 0.5rem;">
+                            <div>
+                                <h3 class="panel-title" style="font-size: 1.05rem; margin: 0;">
+                                    <i class="fa-solid fa-cloud-arrow-up" style="color: var(--color-primary); margin-right: 0.4rem;"></i>
+                                    <span>Carregar Planilha Mensal por Canal (Excel .xlsx / .xls)</span>
+                                </h3>
+                                <p style="font-size: 0.8rem; color: var(--text-secondary); margin: 0.2rem 0 0 0;">
+                                    Cada mês aceita apenas uma carga ativa. Operadores podem carregar apenas meses pendentes.
+                                </p>
+                            </div>
+                        </div>
 
                         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.25rem;">
                             <!-- CARD 1: TABELÃO (CENTRAL / LIGAÇÕES) -->
@@ -6117,7 +6167,7 @@ body.light-theme .btn-module-switch:hover {
                                         </span>
                                         <span class="badge-channel" style="background: rgba(235,92,39,0.15); color: #eb5c27; padding: 0.2rem 0.5rem; border-radius: 6px; font-size: 0.7rem; font-weight: 600;">Central</span>
                                     </div>
-                                    <p style="font-size: 0.78rem; color: var(--text-secondary); margin-bottom: 1rem;">
+                                    <p style="font-size: 0.78rem; color: var(--text-secondary); margin-bottom: 0.75rem;">
                                         Base de chamados da central telefônica. Alimenta volumetria e apuração do SLA de 7 dias.
                                     </p>
                                     
@@ -6129,16 +6179,18 @@ body.light-theme .btn-module-switch:hover {
                                         </select>
                                     </div>
 
-                                    <div id="wrapper-tabelao-mes" style="margin-bottom: 1rem;">
+                                    <div id="wrapper-tabelao-mes" style="margin-bottom: 0.75rem;">
                                         <label style="font-size: 0.75rem; color: var(--text-muted); display: block; margin-bottom: 0.3rem;">Mês de Referência:</label>
-                                        <input type="month" id="input-tabelao-mes" value="2026-08" style="width: 100%; padding: 0.4rem 0.6rem; border-radius: 6px; border: 1px solid var(--border-color); background: rgba(0,0,0,0.3); color: var(--text-primary); font-size: 0.8rem;">
+                                        <input type="month" id="input-tabelao-mes" value="2026-08" onchange="onDiagMonthInputChanged('LIGACOES')" style="width: 100%; padding: 0.4rem 0.6rem; border-radius: 6px; border: 1px solid var(--border-color); background: rgba(0,0,0,0.3); color: var(--text-primary); font-size: 0.8rem;">
                                     </div>
+
+                                    <div id="badge-status-tabelao" style="margin-bottom: 1rem; min-height: 24px;"></div>
                                 </div>
 
                                 <div>
                                     <input type="file" id="file-upload-tabelao" accept=".xlsx,.xls,.csv" style="display: none;" onchange="handleExcelUpload('LIGACOES', this)">
-                                    <button type="button" class="btn btn-primary" onclick="document.getElementById('file-upload-tabelao').click()" style="width: 100%; justify-content: center; font-size: 0.85rem; padding: 0.6rem;">
-                                        <i class="fa-solid fa-file-excel" style="margin-right: 0.4rem;"></i> Selecionar Excel
+                                    <button type="button" id="btn-upload-tabelao" class="btn btn-primary" onclick="triggerDiagUpload('LIGACOES')" style="width: 100%; justify-content: center; font-size: 0.85rem; padding: 0.6rem;">
+                                        <i class="fa-solid fa-file-excel" style="margin-right: 0.4rem;"></i> <span id="label-btn-upload-tabelao">Selecionar Excel</span>
                                     </button>
                                     <div id="status-upload-tabelao" style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.5rem; text-align: center;">Aguardando arquivo</div>
                                 </div>
@@ -6153,20 +6205,22 @@ body.light-theme .btn-module-switch:hover {
                                         </span>
                                         <span class="badge-channel" style="background: rgba(59,130,246,0.15); color: #3b82f6; padding: 0.2rem 0.5rem; border-radius: 6px; font-size: 0.7rem; font-weight: 600;">Chatbot</span>
                                     </div>
-                                    <p style="font-size: 0.78rem; color: var(--text-secondary); margin-bottom: 1rem;">
+                                    <p style="font-size: 0.78rem; color: var(--text-secondary); margin-bottom: 0.75rem;">
                                         Arquivo export_monitoring_chat do mês vigente com tabulações automáticas.
                                     </p>
                                     
-                                    <div style="margin-bottom: 1rem;">
+                                    <div style="margin-bottom: 0.75rem;">
                                         <label style="font-size: 0.75rem; color: var(--text-muted); display: block; margin-bottom: 0.3rem;">Mês de Referência:</label>
-                                        <input type="month" id="input-chat-mes" value="2026-08" style="width: 100%; padding: 0.4rem 0.6rem; border-radius: 6px; border: 1px solid var(--border-color); background: rgba(0,0,0,0.3); color: var(--text-primary); font-size: 0.8rem;">
+                                        <input type="month" id="input-chat-mes" value="2026-08" onchange="onDiagMonthInputChanged('CHAT')" style="width: 100%; padding: 0.4rem 0.6rem; border-radius: 6px; border: 1px solid var(--border-color); background: rgba(0,0,0,0.3); color: var(--text-primary); font-size: 0.8rem;">
                                     </div>
+
+                                    <div id="badge-status-chat" style="margin-bottom: 1rem; min-height: 24px;"></div>
                                 </div>
 
                                 <div>
                                     <input type="file" id="file-upload-chat" accept=".xlsx,.xls,.csv" style="display: none;" onchange="handleExcelUpload('CHAT', this)">
-                                    <button type="button" class="btn btn-primary" onclick="document.getElementById('file-upload-chat').click()" style="width: 100%; justify-content: center; font-size: 0.85rem; padding: 0.6rem;">
-                                        <i class="fa-solid fa-file-excel" style="margin-right: 0.4rem;"></i> Selecionar Excel
+                                    <button type="button" id="btn-upload-chat" class="btn btn-primary" onclick="triggerDiagUpload('CHAT')" style="width: 100%; justify-content: center; font-size: 0.85rem; padding: 0.6rem;">
+                                        <i class="fa-solid fa-file-excel" style="margin-right: 0.4rem;"></i> <span id="label-btn-upload-chat">Selecionar Excel</span>
                                     </button>
                                     <div id="status-upload-chat" style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.5rem; text-align: center;">Aguardando arquivo</div>
                                 </div>
@@ -6181,20 +6235,22 @@ body.light-theme .btn-module-switch:hover {
                                         </span>
                                         <span class="badge-channel" style="background: rgba(16,185,129,0.15); color: #10b981; padding: 0.2rem 0.5rem; border-radius: 6px; font-size: 0.7rem; font-weight: 600;">WhatsApp</span>
                                     </div>
-                                    <p style="font-size: 0.78rem; color: var(--text-secondary); margin-bottom: 1rem;">
+                                    <p style="font-size: 0.78rem; color: var(--text-secondary); margin-bottom: 0.75rem;">
                                         Arquivo export_monitoring_whatsapp do mês vigente com tabulações automáticas.
                                     </p>
                                     
-                                    <div style="margin-bottom: 1rem;">
+                                    <div style="margin-bottom: 0.75rem;">
                                         <label style="font-size: 0.75rem; color: var(--text-muted); display: block; margin-bottom: 0.3rem;">Mês de Referência:</label>
-                                        <input type="month" id="input-whatsapp-mes" value="2026-08" style="width: 100%; padding: 0.4rem 0.6rem; border-radius: 6px; border: 1px solid var(--border-color); background: rgba(0,0,0,0.3); color: var(--text-primary); font-size: 0.8rem;">
+                                        <input type="month" id="input-whatsapp-mes" value="2026-08" onchange="onDiagMonthInputChanged('WHATSAPP')" style="width: 100%; padding: 0.4rem 0.6rem; border-radius: 6px; border: 1px solid var(--border-color); background: rgba(0,0,0,0.3); color: var(--text-primary); font-size: 0.8rem;">
                                     </div>
+
+                                    <div id="badge-status-whatsapp" style="margin-bottom: 1rem; min-height: 24px;"></div>
                                 </div>
 
                                 <div>
                                     <input type="file" id="file-upload-whatsapp" accept=".xlsx,.xls,.csv" style="display: none;" onchange="handleExcelUpload('WHATSAPP', this)">
-                                    <button type="button" class="btn btn-primary" onclick="document.getElementById('file-upload-whatsapp').click()" style="width: 100%; justify-content: center; font-size: 0.85rem; padding: 0.6rem;">
-                                        <i class="fa-solid fa-file-excel" style="margin-right: 0.4rem;"></i> Selecionar Excel
+                                    <button type="button" id="btn-upload-whatsapp" class="btn btn-primary" onclick="triggerDiagUpload('WHATSAPP')" style="width: 100%; justify-content: center; font-size: 0.85rem; padding: 0.6rem;">
+                                        <i class="fa-solid fa-file-excel" style="margin-right: 0.4rem;"></i> <span id="label-btn-upload-whatsapp">Selecionar Excel</span>
                                     </button>
                                     <div id="status-upload-whatsapp" style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.5rem; text-align: center;">Aguardando arquivo</div>
                                 </div>
@@ -6209,24 +6265,71 @@ body.light-theme .btn-module-switch:hover {
                                         </span>
                                         <span class="badge-channel" style="background: rgba(168,85,247,0.15); color: #a855f7; padding: 0.2rem 0.5rem; border-radius: 6px; font-size: 0.7rem; font-weight: 600;">Voz Virtual</span>
                                     </div>
-                                    <p style="font-size: 0.78rem; color: var(--text-secondary); margin-bottom: 1rem;">
+                                    <p style="font-size: 0.78rem; color: var(--text-secondary); margin-bottom: 0.75rem;">
                                         Arquivo export_monitoring_ura do mês vigente com intenções e motivos de voz.
                                     </p>
                                     
-                                    <div style="margin-bottom: 1rem;">
+                                    <div style="margin-bottom: 0.75rem;">
                                         <label style="font-size: 0.75rem; color: var(--text-muted); display: block; margin-bottom: 0.3rem;">Mês de Referência:</label>
-                                        <input type="month" id="input-ura-mes" value="2026-08" style="width: 100%; padding: 0.4rem 0.6rem; border-radius: 6px; border: 1px solid var(--border-color); background: rgba(0,0,0,0.3); color: var(--text-primary); font-size: 0.8rem;">
+                                        <input type="month" id="input-ura-mes" value="2026-08" onchange="onDiagMonthInputChanged('URA')" style="width: 100%; padding: 0.4rem 0.6rem; border-radius: 6px; border: 1px solid var(--border-color); background: rgba(0,0,0,0.3); color: var(--text-primary); font-size: 0.8rem;">
                                     </div>
+
+                                    <div id="badge-status-ura" style="margin-bottom: 1rem; min-height: 24px;"></div>
                                 </div>
 
                                 <div>
                                     <input type="file" id="file-upload-ura" accept=".xlsx,.xls,.csv" style="display: none;" onchange="handleExcelUpload('URA', this)">
-                                    <button type="button" class="btn btn-primary" onclick="document.getElementById('file-upload-ura').click()" style="width: 100%; justify-content: center; font-size: 0.85rem; padding: 0.6rem;">
-                                        <i class="fa-solid fa-file-excel" style="margin-right: 0.4rem;"></i> Selecionar Excel
+                                    <button type="button" id="btn-upload-ura" class="btn btn-primary" onclick="triggerDiagUpload('URA')" style="width: 100%; justify-content: center; font-size: 0.85rem; padding: 0.6rem;">
+                                        <i class="fa-solid fa-file-excel" style="margin-right: 0.4rem;"></i> <span id="label-btn-upload-ura">Selecionar Excel</span>
                                     </button>
                                     <div id="status-upload-ura" style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.5rem; text-align: center;">Aguardando arquivo</div>
                                 </div>
                             </div>
+                        </div>
+                    </section>
+
+                    <!-- SEÇÃO: NOVO QUADRO CARGAS REALIZADAS -->
+                    <section class="panel glass-panel" id="section-diag-cargas-realizadas" style="margin-bottom: 1.5rem; padding: 1.25rem;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.75rem;">
+                            <div>
+                                <h3 class="panel-title" style="font-size: 1.05rem; margin: 0; display: flex; align-items: center; gap: 0.5rem;">
+                                    <i class="fa-solid fa-list-check" style="color: var(--color-primary);"></i>
+                                    <span>Cargas Mensais Realizadas</span>
+                                    <span class="badge" id="diag-cargas-count">0</span>
+                                </h3>
+                                <p style="font-size: 0.8rem; color: var(--text-secondary); margin: 0.2rem 0 0 0;">
+                                    Relação de arquivos carregados. Apenas Administradores podem excluir uma carga para liberar nova inclusão no mesmo mês.
+                                </p>
+                            </div>
+                            <div style="display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;">
+                                <select id="diag-filter-cargas-canal" onchange="renderCargasRealizadasTable()" style="padding: 0.4rem 0.65rem; border-radius: 6px; border: 1px solid var(--border-color); background: rgba(255,255,255,0.05); color: var(--text-primary); font-size: 0.8rem; cursor: pointer;">
+                                    <option value="TODOS">Todos os Canais</option>
+                                    <option value="LIGACOES">Tabelão (Ligações)</option>
+                                    <option value="CHAT">IA - Chat</option>
+                                    <option value="WHATSAPP">IA - WhatsApp</option>
+                                    <option value="URA">IA - URA</option>
+                                </select>
+                                <input type="text" id="diag-search-cargas" oninput="renderCargasRealizadasTable()" placeholder="Buscar por arquivo ou usuário..." style="padding: 0.4rem 0.65rem; border-radius: 6px; border: 1px solid var(--border-color); background: rgba(255,255,255,0.05); color: var(--text-primary); font-size: 0.8rem; width: 220px; outline: none;">
+                            </div>
+                        </div>
+                        <div class="table-responsive" style="max-height: 320px; overflow-y: auto;">
+                            <table class="fte-table" id="table-diag-cargas" style="font-size: 0.82rem;">
+                                <thead>
+                                    <tr>
+                                        <th style="width: 16%;">CANAL</th>
+                                        <th style="width: 12%;">MÊS REF.</th>
+                                        <th style="width: 26%;">ARQUIVO</th>
+                                        <th style="width: 10%; text-align: right;">LINHAS</th>
+                                        <th style="width: 11%; text-align: right;">VOLUME</th>
+                                        <th style="width: 13%;">RESPONSÁVEL</th>
+                                        <th style="width: 12%;">DATA / HORA</th>
+                                        <th class="col-acao-excluir" style="width: 8%; text-align: center;">AÇÕES</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tbody-diag-cargas">
+                                    <!-- Populado dinamicamente -->
+                                </tbody>
+                            </table>
                         </div>
                     </section>
 
@@ -6252,6 +6355,71 @@ body.light-theme .btn-module-switch:hover {
                                     <!-- Populado dinamicamente com badges de status -->
                                 </tbody>
                             </table>
+                        </div>
+                    </section>
+
+                    <!-- ZONA ADMINISTRATIVA: EXCLUSÃO DE DADOS (APENAS ADMIN) -->
+                    <section class="panel glass-panel" id="section-diag-admin-zone" data-permissao="ADMIN" style="margin-bottom: 1.5rem; padding: 1.25rem; border-left: 3px solid #ef4444; background: rgba(239, 68, 68, 0.03);">
+                        <div style="margin-bottom: 1rem;">
+                            <h3 class="panel-title" style="font-size: 1.05rem; margin: 0; display: flex; align-items: center; gap: 0.5rem; color: #f87171;">
+                                <i class="fa-solid fa-shield-halved"></i>
+                                <span>Zona Administrativa - Gestão e Exclusão de Dados</span>
+                                <span class="badge" style="background: rgba(239,68,68,0.2); color: #f87171; font-size: 0.7rem;">ADMIN ONLY</span>
+                            </h3>
+                            <p style="font-size: 0.8rem; color: var(--text-secondary); margin: 0.2rem 0 0 0;">
+                                Ações irreversíveis de exclusão de volumes e tickets do Diagnóstico do Cliente. As regras cadastradas no motor De-Para são preservadas.
+                            </p>
+                        </div>
+
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.25rem;">
+                            <!-- CARD ADMIN 1: EXCLUIR DADOS DE UM MÊS ESPECÍFICO -->
+                            <div style="background: rgba(0,0,0,0.25); border: 1px solid rgba(239, 68, 68, 0.25); border-radius: 10px; padding: 1.15rem; display: flex; flex-direction: column; justify-content: space-between;">
+                                <div>
+                                    <h4 style="font-size: 0.92rem; font-weight: 700; color: #fff; margin-bottom: 0.4rem; display: flex; align-items: center; gap: 0.4rem;">
+                                        <i class="fa-solid fa-calendar-xmark" style="color: #f87171;"></i> Excluir Dados por Mês
+                                    </h4>
+                                    <p style="font-size: 0.78rem; color: var(--text-secondary); margin-bottom: 1rem;">
+                                        Remove os volumes apurados e tickets vinculados ao mês selecionado, liberando novos uploads.
+                                    </p>
+                                    <div style="display: flex; gap: 0.6rem; margin-bottom: 1rem; flex-wrap: wrap;">
+                                        <div style="flex: 1; min-width: 140px;">
+                                            <label style="font-size: 0.73rem; color: var(--text-muted); display: block; margin-bottom: 0.25rem;">Mês de Referência:</label>
+                                            <input type="month" id="admin-delete-mes" value="2026-08" style="width: 100%; padding: 0.4rem 0.6rem; border-radius: 6px; border: 1px solid var(--border-color); background: rgba(0,0,0,0.4); color: var(--text-primary); font-size: 0.82rem;">
+                                        </div>
+                                        <div style="flex: 1; min-width: 150px;">
+                                            <label style="font-size: 0.73rem; color: var(--text-muted); display: block; margin-bottom: 0.25rem;">Canal:</label>
+                                            <select id="admin-delete-canal" style="width: 100%; padding: 0.4rem 0.6rem; border-radius: 6px; border: 1px solid var(--border-color); background: rgba(0,0,0,0.4); color: var(--text-primary); font-size: 0.82rem;">
+                                                <option value="TODOS">Todos os Canais</option>
+                                                <option value="LIGACOES">Tabelão (Ligações)</option>
+                                                <option value="CHAT">IA - Chat</option>
+                                                <option value="WHATSAPP">IA - WhatsApp</option>
+                                                <option value="URA">IA - URA</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <button type="button" class="btn" onclick="openModalConfirmDeleteMes()" style="background: rgba(239,68,68,0.15); border: 1px solid #ef4444; color: #f87171; font-size: 0.82rem; padding: 0.55rem 1rem; font-weight: 600; border-radius: 6px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 0.4rem;">
+                                    <i class="fa-solid fa-trash-can"></i> Excluir Dados do Mês
+                                </button>
+                            </div>
+
+                            <!-- CARD ADMIN 2: EXCLUIR BASE COMPLETA DO DIAGNÓSTICO -->
+                            <div style="background: rgba(0,0,0,0.25); border: 1px solid rgba(239, 68, 68, 0.4); border-radius: 10px; padding: 1.15rem; display: flex; flex-direction: column; justify-content: space-between;">
+                                <div>
+                                    <h4 style="font-size: 0.92rem; font-weight: 700; color: #fca5a5; margin-bottom: 0.4rem; display: flex; align-items: center; gap: 0.4rem;">
+                                        <i class="fa-solid fa-triangle-exclamation" style="color: #ef4444;"></i> Limpeza Total da Base
+                                    </h4>
+                                    <p style="font-size: 0.78rem; color: var(--text-secondary); margin-bottom: 1rem;">
+                                        Exclui <strong>todos os volumes apurados e tickets</strong> de todos os meses e canais. Regras De-Para são preservadas.
+                                    </p>
+                                    <div style="background: rgba(239,68,68,0.08); border: 1px dashed rgba(239,68,68,0.3); border-radius: 6px; padding: 0.65rem 0.85rem; margin-bottom: 1rem; font-size: 0.75rem; color: #fca5a5;">
+                                        <i class="fa-solid fa-circle-exclamation" style="margin-right: 0.3rem;"></i> Exige confirmação por palavra-chave de segurança.
+                                    </div>
+                                </div>
+                                <button type="button" class="btn" onclick="openModalConfirmDeleteAll()" style="background: #ef4444; border: 1px solid #dc2626; color: #fff; font-size: 0.82rem; padding: 0.55rem 1rem; font-weight: 700; border-radius: 6px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 0.4rem;">
+                                    <i class="fa-solid fa-bomb"></i> Zerar Toda a Base de Diagnóstico
+                                </button>
+                            </div>
                         </div>
                     </section>
 
@@ -6817,6 +6985,83 @@ body.light-theme .btn-module-switch:hover {
                 <button type="button" class="btn btn-secondary" onclick="closeConfirmProjectionModal()">Cancelar</button>
                 <button type="button" class="btn btn-primary" id="btn-submit-confirm-sizing" onclick="confirmSizingProjection()" style="background: var(--color-success); border-color: var(--color-success); color: #fff; font-weight: 700; display: inline-flex; align-items: center; gap: 0.45rem; padding: 0.55rem 1.25rem; border-radius: 8px; cursor: pointer;">
                     <i class="fa-solid fa-circle-check"></i> Sim, Confirmar e Fechar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL CONFIRMAR EXCLUSÃO DE CARGA INDIVIDUAL -->
+    <div id="modal-diag-confirm-delete-carga" class="modal-overlay" style="display: none;" onclick="if(event.target === this) closeModalConfirmDeleteCarga()">
+        <div class="modal-content sizing-modal-box" style="max-width: 460px;">
+            <div class="modal-header">
+                <h3>
+                    <i class="fa-solid fa-trash-can" style="color: #f43f5e;"></i> Excluir Carga Mensal
+                </h3>
+                <button type="button" class="modal-close" onclick="closeModalConfirmDeleteCarga()">&times;</button>
+            </div>
+            <p class="sizing-modal-desc">
+                Deseja realmente excluir a carga de <strong id="modal-delete-carga-canal" style="color: var(--text-primary);">-</strong> referente a <strong id="modal-delete-carga-mes" style="color: var(--text-primary);">-</strong>?
+            </p>
+            <div class="sizing-modal-callout" style="background: rgba(244, 63, 94, 0.08); border-color: rgba(244, 63, 94, 0.25); color: #f43f5e; margin-bottom: 1.25rem;">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+                <span>Os dados de volumetria e tickets vinculados serão removidos da base. O mês voltará ao estado <strong>Pendente</strong>, permitindo um novo upload.</span>
+            </div>
+            <div class="sizing-modal-actions">
+                <button type="button" class="btn btn-secondary" onclick="closeModalConfirmDeleteCarga()">Cancelar</button>
+                <button type="button" class="btn btn-danger" id="btn-confirm-delete-carga" onclick="confirmDeleteCarga()" style="background: #f43f5e; border-color: #f43f5e; color: #fff; font-weight: 700; display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.55rem 1.25rem; border-radius: 8px;">
+                    <i class="fa-solid fa-trash-can"></i> Sim, Excluir Carga
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL CONFIRMAR EXCLUSÃO DE DADOS DO MÊS -->
+    <div id="modal-diag-confirm-delete-mes" class="modal-overlay" style="display: none;" onclick="if(event.target === this) closeModalConfirmDeleteMes()">
+        <div class="modal-content sizing-modal-box" style="max-width: 480px;">
+            <div class="modal-header">
+                <h3>
+                    <i class="fa-solid fa-calendar-xmark" style="color: #ef4444;"></i> Excluir Dados do Mês
+                </h3>
+                <button type="button" class="modal-close" onclick="closeModalConfirmDeleteMes()">&times;</button>
+            </div>
+            <p class="sizing-modal-desc">
+                Confirma a exclusão dos dados de <strong id="modal-delete-mes-alvo" style="color: var(--text-primary);">-</strong> no canal <strong id="modal-delete-canal-alvo" style="color: var(--text-primary);">-</strong>?
+            </p>
+            <div class="sizing-modal-callout" style="background: rgba(239, 68, 68, 0.08); border-color: rgba(239, 68, 68, 0.25); color: #ef4444; margin-bottom: 1.25rem;">
+                <i class="fa-solid fa-circle-exclamation"></i>
+                <span>Esta ação removerá todos os volumes consolidados e tickets deste período, zerando os indicadores no Dashboard até que um novo upload seja feito.</span>
+            </div>
+            <div class="sizing-modal-actions">
+                <button type="button" class="btn btn-secondary" onclick="closeModalConfirmDeleteMes()">Cancelar</button>
+                <button type="button" class="btn btn-danger" id="btn-confirm-delete-mes" onclick="confirmDeleteMes()" style="background: #ef4444; border-color: #dc2626; color: #fff; font-weight: 700; display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.55rem 1.25rem; border-radius: 8px;">
+                    <i class="fa-solid fa-trash-can"></i> Excluir Dados
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL CONFIRMAR EXCLUSÃO TOTAL DA BASE DE DIAGNÓSTICO -->
+    <div id="modal-diag-confirm-delete-all" class="modal-overlay" style="display: none;" onclick="if(event.target === this) closeModalConfirmDeleteAll()">
+        <div class="modal-content sizing-modal-box" style="max-width: 500px;">
+            <div class="modal-header">
+                <h3>
+                    <i class="fa-solid fa-bomb" style="color: #ef4444;"></i> Exclusão Total da Base
+                </h3>
+                <button type="button" class="modal-close" onclick="closeModalConfirmDeleteAll()">&times;</button>
+            </div>
+            <p class="sizing-modal-desc">
+                Esta ação é <strong style="color: #ef4444;">irreversível</strong> e apagará <strong>todos os volumes apurados, tickets e cargas registradas</strong> de todos os meses e canais. As regras de mapeamento De-Para serão preservadas.
+            </p>
+            <div style="margin-bottom: 1.25rem;">
+                <label style="font-size: 0.8rem; color: var(--text-secondary); display: block; margin-bottom: 0.4rem;">
+                    Para confirmar, digite <span style="font-family: monospace; font-weight: 700; color: #ef4444; background: rgba(239,68,68,0.1); padding: 0.15rem 0.4rem; border-radius: 4px;">EXCLUIR</span> no campo abaixo:
+                </label>
+                <input type="text" id="input-confirm-delete-all-key" oninput="checkDeleteAllInput()" placeholder="Digite EXCLUIR" autocomplete="off" style="width: 100%; padding: 0.55rem 0.85rem; border-radius: 8px; border: 1px solid var(--border-color); background: rgba(0,0,0,0.4); color: var(--text-primary); font-size: 0.9rem; outline: none;">
+            </div>
+            <div class="sizing-modal-actions">
+                <button type="button" class="btn btn-secondary" onclick="closeModalConfirmDeleteAll()">Cancelar</button>
+                <button type="button" class="btn btn-danger" id="btn-submit-delete-all" disabled onclick="confirmDeleteAll()" style="background: #ef4444; border-color: #dc2626; color: #fff; font-weight: 700; display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.55rem 1.25rem; border-radius: 8px; opacity: 0.4; cursor: not-allowed;">
+                    <i class="fa-solid fa-triangle-exclamation"></i> Confirmar Exclusão Total
                 </button>
             </div>
         </div>
@@ -9061,7 +9306,7 @@ async function forceResetGlobalState() {
         if (error) {
             showToast(`Erro ao publicar base no Supabase: ${error.message}`, 'error', 8000);
         } else {
-            showToast('âœ… Sua visão atual foi publicada com sucesso como a base global para todos!', 'success', 6000);
+            showToast('✅ Sua visão atual foi publicada com sucesso como a base global para todos!', 'success', 6000);
             updateRealtimeStatusUI('SUBSCRIBED');
         }
     } catch (err) {
@@ -11585,7 +11830,7 @@ function submitAddActivityModal() {
         renderAutomationsView();
     }
 
-    showToast(`âœ… ${t('toast_activity_added', 'Atividade adicionada com sucesso!')}`, 'success', 3500);
+    showToast(`✅ ${t('toast_activity_added', 'Atividade adicionada com sucesso!')}`, 'success', 3500);
 }
 
 // NEW PROCESS MANAGEMENT (FALLBACK)
@@ -15760,7 +16005,7 @@ function renderSizingView() {
                 icon = 'âš ï¸ ';
                 statusTag = 'Reaberto';
             } else if (isConf) {
-                icon = 'âœ… ';
+                icon = '✅ ';
                 statusTag = 'Confirmado';
             } else if (isLatest) {
                 icon = '📅 ';
@@ -15827,7 +16072,7 @@ function renderSizingView() {
                 const confInfo = state.sizingConfirmedMonths[curMonth];
                 const dataFmt = confInfo?.confirmedAt ? new Date(confInfo.confirmedAt).toLocaleString('pt-BR') : '';
                 if (elHistoryText) {
-                    elHistoryText.innerHTML = `âœ… Projeção de <strong>${formatMonthName(curMonth)}</strong> <strong>confirmada e fechada</strong>${dataFmt ? ` em ${dataFmt}` : ''} (Somente Leitura).`;
+                    elHistoryText.innerHTML = `✅ Projeção de <strong>${formatMonthName(curMonth)}</strong> <strong>confirmada e fechada</strong>${dataFmt ? ` em ${dataFmt}` : ''} (Somente Leitura).`;
                 }
                 if (btnUnlock) btnUnlock.style.display = 'inline-flex';
                 if (btnRelock) btnRelock.style.display = 'none';
@@ -16061,7 +16306,7 @@ function importSizingVolumes(file) {
             
             if (updatedCount > 0) {
                 renderSizingView();
-                showToast(`âœ… ${updatedCount} parâmetros importados da planilha! (${summary.join(', ')})`, 'success', 6000);
+                showToast(`✅ ${updatedCount} parâmetros importados da planilha! (${summary.join(', ')})`, 'success', 6000);
             } else {
                 showToast('Aviso: Nenhuma coluna correspondente identificada na planilha.', 'warning', 8000);
             }
@@ -16154,26 +16399,379 @@ const DiagStorage = {
             return [];
         }
     },
-    addImportacaoLog(log) {
+    getCargaAtiva(canal, mes) {
+        if (!mes) return null;
         const list = this.getImportacoes();
-        list.unshift({ ...log, id: 'imp_' + Date.now(), data_hora: new Date().toISOString() });
-        localStorage.setItem(DIAG_STORAGE_KEYS.IMPORTS, JSON.stringify(list.slice(0, 100)));
+        return list.find(imp => imp.canal === canal && imp.mes_ref === mes && (imp.status === 'ATIVA' || !imp.status)) || null;
+    },
+    isMesCarregado(canal, mes) {
+        if (!mes) return false;
+        const ativa = this.getCargaAtiva(canal, mes);
+        if (ativa) return true;
+        const vols = this.getVolume();
+        return vols.some(v => v.canal === canal && v.mes === mes);
+    },
+    listarCargas(filtros = {}) {
+        let list = this.getImportacoes().filter(imp => (imp.status === 'ATIVA' || !imp.status));
+        if (filtros.canal && filtros.canal !== 'TODOS') {
+            list = list.filter(imp => imp.canal === filtros.canal);
+        }
+        if (filtros.busca) {
+            const q = filtros.busca.toLowerCase().trim();
+            list = list.filter(imp =>
+                (imp.nome_arquivo || '').toLowerCase().includes(q) ||
+                (imp.usuario_nome || '').toLowerCase().includes(q) ||
+                (imp.usuario_email || '').toLowerCase().includes(q) ||
+                (imp.mes_ref || '').toLowerCase().includes(q)
+            );
+        }
+        return list.sort((a, b) => new Date(b.data_importacao || b.data_hora || 0) - new Date(a.data_importacao || a.data_hora || 0));
+    },
+    registrarCarga(meta) {
+        const list = this.getImportacoes();
+        const userEmail = (typeof currentUser !== 'undefined' && currentUser && currentUser.email) ? currentUser.email : '';
+        const userNome = (typeof currentUser !== 'undefined' && currentUser && currentUser.nome) ? currentUser.nome : 'Usuário';
+
+        // Marca qualquer carga ATIVA anterior do mesmo canal e mês como EXCLUIDA
+        list.forEach(imp => {
+            if (imp.canal === meta.canal && imp.mes_ref === meta.mes_ref && (imp.status === 'ATIVA' || !imp.status)) {
+                imp.status = 'EXCLUIDA';
+                imp.excluido_por = userNome || userEmail;
+                imp.excluido_em = new Date().toISOString();
+            }
+        });
+
+        const novaCarga = {
+            id: 'imp_' + Date.now() + '_' + Math.random().toString(36).substring(2, 7),
+            canal: meta.canal,
+            mes_ref: meta.mes_ref,
+            nome_arquivo: meta.nome_arquivo || 'planilha.xlsx',
+            total_linhas: Number(meta.total_linhas || 0),
+            volume_total: Number(meta.volume_total || 0),
+            tickets_processados: Number(meta.tickets_processados || 0),
+            usuario_email: userEmail,
+            usuario_nome: userNome,
+            status: 'ATIVA',
+            data_importacao: new Date().toISOString(),
+            excluido_por: null,
+            excluido_em: null
+        };
+
+        list.unshift(novaCarga);
+        localStorage.setItem(DIAG_STORAGE_KEYS.IMPORTS, JSON.stringify(list));
+        this.syncSupabaseImportacao(novaCarga);
+        return novaCarga;
+    },
+    excluirCarga(canal, mes) {
+        if (!verificarPermissao('ADMIN')) {
+            alert('Acesso negado: Apenas Administradores podem excluir cargas mensais.');
+            return false;
+        }
+        const userIdentifier = (typeof currentUser !== 'undefined' && currentUser ? (currentUser.nome || currentUser.email || 'Admin') : 'Admin');
+
+        // 1. Marca status como EXCLUIDA
+        const list = this.getImportacoes();
+        list.forEach(imp => {
+            if (imp.canal === canal && imp.mes_ref === mes && (imp.status === 'ATIVA' || !imp.status)) {
+                imp.status = 'EXCLUIDA';
+                imp.excluido_por = userIdentifier;
+                imp.excluido_em = new Date().toISOString();
+            }
+        });
+        localStorage.setItem(DIAG_STORAGE_KEYS.IMPORTS, JSON.stringify(list));
+
+        // 2. Remove volumetria correspondente
+        const volumes = this.getVolume().filter(v => !(v.canal === canal && v.mes === mes));
+        this.saveVolume(volumes);
+
+        // 3. Se for Ligações, remove tickets apurados daquele mês
+        if (canal === 'LIGACOES') {
+            const tickets = this.getTickets().filter(t => t.mes_fechamento !== mes);
+            this.saveTickets(tickets);
+        }
+
+        // 4. Sincroniza exclusão no Supabase
+        this.syncSupabaseExclusaoCarga(canal, mes);
+
+        // 5. Atualiza interface
+        if (typeof updateUploadCardsStatus === 'function') updateUploadCardsStatus();
+        if (typeof renderCargasRealizadasTable === 'function') renderCargasRealizadasTable();
+        if (typeof renderCoverageMatrix === 'function') renderCoverageMatrix();
+        if (typeof renderDeParaCounts === 'function') renderDeParaCounts();
+        const diagDashboardView = document.getElementById('view-diag-dashboard');
+        if (diagDashboardView && diagDashboardView.style.display !== 'none' && typeof renderDiagDashboardView === 'function') {
+            renderDiagDashboardView();
+        }
+
+        return true;
+    },
+    excluirDadosMes(mes, canal = 'TODOS') {
+        if (!verificarPermissao('ADMIN')) {
+            alert('Acesso negado: Apenas Administradores podem excluir dados.');
+            return false;
+        }
+        const userIdentifier = (typeof currentUser !== 'undefined' && currentUser ? (currentUser.nome || currentUser.email || 'Admin') : 'Admin');
+
+        // 1. Marca cargas como excluídas
+        const list = this.getImportacoes();
+        list.forEach(imp => {
+            if (imp.mes_ref === mes && (canal === 'TODOS' || imp.canal === canal) && (imp.status === 'ATIVA' || !imp.status)) {
+                imp.status = 'EXCLUIDA';
+                imp.excluido_por = userIdentifier;
+                imp.excluido_em = new Date().toISOString();
+            }
+        });
+        localStorage.setItem(DIAG_STORAGE_KEYS.IMPORTS, JSON.stringify(list));
+
+        // 2. Remove volumes
+        const volumes = this.getVolume().filter(v => {
+            if (v.mes !== mes) return true;
+            if (canal === 'TODOS') return false;
+            return v.canal !== canal;
+        });
+        this.saveVolume(volumes);
+
+        // 3. Remove tickets se Ligações ou Todos
+        if (canal === 'TODOS' || canal === 'LIGACOES') {
+            const tickets = this.getTickets().filter(t => t.mes_fechamento !== mes);
+            this.saveTickets(tickets);
+        }
+
+        // 4. Sincroniza exclusão no Supabase
+        this.syncSupabaseExclusaoMes(mes, canal);
+
+        // 5. Atualiza telas
+        if (typeof updateUploadCardsStatus === 'function') updateUploadCardsStatus();
+        if (typeof renderCargasRealizadasTable === 'function') renderCargasRealizadasTable();
+        if (typeof renderCoverageMatrix === 'function') renderCoverageMatrix();
+        if (typeof renderDeParaCounts === 'function') renderDeParaCounts();
+        const diagDashboardView = document.getElementById('view-diag-dashboard');
+        if (diagDashboardView && diagDashboardView.style.display !== 'none' && typeof renderDiagDashboardView === 'function') {
+            renderDiagDashboardView();
+        }
+
+        return true;
+    },
+    excluirBaseCompleta() {
+        if (!verificarPermissao('ADMIN')) {
+            alert('Acesso negado: Apenas Administradores podem zerar a base.');
+            return false;
+        }
+        const userIdentifier = (typeof currentUser !== 'undefined' && currentUser ? (currentUser.nome || currentUser.email || 'Admin') : 'Admin');
+
+        // Marca todas as cargas como EXCLUIDA
+        const list = this.getImportacoes();
+        list.forEach(imp => {
+            if (imp.status === 'ATIVA' || !imp.status) {
+                imp.status = 'EXCLUIDA';
+                imp.excluido_por = userIdentifier;
+                imp.excluido_em = new Date().toISOString();
+            }
+        });
+        localStorage.setItem(DIAG_STORAGE_KEYS.IMPORTS, JSON.stringify(list));
+
+        // Zera volumes e tickets
+        this.saveVolume([]);
+        this.saveTickets([]);
+
+        // Sincroniza exclusão total no Supabase
+        this.syncSupabaseExclusaoTotal();
+
+        // Atualiza telas
+        if (typeof updateUploadCardsStatus === 'function') updateUploadCardsStatus();
+        if (typeof renderCargasRealizadasTable === 'function') renderCargasRealizadasTable();
+        if (typeof renderCoverageMatrix === 'function') renderCoverageMatrix();
+        if (typeof renderDeParaCounts === 'function') renderDeParaCounts();
+        const diagDashboardView = document.getElementById('view-diag-dashboard');
+        if (diagDashboardView && diagDashboardView.style.display !== 'none' && typeof renderDiagDashboardView === 'function') {
+            renderDiagDashboardView();
+        }
+
+        return true;
     },
     async syncSupabaseVolume(volumeList) {
         if (!supabase) return;
         try {
-            // Sincronização assíncrona não bloqueante
-            // Se a tabela diag_volume existir no Supabase, envia em lote
+            // Sincronização em lotes de 100 registros
+            if (Array.isArray(volumeList) && volumeList.length > 0) {
+                const rows = volumeList.map(v => ({
+                    env: 'hml',
+                    mes_ref: v.mes,
+                    canal: v.canal,
+                    norm_produto: v.produto || 'Não Especificado',
+                    norm_motivo: v.motivo || 'Não Especificado',
+                    norm_submotivo: v.submotivo || '-',
+                    volume: Number(v.volume || 1),
+                    updated_at: new Date().toISOString()
+                }));
+                for (let i = 0; i < rows.length; i += 100) {
+                    await supabase.from('diag_volume').upsert(rows.slice(i, i + 100), { onConflict: 'env,mes_ref,canal,orig_produto,orig_motivo,orig_submotivo' });
+                }
+            }
         } catch (e) {
-            // Silencioso para fallback em localStorage
+            console.warn('[DiagStorage] Fallback ativo para volumes no localStorage:', e);
         }
     },
     async syncSupabaseTickets(ticketsList) {
         if (!supabase) return;
         try {
-            // Sincronização assíncrona não bloqueante
+            if (Array.isArray(ticketsList) && ticketsList.length > 0) {
+                const rows = ticketsList.slice(0, 1000).map(t => ({
+                    env: 'hml',
+                    ticket_id: String(t.id_ticket || Math.random()),
+                    mes_fechamento: t.mes_fechamento,
+                    mes_abertura: t.mes_abertura || t.mes_fechamento,
+                    data_abertura: new Date().toISOString(),
+                    status: t.status || 'Fechado',
+                    grupo: t.grupo_ticket || 'Geral',
+                    dias_corridos: Number(t.dias_corridos || 0),
+                    dentro_prazo: Boolean(t.dentro_prazo),
+                    updated_at: new Date().toISOString()
+                }));
+                for (let i = 0; i < rows.length; i += 100) {
+                    await supabase.from('diag_tickets').upsert(rows.slice(i, i + 100), { onConflict: 'env,ticket_id' });
+                }
+            }
         } catch (e) {
-            // Silencioso
+            console.warn('[DiagStorage] Fallback ativo para tickets no localStorage:', e);
+        }
+    },
+    async syncSupabaseImportacao(imp) {
+        if (!supabase) return;
+        try {
+            await supabase.from('diag_importacoes').upsert({
+                env: 'hml',
+                mes_ref: imp.mes_ref,
+                canal: imp.canal,
+                nome_arquivo: imp.nome_arquivo,
+                total_linhas: imp.total_linhas,
+                volume_total: imp.volume_total,
+                tickets_processados: imp.tickets_processados,
+                usuario_email: imp.usuario_email,
+                usuario_nome: imp.usuario_nome,
+                status: imp.status || 'ATIVA',
+                excluido_por: imp.excluido_por,
+                excluido_em: imp.excluido_em,
+                data_importacao: imp.data_importacao || new Date().toISOString()
+            }, { onConflict: 'env,mes_ref,canal' });
+        } catch (e) {
+            console.warn('[DiagStorage] Falha ao registrar carga no Supabase (fallback ativo):', e);
+        }
+    },
+    async syncSupabaseExclusaoCarga(canal, mes) {
+        if (!supabase) return;
+        try {
+            const userIdentifier = (typeof currentUser !== 'undefined' && currentUser ? (currentUser.nome || currentUser.email) : 'Admin');
+            await supabase.from('diag_importacoes')
+                .update({ status: 'EXCLUIDA', excluido_por: userIdentifier, excluido_em: new Date().toISOString() })
+                .eq('env', 'hml').eq('canal', canal).eq('mes_ref', mes);
+
+            await supabase.from('diag_volume')
+                .delete().eq('env', 'hml').eq('canal', canal).eq('mes_ref', mes);
+
+            if (canal === 'LIGACOES') {
+                await supabase.from('diag_tickets')
+                    .delete().eq('env', 'hml').eq('mes_fechamento', mes);
+            }
+
+            await supabase.from('diag_audit_log').insert({
+                env: 'hml',
+                acao: 'EXCLUSAO_CARGA',
+                canal,
+                mes_ref: mes,
+                detalhes: 'Carga excluída por ' + userIdentifier,
+                usuario_email: (currentUser && currentUser.email) || '',
+                usuario_nome: (currentUser && currentUser.nome) || ''
+            });
+        } catch (e) {
+            console.warn('[DiagStorage] Falha ao sincronizar exclusão de carga no Supabase:', e);
+        }
+    },
+    async syncSupabaseExclusaoMes(mes, canal) {
+        if (!supabase) return;
+        try {
+            const userIdentifier = (typeof currentUser !== 'undefined' && currentUser ? (currentUser.nome || currentUser.email) : 'Admin');
+            let qImp = supabase.from('diag_importacoes').update({ status: 'EXCLUIDA', excluido_por: userIdentifier, excluido_em: new Date().toISOString() }).eq('env', 'hml').eq('mes_ref', mes);
+            if (canal !== 'TODOS') qImp = qImp.eq('canal', canal);
+            await qImp;
+
+            let qVol = supabase.from('diag_volume').delete().eq('env', 'hml').eq('mes_ref', mes);
+            if (canal !== 'TODOS') qVol = qVol.eq('canal', canal);
+            await qVol;
+
+            if (canal === 'TODOS' || canal === 'LIGACOES') {
+                await supabase.from('diag_tickets').delete().eq('env', 'hml').eq('mes_fechamento', mes);
+            }
+
+            await supabase.from('diag_audit_log').insert({
+                env: 'hml',
+                acao: 'EXCLUSAO_MES',
+                canal,
+                mes_ref: mes,
+                detalhes: 'Mês ' + mes + ' (Canal: ' + canal + ') excluído por ' + userIdentifier,
+                usuario_email: (currentUser && currentUser.email) || '',
+                usuario_nome: (currentUser && currentUser.nome) || ''
+            });
+        } catch (e) {
+            console.warn('[DiagStorage] Falha ao sincronizar exclusão de mês no Supabase:', e);
+        }
+    },
+    async syncSupabaseExclusaoTotal() {
+        if (!supabase) return;
+        try {
+            const userIdentifier = (typeof currentUser !== 'undefined' && currentUser ? (currentUser.nome || currentUser.email) : 'Admin');
+            await supabase.from('diag_importacoes').update({ status: 'EXCLUIDA', excluido_por: userIdentifier, excluido_em: new Date().toISOString() }).eq('env', 'hml');
+            await supabase.from('diag_volume').delete().eq('env', 'hml');
+            await supabase.from('diag_tickets').delete().eq('env', 'hml');
+
+            await supabase.from('diag_audit_log').insert({
+                env: 'hml',
+                acao: 'EXCLUSAO_BASE_COMPLETA',
+                detalhes: 'Base de Diagnóstico zerada por ' + userIdentifier,
+                usuario_email: (currentUser && currentUser.email) || '',
+                usuario_nome: (currentUser && currentUser.nome) || ''
+            });
+        } catch (e) {
+            console.warn('[DiagStorage] Falha ao sincronizar exclusão total no Supabase:', e);
+        }
+    },
+    async loadFromSupabase() {
+        if (!supabase) return;
+        try {
+            const { data: impData, error: impErr } = await supabase.from('diag_importacoes').select('*').eq('env', 'hml');
+            if (!impErr && Array.isArray(impData) && impData.length > 0) {
+                localStorage.setItem(DIAG_STORAGE_KEYS.IMPORTS, JSON.stringify(impData));
+            }
+
+            const { data: volData, error: volErr } = await supabase.from('diag_volume').select('*').eq('env', 'hml');
+            if (!volErr && Array.isArray(volData) && volData.length > 0) {
+                const mappedVols = volData.map(v => ({
+                    id: 'vol_' + (v.id || Math.random().toString(36).substring(2, 9)),
+                    canal: v.canal,
+                    mes: v.mes_ref,
+                    produto: v.norm_produto,
+                    motivo: v.norm_motivo,
+                    submotivo: v.norm_submotivo,
+                    volume: v.volume
+                }));
+                localStorage.setItem(DIAG_STORAGE_KEYS.VOLUME, JSON.stringify(mappedVols));
+            }
+
+            const { data: tickData, error: tickErr } = await supabase.from('diag_tickets').select('*').eq('env', 'hml').limit(5000);
+            if (!tickErr && Array.isArray(tickData) && tickData.length > 0) {
+                const mappedTicks = tickData.map(t => ({
+                    id_ticket: t.ticket_id,
+                    mes_fechamento: t.mes_fechamento,
+                    mes_abertura: t.mes_abertura,
+                    grupo_ticket: t.grupo,
+                    status: t.status,
+                    dias_corridos: Number(t.dias_corridos || 0),
+                    dentro_prazo: Boolean(t.dentro_prazo)
+                }));
+                localStorage.setItem(DIAG_STORAGE_KEYS.TICKETS, JSON.stringify(mappedTicks));
+            }
+        } catch (e) {
+            console.warn('[DiagStorage] Falha ao ler dados do Supabase:', e);
         }
     }
 };
@@ -16350,23 +16948,148 @@ function toggleTabelaoMode() {
     if (sel && wrapper) {
         wrapper.style.display = (sel.value === 'historico') ? 'none' : 'block';
     }
+    updateUploadCardsStatus();
+}
+
+function onDiagMonthInputChanged(canalKey) {
+    updateUploadCardsStatus();
+}
+
+// Atualiza os selos de status e habilitação dos botões dos 4 cards de upload
+function updateUploadCardsStatus() {
+    const isUserAdmin = verificarPermissao('ADMIN');
+    const canaisKeys = ['LIGACOES', 'CHAT', 'WHATSAPP', 'URA'];
+
+    canaisKeys.forEach(key => {
+        const lowerKey = (key === 'LIGACOES') ? 'tabelao' : key.toLowerCase();
+        const inputMes = document.getElementById('input-' + lowerKey + '-mes');
+        const badgeEl = document.getElementById('badge-status-' + lowerKey);
+        const btnUpload = document.getElementById('btn-upload-' + lowerKey);
+        const labelBtn = document.getElementById('label-btn-upload-' + lowerKey);
+
+        const selTipoCarga = (key === 'LIGACOES') ? document.getElementById('select-tabelao-tipo-carga') : null;
+        const isHistorico = selTipoCarga && selTipoCarga.value === 'historico';
+
+        if (isHistorico) {
+            const has2026Data = DiagStorage.getVolume().some(v => v.canal === 'LIGACOES');
+            if (badgeEl) {
+                if (has2026Data) {
+                    badgeEl.innerHTML = `<div class="diag-card-status-pill loaded"><i class="fa-solid fa-circle-check"></i> Base 2026 com dados carregados</div>`;
+                } else {
+                    badgeEl.innerHTML = `<div class="diag-card-status-pill pending"><i class="fa-solid fa-circle-dashed"></i> Nenhum histórico 2026 carregado</div>`;
+                }
+            }
+            if (btnUpload) {
+                if (has2026Data && !isUserAdmin) {
+                    btnUpload.disabled = true;
+                    btnUpload.style.opacity = '0.5';
+                    btnUpload.style.cursor = 'not-allowed';
+                    btnUpload.title = 'A base de 2026 já possui dados carregados. Solicite a um Administrador para recarregar.';
+                    if (labelBtn) labelBtn.textContent = 'Carga Bloqueada (Já Carregado)';
+                } else {
+                    btnUpload.disabled = false;
+                    btnUpload.style.opacity = '1';
+                    btnUpload.style.cursor = 'pointer';
+                    btnUpload.title = isUserAdmin && has2026Data ? 'Substituir carga histórica 2026' : 'Selecionar arquivo histórico 2026';
+                    if (labelBtn) labelBtn.textContent = (isUserAdmin && has2026Data) ? 'Substituir Carga 2026 (ADMIN)' : 'Selecionar Excel';
+                }
+            }
+            return;
+        }
+
+        const selectedMes = inputMes ? inputMes.value : '2026-08';
+        const isLoaded = DiagStorage.isMesCarregado(key, selectedMes);
+        const cargaAtiva = DiagStorage.getCargaAtiva(key, selectedMes);
+
+        if (badgeEl) {
+            if (isLoaded) {
+                const resp = cargaAtiva ? (cargaAtiva.usuario_nome || cargaAtiva.usuario_email || 'Usuário') : 'Usuário';
+                const dt = cargaAtiva && (cargaAtiva.data_importacao || cargaAtiva.data_hora) ? new Date(cargaAtiva.data_importacao || cargaAtiva.data_hora).toLocaleDateString('pt-BR') : '';
+                badgeEl.innerHTML = `<div class="diag-card-status-pill loaded" title="Carga ativa para ${selectedMes}"><i class="fa-solid fa-circle-check"></i> Carregado em ${dt || '2026'} por ${resp}</div>`;
+            } else {
+                badgeEl.innerHTML = `<div class="diag-card-status-pill pending"><i class="fa-solid fa-circle-dashed"></i> Mês ${selectedMes} Pendente</div>`;
+            }
+        }
+
+        if (btnUpload) {
+            if (isLoaded && !isUserAdmin) {
+                btnUpload.disabled = true;
+                btnUpload.style.opacity = '0.5';
+                btnUpload.style.cursor = 'not-allowed';
+                btnUpload.title = `O mês ${selectedMes} já foi carregado para ${DIAG_CANAIS[key].name}. Apenas Administradores podem substituir.`;
+                if (labelBtn) labelBtn.textContent = 'Mês Já Carregado (Bloqueado)';
+            } else if (isLoaded && isUserAdmin) {
+                btnUpload.disabled = false;
+                btnUpload.style.opacity = '1';
+                btnUpload.style.cursor = 'pointer';
+                btnUpload.title = `Substituir carga ativa do mês ${selectedMes}`;
+                if (labelBtn) labelBtn.textContent = 'Substituir Carga (ADMIN)';
+            } else {
+                btnUpload.disabled = false;
+                btnUpload.style.opacity = '1';
+                btnUpload.style.cursor = 'pointer';
+                btnUpload.title = 'Selecionar arquivo Excel para este mês';
+                if (labelBtn) labelBtn.textContent = 'Selecionar Excel';
+            }
+        }
+    });
+}
+
+// Disparo de seleção de arquivo com validação prévia de permissões e mês bloqueado
+function triggerDiagUpload(canalKey) {
+    const isUserAdmin = verificarPermissao('ADMIN');
+    const lowerKey = (canalKey === 'LIGACOES') ? 'tabelao' : canalKey.toLowerCase();
+    const selTipoCarga = (canalKey === 'LIGACOES') ? document.getElementById('select-tabelao-tipo-carga') : null;
+    const isHistorico = selTipoCarga && selTipoCarga.value === 'historico';
+    const inputMes = document.getElementById('input-' + lowerKey + '-mes');
+    const selectedMes = inputMes ? inputMes.value : '2026-08';
+
+    if (!isHistorico && DiagStorage.isMesCarregado(canalKey, selectedMes)) {
+        if (!isUserAdmin) {
+            const carga = DiagStorage.getCargaAtiva(canalKey, selectedMes);
+            const resp = carga ? (carga.usuario_nome || carga.usuario_email || 'outro usuário') : 'outro usuário';
+            const dataStr = carga && (carga.data_importacao || carga.data_hora) ? new Date(carga.data_importacao || carga.data_hora).toLocaleDateString('pt-BR') : '';
+            alert(`O mês ${selectedMes} já foi carregado para ${DIAG_CANAIS[canalKey].name}${dataStr ? ' em ' + dataStr : ''} por ${resp}.\n\nPara operadores normais, apenas meses pendentes são permitidos. Solicite a um Administrador a exclusão da carga atual para recarregar.`);
+            return;
+        } else {
+            const ok = confirm(`Atenção Administrador: O mês ${selectedMes} já possui carga ativa para ${DIAG_CANAIS[canalKey].name}.\n\nDeseja selecionar uma nova planilha para SUBSTITUIR os dados existentes?`);
+            if (!ok) return;
+        }
+    }
+
+    const fileInput = document.getElementById('file-upload-' + lowerKey);
+    if (fileInput) fileInput.click();
 }
 
 // ==========================================================================
-// IMPORTAÇÃO EXCEL E PROCESSAMENTO
+// IMPORTAÇÃO EXCEL E PROCESSAMENTO (COM CONTROLE DE CARGA E TRAVAS RBAC)
 // ==========================================================================
 
 async function handleExcelUpload(canalKey, inputEl) {
     const file = inputEl.files && inputEl.files[0];
     if (!file) return;
 
-    const statusEl = document.getElementById('status-upload-' + canalKey.toLowerCase());
+    const lowerKey = (canalKey === 'LIGACOES') ? 'tabelao' : canalKey.toLowerCase();
+    const statusEl = document.getElementById('status-upload-' + lowerKey);
     if (statusEl) {
         statusEl.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Processando planilha...';
         statusEl.style.color = 'var(--color-primary)';
     }
 
     try {
+        const isUserAdmin = verificarPermissao('ADMIN');
+        const selTipoCarga = (canalKey === 'LIGACOES') ? document.getElementById('select-tabelao-tipo-carga') : null;
+        const isHistorico = selTipoCarga && selTipoCarga.value === 'historico';
+        const inputMes = document.getElementById('input-' + lowerKey + '-mes');
+        const defaultMes = inputMes?.value || '2026-08';
+
+        // PRÉ-VALIDAÇÃO: Se for carga de mês individual já carregado e não for ADMIN, bloqueia
+        if (!isHistorico && DiagStorage.isMesCarregado(canalKey, defaultMes) && !isUserAdmin) {
+            const carga = DiagStorage.getCargaAtiva(canalKey, defaultMes);
+            const resp = carga ? (carga.usuario_nome || carga.usuario_email || 'outro usuário') : 'outro usuário';
+            throw new Error(`O mês ${defaultMes} já foi carregado para ${DIAG_CANAIS[canalKey].name} por ${resp}. Solicite a um Administrador a exclusão para recarregar.`);
+        }
+
         const data = await file.arrayBuffer();
         if (typeof XLSX === 'undefined') {
             throw new Error('Biblioteca SheetJS (XLSX) não carregada no navegador.');
@@ -16387,15 +17110,11 @@ async function handleExcelUpload(canalKey, inputEl) {
 
         if (canalKey === 'LIGACOES') {
             // TABELÃO / CENTRAL DE ATENDIMENTO
-            const selTipoCarga = document.getElementById('select-tabelao-tipo-carga');
-            const isHistorico = selTipoCarga && selTipoCarga.value === 'historico';
-            const defaultMes = document.getElementById('input-tabelao-mes')?.value || '2026-08';
-
             const volumeMap = {}; // { 'YYYY-MM|produto|motivo|submotivo': qtd }
             const ticketsToSave = [];
+            const mesesEncontrados = new Set();
 
             for (const row of rawRows) {
-                // Normaliza chaves da linha para case-insensitive
                 const rowNorm = {};
                 for (const [k, v] of Object.entries(row)) {
                     rowNorm[k.trim().toUpperCase()] = v;
@@ -16414,8 +17133,8 @@ async function handleExcelUpload(canalKey, inputEl) {
                 let mesFechamento = formatDiagYearMonth(dtFechamento);
                 let mesAbertura = formatDiagYearMonth(dtAbertura);
 
-                // Determinação do mês de referência
                 let mesRef = isHistorico ? (mesAbertura || mesFechamento || defaultMes) : defaultMes;
+                mesesEncontrados.add(mesRef);
 
                 // 1. Apuração de SLA de Efetividade (Chamados)
                 if (dtAbertura) {
@@ -16427,14 +17146,12 @@ async function handleExcelUpload(canalKey, inputEl) {
                         diffDays = Math.max(0, diffMs / (1000 * 60 * 60 * 24));
                         dentroPrazo = (diffDays <= 7.0);
                     } else {
-                        // Ticket aberto
                         const now = new Date();
                         const diffMs = now.getTime() - dtAbertura.getTime();
                         diffDays = Math.max(0, diffMs / (1000 * 60 * 60 * 24));
                         if (diffDays > 7.0) dentroPrazo = false;
                     }
 
-                    // Ticket é contabilizado no mês de resolução (ou abertura se não fechado)
                     const ticketMes = mesFechamento || mesAbertura || mesRef;
 
                     ticketsToSave.push({
@@ -16463,10 +17180,23 @@ async function handleExcelUpload(canalKey, inputEl) {
                 }
             }
 
+            // PÓS-VALIDAÇÃO HISTÓRICA: Se algum dos meses encontrados já possui carga ativa
+            if (isHistorico) {
+                const mesesConflito = Array.from(mesesEncontrados).filter(m => DiagStorage.isMesCarregado('LIGACOES', m));
+                if (mesesConflito.length > 0) {
+                    if (!isUserAdmin) {
+                        throw new Error(`Carga histórica bloqueada: os meses ${mesesConflito.join(', ')} já possuem carga ativa de Ligações. Apenas Administradores podem substituir.`);
+                    } else {
+                        const ok = confirm(`Atenção Administrador: O arquivo histórico contém dados dos meses ${mesesConflito.join(', ')} que já possuem carga ativa.\n\nDeseja prosseguir e substituir os dados existentes desses meses?`);
+                        if (!ok) throw new Error('Operação de substituição cancelada.');
+                    }
+                }
+            }
+
             // Consolidação dos volumes
             const existingVolumes = DiagStorage.getVolume().filter(v => {
                 if (isHistorico) {
-                    return v.canal !== 'LIGACOES';
+                    return !(v.canal === 'LIGACOES' && mesesEncontrados.has(v.mes));
                 } else {
                     return !(v.canal === 'LIGACOES' && v.mes === defaultMes);
                 }
@@ -16490,7 +17220,7 @@ async function handleExcelUpload(canalKey, inputEl) {
             if (ticketsToSave.length > 0) {
                 const existingTickets = DiagStorage.getTickets().filter(t => {
                     if (isHistorico) {
-                        return false; // Substitui histórico
+                        return !mesesEncontrados.has(t.mes_fechamento);
                     } else {
                         return t.mes_fechamento !== defaultMes;
                     }
@@ -16498,33 +17228,41 @@ async function handleExcelUpload(canalKey, inputEl) {
                 DiagStorage.saveTickets(existingTickets.concat(ticketsToSave));
             }
 
-            DiagStorage.addImportacaoLog({
-                canal: 'LIGACOES',
-                mes_referencia: isHistorico ? 'Histórico 2026' : defaultMes,
-                total_linhas: rawRows.length,
-                volume_total: totalImportados,
-                tickets_processados: ticketsProcessados,
-                nome_arquivo: file.name
-            });
+            // Registro das cargas ativas no histórico
+            if (isHistorico) {
+                mesesEncontrados.forEach(m => {
+                    DiagStorage.registrarCarga({
+                        canal: 'LIGACOES',
+                        mes_ref: m,
+                        total_linhas: rawRows.length,
+                        volume_total: totalImportados,
+                        tickets_processados: ticketsProcessados,
+                        nome_arquivo: file.name
+                    });
+                });
+            } else {
+                DiagStorage.registrarCarga({
+                    canal: 'LIGACOES',
+                    mes_ref: defaultMes,
+                    total_linhas: rawRows.length,
+                    volume_total: totalImportados,
+                    tickets_processados: ticketsProcessados,
+                    nome_arquivo: file.name
+                });
+            }
 
         } else {
             // CANAIS DE IA (CHAT, WHATSAPP, URA)
-            const inputMes = document.getElementById('input-' + canalKey.toLowerCase() + '-mes');
-            const defaultMes = inputMes?.value || '2026-08';
             const volumeMap = {}; // { 'mes|produto|motivo|submotivo': qtd }
             const mesesIdentificados = new Set();
 
             for (const row of rawRows) {
-                // Normaliza chaves da linha para lowercase
                 const rowNorm = {};
                 for (const [k, v] of Object.entries(row)) {
                     rowNorm[k.trim().toLowerCase()] = v;
                 }
 
-                // Extrai chave do motivo: WhatsApp usa 'faq', Chat/URA usam 'motivo' ou 'use_case'
                 const motivo = rowNorm['faq'] || rowNorm['motivo'] || rowNorm['motivo_contato'] || rowNorm['use_case'] || rowNorm['usecase'] || '';
-
-                // Extrai data se presente na linha
                 const dt = parseDiagDate(rowNorm['createdat'] || rowNorm['created_at'] || rowNorm['time'] || rowNorm['data'] || rowNorm['updatedat']);
                 const rowMes = formatDiagYearMonth(dt);
                 const mesRef = rowMes || defaultMes;
@@ -16543,6 +17281,17 @@ async function handleExcelUpload(canalKey, inputEl) {
                 }
             }
 
+            // PÓS-VALIDAÇÃO: Se algum dos meses identificados no arquivo já possui carga
+            const mesesConflito = Array.from(mesesIdentificados).filter(m => DiagStorage.isMesCarregado(canalKey, m));
+            if (mesesConflito.length > 0) {
+                if (!isUserAdmin) {
+                    throw new Error(`Upload bloqueado: os meses ${mesesConflito.join(', ')} já possuem carga ativa para ${DIAG_CANAIS[canalKey].name}. Solicite a um Administrador a substituição.`);
+                } else {
+                    const ok = confirm(`Atenção Administrador: O arquivo contém dados dos meses ${mesesConflito.join(', ')} que já possuem carga ativa.\n\nDeseja prosseguir e substituir os dados existentes desses meses?`);
+                    if (!ok) throw new Error('Operação de substituição cancelada.');
+                }
+            }
+
             const existingVolumes = DiagStorage.getVolume().filter(v => !(v.canal === canalKey && mesesIdentificados.has(v.mes)));
             for (const [key, vol] of Object.entries(volumeMap)) {
                 const [mes, prod, mot, sub] = key.split('|');
@@ -16558,45 +17307,109 @@ async function handleExcelUpload(canalKey, inputEl) {
             }
             DiagStorage.saveVolume(existingVolumes);
 
-            const displayMeses = Array.from(mesesIdentificados).sort().join(', ') || defaultMes;
-            DiagStorage.addImportacaoLog({
-                canal: canalKey,
-                mes_referencia: displayMeses,
-                total_linhas: rawRows.length,
-                volume_total: totalImportados,
-                tickets_processados: 0,
-                nome_arquivo: file.name
-            });
+            // Registra cada mês identificado como carga ativa
+            if (mesesIdentificados.size > 0) {
+                mesesIdentificados.forEach(m => {
+                    DiagStorage.registrarCarga({
+                        canal: canalKey,
+                        mes_ref: m,
+                        total_linhas: rawRows.length,
+                        volume_total: totalImportados,
+                        tickets_processados: 0,
+                        nome_arquivo: file.name
+                    });
+                });
+            } else {
+                DiagStorage.registrarCarga({
+                    canal: canalKey,
+                    mes_ref: defaultMes,
+                    total_linhas: rawRows.length,
+                    volume_total: totalImportados,
+                    tickets_processados: 0,
+                    nome_arquivo: file.name
+                });
+            }
         }
 
         if (statusEl) {
             statusEl.innerHTML = `<span style="color: #10b981;"><i class="fa-solid fa-circle-check"></i> ${totalImportados.toLocaleString('pt-BR')} registros importados com sucesso!</span>`;
         }
 
-        showToast(`âœ… Carga de ${DIAG_CANAIS[canalKey].name} concluída: ${totalImportados.toLocaleString('pt-BR')} volumes processados!`, 'success', 6000);
+        showToast(`✅ Carga de ${DIAG_CANAIS[canalKey].name} concluída com sucesso!`, 'success', 6000);
 
+        updateUploadCardsStatus();
+        renderCargasRealizadasTable();
         renderCoverageMatrix();
         renderDeParaCounts();
 
-        // Se estivermos visualizando o dashboard, re-renderizar imediatamente
         const diagDashboardView = document.getElementById('view-diag-dashboard');
-        if (diagDashboardView && diagDashboardView.style.display !== 'none') {
+        if (diagDashboardView && diagDashboardView.style.display !== 'none' && typeof renderDiagDashboardView === 'function') {
             renderDiagDashboardView();
         }
 
     } catch (err) {
         console.error('[Diagnóstico Upload Error]', err);
         if (statusEl) {
-            statusEl.innerHTML = `<span style="color: #ef4444;"><i class="fa-solid fa-triangle-exclamation"></i> Erro: ${err.message}</span>`;
+            statusEl.innerHTML = `<span style="color: #ef4444;"><i class="fa-solid fa-triangle-exclamation"></i> ${err.message}</span>`;
         }
-        showToast('Erro ao importar arquivo: ' + err.message, 'error', 8000);
+        showToast('Erro ao importar planilha: ' + err.message, 'error', 8000);
     } finally {
         inputEl.value = '';
     }
 }
 
 // ==========================================================================
-// RENDERIZAÇÃO: MATRIZ DE COBERTURA DOS MESES (2026)
+// RENDERIZAÇÃO: QUADRO DE CARGAS REALIZADAS
+// ==========================================================================
+
+function renderCargasRealizadasTable() {
+    const tbody = document.getElementById('tbody-diag-cargas');
+    const countBadge = document.getElementById('diag-cargas-count');
+    if (!tbody) return;
+
+    const canalFilter = document.getElementById('diag-filter-cargas-canal')?.value || 'TODOS';
+    const searchQuery = document.getElementById('diag-search-cargas')?.value || '';
+
+    const cargas = DiagStorage.listarCargas({ canal: canalFilter, busca: searchQuery });
+    if (countBadge) countBadge.textContent = cargas.length;
+
+    if (cargas.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="8" style="text-align: center; color: var(--text-muted); padding: 1.5rem;">Nenhuma carga mensal encontrada com os filtros selecionados.</td></tr>`;
+        return;
+    }
+
+    const isUserAdmin = verificarPermissao('ADMIN');
+
+    let html = '';
+    cargas.forEach(c => {
+        const canalDef = DIAG_CANAIS[c.canal] || { name: c.canal, icon: 'fa-file', color: '#888' };
+        const dataHoraStr = c.data_importacao || c.data_hora ? new Date(c.data_importacao || c.data_hora).toLocaleString('pt-BR') : '-';
+        const usuarioStr = c.usuario_nome || c.usuario_email || 'Usuário';
+
+        html += `<tr>
+            <td style="font-weight: 600; color: #fff; display: flex; align-items: center; gap: 0.4rem;">
+                <i class="fa-solid ${canalDef.icon}" style="color: ${canalDef.color};"></i>
+                ${canalDef.name}
+            </td>
+            <td><strong style="color: var(--color-primary);">${c.mes_ref}</strong></td>
+            <td style="max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${c.nome_arquivo}">
+                <i class="fa-solid fa-file-excel" style="color: #10b981; margin-right: 0.3rem;"></i>${c.nome_arquivo}
+            </td>
+            <td style="text-align: right;">${Number(c.total_linhas || 0).toLocaleString('pt-BR')}</td>
+            <td style="text-align: right; font-weight: 600; color: #fff;">${Number(c.volume_total || 0).toLocaleString('pt-BR')}</td>
+            <td>${usuarioStr}</td>
+            <td style="font-size: 0.76rem; color: var(--text-muted);">${dataHoraStr}</td>
+            <td style="text-align: center;">
+                ${isUserAdmin ? `<button type="button" class="diag-btn-danger-subtle" onclick="openModalConfirmDeleteCarga('${c.canal}', '${c.mes_ref}')" title="Excluir carga e liberar mês"><i class="fa-solid fa-trash-can"></i> Excluir</button>` : `<span style="font-size: 0.72rem; color: var(--text-muted);">Bloqueado</span>`}
+            </td>
+        </tr>`;
+    });
+
+    tbody.innerHTML = html;
+}
+
+// ==========================================================================
+// RENDERIZAÇÃO: MATRIZ DE COBERTURA DOS MESES (2026) COM INTERATIVIDADE
 // ==========================================================================
 
 function renderCoverageMatrix() {
@@ -16623,7 +17436,7 @@ function renderCoverageMatrix() {
 
             if (volMonth > 0) {
                 html += `<td style="text-align: center;">
-                    <span class="diag-coverage-badge status-ok" title="${volMonth.toLocaleString('pt-BR')} atendimentos carregados">
+                    <span class="diag-coverage-badge status-ok" style="cursor: pointer;" onclick="handleCoverageCellClick('${key}', '${ym}', ${volMonth})" title="${volMonth.toLocaleString('pt-BR')} atendimentos carregados (Clique para gerenciar)">
                         <i class="fa-solid fa-check"></i> ${volMonth > 999 ? Math.round(volMonth/1000) + 'k' : volMonth}
                     </span>
                 </td>`;
@@ -16639,6 +17452,146 @@ function renderCoverageMatrix() {
     }
 
     tbody.innerHTML = html;
+}
+
+function handleCoverageCellClick(canalKey, yearMonth, volume) {
+    const canalDef = DIAG_CANAIS[canalKey] || { name: canalKey };
+    const carga = DiagStorage.getCargaAtiva(canalKey, yearMonth);
+    const isUserAdmin = verificarPermissao('ADMIN');
+
+    let info = `Canal: ${canalDef.name}\nMês: ${yearMonth}\nVolume Apurado: ${volume.toLocaleString('pt-BR')} atendimentos\n`;
+    if (carga) {
+        info += `Arquivo: ${carga.nome_arquivo || '-'}\n`;
+        info += `Responsável: ${carga.usuario_nome || carga.usuario_email || '-'}\n`;
+        info += `Data de Carga: ${carga.data_importacao ? new Date(carga.data_importacao).toLocaleString('pt-BR') : '-'}\n`;
+    }
+
+    if (isUserAdmin) {
+        info += '\nDeseja EXCLUIR esta carga para permitir um novo upload deste mês?';
+        if (confirm(info)) {
+            openModalConfirmDeleteCarga(canalKey, yearMonth);
+        }
+    } else {
+        alert(info);
+    }
+}
+
+// ==========================================================================
+// CONTROLADORES DA ZONA ADMINISTRATIVA E MODAIS DE CONFIRMAÇÃO
+// ==========================================================================
+
+let _diagPendingDeleteCarga = { canal: null, mes: null };
+let _diagPendingDeleteMes = { canal: null, mes: null };
+
+function openModalConfirmDeleteCarga(canal, mes) {
+    if (!verificarPermissao('ADMIN')) {
+        alert('Acesso restrito ao perfil ADMIN.');
+        return;
+    }
+    _diagPendingDeleteCarga = { canal, mes };
+    const modal = document.getElementById('modal-diag-confirm-delete-carga');
+    const canalEl = document.getElementById('modal-delete-carga-canal');
+    const mesEl = document.getElementById('modal-delete-carga-mes');
+
+    if (canalEl) canalEl.textContent = DIAG_CANAIS[canal]?.name || canal;
+    if (mesEl) mesEl.textContent = mes;
+    if (modal) modal.style.display = 'flex';
+}
+
+function closeModalConfirmDeleteCarga() {
+    const modal = document.getElementById('modal-diag-confirm-delete-carga');
+    if (modal) modal.style.display = 'none';
+    _diagPendingDeleteCarga = { canal: null, mes: null };
+}
+
+function confirmDeleteCarga() {
+    if (!_diagPendingDeleteCarga.canal || !_diagPendingDeleteCarga.mes) return;
+    const ok = DiagStorage.excluirCarga(_diagPendingDeleteCarga.canal, _diagPendingDeleteCarga.mes);
+    if (ok) {
+        closeModalConfirmDeleteCarga();
+        showToast('Carga excluída com sucesso! O mês agora está livre para nova importação.', 'success');
+    }
+}
+
+function openModalConfirmDeleteMes() {
+    if (!verificarPermissao('ADMIN')) {
+        alert('Acesso restrito ao perfil ADMIN.');
+        return;
+    }
+    const mes = document.getElementById('admin-delete-mes')?.value || '2026-08';
+    const canal = document.getElementById('admin-delete-canal')?.value || 'TODOS';
+
+    _diagPendingDeleteMes = { canal, mes };
+
+    const modal = document.getElementById('modal-diag-confirm-delete-mes');
+    const mesEl = document.getElementById('modal-delete-mes-alvo');
+    const canalEl = document.getElementById('modal-delete-canal-alvo');
+
+    if (mesEl) mesEl.textContent = mes;
+    if (canalEl) canalEl.textContent = (canal === 'TODOS') ? 'Todos os Canais' : (DIAG_CANAIS[canal]?.name || canal);
+    if (modal) modal.style.display = 'flex';
+}
+
+function closeModalConfirmDeleteMes() {
+    const modal = document.getElementById('modal-diag-confirm-delete-mes');
+    if (modal) modal.style.display = 'none';
+    _diagPendingDeleteMes = { canal: null, mes: null };
+}
+
+function confirmDeleteMes() {
+    if (!_diagPendingDeleteMes.mes) return;
+    const ok = DiagStorage.excluirDadosMes(_diagPendingDeleteMes.mes, _diagPendingDeleteMes.canal);
+    if (ok) {
+        closeModalConfirmDeleteMes();
+        showToast(`Dados de ${_diagPendingDeleteMes.mes} excluídos com sucesso!`, 'success');
+    }
+}
+
+function openModalConfirmDeleteAll() {
+    if (!verificarPermissao('ADMIN')) {
+        alert('Acesso restrito ao perfil ADMIN.');
+        return;
+    }
+    const modal = document.getElementById('modal-diag-confirm-delete-all');
+    const inputKey = document.getElementById('input-confirm-delete-all-key');
+    const btnSubmit = document.getElementById('btn-submit-delete-all');
+
+    if (inputKey) inputKey.value = '';
+    if (btnSubmit) {
+        btnSubmit.disabled = true;
+        btnSubmit.style.opacity = '0.4';
+        btnSubmit.style.cursor = 'not-allowed';
+    }
+    if (modal) modal.style.display = 'flex';
+}
+
+function closeModalConfirmDeleteAll() {
+    const modal = document.getElementById('modal-diag-confirm-delete-all');
+    if (modal) modal.style.display = 'none';
+}
+
+function checkDeleteAllInput() {
+    const val = document.getElementById('input-confirm-delete-all-key')?.value || '';
+    const btnSubmit = document.getElementById('btn-submit-delete-all');
+    if (btnSubmit) {
+        const isMatch = (val.trim().toUpperCase() === 'EXCLUIR');
+        btnSubmit.disabled = !isMatch;
+        btnSubmit.style.opacity = isMatch ? '1' : '0.4';
+        btnSubmit.style.cursor = isMatch ? 'pointer' : 'not-allowed';
+    }
+}
+
+function confirmDeleteAll() {
+    const val = document.getElementById('input-confirm-delete-all-key')?.value || '';
+    if (val.trim().toUpperCase() !== 'EXCLUIR') {
+        alert('Palavra-chave incorreta. Digite EXCLUIR para confirmar.');
+        return;
+    }
+    const ok = DiagStorage.excluirBaseCompleta();
+    if (ok) {
+        closeModalConfirmDeleteAll();
+        showToast('Toda a base de Diagnóstico foi zerada com sucesso! As regras De-Para foram preservadas.', 'success', 7000);
+    }
 }
 
 // ==========================================================================
@@ -17407,8 +18360,11 @@ function filterDeParaTable() {
 }
 
 function renderDiagImportView() {
+    updateUploadCardsStatus();
+    renderCargasRealizadasTable();
     renderCoverageMatrix();
     renderDeParaTable();
+    DiagStorage.loadFromSupabase();
 }
 
 // EXPORTAÇÃO EXCEL DO DE-PARA

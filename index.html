@@ -2021,10 +2021,17 @@
 
                     <!-- SEÇÃO: 4 CARDS DE UPLOAD EXCEL -->
                     <section class="panel glass-panel" style="margin-bottom: 1.5rem; padding: 1.25rem;">
-                        <h3 class="panel-title" style="font-size: 1.05rem; margin-bottom: 1.25rem;">
-                            <i class="fa-solid fa-cloud-arrow-up" style="color: var(--color-primary); margin-right: 0.4rem;"></i>
-                            <span>Carregar Planilha Mensal por Canal (Excel .xlsx / .xls)</span>
-                        </h3>
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; flex-wrap: wrap; gap: 0.5rem;">
+                            <div>
+                                <h3 class="panel-title" style="font-size: 1.05rem; margin: 0;">
+                                    <i class="fa-solid fa-cloud-arrow-up" style="color: var(--color-primary); margin-right: 0.4rem;"></i>
+                                    <span>Carregar Planilha Mensal por Canal (Excel .xlsx / .xls)</span>
+                                </h3>
+                                <p style="font-size: 0.8rem; color: var(--text-secondary); margin: 0.2rem 0 0 0;">
+                                    Cada mês aceita apenas uma carga ativa. Operadores podem carregar apenas meses pendentes.
+                                </p>
+                            </div>
+                        </div>
 
                         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.25rem;">
                             <!-- CARD 1: TABELÃO (CENTRAL / LIGAÇÕES) -->
@@ -2036,7 +2043,7 @@
                                         </span>
                                         <span class="badge-channel" style="background: rgba(235,92,39,0.15); color: #eb5c27; padding: 0.2rem 0.5rem; border-radius: 6px; font-size: 0.7rem; font-weight: 600;">Central</span>
                                     </div>
-                                    <p style="font-size: 0.78rem; color: var(--text-secondary); margin-bottom: 1rem;">
+                                    <p style="font-size: 0.78rem; color: var(--text-secondary); margin-bottom: 0.75rem;">
                                         Base de chamados da central telefônica. Alimenta volumetria e apuração do SLA de 7 dias.
                                     </p>
                                     
@@ -2048,16 +2055,18 @@
                                         </select>
                                     </div>
 
-                                    <div id="wrapper-tabelao-mes" style="margin-bottom: 1rem;">
+                                    <div id="wrapper-tabelao-mes" style="margin-bottom: 0.75rem;">
                                         <label style="font-size: 0.75rem; color: var(--text-muted); display: block; margin-bottom: 0.3rem;">Mês de Referência:</label>
-                                        <input type="month" id="input-tabelao-mes" value="2026-08" style="width: 100%; padding: 0.4rem 0.6rem; border-radius: 6px; border: 1px solid var(--border-color); background: rgba(0,0,0,0.3); color: var(--text-primary); font-size: 0.8rem;">
+                                        <input type="month" id="input-tabelao-mes" value="2026-08" onchange="onDiagMonthInputChanged('LIGACOES')" style="width: 100%; padding: 0.4rem 0.6rem; border-radius: 6px; border: 1px solid var(--border-color); background: rgba(0,0,0,0.3); color: var(--text-primary); font-size: 0.8rem;">
                                     </div>
+
+                                    <div id="badge-status-tabelao" style="margin-bottom: 1rem; min-height: 24px;"></div>
                                 </div>
 
                                 <div>
                                     <input type="file" id="file-upload-tabelao" accept=".xlsx,.xls,.csv" style="display: none;" onchange="handleExcelUpload('LIGACOES', this)">
-                                    <button type="button" class="btn btn-primary" onclick="document.getElementById('file-upload-tabelao').click()" style="width: 100%; justify-content: center; font-size: 0.85rem; padding: 0.6rem;">
-                                        <i class="fa-solid fa-file-excel" style="margin-right: 0.4rem;"></i> Selecionar Excel
+                                    <button type="button" id="btn-upload-tabelao" class="btn btn-primary" onclick="triggerDiagUpload('LIGACOES')" style="width: 100%; justify-content: center; font-size: 0.85rem; padding: 0.6rem;">
+                                        <i class="fa-solid fa-file-excel" style="margin-right: 0.4rem;"></i> <span id="label-btn-upload-tabelao">Selecionar Excel</span>
                                     </button>
                                     <div id="status-upload-tabelao" style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.5rem; text-align: center;">Aguardando arquivo</div>
                                 </div>
@@ -2072,20 +2081,22 @@
                                         </span>
                                         <span class="badge-channel" style="background: rgba(59,130,246,0.15); color: #3b82f6; padding: 0.2rem 0.5rem; border-radius: 6px; font-size: 0.7rem; font-weight: 600;">Chatbot</span>
                                     </div>
-                                    <p style="font-size: 0.78rem; color: var(--text-secondary); margin-bottom: 1rem;">
+                                    <p style="font-size: 0.78rem; color: var(--text-secondary); margin-bottom: 0.75rem;">
                                         Arquivo export_monitoring_chat do mês vigente com tabulações automáticas.
                                     </p>
                                     
-                                    <div style="margin-bottom: 1rem;">
+                                    <div style="margin-bottom: 0.75rem;">
                                         <label style="font-size: 0.75rem; color: var(--text-muted); display: block; margin-bottom: 0.3rem;">Mês de Referência:</label>
-                                        <input type="month" id="input-chat-mes" value="2026-08" style="width: 100%; padding: 0.4rem 0.6rem; border-radius: 6px; border: 1px solid var(--border-color); background: rgba(0,0,0,0.3); color: var(--text-primary); font-size: 0.8rem;">
+                                        <input type="month" id="input-chat-mes" value="2026-08" onchange="onDiagMonthInputChanged('CHAT')" style="width: 100%; padding: 0.4rem 0.6rem; border-radius: 6px; border: 1px solid var(--border-color); background: rgba(0,0,0,0.3); color: var(--text-primary); font-size: 0.8rem;">
                                     </div>
+
+                                    <div id="badge-status-chat" style="margin-bottom: 1rem; min-height: 24px;"></div>
                                 </div>
 
                                 <div>
                                     <input type="file" id="file-upload-chat" accept=".xlsx,.xls,.csv" style="display: none;" onchange="handleExcelUpload('CHAT', this)">
-                                    <button type="button" class="btn btn-primary" onclick="document.getElementById('file-upload-chat').click()" style="width: 100%; justify-content: center; font-size: 0.85rem; padding: 0.6rem;">
-                                        <i class="fa-solid fa-file-excel" style="margin-right: 0.4rem;"></i> Selecionar Excel
+                                    <button type="button" id="btn-upload-chat" class="btn btn-primary" onclick="triggerDiagUpload('CHAT')" style="width: 100%; justify-content: center; font-size: 0.85rem; padding: 0.6rem;">
+                                        <i class="fa-solid fa-file-excel" style="margin-right: 0.4rem;"></i> <span id="label-btn-upload-chat">Selecionar Excel</span>
                                     </button>
                                     <div id="status-upload-chat" style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.5rem; text-align: center;">Aguardando arquivo</div>
                                 </div>
@@ -2100,20 +2111,22 @@
                                         </span>
                                         <span class="badge-channel" style="background: rgba(16,185,129,0.15); color: #10b981; padding: 0.2rem 0.5rem; border-radius: 6px; font-size: 0.7rem; font-weight: 600;">WhatsApp</span>
                                     </div>
-                                    <p style="font-size: 0.78rem; color: var(--text-secondary); margin-bottom: 1rem;">
+                                    <p style="font-size: 0.78rem; color: var(--text-secondary); margin-bottom: 0.75rem;">
                                         Arquivo export_monitoring_whatsapp do mês vigente com tabulações automáticas.
                                     </p>
                                     
-                                    <div style="margin-bottom: 1rem;">
+                                    <div style="margin-bottom: 0.75rem;">
                                         <label style="font-size: 0.75rem; color: var(--text-muted); display: block; margin-bottom: 0.3rem;">Mês de Referência:</label>
-                                        <input type="month" id="input-whatsapp-mes" value="2026-08" style="width: 100%; padding: 0.4rem 0.6rem; border-radius: 6px; border: 1px solid var(--border-color); background: rgba(0,0,0,0.3); color: var(--text-primary); font-size: 0.8rem;">
+                                        <input type="month" id="input-whatsapp-mes" value="2026-08" onchange="onDiagMonthInputChanged('WHATSAPP')" style="width: 100%; padding: 0.4rem 0.6rem; border-radius: 6px; border: 1px solid var(--border-color); background: rgba(0,0,0,0.3); color: var(--text-primary); font-size: 0.8rem;">
                                     </div>
+
+                                    <div id="badge-status-whatsapp" style="margin-bottom: 1rem; min-height: 24px;"></div>
                                 </div>
 
                                 <div>
                                     <input type="file" id="file-upload-whatsapp" accept=".xlsx,.xls,.csv" style="display: none;" onchange="handleExcelUpload('WHATSAPP', this)">
-                                    <button type="button" class="btn btn-primary" onclick="document.getElementById('file-upload-whatsapp').click()" style="width: 100%; justify-content: center; font-size: 0.85rem; padding: 0.6rem;">
-                                        <i class="fa-solid fa-file-excel" style="margin-right: 0.4rem;"></i> Selecionar Excel
+                                    <button type="button" id="btn-upload-whatsapp" class="btn btn-primary" onclick="triggerDiagUpload('WHATSAPP')" style="width: 100%; justify-content: center; font-size: 0.85rem; padding: 0.6rem;">
+                                        <i class="fa-solid fa-file-excel" style="margin-right: 0.4rem;"></i> <span id="label-btn-upload-whatsapp">Selecionar Excel</span>
                                     </button>
                                     <div id="status-upload-whatsapp" style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.5rem; text-align: center;">Aguardando arquivo</div>
                                 </div>
@@ -2128,24 +2141,71 @@
                                         </span>
                                         <span class="badge-channel" style="background: rgba(168,85,247,0.15); color: #a855f7; padding: 0.2rem 0.5rem; border-radius: 6px; font-size: 0.7rem; font-weight: 600;">Voz Virtual</span>
                                     </div>
-                                    <p style="font-size: 0.78rem; color: var(--text-secondary); margin-bottom: 1rem;">
+                                    <p style="font-size: 0.78rem; color: var(--text-secondary); margin-bottom: 0.75rem;">
                                         Arquivo export_monitoring_ura do mês vigente com intenções e motivos de voz.
                                     </p>
                                     
-                                    <div style="margin-bottom: 1rem;">
+                                    <div style="margin-bottom: 0.75rem;">
                                         <label style="font-size: 0.75rem; color: var(--text-muted); display: block; margin-bottom: 0.3rem;">Mês de Referência:</label>
-                                        <input type="month" id="input-ura-mes" value="2026-08" style="width: 100%; padding: 0.4rem 0.6rem; border-radius: 6px; border: 1px solid var(--border-color); background: rgba(0,0,0,0.3); color: var(--text-primary); font-size: 0.8rem;">
+                                        <input type="month" id="input-ura-mes" value="2026-08" onchange="onDiagMonthInputChanged('URA')" style="width: 100%; padding: 0.4rem 0.6rem; border-radius: 6px; border: 1px solid var(--border-color); background: rgba(0,0,0,0.3); color: var(--text-primary); font-size: 0.8rem;">
                                     </div>
+
+                                    <div id="badge-status-ura" style="margin-bottom: 1rem; min-height: 24px;"></div>
                                 </div>
 
                                 <div>
                                     <input type="file" id="file-upload-ura" accept=".xlsx,.xls,.csv" style="display: none;" onchange="handleExcelUpload('URA', this)">
-                                    <button type="button" class="btn btn-primary" onclick="document.getElementById('file-upload-ura').click()" style="width: 100%; justify-content: center; font-size: 0.85rem; padding: 0.6rem;">
-                                        <i class="fa-solid fa-file-excel" style="margin-right: 0.4rem;"></i> Selecionar Excel
+                                    <button type="button" id="btn-upload-ura" class="btn btn-primary" onclick="triggerDiagUpload('URA')" style="width: 100%; justify-content: center; font-size: 0.85rem; padding: 0.6rem;">
+                                        <i class="fa-solid fa-file-excel" style="margin-right: 0.4rem;"></i> <span id="label-btn-upload-ura">Selecionar Excel</span>
                                     </button>
                                     <div id="status-upload-ura" style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.5rem; text-align: center;">Aguardando arquivo</div>
                                 </div>
                             </div>
+                        </div>
+                    </section>
+
+                    <!-- SEÇÃO: NOVO QUADRO CARGAS REALIZADAS -->
+                    <section class="panel glass-panel" id="section-diag-cargas-realizadas" style="margin-bottom: 1.5rem; padding: 1.25rem;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.75rem;">
+                            <div>
+                                <h3 class="panel-title" style="font-size: 1.05rem; margin: 0; display: flex; align-items: center; gap: 0.5rem;">
+                                    <i class="fa-solid fa-list-check" style="color: var(--color-primary);"></i>
+                                    <span>Cargas Mensais Realizadas</span>
+                                    <span class="badge" id="diag-cargas-count">0</span>
+                                </h3>
+                                <p style="font-size: 0.8rem; color: var(--text-secondary); margin: 0.2rem 0 0 0;">
+                                    Relação de arquivos carregados. Apenas Administradores podem excluir uma carga para liberar nova inclusão no mesmo mês.
+                                </p>
+                            </div>
+                            <div style="display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;">
+                                <select id="diag-filter-cargas-canal" onchange="renderCargasRealizadasTable()" style="padding: 0.4rem 0.65rem; border-radius: 6px; border: 1px solid var(--border-color); background: rgba(255,255,255,0.05); color: var(--text-primary); font-size: 0.8rem; cursor: pointer;">
+                                    <option value="TODOS">Todos os Canais</option>
+                                    <option value="LIGACOES">Tabelão (Ligações)</option>
+                                    <option value="CHAT">IA - Chat</option>
+                                    <option value="WHATSAPP">IA - WhatsApp</option>
+                                    <option value="URA">IA - URA</option>
+                                </select>
+                                <input type="text" id="diag-search-cargas" oninput="renderCargasRealizadasTable()" placeholder="Buscar por arquivo ou usuário..." style="padding: 0.4rem 0.65rem; border-radius: 6px; border: 1px solid var(--border-color); background: rgba(255,255,255,0.05); color: var(--text-primary); font-size: 0.8rem; width: 220px; outline: none;">
+                            </div>
+                        </div>
+                        <div class="table-responsive" style="max-height: 320px; overflow-y: auto;">
+                            <table class="fte-table" id="table-diag-cargas" style="font-size: 0.82rem;">
+                                <thead>
+                                    <tr>
+                                        <th style="width: 16%;">CANAL</th>
+                                        <th style="width: 12%;">MÊS REF.</th>
+                                        <th style="width: 26%;">ARQUIVO</th>
+                                        <th style="width: 10%; text-align: right;">LINHAS</th>
+                                        <th style="width: 11%; text-align: right;">VOLUME</th>
+                                        <th style="width: 13%;">RESPONSÁVEL</th>
+                                        <th style="width: 12%;">DATA / HORA</th>
+                                        <th class="col-acao-excluir" style="width: 8%; text-align: center;">AÇÕES</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tbody-diag-cargas">
+                                    <!-- Populado dinamicamente -->
+                                </tbody>
+                            </table>
                         </div>
                     </section>
 
@@ -2171,6 +2231,71 @@
                                     <!-- Populado dinamicamente com badges de status -->
                                 </tbody>
                             </table>
+                        </div>
+                    </section>
+
+                    <!-- ZONA ADMINISTRATIVA: EXCLUSÃO DE DADOS (APENAS ADMIN) -->
+                    <section class="panel glass-panel" id="section-diag-admin-zone" data-permissao="ADMIN" style="margin-bottom: 1.5rem; padding: 1.25rem; border-left: 3px solid #ef4444; background: rgba(239, 68, 68, 0.03);">
+                        <div style="margin-bottom: 1rem;">
+                            <h3 class="panel-title" style="font-size: 1.05rem; margin: 0; display: flex; align-items: center; gap: 0.5rem; color: #f87171;">
+                                <i class="fa-solid fa-shield-halved"></i>
+                                <span>Zona Administrativa - Gestão e Exclusão de Dados</span>
+                                <span class="badge" style="background: rgba(239,68,68,0.2); color: #f87171; font-size: 0.7rem;">ADMIN ONLY</span>
+                            </h3>
+                            <p style="font-size: 0.8rem; color: var(--text-secondary); margin: 0.2rem 0 0 0;">
+                                Ações irreversíveis de exclusão de volumes e tickets do Diagnóstico do Cliente. As regras cadastradas no motor De-Para são preservadas.
+                            </p>
+                        </div>
+
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.25rem;">
+                            <!-- CARD ADMIN 1: EXCLUIR DADOS DE UM MÊS ESPECÍFICO -->
+                            <div style="background: rgba(0,0,0,0.25); border: 1px solid rgba(239, 68, 68, 0.25); border-radius: 10px; padding: 1.15rem; display: flex; flex-direction: column; justify-content: space-between;">
+                                <div>
+                                    <h4 style="font-size: 0.92rem; font-weight: 700; color: #fff; margin-bottom: 0.4rem; display: flex; align-items: center; gap: 0.4rem;">
+                                        <i class="fa-solid fa-calendar-xmark" style="color: #f87171;"></i> Excluir Dados por Mês
+                                    </h4>
+                                    <p style="font-size: 0.78rem; color: var(--text-secondary); margin-bottom: 1rem;">
+                                        Remove os volumes apurados e tickets vinculados ao mês selecionado, liberando novos uploads.
+                                    </p>
+                                    <div style="display: flex; gap: 0.6rem; margin-bottom: 1rem; flex-wrap: wrap;">
+                                        <div style="flex: 1; min-width: 140px;">
+                                            <label style="font-size: 0.73rem; color: var(--text-muted); display: block; margin-bottom: 0.25rem;">Mês de Referência:</label>
+                                            <input type="month" id="admin-delete-mes" value="2026-08" style="width: 100%; padding: 0.4rem 0.6rem; border-radius: 6px; border: 1px solid var(--border-color); background: rgba(0,0,0,0.4); color: var(--text-primary); font-size: 0.82rem;">
+                                        </div>
+                                        <div style="flex: 1; min-width: 150px;">
+                                            <label style="font-size: 0.73rem; color: var(--text-muted); display: block; margin-bottom: 0.25rem;">Canal:</label>
+                                            <select id="admin-delete-canal" style="width: 100%; padding: 0.4rem 0.6rem; border-radius: 6px; border: 1px solid var(--border-color); background: rgba(0,0,0,0.4); color: var(--text-primary); font-size: 0.82rem;">
+                                                <option value="TODOS">Todos os Canais</option>
+                                                <option value="LIGACOES">Tabelão (Ligações)</option>
+                                                <option value="CHAT">IA - Chat</option>
+                                                <option value="WHATSAPP">IA - WhatsApp</option>
+                                                <option value="URA">IA - URA</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <button type="button" class="btn" onclick="openModalConfirmDeleteMes()" style="background: rgba(239,68,68,0.15); border: 1px solid #ef4444; color: #f87171; font-size: 0.82rem; padding: 0.55rem 1rem; font-weight: 600; border-radius: 6px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 0.4rem;">
+                                    <i class="fa-solid fa-trash-can"></i> Excluir Dados do Mês
+                                </button>
+                            </div>
+
+                            <!-- CARD ADMIN 2: EXCLUIR BASE COMPLETA DO DIAGNÓSTICO -->
+                            <div style="background: rgba(0,0,0,0.25); border: 1px solid rgba(239, 68, 68, 0.4); border-radius: 10px; padding: 1.15rem; display: flex; flex-direction: column; justify-content: space-between;">
+                                <div>
+                                    <h4 style="font-size: 0.92rem; font-weight: 700; color: #fca5a5; margin-bottom: 0.4rem; display: flex; align-items: center; gap: 0.4rem;">
+                                        <i class="fa-solid fa-triangle-exclamation" style="color: #ef4444;"></i> Limpeza Total da Base
+                                    </h4>
+                                    <p style="font-size: 0.78rem; color: var(--text-secondary); margin-bottom: 1rem;">
+                                        Exclui <strong>todos os volumes apurados e tickets</strong> de todos os meses e canais. Regras De-Para são preservadas.
+                                    </p>
+                                    <div style="background: rgba(239,68,68,0.08); border: 1px dashed rgba(239,68,68,0.3); border-radius: 6px; padding: 0.65rem 0.85rem; margin-bottom: 1rem; font-size: 0.75rem; color: #fca5a5;">
+                                        <i class="fa-solid fa-circle-exclamation" style="margin-right: 0.3rem;"></i> Exige confirmação por palavra-chave de segurança.
+                                    </div>
+                                </div>
+                                <button type="button" class="btn" onclick="openModalConfirmDeleteAll()" style="background: #ef4444; border: 1px solid #dc2626; color: #fff; font-size: 0.82rem; padding: 0.55rem 1rem; font-weight: 700; border-radius: 6px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 0.4rem;">
+                                    <i class="fa-solid fa-bomb"></i> Zerar Toda a Base de Diagnóstico
+                                </button>
+                            </div>
                         </div>
                     </section>
 
@@ -2736,6 +2861,83 @@
                 <button type="button" class="btn btn-secondary" onclick="closeConfirmProjectionModal()">Cancelar</button>
                 <button type="button" class="btn btn-primary" id="btn-submit-confirm-sizing" onclick="confirmSizingProjection()" style="background: var(--color-success); border-color: var(--color-success); color: #fff; font-weight: 700; display: inline-flex; align-items: center; gap: 0.45rem; padding: 0.55rem 1.25rem; border-radius: 8px; cursor: pointer;">
                     <i class="fa-solid fa-circle-check"></i> Sim, Confirmar e Fechar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL CONFIRMAR EXCLUSÃO DE CARGA INDIVIDUAL -->
+    <div id="modal-diag-confirm-delete-carga" class="modal-overlay" style="display: none;" onclick="if(event.target === this) closeModalConfirmDeleteCarga()">
+        <div class="modal-content sizing-modal-box" style="max-width: 460px;">
+            <div class="modal-header">
+                <h3>
+                    <i class="fa-solid fa-trash-can" style="color: #f43f5e;"></i> Excluir Carga Mensal
+                </h3>
+                <button type="button" class="modal-close" onclick="closeModalConfirmDeleteCarga()">&times;</button>
+            </div>
+            <p class="sizing-modal-desc">
+                Deseja realmente excluir a carga de <strong id="modal-delete-carga-canal" style="color: var(--text-primary);">-</strong> referente a <strong id="modal-delete-carga-mes" style="color: var(--text-primary);">-</strong>?
+            </p>
+            <div class="sizing-modal-callout" style="background: rgba(244, 63, 94, 0.08); border-color: rgba(244, 63, 94, 0.25); color: #f43f5e; margin-bottom: 1.25rem;">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+                <span>Os dados de volumetria e tickets vinculados serão removidos da base. O mês voltará ao estado <strong>Pendente</strong>, permitindo um novo upload.</span>
+            </div>
+            <div class="sizing-modal-actions">
+                <button type="button" class="btn btn-secondary" onclick="closeModalConfirmDeleteCarga()">Cancelar</button>
+                <button type="button" class="btn btn-danger" id="btn-confirm-delete-carga" onclick="confirmDeleteCarga()" style="background: #f43f5e; border-color: #f43f5e; color: #fff; font-weight: 700; display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.55rem 1.25rem; border-radius: 8px;">
+                    <i class="fa-solid fa-trash-can"></i> Sim, Excluir Carga
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL CONFIRMAR EXCLUSÃO DE DADOS DO MÊS -->
+    <div id="modal-diag-confirm-delete-mes" class="modal-overlay" style="display: none;" onclick="if(event.target === this) closeModalConfirmDeleteMes()">
+        <div class="modal-content sizing-modal-box" style="max-width: 480px;">
+            <div class="modal-header">
+                <h3>
+                    <i class="fa-solid fa-calendar-xmark" style="color: #ef4444;"></i> Excluir Dados do Mês
+                </h3>
+                <button type="button" class="modal-close" onclick="closeModalConfirmDeleteMes()">&times;</button>
+            </div>
+            <p class="sizing-modal-desc">
+                Confirma a exclusão dos dados de <strong id="modal-delete-mes-alvo" style="color: var(--text-primary);">-</strong> no canal <strong id="modal-delete-canal-alvo" style="color: var(--text-primary);">-</strong>?
+            </p>
+            <div class="sizing-modal-callout" style="background: rgba(239, 68, 68, 0.08); border-color: rgba(239, 68, 68, 0.25); color: #ef4444; margin-bottom: 1.25rem;">
+                <i class="fa-solid fa-circle-exclamation"></i>
+                <span>Esta ação removerá todos os volumes consolidados e tickets deste período, zerando os indicadores no Dashboard até que um novo upload seja feito.</span>
+            </div>
+            <div class="sizing-modal-actions">
+                <button type="button" class="btn btn-secondary" onclick="closeModalConfirmDeleteMes()">Cancelar</button>
+                <button type="button" class="btn btn-danger" id="btn-confirm-delete-mes" onclick="confirmDeleteMes()" style="background: #ef4444; border-color: #dc2626; color: #fff; font-weight: 700; display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.55rem 1.25rem; border-radius: 8px;">
+                    <i class="fa-solid fa-trash-can"></i> Excluir Dados
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL CONFIRMAR EXCLUSÃO TOTAL DA BASE DE DIAGNÓSTICO -->
+    <div id="modal-diag-confirm-delete-all" class="modal-overlay" style="display: none;" onclick="if(event.target === this) closeModalConfirmDeleteAll()">
+        <div class="modal-content sizing-modal-box" style="max-width: 500px;">
+            <div class="modal-header">
+                <h3>
+                    <i class="fa-solid fa-bomb" style="color: #ef4444;"></i> Exclusão Total da Base
+                </h3>
+                <button type="button" class="modal-close" onclick="closeModalConfirmDeleteAll()">&times;</button>
+            </div>
+            <p class="sizing-modal-desc">
+                Esta ação é <strong style="color: #ef4444;">irreversível</strong> e apagará <strong>todos os volumes apurados, tickets e cargas registradas</strong> de todos os meses e canais. As regras de mapeamento De-Para serão preservadas.
+            </p>
+            <div style="margin-bottom: 1.25rem;">
+                <label style="font-size: 0.8rem; color: var(--text-secondary); display: block; margin-bottom: 0.4rem;">
+                    Para confirmar, digite <span style="font-family: monospace; font-weight: 700; color: #ef4444; background: rgba(239,68,68,0.1); padding: 0.15rem 0.4rem; border-radius: 4px;">EXCLUIR</span> no campo abaixo:
+                </label>
+                <input type="text" id="input-confirm-delete-all-key" oninput="checkDeleteAllInput()" placeholder="Digite EXCLUIR" autocomplete="off" style="width: 100%; padding: 0.55rem 0.85rem; border-radius: 8px; border: 1px solid var(--border-color); background: rgba(0,0,0,0.4); color: var(--text-primary); font-size: 0.9rem; outline: none;">
+            </div>
+            <div class="sizing-modal-actions">
+                <button type="button" class="btn btn-secondary" onclick="closeModalConfirmDeleteAll()">Cancelar</button>
+                <button type="button" class="btn btn-danger" id="btn-submit-delete-all" disabled onclick="confirmDeleteAll()" style="background: #ef4444; border-color: #dc2626; color: #fff; font-weight: 700; display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.55rem 1.25rem; border-radius: 8px; opacity: 0.4; cursor: not-allowed;">
+                    <i class="fa-solid fa-triangle-exclamation"></i> Confirmar Exclusão Total
                 </button>
             </div>
         </div>

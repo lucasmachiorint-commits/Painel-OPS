@@ -2112,7 +2112,7 @@ async function forceResetGlobalState() {
         if (error) {
             showToast(`Erro ao publicar base no Supabase: ${error.message}`, 'error', 8000);
         } else {
-            showToast('âœ… Sua visão atual foi publicada com sucesso como a base global para todos!', 'success', 6000);
+            showToast('✅ Sua visão atual foi publicada com sucesso como a base global para todos!', 'success', 6000);
             updateRealtimeStatusUI('SUBSCRIBED');
         }
     } catch (err) {
@@ -4636,7 +4636,7 @@ function submitAddActivityModal() {
         renderAutomationsView();
     }
 
-    showToast(`âœ… ${t('toast_activity_added', 'Atividade adicionada com sucesso!')}`, 'success', 3500);
+    showToast(`✅ ${t('toast_activity_added', 'Atividade adicionada com sucesso!')}`, 'success', 3500);
 }
 
 // NEW PROCESS MANAGEMENT (FALLBACK)
@@ -8811,7 +8811,7 @@ function renderSizingView() {
                 icon = 'âš ï¸ ';
                 statusTag = 'Reaberto';
             } else if (isConf) {
-                icon = 'âœ… ';
+                icon = '✅ ';
                 statusTag = 'Confirmado';
             } else if (isLatest) {
                 icon = '📅 ';
@@ -8878,7 +8878,7 @@ function renderSizingView() {
                 const confInfo = state.sizingConfirmedMonths[curMonth];
                 const dataFmt = confInfo?.confirmedAt ? new Date(confInfo.confirmedAt).toLocaleString('pt-BR') : '';
                 if (elHistoryText) {
-                    elHistoryText.innerHTML = `âœ… Projeção de <strong>${formatMonthName(curMonth)}</strong> <strong>confirmada e fechada</strong>${dataFmt ? ` em ${dataFmt}` : ''} (Somente Leitura).`;
+                    elHistoryText.innerHTML = `✅ Projeção de <strong>${formatMonthName(curMonth)}</strong> <strong>confirmada e fechada</strong>${dataFmt ? ` em ${dataFmt}` : ''} (Somente Leitura).`;
                 }
                 if (btnUnlock) btnUnlock.style.display = 'inline-flex';
                 if (btnRelock) btnRelock.style.display = 'none';
@@ -9112,7 +9112,7 @@ function importSizingVolumes(file) {
             
             if (updatedCount > 0) {
                 renderSizingView();
-                showToast(`âœ… ${updatedCount} parâmetros importados da planilha! (${summary.join(', ')})`, 'success', 6000);
+                showToast(`✅ ${updatedCount} parâmetros importados da planilha! (${summary.join(', ')})`, 'success', 6000);
             } else {
                 showToast('Aviso: Nenhuma coluna correspondente identificada na planilha.', 'warning', 8000);
             }
@@ -9205,26 +9205,379 @@ const DiagStorage = {
             return [];
         }
     },
-    addImportacaoLog(log) {
+    getCargaAtiva(canal, mes) {
+        if (!mes) return null;
         const list = this.getImportacoes();
-        list.unshift({ ...log, id: 'imp_' + Date.now(), data_hora: new Date().toISOString() });
-        localStorage.setItem(DIAG_STORAGE_KEYS.IMPORTS, JSON.stringify(list.slice(0, 100)));
+        return list.find(imp => imp.canal === canal && imp.mes_ref === mes && (imp.status === 'ATIVA' || !imp.status)) || null;
+    },
+    isMesCarregado(canal, mes) {
+        if (!mes) return false;
+        const ativa = this.getCargaAtiva(canal, mes);
+        if (ativa) return true;
+        const vols = this.getVolume();
+        return vols.some(v => v.canal === canal && v.mes === mes);
+    },
+    listarCargas(filtros = {}) {
+        let list = this.getImportacoes().filter(imp => (imp.status === 'ATIVA' || !imp.status));
+        if (filtros.canal && filtros.canal !== 'TODOS') {
+            list = list.filter(imp => imp.canal === filtros.canal);
+        }
+        if (filtros.busca) {
+            const q = filtros.busca.toLowerCase().trim();
+            list = list.filter(imp =>
+                (imp.nome_arquivo || '').toLowerCase().includes(q) ||
+                (imp.usuario_nome || '').toLowerCase().includes(q) ||
+                (imp.usuario_email || '').toLowerCase().includes(q) ||
+                (imp.mes_ref || '').toLowerCase().includes(q)
+            );
+        }
+        return list.sort((a, b) => new Date(b.data_importacao || b.data_hora || 0) - new Date(a.data_importacao || a.data_hora || 0));
+    },
+    registrarCarga(meta) {
+        const list = this.getImportacoes();
+        const userEmail = (typeof currentUser !== 'undefined' && currentUser && currentUser.email) ? currentUser.email : '';
+        const userNome = (typeof currentUser !== 'undefined' && currentUser && currentUser.nome) ? currentUser.nome : 'Usuário';
+
+        // Marca qualquer carga ATIVA anterior do mesmo canal e mês como EXCLUIDA
+        list.forEach(imp => {
+            if (imp.canal === meta.canal && imp.mes_ref === meta.mes_ref && (imp.status === 'ATIVA' || !imp.status)) {
+                imp.status = 'EXCLUIDA';
+                imp.excluido_por = userNome || userEmail;
+                imp.excluido_em = new Date().toISOString();
+            }
+        });
+
+        const novaCarga = {
+            id: 'imp_' + Date.now() + '_' + Math.random().toString(36).substring(2, 7),
+            canal: meta.canal,
+            mes_ref: meta.mes_ref,
+            nome_arquivo: meta.nome_arquivo || 'planilha.xlsx',
+            total_linhas: Number(meta.total_linhas || 0),
+            volume_total: Number(meta.volume_total || 0),
+            tickets_processados: Number(meta.tickets_processados || 0),
+            usuario_email: userEmail,
+            usuario_nome: userNome,
+            status: 'ATIVA',
+            data_importacao: new Date().toISOString(),
+            excluido_por: null,
+            excluido_em: null
+        };
+
+        list.unshift(novaCarga);
+        localStorage.setItem(DIAG_STORAGE_KEYS.IMPORTS, JSON.stringify(list));
+        this.syncSupabaseImportacao(novaCarga);
+        return novaCarga;
+    },
+    excluirCarga(canal, mes) {
+        if (!verificarPermissao('ADMIN')) {
+            alert('Acesso negado: Apenas Administradores podem excluir cargas mensais.');
+            return false;
+        }
+        const userIdentifier = (typeof currentUser !== 'undefined' && currentUser ? (currentUser.nome || currentUser.email || 'Admin') : 'Admin');
+
+        // 1. Marca status como EXCLUIDA
+        const list = this.getImportacoes();
+        list.forEach(imp => {
+            if (imp.canal === canal && imp.mes_ref === mes && (imp.status === 'ATIVA' || !imp.status)) {
+                imp.status = 'EXCLUIDA';
+                imp.excluido_por = userIdentifier;
+                imp.excluido_em = new Date().toISOString();
+            }
+        });
+        localStorage.setItem(DIAG_STORAGE_KEYS.IMPORTS, JSON.stringify(list));
+
+        // 2. Remove volumetria correspondente
+        const volumes = this.getVolume().filter(v => !(v.canal === canal && v.mes === mes));
+        this.saveVolume(volumes);
+
+        // 3. Se for Ligações, remove tickets apurados daquele mês
+        if (canal === 'LIGACOES') {
+            const tickets = this.getTickets().filter(t => t.mes_fechamento !== mes);
+            this.saveTickets(tickets);
+        }
+
+        // 4. Sincroniza exclusão no Supabase
+        this.syncSupabaseExclusaoCarga(canal, mes);
+
+        // 5. Atualiza interface
+        if (typeof updateUploadCardsStatus === 'function') updateUploadCardsStatus();
+        if (typeof renderCargasRealizadasTable === 'function') renderCargasRealizadasTable();
+        if (typeof renderCoverageMatrix === 'function') renderCoverageMatrix();
+        if (typeof renderDeParaCounts === 'function') renderDeParaCounts();
+        const diagDashboardView = document.getElementById('view-diag-dashboard');
+        if (diagDashboardView && diagDashboardView.style.display !== 'none' && typeof renderDiagDashboardView === 'function') {
+            renderDiagDashboardView();
+        }
+
+        return true;
+    },
+    excluirDadosMes(mes, canal = 'TODOS') {
+        if (!verificarPermissao('ADMIN')) {
+            alert('Acesso negado: Apenas Administradores podem excluir dados.');
+            return false;
+        }
+        const userIdentifier = (typeof currentUser !== 'undefined' && currentUser ? (currentUser.nome || currentUser.email || 'Admin') : 'Admin');
+
+        // 1. Marca cargas como excluídas
+        const list = this.getImportacoes();
+        list.forEach(imp => {
+            if (imp.mes_ref === mes && (canal === 'TODOS' || imp.canal === canal) && (imp.status === 'ATIVA' || !imp.status)) {
+                imp.status = 'EXCLUIDA';
+                imp.excluido_por = userIdentifier;
+                imp.excluido_em = new Date().toISOString();
+            }
+        });
+        localStorage.setItem(DIAG_STORAGE_KEYS.IMPORTS, JSON.stringify(list));
+
+        // 2. Remove volumes
+        const volumes = this.getVolume().filter(v => {
+            if (v.mes !== mes) return true;
+            if (canal === 'TODOS') return false;
+            return v.canal !== canal;
+        });
+        this.saveVolume(volumes);
+
+        // 3. Remove tickets se Ligações ou Todos
+        if (canal === 'TODOS' || canal === 'LIGACOES') {
+            const tickets = this.getTickets().filter(t => t.mes_fechamento !== mes);
+            this.saveTickets(tickets);
+        }
+
+        // 4. Sincroniza exclusão no Supabase
+        this.syncSupabaseExclusaoMes(mes, canal);
+
+        // 5. Atualiza telas
+        if (typeof updateUploadCardsStatus === 'function') updateUploadCardsStatus();
+        if (typeof renderCargasRealizadasTable === 'function') renderCargasRealizadasTable();
+        if (typeof renderCoverageMatrix === 'function') renderCoverageMatrix();
+        if (typeof renderDeParaCounts === 'function') renderDeParaCounts();
+        const diagDashboardView = document.getElementById('view-diag-dashboard');
+        if (diagDashboardView && diagDashboardView.style.display !== 'none' && typeof renderDiagDashboardView === 'function') {
+            renderDiagDashboardView();
+        }
+
+        return true;
+    },
+    excluirBaseCompleta() {
+        if (!verificarPermissao('ADMIN')) {
+            alert('Acesso negado: Apenas Administradores podem zerar a base.');
+            return false;
+        }
+        const userIdentifier = (typeof currentUser !== 'undefined' && currentUser ? (currentUser.nome || currentUser.email || 'Admin') : 'Admin');
+
+        // Marca todas as cargas como EXCLUIDA
+        const list = this.getImportacoes();
+        list.forEach(imp => {
+            if (imp.status === 'ATIVA' || !imp.status) {
+                imp.status = 'EXCLUIDA';
+                imp.excluido_por = userIdentifier;
+                imp.excluido_em = new Date().toISOString();
+            }
+        });
+        localStorage.setItem(DIAG_STORAGE_KEYS.IMPORTS, JSON.stringify(list));
+
+        // Zera volumes e tickets
+        this.saveVolume([]);
+        this.saveTickets([]);
+
+        // Sincroniza exclusão total no Supabase
+        this.syncSupabaseExclusaoTotal();
+
+        // Atualiza telas
+        if (typeof updateUploadCardsStatus === 'function') updateUploadCardsStatus();
+        if (typeof renderCargasRealizadasTable === 'function') renderCargasRealizadasTable();
+        if (typeof renderCoverageMatrix === 'function') renderCoverageMatrix();
+        if (typeof renderDeParaCounts === 'function') renderDeParaCounts();
+        const diagDashboardView = document.getElementById('view-diag-dashboard');
+        if (diagDashboardView && diagDashboardView.style.display !== 'none' && typeof renderDiagDashboardView === 'function') {
+            renderDiagDashboardView();
+        }
+
+        return true;
     },
     async syncSupabaseVolume(volumeList) {
         if (!supabase) return;
         try {
-            // Sincronização assíncrona não bloqueante
-            // Se a tabela diag_volume existir no Supabase, envia em lote
+            // Sincronização em lotes de 100 registros
+            if (Array.isArray(volumeList) && volumeList.length > 0) {
+                const rows = volumeList.map(v => ({
+                    env: 'hml',
+                    mes_ref: v.mes,
+                    canal: v.canal,
+                    norm_produto: v.produto || 'Não Especificado',
+                    norm_motivo: v.motivo || 'Não Especificado',
+                    norm_submotivo: v.submotivo || '-',
+                    volume: Number(v.volume || 1),
+                    updated_at: new Date().toISOString()
+                }));
+                for (let i = 0; i < rows.length; i += 100) {
+                    await supabase.from('diag_volume').upsert(rows.slice(i, i + 100), { onConflict: 'env,mes_ref,canal,orig_produto,orig_motivo,orig_submotivo' });
+                }
+            }
         } catch (e) {
-            // Silencioso para fallback em localStorage
+            console.warn('[DiagStorage] Fallback ativo para volumes no localStorage:', e);
         }
     },
     async syncSupabaseTickets(ticketsList) {
         if (!supabase) return;
         try {
-            // Sincronização assíncrona não bloqueante
+            if (Array.isArray(ticketsList) && ticketsList.length > 0) {
+                const rows = ticketsList.slice(0, 1000).map(t => ({
+                    env: 'hml',
+                    ticket_id: String(t.id_ticket || Math.random()),
+                    mes_fechamento: t.mes_fechamento,
+                    mes_abertura: t.mes_abertura || t.mes_fechamento,
+                    data_abertura: new Date().toISOString(),
+                    status: t.status || 'Fechado',
+                    grupo: t.grupo_ticket || 'Geral',
+                    dias_corridos: Number(t.dias_corridos || 0),
+                    dentro_prazo: Boolean(t.dentro_prazo),
+                    updated_at: new Date().toISOString()
+                }));
+                for (let i = 0; i < rows.length; i += 100) {
+                    await supabase.from('diag_tickets').upsert(rows.slice(i, i + 100), { onConflict: 'env,ticket_id' });
+                }
+            }
         } catch (e) {
-            // Silencioso
+            console.warn('[DiagStorage] Fallback ativo para tickets no localStorage:', e);
+        }
+    },
+    async syncSupabaseImportacao(imp) {
+        if (!supabase) return;
+        try {
+            await supabase.from('diag_importacoes').upsert({
+                env: 'hml',
+                mes_ref: imp.mes_ref,
+                canal: imp.canal,
+                nome_arquivo: imp.nome_arquivo,
+                total_linhas: imp.total_linhas,
+                volume_total: imp.volume_total,
+                tickets_processados: imp.tickets_processados,
+                usuario_email: imp.usuario_email,
+                usuario_nome: imp.usuario_nome,
+                status: imp.status || 'ATIVA',
+                excluido_por: imp.excluido_por,
+                excluido_em: imp.excluido_em,
+                data_importacao: imp.data_importacao || new Date().toISOString()
+            }, { onConflict: 'env,mes_ref,canal' });
+        } catch (e) {
+            console.warn('[DiagStorage] Falha ao registrar carga no Supabase (fallback ativo):', e);
+        }
+    },
+    async syncSupabaseExclusaoCarga(canal, mes) {
+        if (!supabase) return;
+        try {
+            const userIdentifier = (typeof currentUser !== 'undefined' && currentUser ? (currentUser.nome || currentUser.email) : 'Admin');
+            await supabase.from('diag_importacoes')
+                .update({ status: 'EXCLUIDA', excluido_por: userIdentifier, excluido_em: new Date().toISOString() })
+                .eq('env', 'hml').eq('canal', canal).eq('mes_ref', mes);
+
+            await supabase.from('diag_volume')
+                .delete().eq('env', 'hml').eq('canal', canal).eq('mes_ref', mes);
+
+            if (canal === 'LIGACOES') {
+                await supabase.from('diag_tickets')
+                    .delete().eq('env', 'hml').eq('mes_fechamento', mes);
+            }
+
+            await supabase.from('diag_audit_log').insert({
+                env: 'hml',
+                acao: 'EXCLUSAO_CARGA',
+                canal,
+                mes_ref: mes,
+                detalhes: 'Carga excluída por ' + userIdentifier,
+                usuario_email: (currentUser && currentUser.email) || '',
+                usuario_nome: (currentUser && currentUser.nome) || ''
+            });
+        } catch (e) {
+            console.warn('[DiagStorage] Falha ao sincronizar exclusão de carga no Supabase:', e);
+        }
+    },
+    async syncSupabaseExclusaoMes(mes, canal) {
+        if (!supabase) return;
+        try {
+            const userIdentifier = (typeof currentUser !== 'undefined' && currentUser ? (currentUser.nome || currentUser.email) : 'Admin');
+            let qImp = supabase.from('diag_importacoes').update({ status: 'EXCLUIDA', excluido_por: userIdentifier, excluido_em: new Date().toISOString() }).eq('env', 'hml').eq('mes_ref', mes);
+            if (canal !== 'TODOS') qImp = qImp.eq('canal', canal);
+            await qImp;
+
+            let qVol = supabase.from('diag_volume').delete().eq('env', 'hml').eq('mes_ref', mes);
+            if (canal !== 'TODOS') qVol = qVol.eq('canal', canal);
+            await qVol;
+
+            if (canal === 'TODOS' || canal === 'LIGACOES') {
+                await supabase.from('diag_tickets').delete().eq('env', 'hml').eq('mes_fechamento', mes);
+            }
+
+            await supabase.from('diag_audit_log').insert({
+                env: 'hml',
+                acao: 'EXCLUSAO_MES',
+                canal,
+                mes_ref: mes,
+                detalhes: 'Mês ' + mes + ' (Canal: ' + canal + ') excluído por ' + userIdentifier,
+                usuario_email: (currentUser && currentUser.email) || '',
+                usuario_nome: (currentUser && currentUser.nome) || ''
+            });
+        } catch (e) {
+            console.warn('[DiagStorage] Falha ao sincronizar exclusão de mês no Supabase:', e);
+        }
+    },
+    async syncSupabaseExclusaoTotal() {
+        if (!supabase) return;
+        try {
+            const userIdentifier = (typeof currentUser !== 'undefined' && currentUser ? (currentUser.nome || currentUser.email) : 'Admin');
+            await supabase.from('diag_importacoes').update({ status: 'EXCLUIDA', excluido_por: userIdentifier, excluido_em: new Date().toISOString() }).eq('env', 'hml');
+            await supabase.from('diag_volume').delete().eq('env', 'hml');
+            await supabase.from('diag_tickets').delete().eq('env', 'hml');
+
+            await supabase.from('diag_audit_log').insert({
+                env: 'hml',
+                acao: 'EXCLUSAO_BASE_COMPLETA',
+                detalhes: 'Base de Diagnóstico zerada por ' + userIdentifier,
+                usuario_email: (currentUser && currentUser.email) || '',
+                usuario_nome: (currentUser && currentUser.nome) || ''
+            });
+        } catch (e) {
+            console.warn('[DiagStorage] Falha ao sincronizar exclusão total no Supabase:', e);
+        }
+    },
+    async loadFromSupabase() {
+        if (!supabase) return;
+        try {
+            const { data: impData, error: impErr } = await supabase.from('diag_importacoes').select('*').eq('env', 'hml');
+            if (!impErr && Array.isArray(impData) && impData.length > 0) {
+                localStorage.setItem(DIAG_STORAGE_KEYS.IMPORTS, JSON.stringify(impData));
+            }
+
+            const { data: volData, error: volErr } = await supabase.from('diag_volume').select('*').eq('env', 'hml');
+            if (!volErr && Array.isArray(volData) && volData.length > 0) {
+                const mappedVols = volData.map(v => ({
+                    id: 'vol_' + (v.id || Math.random().toString(36).substring(2, 9)),
+                    canal: v.canal,
+                    mes: v.mes_ref,
+                    produto: v.norm_produto,
+                    motivo: v.norm_motivo,
+                    submotivo: v.norm_submotivo,
+                    volume: v.volume
+                }));
+                localStorage.setItem(DIAG_STORAGE_KEYS.VOLUME, JSON.stringify(mappedVols));
+            }
+
+            const { data: tickData, error: tickErr } = await supabase.from('diag_tickets').select('*').eq('env', 'hml').limit(5000);
+            if (!tickErr && Array.isArray(tickData) && tickData.length > 0) {
+                const mappedTicks = tickData.map(t => ({
+                    id_ticket: t.ticket_id,
+                    mes_fechamento: t.mes_fechamento,
+                    mes_abertura: t.mes_abertura,
+                    grupo_ticket: t.grupo,
+                    status: t.status,
+                    dias_corridos: Number(t.dias_corridos || 0),
+                    dentro_prazo: Boolean(t.dentro_prazo)
+                }));
+                localStorage.setItem(DIAG_STORAGE_KEYS.TICKETS, JSON.stringify(mappedTicks));
+            }
+        } catch (e) {
+            console.warn('[DiagStorage] Falha ao ler dados do Supabase:', e);
         }
     }
 };
@@ -9401,23 +9754,148 @@ function toggleTabelaoMode() {
     if (sel && wrapper) {
         wrapper.style.display = (sel.value === 'historico') ? 'none' : 'block';
     }
+    updateUploadCardsStatus();
+}
+
+function onDiagMonthInputChanged(canalKey) {
+    updateUploadCardsStatus();
+}
+
+// Atualiza os selos de status e habilitação dos botões dos 4 cards de upload
+function updateUploadCardsStatus() {
+    const isUserAdmin = verificarPermissao('ADMIN');
+    const canaisKeys = ['LIGACOES', 'CHAT', 'WHATSAPP', 'URA'];
+
+    canaisKeys.forEach(key => {
+        const lowerKey = (key === 'LIGACOES') ? 'tabelao' : key.toLowerCase();
+        const inputMes = document.getElementById('input-' + lowerKey + '-mes');
+        const badgeEl = document.getElementById('badge-status-' + lowerKey);
+        const btnUpload = document.getElementById('btn-upload-' + lowerKey);
+        const labelBtn = document.getElementById('label-btn-upload-' + lowerKey);
+
+        const selTipoCarga = (key === 'LIGACOES') ? document.getElementById('select-tabelao-tipo-carga') : null;
+        const isHistorico = selTipoCarga && selTipoCarga.value === 'historico';
+
+        if (isHistorico) {
+            const has2026Data = DiagStorage.getVolume().some(v => v.canal === 'LIGACOES');
+            if (badgeEl) {
+                if (has2026Data) {
+                    badgeEl.innerHTML = `<div class="diag-card-status-pill loaded"><i class="fa-solid fa-circle-check"></i> Base 2026 com dados carregados</div>`;
+                } else {
+                    badgeEl.innerHTML = `<div class="diag-card-status-pill pending"><i class="fa-solid fa-circle-dashed"></i> Nenhum histórico 2026 carregado</div>`;
+                }
+            }
+            if (btnUpload) {
+                if (has2026Data && !isUserAdmin) {
+                    btnUpload.disabled = true;
+                    btnUpload.style.opacity = '0.5';
+                    btnUpload.style.cursor = 'not-allowed';
+                    btnUpload.title = 'A base de 2026 já possui dados carregados. Solicite a um Administrador para recarregar.';
+                    if (labelBtn) labelBtn.textContent = 'Carga Bloqueada (Já Carregado)';
+                } else {
+                    btnUpload.disabled = false;
+                    btnUpload.style.opacity = '1';
+                    btnUpload.style.cursor = 'pointer';
+                    btnUpload.title = isUserAdmin && has2026Data ? 'Substituir carga histórica 2026' : 'Selecionar arquivo histórico 2026';
+                    if (labelBtn) labelBtn.textContent = (isUserAdmin && has2026Data) ? 'Substituir Carga 2026 (ADMIN)' : 'Selecionar Excel';
+                }
+            }
+            return;
+        }
+
+        const selectedMes = inputMes ? inputMes.value : '2026-08';
+        const isLoaded = DiagStorage.isMesCarregado(key, selectedMes);
+        const cargaAtiva = DiagStorage.getCargaAtiva(key, selectedMes);
+
+        if (badgeEl) {
+            if (isLoaded) {
+                const resp = cargaAtiva ? (cargaAtiva.usuario_nome || cargaAtiva.usuario_email || 'Usuário') : 'Usuário';
+                const dt = cargaAtiva && (cargaAtiva.data_importacao || cargaAtiva.data_hora) ? new Date(cargaAtiva.data_importacao || cargaAtiva.data_hora).toLocaleDateString('pt-BR') : '';
+                badgeEl.innerHTML = `<div class="diag-card-status-pill loaded" title="Carga ativa para ${selectedMes}"><i class="fa-solid fa-circle-check"></i> Carregado em ${dt || '2026'} por ${resp}</div>`;
+            } else {
+                badgeEl.innerHTML = `<div class="diag-card-status-pill pending"><i class="fa-solid fa-circle-dashed"></i> Mês ${selectedMes} Pendente</div>`;
+            }
+        }
+
+        if (btnUpload) {
+            if (isLoaded && !isUserAdmin) {
+                btnUpload.disabled = true;
+                btnUpload.style.opacity = '0.5';
+                btnUpload.style.cursor = 'not-allowed';
+                btnUpload.title = `O mês ${selectedMes} já foi carregado para ${DIAG_CANAIS[key].name}. Apenas Administradores podem substituir.`;
+                if (labelBtn) labelBtn.textContent = 'Mês Já Carregado (Bloqueado)';
+            } else if (isLoaded && isUserAdmin) {
+                btnUpload.disabled = false;
+                btnUpload.style.opacity = '1';
+                btnUpload.style.cursor = 'pointer';
+                btnUpload.title = `Substituir carga ativa do mês ${selectedMes}`;
+                if (labelBtn) labelBtn.textContent = 'Substituir Carga (ADMIN)';
+            } else {
+                btnUpload.disabled = false;
+                btnUpload.style.opacity = '1';
+                btnUpload.style.cursor = 'pointer';
+                btnUpload.title = 'Selecionar arquivo Excel para este mês';
+                if (labelBtn) labelBtn.textContent = 'Selecionar Excel';
+            }
+        }
+    });
+}
+
+// Disparo de seleção de arquivo com validação prévia de permissões e mês bloqueado
+function triggerDiagUpload(canalKey) {
+    const isUserAdmin = verificarPermissao('ADMIN');
+    const lowerKey = (canalKey === 'LIGACOES') ? 'tabelao' : canalKey.toLowerCase();
+    const selTipoCarga = (canalKey === 'LIGACOES') ? document.getElementById('select-tabelao-tipo-carga') : null;
+    const isHistorico = selTipoCarga && selTipoCarga.value === 'historico';
+    const inputMes = document.getElementById('input-' + lowerKey + '-mes');
+    const selectedMes = inputMes ? inputMes.value : '2026-08';
+
+    if (!isHistorico && DiagStorage.isMesCarregado(canalKey, selectedMes)) {
+        if (!isUserAdmin) {
+            const carga = DiagStorage.getCargaAtiva(canalKey, selectedMes);
+            const resp = carga ? (carga.usuario_nome || carga.usuario_email || 'outro usuário') : 'outro usuário';
+            const dataStr = carga && (carga.data_importacao || carga.data_hora) ? new Date(carga.data_importacao || carga.data_hora).toLocaleDateString('pt-BR') : '';
+            alert(`O mês ${selectedMes} já foi carregado para ${DIAG_CANAIS[canalKey].name}${dataStr ? ' em ' + dataStr : ''} por ${resp}.\n\nPara operadores normais, apenas meses pendentes são permitidos. Solicite a um Administrador a exclusão da carga atual para recarregar.`);
+            return;
+        } else {
+            const ok = confirm(`Atenção Administrador: O mês ${selectedMes} já possui carga ativa para ${DIAG_CANAIS[canalKey].name}.\n\nDeseja selecionar uma nova planilha para SUBSTITUIR os dados existentes?`);
+            if (!ok) return;
+        }
+    }
+
+    const fileInput = document.getElementById('file-upload-' + lowerKey);
+    if (fileInput) fileInput.click();
 }
 
 // ==========================================================================
-// IMPORTAÇÃO EXCEL E PROCESSAMENTO
+// IMPORTAÇÃO EXCEL E PROCESSAMENTO (COM CONTROLE DE CARGA E TRAVAS RBAC)
 // ==========================================================================
 
 async function handleExcelUpload(canalKey, inputEl) {
     const file = inputEl.files && inputEl.files[0];
     if (!file) return;
 
-    const statusEl = document.getElementById('status-upload-' + canalKey.toLowerCase());
+    const lowerKey = (canalKey === 'LIGACOES') ? 'tabelao' : canalKey.toLowerCase();
+    const statusEl = document.getElementById('status-upload-' + lowerKey);
     if (statusEl) {
         statusEl.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Processando planilha...';
         statusEl.style.color = 'var(--color-primary)';
     }
 
     try {
+        const isUserAdmin = verificarPermissao('ADMIN');
+        const selTipoCarga = (canalKey === 'LIGACOES') ? document.getElementById('select-tabelao-tipo-carga') : null;
+        const isHistorico = selTipoCarga && selTipoCarga.value === 'historico';
+        const inputMes = document.getElementById('input-' + lowerKey + '-mes');
+        const defaultMes = inputMes?.value || '2026-08';
+
+        // PRÉ-VALIDAÇÃO: Se for carga de mês individual já carregado e não for ADMIN, bloqueia
+        if (!isHistorico && DiagStorage.isMesCarregado(canalKey, defaultMes) && !isUserAdmin) {
+            const carga = DiagStorage.getCargaAtiva(canalKey, defaultMes);
+            const resp = carga ? (carga.usuario_nome || carga.usuario_email || 'outro usuário') : 'outro usuário';
+            throw new Error(`O mês ${defaultMes} já foi carregado para ${DIAG_CANAIS[canalKey].name} por ${resp}. Solicite a um Administrador a exclusão para recarregar.`);
+        }
+
         const data = await file.arrayBuffer();
         if (typeof XLSX === 'undefined') {
             throw new Error('Biblioteca SheetJS (XLSX) não carregada no navegador.');
@@ -9438,15 +9916,11 @@ async function handleExcelUpload(canalKey, inputEl) {
 
         if (canalKey === 'LIGACOES') {
             // TABELÃO / CENTRAL DE ATENDIMENTO
-            const selTipoCarga = document.getElementById('select-tabelao-tipo-carga');
-            const isHistorico = selTipoCarga && selTipoCarga.value === 'historico';
-            const defaultMes = document.getElementById('input-tabelao-mes')?.value || '2026-08';
-
             const volumeMap = {}; // { 'YYYY-MM|produto|motivo|submotivo': qtd }
             const ticketsToSave = [];
+            const mesesEncontrados = new Set();
 
             for (const row of rawRows) {
-                // Normaliza chaves da linha para case-insensitive
                 const rowNorm = {};
                 for (const [k, v] of Object.entries(row)) {
                     rowNorm[k.trim().toUpperCase()] = v;
@@ -9465,8 +9939,8 @@ async function handleExcelUpload(canalKey, inputEl) {
                 let mesFechamento = formatDiagYearMonth(dtFechamento);
                 let mesAbertura = formatDiagYearMonth(dtAbertura);
 
-                // Determinação do mês de referência
                 let mesRef = isHistorico ? (mesAbertura || mesFechamento || defaultMes) : defaultMes;
+                mesesEncontrados.add(mesRef);
 
                 // 1. Apuração de SLA de Efetividade (Chamados)
                 if (dtAbertura) {
@@ -9478,14 +9952,12 @@ async function handleExcelUpload(canalKey, inputEl) {
                         diffDays = Math.max(0, diffMs / (1000 * 60 * 60 * 24));
                         dentroPrazo = (diffDays <= 7.0);
                     } else {
-                        // Ticket aberto
                         const now = new Date();
                         const diffMs = now.getTime() - dtAbertura.getTime();
                         diffDays = Math.max(0, diffMs / (1000 * 60 * 60 * 24));
                         if (diffDays > 7.0) dentroPrazo = false;
                     }
 
-                    // Ticket é contabilizado no mês de resolução (ou abertura se não fechado)
                     const ticketMes = mesFechamento || mesAbertura || mesRef;
 
                     ticketsToSave.push({
@@ -9514,10 +9986,23 @@ async function handleExcelUpload(canalKey, inputEl) {
                 }
             }
 
+            // PÓS-VALIDAÇÃO HISTÓRICA: Se algum dos meses encontrados já possui carga ativa
+            if (isHistorico) {
+                const mesesConflito = Array.from(mesesEncontrados).filter(m => DiagStorage.isMesCarregado('LIGACOES', m));
+                if (mesesConflito.length > 0) {
+                    if (!isUserAdmin) {
+                        throw new Error(`Carga histórica bloqueada: os meses ${mesesConflito.join(', ')} já possuem carga ativa de Ligações. Apenas Administradores podem substituir.`);
+                    } else {
+                        const ok = confirm(`Atenção Administrador: O arquivo histórico contém dados dos meses ${mesesConflito.join(', ')} que já possuem carga ativa.\n\nDeseja prosseguir e substituir os dados existentes desses meses?`);
+                        if (!ok) throw new Error('Operação de substituição cancelada.');
+                    }
+                }
+            }
+
             // Consolidação dos volumes
             const existingVolumes = DiagStorage.getVolume().filter(v => {
                 if (isHistorico) {
-                    return v.canal !== 'LIGACOES';
+                    return !(v.canal === 'LIGACOES' && mesesEncontrados.has(v.mes));
                 } else {
                     return !(v.canal === 'LIGACOES' && v.mes === defaultMes);
                 }
@@ -9541,7 +10026,7 @@ async function handleExcelUpload(canalKey, inputEl) {
             if (ticketsToSave.length > 0) {
                 const existingTickets = DiagStorage.getTickets().filter(t => {
                     if (isHistorico) {
-                        return false; // Substitui histórico
+                        return !mesesEncontrados.has(t.mes_fechamento);
                     } else {
                         return t.mes_fechamento !== defaultMes;
                     }
@@ -9549,33 +10034,41 @@ async function handleExcelUpload(canalKey, inputEl) {
                 DiagStorage.saveTickets(existingTickets.concat(ticketsToSave));
             }
 
-            DiagStorage.addImportacaoLog({
-                canal: 'LIGACOES',
-                mes_referencia: isHistorico ? 'Histórico 2026' : defaultMes,
-                total_linhas: rawRows.length,
-                volume_total: totalImportados,
-                tickets_processados: ticketsProcessados,
-                nome_arquivo: file.name
-            });
+            // Registro das cargas ativas no histórico
+            if (isHistorico) {
+                mesesEncontrados.forEach(m => {
+                    DiagStorage.registrarCarga({
+                        canal: 'LIGACOES',
+                        mes_ref: m,
+                        total_linhas: rawRows.length,
+                        volume_total: totalImportados,
+                        tickets_processados: ticketsProcessados,
+                        nome_arquivo: file.name
+                    });
+                });
+            } else {
+                DiagStorage.registrarCarga({
+                    canal: 'LIGACOES',
+                    mes_ref: defaultMes,
+                    total_linhas: rawRows.length,
+                    volume_total: totalImportados,
+                    tickets_processados: ticketsProcessados,
+                    nome_arquivo: file.name
+                });
+            }
 
         } else {
             // CANAIS DE IA (CHAT, WHATSAPP, URA)
-            const inputMes = document.getElementById('input-' + canalKey.toLowerCase() + '-mes');
-            const defaultMes = inputMes?.value || '2026-08';
             const volumeMap = {}; // { 'mes|produto|motivo|submotivo': qtd }
             const mesesIdentificados = new Set();
 
             for (const row of rawRows) {
-                // Normaliza chaves da linha para lowercase
                 const rowNorm = {};
                 for (const [k, v] of Object.entries(row)) {
                     rowNorm[k.trim().toLowerCase()] = v;
                 }
 
-                // Extrai chave do motivo: WhatsApp usa 'faq', Chat/URA usam 'motivo' ou 'use_case'
                 const motivo = rowNorm['faq'] || rowNorm['motivo'] || rowNorm['motivo_contato'] || rowNorm['use_case'] || rowNorm['usecase'] || '';
-
-                // Extrai data se presente na linha
                 const dt = parseDiagDate(rowNorm['createdat'] || rowNorm['created_at'] || rowNorm['time'] || rowNorm['data'] || rowNorm['updatedat']);
                 const rowMes = formatDiagYearMonth(dt);
                 const mesRef = rowMes || defaultMes;
@@ -9594,6 +10087,17 @@ async function handleExcelUpload(canalKey, inputEl) {
                 }
             }
 
+            // PÓS-VALIDAÇÃO: Se algum dos meses identificados no arquivo já possui carga
+            const mesesConflito = Array.from(mesesIdentificados).filter(m => DiagStorage.isMesCarregado(canalKey, m));
+            if (mesesConflito.length > 0) {
+                if (!isUserAdmin) {
+                    throw new Error(`Upload bloqueado: os meses ${mesesConflito.join(', ')} já possuem carga ativa para ${DIAG_CANAIS[canalKey].name}. Solicite a um Administrador a substituição.`);
+                } else {
+                    const ok = confirm(`Atenção Administrador: O arquivo contém dados dos meses ${mesesConflito.join(', ')} que já possuem carga ativa.\n\nDeseja prosseguir e substituir os dados existentes desses meses?`);
+                    if (!ok) throw new Error('Operação de substituição cancelada.');
+                }
+            }
+
             const existingVolumes = DiagStorage.getVolume().filter(v => !(v.canal === canalKey && mesesIdentificados.has(v.mes)));
             for (const [key, vol] of Object.entries(volumeMap)) {
                 const [mes, prod, mot, sub] = key.split('|');
@@ -9609,45 +10113,109 @@ async function handleExcelUpload(canalKey, inputEl) {
             }
             DiagStorage.saveVolume(existingVolumes);
 
-            const displayMeses = Array.from(mesesIdentificados).sort().join(', ') || defaultMes;
-            DiagStorage.addImportacaoLog({
-                canal: canalKey,
-                mes_referencia: displayMeses,
-                total_linhas: rawRows.length,
-                volume_total: totalImportados,
-                tickets_processados: 0,
-                nome_arquivo: file.name
-            });
+            // Registra cada mês identificado como carga ativa
+            if (mesesIdentificados.size > 0) {
+                mesesIdentificados.forEach(m => {
+                    DiagStorage.registrarCarga({
+                        canal: canalKey,
+                        mes_ref: m,
+                        total_linhas: rawRows.length,
+                        volume_total: totalImportados,
+                        tickets_processados: 0,
+                        nome_arquivo: file.name
+                    });
+                });
+            } else {
+                DiagStorage.registrarCarga({
+                    canal: canalKey,
+                    mes_ref: defaultMes,
+                    total_linhas: rawRows.length,
+                    volume_total: totalImportados,
+                    tickets_processados: 0,
+                    nome_arquivo: file.name
+                });
+            }
         }
 
         if (statusEl) {
             statusEl.innerHTML = `<span style="color: #10b981;"><i class="fa-solid fa-circle-check"></i> ${totalImportados.toLocaleString('pt-BR')} registros importados com sucesso!</span>`;
         }
 
-        showToast(`âœ… Carga de ${DIAG_CANAIS[canalKey].name} concluída: ${totalImportados.toLocaleString('pt-BR')} volumes processados!`, 'success', 6000);
+        showToast(`✅ Carga de ${DIAG_CANAIS[canalKey].name} concluída com sucesso!`, 'success', 6000);
 
+        updateUploadCardsStatus();
+        renderCargasRealizadasTable();
         renderCoverageMatrix();
         renderDeParaCounts();
 
-        // Se estivermos visualizando o dashboard, re-renderizar imediatamente
         const diagDashboardView = document.getElementById('view-diag-dashboard');
-        if (diagDashboardView && diagDashboardView.style.display !== 'none') {
+        if (diagDashboardView && diagDashboardView.style.display !== 'none' && typeof renderDiagDashboardView === 'function') {
             renderDiagDashboardView();
         }
 
     } catch (err) {
         console.error('[Diagnóstico Upload Error]', err);
         if (statusEl) {
-            statusEl.innerHTML = `<span style="color: #ef4444;"><i class="fa-solid fa-triangle-exclamation"></i> Erro: ${err.message}</span>`;
+            statusEl.innerHTML = `<span style="color: #ef4444;"><i class="fa-solid fa-triangle-exclamation"></i> ${err.message}</span>`;
         }
-        showToast('Erro ao importar arquivo: ' + err.message, 'error', 8000);
+        showToast('Erro ao importar planilha: ' + err.message, 'error', 8000);
     } finally {
         inputEl.value = '';
     }
 }
 
 // ==========================================================================
-// RENDERIZAÇÃO: MATRIZ DE COBERTURA DOS MESES (2026)
+// RENDERIZAÇÃO: QUADRO DE CARGAS REALIZADAS
+// ==========================================================================
+
+function renderCargasRealizadasTable() {
+    const tbody = document.getElementById('tbody-diag-cargas');
+    const countBadge = document.getElementById('diag-cargas-count');
+    if (!tbody) return;
+
+    const canalFilter = document.getElementById('diag-filter-cargas-canal')?.value || 'TODOS';
+    const searchQuery = document.getElementById('diag-search-cargas')?.value || '';
+
+    const cargas = DiagStorage.listarCargas({ canal: canalFilter, busca: searchQuery });
+    if (countBadge) countBadge.textContent = cargas.length;
+
+    if (cargas.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="8" style="text-align: center; color: var(--text-muted); padding: 1.5rem;">Nenhuma carga mensal encontrada com os filtros selecionados.</td></tr>`;
+        return;
+    }
+
+    const isUserAdmin = verificarPermissao('ADMIN');
+
+    let html = '';
+    cargas.forEach(c => {
+        const canalDef = DIAG_CANAIS[c.canal] || { name: c.canal, icon: 'fa-file', color: '#888' };
+        const dataHoraStr = c.data_importacao || c.data_hora ? new Date(c.data_importacao || c.data_hora).toLocaleString('pt-BR') : '-';
+        const usuarioStr = c.usuario_nome || c.usuario_email || 'Usuário';
+
+        html += `<tr>
+            <td style="font-weight: 600; color: #fff; display: flex; align-items: center; gap: 0.4rem;">
+                <i class="fa-solid ${canalDef.icon}" style="color: ${canalDef.color};"></i>
+                ${canalDef.name}
+            </td>
+            <td><strong style="color: var(--color-primary);">${c.mes_ref}</strong></td>
+            <td style="max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${c.nome_arquivo}">
+                <i class="fa-solid fa-file-excel" style="color: #10b981; margin-right: 0.3rem;"></i>${c.nome_arquivo}
+            </td>
+            <td style="text-align: right;">${Number(c.total_linhas || 0).toLocaleString('pt-BR')}</td>
+            <td style="text-align: right; font-weight: 600; color: #fff;">${Number(c.volume_total || 0).toLocaleString('pt-BR')}</td>
+            <td>${usuarioStr}</td>
+            <td style="font-size: 0.76rem; color: var(--text-muted);">${dataHoraStr}</td>
+            <td style="text-align: center;">
+                ${isUserAdmin ? `<button type="button" class="diag-btn-danger-subtle" onclick="openModalConfirmDeleteCarga('${c.canal}', '${c.mes_ref}')" title="Excluir carga e liberar mês"><i class="fa-solid fa-trash-can"></i> Excluir</button>` : `<span style="font-size: 0.72rem; color: var(--text-muted);">Bloqueado</span>`}
+            </td>
+        </tr>`;
+    });
+
+    tbody.innerHTML = html;
+}
+
+// ==========================================================================
+// RENDERIZAÇÃO: MATRIZ DE COBERTURA DOS MESES (2026) COM INTERATIVIDADE
 // ==========================================================================
 
 function renderCoverageMatrix() {
@@ -9674,7 +10242,7 @@ function renderCoverageMatrix() {
 
             if (volMonth > 0) {
                 html += `<td style="text-align: center;">
-                    <span class="diag-coverage-badge status-ok" title="${volMonth.toLocaleString('pt-BR')} atendimentos carregados">
+                    <span class="diag-coverage-badge status-ok" style="cursor: pointer;" onclick="handleCoverageCellClick('${key}', '${ym}', ${volMonth})" title="${volMonth.toLocaleString('pt-BR')} atendimentos carregados (Clique para gerenciar)">
                         <i class="fa-solid fa-check"></i> ${volMonth > 999 ? Math.round(volMonth/1000) + 'k' : volMonth}
                     </span>
                 </td>`;
@@ -9690,6 +10258,146 @@ function renderCoverageMatrix() {
     }
 
     tbody.innerHTML = html;
+}
+
+function handleCoverageCellClick(canalKey, yearMonth, volume) {
+    const canalDef = DIAG_CANAIS[canalKey] || { name: canalKey };
+    const carga = DiagStorage.getCargaAtiva(canalKey, yearMonth);
+    const isUserAdmin = verificarPermissao('ADMIN');
+
+    let info = `Canal: ${canalDef.name}\nMês: ${yearMonth}\nVolume Apurado: ${volume.toLocaleString('pt-BR')} atendimentos\n`;
+    if (carga) {
+        info += `Arquivo: ${carga.nome_arquivo || '-'}\n`;
+        info += `Responsável: ${carga.usuario_nome || carga.usuario_email || '-'}\n`;
+        info += `Data de Carga: ${carga.data_importacao ? new Date(carga.data_importacao).toLocaleString('pt-BR') : '-'}\n`;
+    }
+
+    if (isUserAdmin) {
+        info += '\nDeseja EXCLUIR esta carga para permitir um novo upload deste mês?';
+        if (confirm(info)) {
+            openModalConfirmDeleteCarga(canalKey, yearMonth);
+        }
+    } else {
+        alert(info);
+    }
+}
+
+// ==========================================================================
+// CONTROLADORES DA ZONA ADMINISTRATIVA E MODAIS DE CONFIRMAÇÃO
+// ==========================================================================
+
+let _diagPendingDeleteCarga = { canal: null, mes: null };
+let _diagPendingDeleteMes = { canal: null, mes: null };
+
+function openModalConfirmDeleteCarga(canal, mes) {
+    if (!verificarPermissao('ADMIN')) {
+        alert('Acesso restrito ao perfil ADMIN.');
+        return;
+    }
+    _diagPendingDeleteCarga = { canal, mes };
+    const modal = document.getElementById('modal-diag-confirm-delete-carga');
+    const canalEl = document.getElementById('modal-delete-carga-canal');
+    const mesEl = document.getElementById('modal-delete-carga-mes');
+
+    if (canalEl) canalEl.textContent = DIAG_CANAIS[canal]?.name || canal;
+    if (mesEl) mesEl.textContent = mes;
+    if (modal) modal.style.display = 'flex';
+}
+
+function closeModalConfirmDeleteCarga() {
+    const modal = document.getElementById('modal-diag-confirm-delete-carga');
+    if (modal) modal.style.display = 'none';
+    _diagPendingDeleteCarga = { canal: null, mes: null };
+}
+
+function confirmDeleteCarga() {
+    if (!_diagPendingDeleteCarga.canal || !_diagPendingDeleteCarga.mes) return;
+    const ok = DiagStorage.excluirCarga(_diagPendingDeleteCarga.canal, _diagPendingDeleteCarga.mes);
+    if (ok) {
+        closeModalConfirmDeleteCarga();
+        showToast('Carga excluída com sucesso! O mês agora está livre para nova importação.', 'success');
+    }
+}
+
+function openModalConfirmDeleteMes() {
+    if (!verificarPermissao('ADMIN')) {
+        alert('Acesso restrito ao perfil ADMIN.');
+        return;
+    }
+    const mes = document.getElementById('admin-delete-mes')?.value || '2026-08';
+    const canal = document.getElementById('admin-delete-canal')?.value || 'TODOS';
+
+    _diagPendingDeleteMes = { canal, mes };
+
+    const modal = document.getElementById('modal-diag-confirm-delete-mes');
+    const mesEl = document.getElementById('modal-delete-mes-alvo');
+    const canalEl = document.getElementById('modal-delete-canal-alvo');
+
+    if (mesEl) mesEl.textContent = mes;
+    if (canalEl) canalEl.textContent = (canal === 'TODOS') ? 'Todos os Canais' : (DIAG_CANAIS[canal]?.name || canal);
+    if (modal) modal.style.display = 'flex';
+}
+
+function closeModalConfirmDeleteMes() {
+    const modal = document.getElementById('modal-diag-confirm-delete-mes');
+    if (modal) modal.style.display = 'none';
+    _diagPendingDeleteMes = { canal: null, mes: null };
+}
+
+function confirmDeleteMes() {
+    if (!_diagPendingDeleteMes.mes) return;
+    const ok = DiagStorage.excluirDadosMes(_diagPendingDeleteMes.mes, _diagPendingDeleteMes.canal);
+    if (ok) {
+        closeModalConfirmDeleteMes();
+        showToast(`Dados de ${_diagPendingDeleteMes.mes} excluídos com sucesso!`, 'success');
+    }
+}
+
+function openModalConfirmDeleteAll() {
+    if (!verificarPermissao('ADMIN')) {
+        alert('Acesso restrito ao perfil ADMIN.');
+        return;
+    }
+    const modal = document.getElementById('modal-diag-confirm-delete-all');
+    const inputKey = document.getElementById('input-confirm-delete-all-key');
+    const btnSubmit = document.getElementById('btn-submit-delete-all');
+
+    if (inputKey) inputKey.value = '';
+    if (btnSubmit) {
+        btnSubmit.disabled = true;
+        btnSubmit.style.opacity = '0.4';
+        btnSubmit.style.cursor = 'not-allowed';
+    }
+    if (modal) modal.style.display = 'flex';
+}
+
+function closeModalConfirmDeleteAll() {
+    const modal = document.getElementById('modal-diag-confirm-delete-all');
+    if (modal) modal.style.display = 'none';
+}
+
+function checkDeleteAllInput() {
+    const val = document.getElementById('input-confirm-delete-all-key')?.value || '';
+    const btnSubmit = document.getElementById('btn-submit-delete-all');
+    if (btnSubmit) {
+        const isMatch = (val.trim().toUpperCase() === 'EXCLUIR');
+        btnSubmit.disabled = !isMatch;
+        btnSubmit.style.opacity = isMatch ? '1' : '0.4';
+        btnSubmit.style.cursor = isMatch ? 'pointer' : 'not-allowed';
+    }
+}
+
+function confirmDeleteAll() {
+    const val = document.getElementById('input-confirm-delete-all-key')?.value || '';
+    if (val.trim().toUpperCase() !== 'EXCLUIR') {
+        alert('Palavra-chave incorreta. Digite EXCLUIR para confirmar.');
+        return;
+    }
+    const ok = DiagStorage.excluirBaseCompleta();
+    if (ok) {
+        closeModalConfirmDeleteAll();
+        showToast('Toda a base de Diagnóstico foi zerada com sucesso! As regras De-Para foram preservadas.', 'success', 7000);
+    }
 }
 
 // ==========================================================================
@@ -10458,8 +11166,11 @@ function filterDeParaTable() {
 }
 
 function renderDiagImportView() {
+    updateUploadCardsStatus();
+    renderCargasRealizadasTable();
     renderCoverageMatrix();
     renderDeParaTable();
+    DiagStorage.loadFromSupabase();
 }
 
 // EXPORTAÇÃO EXCEL DO DE-PARA
