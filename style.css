@@ -4120,3 +4120,56 @@ body.light-theme .btn-module-switch:hover {
     color: #fff;
     border-color: #ef4444;
 }
+
+/* ==========================================================================
+   SELETOR DE MÊS / CALENDÁRIO EM PORTUGUÊS DO BRASIL (pt-BR)
+   ========================================================================== */
+.diag-month-select-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    width: 100%;
+}
+.diag-month-select-wrapper i {
+    position: absolute;
+    left: 0.65rem;
+    pointer-events: none;
+    font-size: 0.82rem;
+    z-index: 2;
+}
+.diag-month-select {
+    width: 100%;
+    padding: 0.45rem 1.8rem 0.45rem 2.1rem;
+    border-radius: 6px;
+    border: 1px solid var(--border-color);
+    background-color: rgba(0, 0, 0, 0.35);
+    color: var(--text-primary);
+    font-size: 0.82rem;
+    cursor: pointer;
+    outline: none;
+    transition: all 0.2s ease;
+    appearance: none;
+    -webkit-appearance: none;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2212%22%20height%3D%2212%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%2394a3b8%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpolyline%20points%3D%226%209%2012%2015%2018%209%22%3E%3C%2Fpolyline%3E%3C%2Fsvg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.65rem center;
+    background-size: 11px;
+}
+.diag-month-select:hover {
+    border-color: rgba(255, 255, 255, 0.25);
+    background-color: rgba(0, 0, 0, 0.45);
+}
+.diag-month-select:focus {
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 2px rgba(235, 92, 39, 0.2);
+}
+.diag-month-select optgroup {
+    background: #0f172a;
+    color: var(--color-primary);
+    font-weight: 700;
+}
+.diag-month-select option {
+    background: #0b1120;
+    color: var(--text-primary);
+    padding: 0.4rem;
+}

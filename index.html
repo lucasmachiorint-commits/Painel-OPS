@@ -2057,7 +2057,53 @@
 
                                     <div id="wrapper-tabelao-mes" style="margin-bottom: 0.75rem;">
                                         <label style="font-size: 0.75rem; color: var(--text-muted); display: block; margin-bottom: 0.3rem;">Mês de Referência:</label>
-                                        <input type="month" id="input-tabelao-mes" value="2026-08" onchange="onDiagMonthInputChanged('LIGACOES')" style="width: 100%; padding: 0.4rem 0.6rem; border-radius: 6px; border: 1px solid var(--border-color); background: rgba(0,0,0,0.3); color: var(--text-primary); font-size: 0.8rem;">
+                                        <div class="diag-month-select-wrapper">
+                                            <i class="fa-solid fa-calendar-days" style="color: #eb5c27;"></i>
+                                            <select id="input-tabelao-mes" onchange="onDiagMonthInputChanged('LIGACOES')" class="diag-month-select">
+                                                <optgroup label="2026">
+                                                    <option value="2026-01">Janeiro de 2026</option>
+                                                    <option value="2026-02">Fevereiro de 2026</option>
+                                                    <option value="2026-03">Março de 2026</option>
+                                                    <option value="2026-04">Abril de 2026</option>
+                                                    <option value="2026-05">Maio de 2026</option>
+                                                    <option value="2026-06">Junho de 2026</option>
+                                                    <option value="2026-07">Julho de 2026</option>
+                                                    <option value="2026-08" selected>Agosto de 2026</option>
+                                                    <option value="2026-09">Setembro de 2026</option>
+                                                    <option value="2026-10">Outubro de 2026</option>
+                                                    <option value="2026-11">Novembro de 2026</option>
+                                                    <option value="2026-12">Dezembro de 2026</option>
+                                                </optgroup>
+                                                <optgroup label="2025">
+                                                    <option value="2025-01">Janeiro de 2025</option>
+                                                    <option value="2025-02">Fevereiro de 2025</option>
+                                                    <option value="2025-03">Março de 2025</option>
+                                                    <option value="2025-04">Abril de 2025</option>
+                                                    <option value="2025-05">Maio de 2025</option>
+                                                    <option value="2025-06">Junho de 2025</option>
+                                                    <option value="2025-07">Julho de 2025</option>
+                                                    <option value="2025-08">Agosto de 2025</option>
+                                                    <option value="2025-09">Setembro de 2025</option>
+                                                    <option value="2025-10">Outubro de 2025</option>
+                                                    <option value="2025-11">Novembro de 2025</option>
+                                                    <option value="2025-12">Dezembro de 2025</option>
+                                                </optgroup>
+                                                <optgroup label="2027">
+                                                    <option value="2027-01">Janeiro de 2027</option>
+                                                    <option value="2027-02">Fevereiro de 2027</option>
+                                                    <option value="2027-03">Março de 2027</option>
+                                                    <option value="2027-04">Abril de 2027</option>
+                                                    <option value="2027-05">Maio de 2027</option>
+                                                    <option value="2027-06">Junho de 2027</option>
+                                                    <option value="2027-07">Julho de 2027</option>
+                                                    <option value="2027-08">Agosto de 2027</option>
+                                                    <option value="2027-09">Setembro de 2027</option>
+                                                    <option value="2027-10">Outubro de 2027</option>
+                                                    <option value="2027-11">Novembro de 2027</option>
+                                                    <option value="2027-12">Dezembro de 2027</option>
+                                                </optgroup>
+                                            </select>
+                                        </div>
                                     </div>
 
                                     <div id="badge-status-tabelao" style="margin-bottom: 1rem; min-height: 24px;"></div>
@@ -2087,7 +2133,53 @@
                                     
                                     <div style="margin-bottom: 0.75rem;">
                                         <label style="font-size: 0.75rem; color: var(--text-muted); display: block; margin-bottom: 0.3rem;">Mês de Referência:</label>
-                                        <input type="month" id="input-chat-mes" value="2026-08" onchange="onDiagMonthInputChanged('CHAT')" style="width: 100%; padding: 0.4rem 0.6rem; border-radius: 6px; border: 1px solid var(--border-color); background: rgba(0,0,0,0.3); color: var(--text-primary); font-size: 0.8rem;">
+                                        <div class="diag-month-select-wrapper">
+                                            <i class="fa-solid fa-calendar-days" style="color: #3b82f6;"></i>
+                                            <select id="input-chat-mes" onchange="onDiagMonthInputChanged('CHAT')" class="diag-month-select">
+                                                <optgroup label="2026">
+                                                    <option value="2026-01">Janeiro de 2026</option>
+                                                    <option value="2026-02">Fevereiro de 2026</option>
+                                                    <option value="2026-03">Março de 2026</option>
+                                                    <option value="2026-04">Abril de 2026</option>
+                                                    <option value="2026-05">Maio de 2026</option>
+                                                    <option value="2026-06">Junho de 2026</option>
+                                                    <option value="2026-07">Julho de 2026</option>
+                                                    <option value="2026-08" selected>Agosto de 2026</option>
+                                                    <option value="2026-09">Setembro de 2026</option>
+                                                    <option value="2026-10">Outubro de 2026</option>
+                                                    <option value="2026-11">Novembro de 2026</option>
+                                                    <option value="2026-12">Dezembro de 2026</option>
+                                                </optgroup>
+                                                <optgroup label="2025">
+                                                    <option value="2025-01">Janeiro de 2025</option>
+                                                    <option value="2025-02">Fevereiro de 2025</option>
+                                                    <option value="2025-03">Março de 2025</option>
+                                                    <option value="2025-04">Abril de 2025</option>
+                                                    <option value="2025-05">Maio de 2025</option>
+                                                    <option value="2025-06">Junho de 2025</option>
+                                                    <option value="2025-07">Julho de 2025</option>
+                                                    <option value="2025-08">Agosto de 2025</option>
+                                                    <option value="2025-09">Setembro de 2025</option>
+                                                    <option value="2025-10">Outubro de 2025</option>
+                                                    <option value="2025-11">Novembro de 2025</option>
+                                                    <option value="2025-12">Dezembro de 2025</option>
+                                                </optgroup>
+                                                <optgroup label="2027">
+                                                    <option value="2027-01">Janeiro de 2027</option>
+                                                    <option value="2027-02">Fevereiro de 2027</option>
+                                                    <option value="2027-03">Março de 2027</option>
+                                                    <option value="2027-04">Abril de 2027</option>
+                                                    <option value="2027-05">Maio de 2027</option>
+                                                    <option value="2027-06">Junho de 2027</option>
+                                                    <option value="2027-07">Julho de 2027</option>
+                                                    <option value="2027-08">Agosto de 2027</option>
+                                                    <option value="2027-09">Setembro de 2027</option>
+                                                    <option value="2027-10">Outubro de 2027</option>
+                                                    <option value="2027-11">Novembro de 2027</option>
+                                                    <option value="2027-12">Dezembro de 2027</option>
+                                                </optgroup>
+                                            </select>
+                                        </div>
                                     </div>
 
                                     <div id="badge-status-chat" style="margin-bottom: 1rem; min-height: 24px;"></div>
@@ -2117,7 +2209,53 @@
                                     
                                     <div style="margin-bottom: 0.75rem;">
                                         <label style="font-size: 0.75rem; color: var(--text-muted); display: block; margin-bottom: 0.3rem;">Mês de Referência:</label>
-                                        <input type="month" id="input-whatsapp-mes" value="2026-08" onchange="onDiagMonthInputChanged('WHATSAPP')" style="width: 100%; padding: 0.4rem 0.6rem; border-radius: 6px; border: 1px solid var(--border-color); background: rgba(0,0,0,0.3); color: var(--text-primary); font-size: 0.8rem;">
+                                        <div class="diag-month-select-wrapper">
+                                            <i class="fa-solid fa-calendar-days" style="color: #10b981;"></i>
+                                            <select id="input-whatsapp-mes" onchange="onDiagMonthInputChanged('WHATSAPP')" class="diag-month-select">
+                                                <optgroup label="2026">
+                                                    <option value="2026-01">Janeiro de 2026</option>
+                                                    <option value="2026-02">Fevereiro de 2026</option>
+                                                    <option value="2026-03">Março de 2026</option>
+                                                    <option value="2026-04">Abril de 2026</option>
+                                                    <option value="2026-05">Maio de 2026</option>
+                                                    <option value="2026-06">Junho de 2026</option>
+                                                    <option value="2026-07">Julho de 2026</option>
+                                                    <option value="2026-08" selected>Agosto de 2026</option>
+                                                    <option value="2026-09">Setembro de 2026</option>
+                                                    <option value="2026-10">Outubro de 2026</option>
+                                                    <option value="2026-11">Novembro de 2026</option>
+                                                    <option value="2026-12">Dezembro de 2026</option>
+                                                </optgroup>
+                                                <optgroup label="2025">
+                                                    <option value="2025-01">Janeiro de 2025</option>
+                                                    <option value="2025-02">Fevereiro de 2025</option>
+                                                    <option value="2025-03">Março de 2025</option>
+                                                    <option value="2025-04">Abril de 2025</option>
+                                                    <option value="2025-05">Maio de 2025</option>
+                                                    <option value="2025-06">Junho de 2025</option>
+                                                    <option value="2025-07">Julho de 2025</option>
+                                                    <option value="2025-08">Agosto de 2025</option>
+                                                    <option value="2025-09">Setembro de 2025</option>
+                                                    <option value="2025-10">Outubro de 2025</option>
+                                                    <option value="2025-11">Novembro de 2025</option>
+                                                    <option value="2025-12">Dezembro de 2025</option>
+                                                </optgroup>
+                                                <optgroup label="2027">
+                                                    <option value="2027-01">Janeiro de 2027</option>
+                                                    <option value="2027-02">Fevereiro de 2027</option>
+                                                    <option value="2027-03">Março de 2027</option>
+                                                    <option value="2027-04">Abril de 2027</option>
+                                                    <option value="2027-05">Maio de 2027</option>
+                                                    <option value="2027-06">Junho de 2027</option>
+                                                    <option value="2027-07">Julho de 2027</option>
+                                                    <option value="2027-08">Agosto de 2027</option>
+                                                    <option value="2027-09">Setembro de 2027</option>
+                                                    <option value="2027-10">Outubro de 2027</option>
+                                                    <option value="2027-11">Novembro de 2027</option>
+                                                    <option value="2027-12">Dezembro de 2027</option>
+                                                </optgroup>
+                                            </select>
+                                        </div>
                                     </div>
 
                                     <div id="badge-status-whatsapp" style="margin-bottom: 1rem; min-height: 24px;"></div>
@@ -2147,7 +2285,53 @@
                                     
                                     <div style="margin-bottom: 0.75rem;">
                                         <label style="font-size: 0.75rem; color: var(--text-muted); display: block; margin-bottom: 0.3rem;">Mês de Referência:</label>
-                                        <input type="month" id="input-ura-mes" value="2026-08" onchange="onDiagMonthInputChanged('URA')" style="width: 100%; padding: 0.4rem 0.6rem; border-radius: 6px; border: 1px solid var(--border-color); background: rgba(0,0,0,0.3); color: var(--text-primary); font-size: 0.8rem;">
+                                        <div class="diag-month-select-wrapper">
+                                            <i class="fa-solid fa-calendar-days" style="color: #a855f7;"></i>
+                                            <select id="input-ura-mes" onchange="onDiagMonthInputChanged('URA')" class="diag-month-select">
+                                                <optgroup label="2026">
+                                                    <option value="2026-01">Janeiro de 2026</option>
+                                                    <option value="2026-02">Fevereiro de 2026</option>
+                                                    <option value="2026-03">Março de 2026</option>
+                                                    <option value="2026-04">Abril de 2026</option>
+                                                    <option value="2026-05">Maio de 2026</option>
+                                                    <option value="2026-06">Junho de 2026</option>
+                                                    <option value="2026-07">Julho de 2026</option>
+                                                    <option value="2026-08" selected>Agosto de 2026</option>
+                                                    <option value="2026-09">Setembro de 2026</option>
+                                                    <option value="2026-10">Outubro de 2026</option>
+                                                    <option value="2026-11">Novembro de 2026</option>
+                                                    <option value="2026-12">Dezembro de 2026</option>
+                                                </optgroup>
+                                                <optgroup label="2025">
+                                                    <option value="2025-01">Janeiro de 2025</option>
+                                                    <option value="2025-02">Fevereiro de 2025</option>
+                                                    <option value="2025-03">Março de 2025</option>
+                                                    <option value="2025-04">Abril de 2025</option>
+                                                    <option value="2025-05">Maio de 2025</option>
+                                                    <option value="2025-06">Junho de 2025</option>
+                                                    <option value="2025-07">Julho de 2025</option>
+                                                    <option value="2025-08">Agosto de 2025</option>
+                                                    <option value="2025-09">Setembro de 2025</option>
+                                                    <option value="2025-10">Outubro de 2025</option>
+                                                    <option value="2025-11">Novembro de 2025</option>
+                                                    <option value="2025-12">Dezembro de 2025</option>
+                                                </optgroup>
+                                                <optgroup label="2027">
+                                                    <option value="2027-01">Janeiro de 2027</option>
+                                                    <option value="2027-02">Fevereiro de 2027</option>
+                                                    <option value="2027-03">Março de 2027</option>
+                                                    <option value="2027-04">Abril de 2027</option>
+                                                    <option value="2027-05">Maio de 2027</option>
+                                                    <option value="2027-06">Junho de 2027</option>
+                                                    <option value="2027-07">Julho de 2027</option>
+                                                    <option value="2027-08">Agosto de 2027</option>
+                                                    <option value="2027-09">Setembro de 2027</option>
+                                                    <option value="2027-10">Outubro de 2027</option>
+                                                    <option value="2027-11">Novembro de 2027</option>
+                                                    <option value="2027-12">Dezembro de 2027</option>
+                                                </optgroup>
+                                            </select>
+                                        </div>
                                     </div>
 
                                     <div id="badge-status-ura" style="margin-bottom: 1rem; min-height: 24px;"></div>
@@ -2260,7 +2444,53 @@
                                     <div style="display: flex; gap: 0.6rem; margin-bottom: 1rem; flex-wrap: wrap;">
                                         <div style="flex: 1; min-width: 140px;">
                                             <label style="font-size: 0.73rem; color: var(--text-muted); display: block; margin-bottom: 0.25rem;">Mês de Referência:</label>
-                                            <input type="month" id="admin-delete-mes" value="2026-08" style="width: 100%; padding: 0.4rem 0.6rem; border-radius: 6px; border: 1px solid var(--border-color); background: rgba(0,0,0,0.4); color: var(--text-primary); font-size: 0.82rem;">
+                                            <div class="diag-month-select-wrapper">
+                                                <i class="fa-solid fa-calendar-days" style="color: #ef4444;"></i>
+                                                <select id="admin-delete-mes" class="diag-month-select">
+                                                <optgroup label="2026">
+                                                    <option value="2026-01">Janeiro de 2026</option>
+                                                    <option value="2026-02">Fevereiro de 2026</option>
+                                                    <option value="2026-03">Março de 2026</option>
+                                                    <option value="2026-04">Abril de 2026</option>
+                                                    <option value="2026-05">Maio de 2026</option>
+                                                    <option value="2026-06">Junho de 2026</option>
+                                                    <option value="2026-07">Julho de 2026</option>
+                                                    <option value="2026-08" selected>Agosto de 2026</option>
+                                                    <option value="2026-09">Setembro de 2026</option>
+                                                    <option value="2026-10">Outubro de 2026</option>
+                                                    <option value="2026-11">Novembro de 2026</option>
+                                                    <option value="2026-12">Dezembro de 2026</option>
+                                                </optgroup>
+                                                <optgroup label="2025">
+                                                    <option value="2025-01">Janeiro de 2025</option>
+                                                    <option value="2025-02">Fevereiro de 2025</option>
+                                                    <option value="2025-03">Março de 2025</option>
+                                                    <option value="2025-04">Abril de 2025</option>
+                                                    <option value="2025-05">Maio de 2025</option>
+                                                    <option value="2025-06">Junho de 2025</option>
+                                                    <option value="2025-07">Julho de 2025</option>
+                                                    <option value="2025-08">Agosto de 2025</option>
+                                                    <option value="2025-09">Setembro de 2025</option>
+                                                    <option value="2025-10">Outubro de 2025</option>
+                                                    <option value="2025-11">Novembro de 2025</option>
+                                                    <option value="2025-12">Dezembro de 2025</option>
+                                                </optgroup>
+                                                <optgroup label="2027">
+                                                    <option value="2027-01">Janeiro de 2027</option>
+                                                    <option value="2027-02">Fevereiro de 2027</option>
+                                                    <option value="2027-03">Março de 2027</option>
+                                                    <option value="2027-04">Abril de 2027</option>
+                                                    <option value="2027-05">Maio de 2027</option>
+                                                    <option value="2027-06">Junho de 2027</option>
+                                                    <option value="2027-07">Julho de 2027</option>
+                                                    <option value="2027-08">Agosto de 2027</option>
+                                                    <option value="2027-09">Setembro de 2027</option>
+                                                    <option value="2027-10">Outubro de 2027</option>
+                                                    <option value="2027-11">Novembro de 2027</option>
+                                                    <option value="2027-12">Dezembro de 2027</option>
+                                                </optgroup>
+                                                </select>
+                                            </div>
                                         </div>
                                         <div style="flex: 1; min-width: 150px;">
                                             <label style="font-size: 0.73rem; color: var(--text-muted); display: block; margin-bottom: 0.25rem;">Canal:</label>
@@ -2373,7 +2603,50 @@
                             <div style="display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
                                 <div class="filter-group" style="margin: 0; background: rgba(255, 255, 255, 0.05); border: 1px solid var(--border-color); padding: 0.4rem 0.8rem; border-radius: 6px;">
                                     <i class="fa-solid fa-calendar-days" style="color: var(--color-primary); margin-right: 0.5rem;"></i>
-                                    <input type="month" id="history-month-input" style="background: transparent; border: none; color: var(--text-primary); outline: none; font-size: 0.9rem; font-family: inherit;">
+                                    <select id="history-month-input" class="diag-month-select" style="background: transparent; border: none; padding: 0.2rem 1.8rem 0.2rem 0.4rem; font-size: 0.85rem; color: var(--text-primary);">
+                                                <optgroup label="2026">
+                                                    <option value="2026-01">Janeiro de 2026</option>
+                                                    <option value="2026-02">Fevereiro de 2026</option>
+                                                    <option value="2026-03">Março de 2026</option>
+                                                    <option value="2026-04">Abril de 2026</option>
+                                                    <option value="2026-05">Maio de 2026</option>
+                                                    <option value="2026-06">Junho de 2026</option>
+                                                    <option value="2026-07">Julho de 2026</option>
+                                                    <option value="2026-08">Agosto de 2026</option>
+                                                    <option value="2026-09">Setembro de 2026</option>
+                                                    <option value="2026-10">Outubro de 2026</option>
+                                                    <option value="2026-11" selected>Novembro de 2026</option>
+                                                    <option value="2026-12">Dezembro de 2026</option>
+                                                </optgroup>
+                                                <optgroup label="2025">
+                                                    <option value="2025-01">Janeiro de 2025</option>
+                                                    <option value="2025-02">Fevereiro de 2025</option>
+                                                    <option value="2025-03">Março de 2025</option>
+                                                    <option value="2025-04">Abril de 2025</option>
+                                                    <option value="2025-05">Maio de 2025</option>
+                                                    <option value="2025-06">Junho de 2025</option>
+                                                    <option value="2025-07">Julho de 2025</option>
+                                                    <option value="2025-08">Agosto de 2025</option>
+                                                    <option value="2025-09">Setembro de 2025</option>
+                                                    <option value="2025-10">Outubro de 2025</option>
+                                                    <option value="2025-11">Novembro de 2025</option>
+                                                    <option value="2025-12">Dezembro de 2025</option>
+                                                </optgroup>
+                                                <optgroup label="2027">
+                                                    <option value="2027-01">Janeiro de 2027</option>
+                                                    <option value="2027-02">Fevereiro de 2027</option>
+                                                    <option value="2027-03">Março de 2027</option>
+                                                    <option value="2027-04">Abril de 2027</option>
+                                                    <option value="2027-05">Maio de 2027</option>
+                                                    <option value="2027-06">Junho de 2027</option>
+                                                    <option value="2027-07">Julho de 2027</option>
+                                                    <option value="2027-08">Agosto de 2027</option>
+                                                    <option value="2027-09">Setembro de 2027</option>
+                                                    <option value="2027-10">Outubro de 2027</option>
+                                                    <option value="2027-11">Novembro de 2027</option>
+                                                    <option value="2027-12">Dezembro de 2027</option>
+                                                </optgroup>
+                                    </select>
                                 </div>
                                 <button id="btn-save-history" data-permissao="OPERADOR,ADMIN" class="btn btn-primary">
                                     <i class="fa-solid fa-floppy-disk"></i> Salvar Registro do Mês
@@ -2787,7 +3060,29 @@
             </p>
             <div class="sizing-modal-form-group">
                 <label for="modal-input-new-sizing-month">Mês a Projetar:</label>
-                <input type="month" id="modal-input-new-sizing-month" class="sizing-modal-month-input" min="2026-11">
+                <div class="diag-month-select-wrapper">
+                        <i class="fa-solid fa-calendar-days" style="color: var(--color-primary);"></i>
+                        <select id="modal-input-new-sizing-month" class="diag-month-select sizing-modal-month-input">
+                            <optgroup label="2026">
+                                <option value="2026-11" selected>Novembro de 2026</option>
+                                <option value="2026-12">Dezembro de 2026</option>
+                            </optgroup>
+                            <optgroup label="2027">
+                                <option value="2027-01">Janeiro de 2027</option>
+                                <option value="2027-02">Fevereiro de 2027</option>
+                                <option value="2027-03">Março de 2027</option>
+                                <option value="2027-04">Abril de 2027</option>
+                                <option value="2027-05">Maio de 2027</option>
+                                <option value="2027-06">Junho de 2027</option>
+                                <option value="2027-07">Julho de 2027</option>
+                                <option value="2027-08">Agosto de 2027</option>
+                                <option value="2027-09">Setembro de 2027</option>
+                                <option value="2027-10">Outubro de 2027</option>
+                                <option value="2027-11">Novembro de 2027</option>
+                                <option value="2027-12">Dezembro de 2027</option>
+                            </optgroup>
+                        </select>
+                    </div>
                 <span id="modal-tip-new-sizing-month" class="sizing-modal-tip">Sugerido automaticamente a partir da última projeção.</span>
             </div>
             <div class="sizing-modal-callout">
