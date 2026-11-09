@@ -2049,10 +2049,13 @@
                                     
                                     <div style="margin-bottom: 0.75rem;">
                                         <label style="font-size: 0.75rem; color: var(--text-muted); display: block; margin-bottom: 0.3rem;">Tipo de Carga:</label>
-                                        <select id="select-tabelao-tipo-carga" onchange="toggleTabelaoMode()" class="diag-control-select">
-                                            <option value="mensal">Carga Mensal</option>
-                                            <option value="historico">Carga Histórica 2026 (Ano Todo)</option>
-                                        </select>
+                                        <div class="diag-month-select-wrapper">
+                                            <i class="fa-solid fa-layer-group" style="color: #eb5c27;"></i>
+                                            <select id="select-tabelao-tipo-carga" onchange="toggleTabelaoMode()" class="diag-month-select">
+                                                <option value="mensal">Carga Mensal</option>
+                                                <option value="historico">Carga Histórica 2026 (Ano Todo)</option>
+                                            </select>
+                                        </div>
                                     </div>
 
                                     <div id="wrapper-tabelao-mes" style="margin-bottom: 0.75rem;">
