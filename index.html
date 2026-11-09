@@ -2038,7 +2038,7 @@
                             <div class="diag-upload-card" id="card-upload-tabelao" style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); border-radius: 12px; padding: 1.25rem; display: flex; flex-direction: column; justify-content: space-between;">
                                 <div>
                                     <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.75rem;">
-                                        <span style="font-weight: 700; font-size: 0.95rem; color: #fff; display: flex; align-items: center; gap: 0.4rem;">
+                                        <span style="font-weight: 700; font-size: 0.95rem; color: var(--text-primary); display: flex; align-items: center; gap: 0.4rem;">
                                             <i class="fa-solid fa-phone" style="color: #eb5c27;"></i> Tabelão (Ligações)
                                         </span>
                                         <span class="badge-channel" style="background: rgba(235,92,39,0.15); color: #eb5c27; padding: 0.2rem 0.5rem; border-radius: 6px; font-size: 0.7rem; font-weight: 600;">Central</span>
@@ -2049,7 +2049,7 @@
                                     
                                     <div style="margin-bottom: 0.75rem;">
                                         <label style="font-size: 0.75rem; color: var(--text-muted); display: block; margin-bottom: 0.3rem;">Tipo de Carga:</label>
-                                        <select id="select-tabelao-tipo-carga" onchange="toggleTabelaoMode()" style="width: 100%; padding: 0.4rem 0.6rem; border-radius: 6px; border: 1px solid var(--border-color); background: rgba(0,0,0,0.3); color: var(--text-primary); font-size: 0.8rem;">
+                                        <select id="select-tabelao-tipo-carga" onchange="toggleTabelaoMode()" class="diag-control-select">
                                             <option value="mensal">Carga Mensal</option>
                                             <option value="historico">Carga Histórica 2026 (Ano Todo)</option>
                                         </select>
@@ -2122,7 +2122,7 @@
                             <div class="diag-upload-card" id="card-upload-chat" style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); border-radius: 12px; padding: 1.25rem; display: flex; flex-direction: column; justify-content: space-between;">
                                 <div>
                                     <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.75rem;">
-                                        <span style="font-weight: 700; font-size: 0.95rem; color: #fff; display: flex; align-items: center; gap: 0.4rem;">
+                                        <span style="font-weight: 700; font-size: 0.95rem; color: var(--text-primary); display: flex; align-items: center; gap: 0.4rem;">
                                             <i class="fa-solid fa-comments" style="color: #3b82f6;"></i> IA - Chat
                                         </span>
                                         <span class="badge-channel" style="background: rgba(59,130,246,0.15); color: #3b82f6; padding: 0.2rem 0.5rem; border-radius: 6px; font-size: 0.7rem; font-weight: 600;">Chatbot</span>
@@ -2198,7 +2198,7 @@
                             <div class="diag-upload-card" id="card-upload-whatsapp" style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); border-radius: 12px; padding: 1.25rem; display: flex; flex-direction: column; justify-content: space-between;">
                                 <div>
                                     <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.75rem;">
-                                        <span style="font-weight: 700; font-size: 0.95rem; color: #fff; display: flex; align-items: center; gap: 0.4rem;">
+                                        <span style="font-weight: 700; font-size: 0.95rem; color: var(--text-primary); display: flex; align-items: center; gap: 0.4rem;">
                                             <i class="fa-brands fa-whatsapp" style="color: #10b981;"></i> IA - WhatsApp
                                         </span>
                                         <span class="badge-channel" style="background: rgba(16,185,129,0.15); color: #10b981; padding: 0.2rem 0.5rem; border-radius: 6px; font-size: 0.7rem; font-weight: 600;">WhatsApp</span>
@@ -2274,7 +2274,7 @@
                             <div class="diag-upload-card" id="card-upload-ura" style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); border-radius: 12px; padding: 1.25rem; display: flex; flex-direction: column; justify-content: space-between;">
                                 <div>
                                     <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.75rem;">
-                                        <span style="font-weight: 700; font-size: 0.95rem; color: #fff; display: flex; align-items: center; gap: 0.4rem;">
+                                        <span style="font-weight: 700; font-size: 0.95rem; color: var(--text-primary); display: flex; align-items: center; gap: 0.4rem;">
                                             <i class="fa-solid fa-robot" style="color: #a855f7;"></i> IA - URA
                                         </span>
                                         <span class="badge-channel" style="background: rgba(168,85,247,0.15); color: #a855f7; padding: 0.2rem 0.5rem; border-radius: 6px; font-size: 0.7rem; font-weight: 600;">Voz Virtual</span>
@@ -2494,7 +2494,7 @@
                                         </div>
                                         <div style="flex: 1; min-width: 150px;">
                                             <label style="font-size: 0.73rem; color: var(--text-muted); display: block; margin-bottom: 0.25rem;">Canal:</label>
-                                            <select id="admin-delete-canal" style="width: 100%; padding: 0.4rem 0.6rem; border-radius: 6px; border: 1px solid var(--border-color); background: rgba(0,0,0,0.4); color: var(--text-primary); font-size: 0.82rem;">
+                                            <select id="admin-delete-canal" class="diag-control-select">
                                                 <option value="TODOS">Todos os Canais</option>
                                                 <option value="LIGACOES">Tabelão (Ligações)</option>
                                                 <option value="CHAT">IA - Chat</option>

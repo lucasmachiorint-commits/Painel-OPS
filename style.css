@@ -4122,7 +4122,7 @@ body.light-theme .btn-module-switch:hover {
 }
 
 /* ==========================================================================
-   SELETOR DE MÊS / CALENDÁRIO EM PORTUGUÊS DO BRASIL (pt-BR)
+   SELETOR DE MÊS / CALENDÁRIO EM PORTUGUÊS DO BRASIL (pt-BR) - DARK & LIGHT
    ========================================================================== */
 .diag-month-select-wrapper {
     position: relative;
@@ -4137,6 +4137,8 @@ body.light-theme .btn-module-switch:hover {
     font-size: 0.82rem;
     z-index: 2;
 }
+
+/* DARK THEME (PADRÃO) */
 .diag-month-select {
     width: 100%;
     padding: 0.45rem 1.8rem 0.45rem 2.1rem;
@@ -4164,12 +4166,93 @@ body.light-theme .btn-module-switch:hover {
     box-shadow: 0 0 0 2px rgba(235, 92, 39, 0.2);
 }
 .diag-month-select optgroup {
-    background: #0f172a;
+    background-color: #0f172a;
     color: var(--color-primary);
     font-weight: 700;
 }
 .diag-month-select option {
-    background: #0b1120;
+    background-color: #0b1120;
     color: var(--text-primary);
     padding: 0.4rem;
+}
+
+/* LIGHT THEME (MODO CLARO) */
+body.light-theme .diag-month-select {
+    background-color: #ffffff !important;
+    border: 1px solid rgba(4, 62, 38, 0.18) !important;
+    color: #031c10 !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2212%22%20height%3D%2212%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%23475569%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpolyline%20points%3D%226%209%2012%2015%2018%209%22%3E%3C%2Fpolyline%3E%3C%2Fsvg%3E") !important;
+}
+body.light-theme .diag-month-select:hover {
+    border-color: var(--color-primary) !important;
+    background-color: #ffffff !important;
+}
+body.light-theme .diag-month-select:focus {
+    border-color: var(--color-primary) !important;
+    box-shadow: 0 0 0 2px rgba(207, 72, 23, 0.2) !important;
+}
+body.light-theme .diag-month-select optgroup {
+    background-color: #f1f5f9 !important;
+    color: #cf4817 !important;
+    font-weight: 700;
+}
+body.light-theme .diag-month-select option {
+    background-color: #ffffff !important;
+    color: #0f172a !important;
+    padding: 0.4rem;
+}
+
+/* OUTROS CONTROLES EM MODO CLARO (DIAGNÓSTICO) */
+body.light-theme .diag-upload-card {
+    background: #ffffff !important;
+    border-color: rgba(4, 62, 38, 0.12) !important;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.03);
+}
+body.light-theme .diag-upload-card:hover {
+    border-color: var(--color-primary) !important;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+}
+body.light-theme .diag-card-title,
+body.light-theme .diag-upload-card span[style*="color: #fff"] {
+    color: #031c10 !important;
+}
+body.light-theme .diag-card-status-pill.pending {
+    background: rgba(0, 0, 0, 0.04);
+    color: var(--text-muted);
+    border: 1px dashed rgba(0, 0, 0, 0.15);
+}
+body.light-theme .diag-card-status-pill.loaded {
+    background: rgba(5, 150, 105, 0.1);
+    color: #059669;
+    border: 1px solid rgba(5, 150, 105, 0.25);
+}
+body.light-theme #select-tabelao-tipo-carga,
+body.light-theme #admin-delete-canal,
+body.light-theme #diag-filter-cargas-canal,
+body.light-theme #diag-search-cargas,
+body.light-theme #input-search-depara,
+body.light-theme .diag-select {
+    background-color: #ffffff !important;
+    border: 1px solid rgba(4, 62, 38, 0.18) !important;
+    color: #031c10 !important;
+}
+body.light-theme #select-tabelao-tipo-carga option,
+body.light-theme #admin-delete-canal option,
+body.light-theme #diag-filter-cargas-canal option,
+body.light-theme .diag-select option {
+    background-color: #ffffff !important;
+    color: #0f172a !important;
+}
+body.light-theme #section-diag-admin-zone {
+    background: rgba(239, 68, 68, 0.03) !important;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.03);
+}
+body.light-theme #section-diag-admin-zone div[style*="background: rgba(0,0,0,0.25)"] {
+    background: #ffffff !important;
+    border-color: rgba(239, 68, 68, 0.2) !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+}
+body.light-theme #section-diag-admin-zone h4 {
+    color: #031c10 !important;
 }
