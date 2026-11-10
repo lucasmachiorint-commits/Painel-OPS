@@ -1643,7 +1643,7 @@
                                 </p>
                             </div>
                             <!-- SUB-NAVEGAÇÃO: VOLUMETRIA x EFETIVIDADE -->
-                            <div class="diag-subnav-container" style="display: flex; gap: 0.5rem; background: rgba(0,0,0,0.25); padding: 0.35rem; border-radius: 10px; border: 1px solid var(--border-color);">
+                            <div class="diag-subnav-container" style="display: flex; gap: 0.5rem; background: var(--bg-card); padding: 0.35rem; border-radius: 10px; border: 1px solid var(--border-color);">
                                 <button type="button" class="btn btn-secondary diag-subnav-btn active" id="btn-diag-tab-vol" onclick="switchDiagSubView('volumetria')" style="padding: 0.5rem 1.1rem; border-radius: 8px; font-weight: 600; font-size: 0.85rem;">
                                     <i class="fa-solid fa-chart-pie" style="margin-right: 0.4rem;"></i> Volumetria
                                 </button>
@@ -1701,7 +1701,7 @@
                                 <div style="display: flex; align-items: center; gap: 0.5rem;">
                                     <div style="position: relative;">
                                         <i class="fa-solid fa-magnifying-glass" style="position: absolute; left: 0.75rem; top: 50%; transform: translateY(-50%); font-size: 0.8rem; color: var(--text-muted);"></i>
-                                        <input type="text" id="filter-diag-search" oninput="renderDiagVolumetria()" placeholder="Buscar produto ou motivo..." style="padding: 0.45rem 0.85rem 0.45rem 2rem; border-radius: 8px; border: 1px solid var(--border-color); background: rgba(255,255,255,0.05); color: var(--text-primary); font-size: 0.85rem; outline: none; width: 220px;">
+                                        <input type="text" id="filter-diag-search" oninput="renderDiagVolumetria()" placeholder="Buscar produto ou motivo..." style="padding: 0.45rem 1rem 0.45rem 2.2rem; border-radius: 20px; border: 1px solid var(--border-color); background: rgba(255,255,255,0.05); color: var(--text-primary); font-size: 0.85rem; outline: none; width: 220px;">
                                     </div>
                                 </div>
                             </div>
@@ -1713,7 +1713,7 @@
                                 <div style="display: flex; justify-content: space-between; align-items: flex-start;">
                                     <div>
                                         <span style="font-size: 0.75rem; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px;">Volume Mês Vigente</span>
-                                        <p class="widget-value" id="kpi-diag-vol-total" style="font-size: 2rem; font-weight: 700; margin: 0.35rem 0 0.2rem 0; color: #fff;">0</p>
+                                        <p class="widget-value" id="kpi-diag-vol-total" style="font-size: 2rem; font-weight: 700; margin: 0.35rem 0 0.2rem 0; color: var(--text-main, var(--text-primary));">0</p>
                                         <span class="widget-sub" id="kpi-diag-vol-mes-label" style="font-size: 0.78rem; color: var(--text-muted);">Mês selecionado</span>
                                     </div>
                                     <div style="width: 42px; height: 42px; border-radius: 10px; background: rgba(235,92,39,0.15); display: flex; align-items: center; justify-content: center; color: var(--color-primary); font-size: 1.15rem;">
@@ -1739,7 +1739,7 @@
                                 <div style="display: flex; justify-content: space-between; align-items: flex-start;">
                                     <div>
                                         <span style="font-size: 0.75rem; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px;">Canal Mais Acionado</span>
-                                        <p class="widget-value" id="kpi-diag-top-canal" style="font-size: 1.4rem; font-weight: 700; margin: 0.35rem 0 0.2rem 0; color: #fff;">-</p>
+                                        <p class="widget-value" id="kpi-diag-top-canal" style="font-size: 1.4rem; font-weight: 700; margin: 0.35rem 0 0.2rem 0; color: var(--text-main, var(--text-primary));">-</p>
                                         <span class="widget-sub" id="kpi-diag-top-canal-sub" style="font-size: 0.78rem; color: var(--text-muted);">0 contatos (0.0%)</span>
                                     </div>
                                     <div style="width: 42px; height: 42px; border-radius: 10px; background: rgba(59,130,246,0.15); display: flex; align-items: center; justify-content: center; color: #3b82f6; font-size: 1.15rem;">
@@ -1752,7 +1752,7 @@
                                 <div style="display: flex; justify-content: space-between; align-items: flex-start;">
                                     <div>
                                         <span style="font-size: 0.75rem; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px;">Maior Motivo de Contato</span>
-                                        <p class="widget-value" id="kpi-diag-top-motivo" style="font-size: 1.2rem; font-weight: 700; margin: 0.35rem 0 0.2rem 0; color: #fff; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 200px;">-</p>
+                                        <p class="widget-value" id="kpi-diag-top-motivo" style="font-size: 1.2rem; font-weight: 700; margin: 0.35rem 0 0.2rem 0; color: var(--text-main, var(--text-primary)); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 200px;">-</p>
                                         <span class="widget-sub" id="kpi-diag-top-motivo-sub" style="font-size: 0.78rem; color: var(--text-muted);">0 contatos</span>
                                     </div>
                                     <div style="width: 42px; height: 42px; border-radius: 10px; background: rgba(168,85,247,0.15); display: flex; align-items: center; justify-content: center; color: #a855f7; font-size: 1.15rem;">
@@ -1811,12 +1811,13 @@
                                 <table class="fte-table" id="table-diag-volumetria">
                                     <thead>
                                         <tr>
-                                            <th style="width: 44%; text-align: left;">PRODUTO / MOTIVO / SUBMOTIVO</th>
-                                            <th id="th-diag-m2" style="width: 11%; text-align: right;">M-2</th>
-                                            <th id="th-diag-m1" style="width: 11%; text-align: right;">M-1</th>
+                                            <th style="width: 36%; text-align: left;">PRODUTO / MOTIVO / SUBMOTIVO</th>
+                                            <th id="th-diag-m2" style="width: 10%; text-align: right;">M-2</th>
+                                            <th id="th-diag-m1" style="width: 10%; text-align: right;">M-1</th>
                                             <th id="th-diag-m0" style="width: 11%; text-align: right;">MÊS ATUAL</th>
                                             <th style="width: 11%; text-align: right;">VARIAÇÃO (M/M-1)</th>
-                                            <th style="width: 12%; text-align: right;">COMPOSIÇÃO (%)</th>
+                                            <th style="width: 11%; text-align: right;">COMPOSIÇÃO (%)</th>
+                                            <th style="width: 11%; text-align: right;">PARETO ACUM.</th>
                                         </tr>
                                     </thead>
                                     <tbody id="tbody-diag-volumetria">
@@ -1829,6 +1830,7 @@
                                             <td id="tfoot-diag-m1" style="text-align: right; font-weight: 700;">0</td>
                                             <td id="tfoot-diag-m0" style="text-align: right; font-weight: 700;">0</td>
                                             <td id="tfoot-diag-var" style="text-align: right; font-weight: 700;">0.0%</td>
+                                            <td style="text-align: right; font-weight: 700;">100.0%</td>
                                             <td style="text-align: right; font-weight: 700;">100.0%</td>
                                         </tr>
                                     </tfoot>
@@ -1896,7 +1898,7 @@
                                 <div style="display: flex; justify-content: space-between; align-items: flex-start;">
                                     <div>
                                         <span style="font-size: 0.75rem; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px;">Total Atendido no Prazo</span>
-                                        <p class="widget-value" id="kpi-diag-tickets-noprazo" style="font-size: 2rem; font-weight: 700; margin: 0.35rem 0 0.2rem 0; color: #fff;">0</p>
+                                        <p class="widget-value" id="kpi-diag-tickets-noprazo" style="font-size: 2rem; font-weight: 700; margin: 0.35rem 0 0.2rem 0; color: var(--text-main, var(--text-primary));">0</p>
                                         <span class="widget-sub" style="font-size: 0.78rem; color: var(--text-muted);">Fechados em até 7 dias corridos</span>
                                     </div>
                                     <div style="width: 42px; height: 42px; border-radius: 10px; background: rgba(16,185,129,0.15); display: flex; align-items: center; justify-content: center; color: #10b981; font-size: 1.15rem;">
@@ -1922,7 +1924,7 @@
                                 <div style="display: flex; justify-content: space-between; align-items: flex-start;">
                                     <div>
                                         <span style="font-size: 0.75rem; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px;">Total de Tickets Analisados</span>
-                                        <p class="widget-value" id="kpi-diag-tickets-total" style="font-size: 2rem; font-weight: 700; margin: 0.35rem 0 0.2rem 0; color: #fff;">0</p>
+                                        <p class="widget-value" id="kpi-diag-tickets-total" style="font-size: 2rem; font-weight: 700; margin: 0.35rem 0 0.2rem 0; color: var(--text-main, var(--text-primary));">0</p>
                                         <span class="widget-sub" style="font-size: 0.78rem; color: var(--text-muted);">Base Central de Atendimento</span>
                                     </div>
                                     <div style="width: 42px; height: 42px; border-radius: 10px; background: rgba(235,92,39,0.15); display: flex; align-items: center; justify-content: center; color: var(--color-primary); font-size: 1.15rem;">
@@ -1954,11 +1956,12 @@
                                     <table class="fte-table" id="table-diag-efet-meses">
                                         <thead>
                                             <tr>
-                                                <th style="width: 22%;">MÊS</th>
-                                                <th style="width: 19%; text-align: right;">NO PRAZO</th>
-                                                <th style="width: 19%; text-align: right;">FORA DO PRAZO</th>
-                                                <th style="width: 20%; text-align: right;">TOTAL</th>
-                                                <th style="width: 20%; text-align: right;">% NO PRAZO</th>
+                                                <th style="width: 18%;">MÊS</th>
+                                                <th style="width: 16%; text-align: right;">TOTAL</th>
+                                                <th style="width: 16%; text-align: right;">NO PRAZO</th>
+                                                <th style="width: 16%; text-align: right;">FORA DO PRAZO</th>
+                                                <th style="width: 16%; text-align: right;">% NO PRAZO</th>
+                                                <th style="width: 18%; text-align: center;">STATUS META</th>
                                             </tr>
                                         </thead>
                                         <tbody id="tbody-diag-efet-meses">
@@ -2365,7 +2368,7 @@
                                 </p>
                             </div>
                             <div style="display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;">
-                                <select id="diag-filter-cargas-canal" onchange="renderCargasRealizadasTable()" style="padding: 0.4rem 0.65rem; border-radius: 6px; border: 1px solid var(--border-color); background: rgba(255,255,255,0.05); color: var(--text-primary); font-size: 0.8rem; cursor: pointer;">
+                                <div class="diag-capsule-select-wrapper" style="width: auto; min-width: 180px;"><i class="fa-solid fa-layer-group" style="color: var(--color-primary);"></i><select id="diag-filter-cargas-canal" class="diag-capsule-select" onchange="renderCargasRealizadasTable()">
                                     <option value="TODOS">Todos os Canais</option>
                                     <option value="LIGACOES">Tabelão (Ligações)</option>
                                     <option value="CHAT">IA - Chat</option>
@@ -2497,17 +2500,13 @@
                                         </div>
                                         <div style="flex: 1; min-width: 150px;">
                                             <label style="font-size: 0.73rem; color: var(--text-muted); display: block; margin-bottom: 0.25rem;">Canal:</label>
-                                            <select id="admin-delete-canal" class="diag-control-select">
+                                            <div class="diag-month-select-wrapper" style="position: relative; display: flex; align-items: center; width: 100%;"><i class="fa-solid fa-layer-group" style="position: absolute; left: 1rem; color: var(--color-primary); pointer-events: none; font-size: 0.85rem; z-index: 1;"></i><select id="admin-delete-canal" class="diag-month-select" style="width: 100%; border-radius: 20px;">
                                                 <option value="TODOS">Todos os Canais</option>
                                                 <option value="LIGACOES">Tabelão (Ligações)</option>
                                                 <option value="CHAT">IA - Chat</option>
                                                 <option value="WHATSAPP">IA - WhatsApp</option>
                                                 <option value="URA">IA - URA</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                </div>
-                                <button type="button" class="btn" onclick="openModalConfirmDeleteMes()" style="background: rgba(239,68,68,0.15); border: 1px solid #ef4444; color: #f87171; font-size: 0.82rem; padding: 0.55rem 1rem; font-weight: 600; border-radius: 6px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 0.4rem;">
+                                            </select></div></div></div></div><button type="button" class="btn" onclick="openModalConfirmDeleteMes()" style="background: rgba(239,68,68,0.15); border: 1px solid #ef4444; color: #f87171; font-size: 0.82rem; padding: 0.55rem 1rem; font-weight: 600; border-radius: 6px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 0.4rem;">
                                     <i class="fa-solid fa-trash-can"></i> Excluir Dados do Mês
                                 </button>
                             </div>
@@ -2557,20 +2556,20 @@
 
                         <!-- SUB-TABS DO DE-PARA: IA x CENTRAL x NÃO MAPEADOS -->
                         <div style="display: flex; gap: 0.5rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem; margin-bottom: 1rem;">
-                            <button type="button" class="btn btn-secondary active" id="btn-depara-tab-ia" onclick="switchDeParaTab('IA')" style="font-size: 0.82rem; padding: 0.4rem 0.85rem;">
+                            <button type="button" class="btn btn-secondary active" id="btn-depara-tab-ia" class="btn btn-secondary diag-depara-tab-btn active" onclick="switchDeParaTab('IA')" style="font-size: 0.82rem; padding: 0.4rem 0.85rem; border-radius: 20px;">
                                 Regras de IA (<span id="count-depara-ia">0</span>)
                             </button>
-                            <button type="button" class="btn btn-secondary" id="btn-depara-tab-central" onclick="switchDeParaTab('CENTRAL')" style="font-size: 0.82rem; padding: 0.4rem 0.85rem;">
+                            <button type="button" class="btn btn-secondary" id="btn-depara-tab-central" class="btn btn-secondary diag-depara-tab-btn" onclick="switchDeParaTab('CENTRAL')" style="font-size: 0.82rem; padding: 0.4rem 0.85rem; border-radius: 20px;">
                                 Regras Central (<span id="count-depara-central">0</span>)
                             </button>
-                            <button type="button" class="btn btn-secondary" id="btn-depara-tab-unmapped" onclick="switchDeParaTab('UNMAPPED')" style="font-size: 0.82rem; padding: 0.4rem 0.85rem; color: #f43f5e;">
+                            <button type="button" class="btn btn-secondary" id="btn-depara-tab-unmapped" class="btn btn-secondary diag-depara-tab-btn" onclick="switchDeParaTab('UNMAPPED')" style="font-size: 0.82rem; padding: 0.4rem 0.85rem; color: #f43f5e; border-radius: 20px;">
                                 ⚠️ Pendências / Não Mapeados (<span id="count-depara-unmapped">0</span>)
                             </button>
                         </div>
 
                         <!-- BUSCA DE REGRAS -->
                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.5rem;">
-                            <input type="text" id="input-search-depara" oninput="renderDeParaTable()" placeholder="Buscar regra por origem ou destino..." style="padding: 0.45rem 0.85rem; border-radius: 8px; border: 1px solid var(--border-color); background: rgba(255,255,255,0.05); color: var(--text-primary); font-size: 0.85rem; outline: none; width: 300px;">
+                            <input type="text" id="input-search-depara" oninput="renderDeParaTable()" placeholder="Buscar regra por origem ou destino..." style="padding: 0.45rem 1rem 0.45rem 2.2rem; border-radius: 20px; border: 1px solid var(--border-color); background: rgba(255,255,255,0.05); color: var(--text-primary); font-size: 0.85rem; outline: none; width: 300px;">
                             <span id="label-depara-total-regras" style="font-size: 0.8rem; color: var(--text-muted);">Carregando regras...</span>
                         </div>
 
@@ -2578,10 +2577,11 @@
                             <table class="fte-table" id="table-diag-depara" style="font-size: 0.82rem;">
                                 <thead>
                                     <tr>
-                                        <th style="width: 35%;">CHAVE DE ORIGEM</th>
+                                        <th style="width: 32%;">CHAVE DE ORIGEM</th>
                                         <th style="width: 20%;">PRODUTO DESTINO</th>
-                                        <th style="width: 22%;">MOTIVO DESTINO</th>
-                                        <th style="width: 23%;">SUBMOTIVO DESTINO</th>
+                                        <th style="width: 20%;">MOTIVO DESTINO</th>
+                                        <th style="width: 16%;">SUBMOTIVO DESTINO</th>
+                                        <th style="width: 12%; text-align: center;">CANAL / ORIGEM</th>
                                     </tr>
                                 </thead>
                                 <tbody id="tbody-diag-depara">
@@ -2604,9 +2604,7 @@
                                 </p>
                             </div>
                             <div style="display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
-                                <div class="filter-group" style="margin: 0; background: rgba(255, 255, 255, 0.05); border: 1px solid var(--border-color); padding: 0.4rem 0.8rem; border-radius: 6px;">
-                                    <i class="fa-solid fa-calendar-days" style="color: var(--color-primary); margin-right: 0.5rem;"></i>
-                                    <select id="history-month-input" class="diag-month-select" style="background: transparent; border: none; padding: 0.2rem 1.8rem 0.2rem 0.4rem; font-size: 0.85rem; color: var(--text-primary);">
+                                <div class="diag-month-select-wrapper" style="position: relative; display: flex; align-items: center;"><i class="fa-regular fa-calendar" style="position: absolute; left: 1rem; color: var(--color-primary); pointer-events: none; font-size: 0.85rem; z-index: 1;"></i><select id="history-month-input" class="diag-month-select" style="border-radius: 20px;">
                                                 <optgroup label="2026">
                                                     <option value="2026-01">Janeiro de 2026</option>
                                                     <option value="2026-02">Fevereiro de 2026</option>
@@ -3027,7 +3025,7 @@
 
     <!-- MODAL ALTERAR SENHA (USUÁRIO LOGADO) -->
     <div id="modal-change-password" class="modal-overlay" style="display: none;">
-        <div class="modal-container" style="max-width: 380px; padding: 1.8rem;">
+        <div class="modal-content glass-panel" style="max-width: 380px; padding: 1.8rem;">
             <div class="modal-header" style="margin-bottom: 1.25rem;">
                 <h3 style="font-size: 1.1rem;"><i class="fa-solid fa-key" style="color: var(--color-primary);"></i> Alterar Senha</h3>
                 <button class="modal-close" onclick="closeChangePasswordModal()">&times;</button>
@@ -3309,7 +3307,7 @@
 
     <!-- AUTH OVERLAY -->
     <div id="auth-overlay" class="modal-overlay" style="display: flex; z-index: 9999;">
-        <div class="modal-container" style="max-width: 400px; padding: 2rem;">
+        <div class="modal-content glass-panel" style="max-width: 400px; padding: 2rem;">
             <div style="text-align: center; margin-bottom: 1.5rem;">
                 <h2 id="auth-main-title" style="font-size: 1.5rem; margin-bottom: 0.3rem; color: var(--text-primary);">EmanaPay</h2>
                 <p id="auth-main-subtitle" style="color: var(--text-secondary); font-size: 0.9rem;">Controle de Eficiência Operacional</p>

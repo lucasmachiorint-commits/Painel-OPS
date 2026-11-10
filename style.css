@@ -1084,8 +1084,8 @@ body.light-theme .icon-dark {
     gap: 0.5rem;
     background: rgba(255, 255, 255, 0.03);
     border: 1px solid var(--border-color);
-    padding: 0.25rem 0.75rem;
-    border-radius: var(--radius-sm);
+    padding: 0.35rem 0.85rem;
+    border-radius: 20px;
     color: var(--text-secondary);
 }
 
@@ -1901,7 +1901,8 @@ body.light-theme .menu-section-label {
     gap: 0.4rem;
     background: rgba(255, 255, 255, 0.04);
     border: 1px solid var(--border-color);
-    border-radius: var(--radius-sm);
+    border-radius: 999px;
+    padding: 0.35rem 0.85rem;
     padding: 0.3rem 0.6rem;
     transition: all var(--transition-fast);
 }
@@ -4271,4 +4272,200 @@ body.light-theme #section-diag-admin-zone div[style*="background: rgba(0,0,0,0.2
 }
 body.light-theme #section-diag-admin-zone h4 {
     color: #031c10 !important;
+}
+
+
+/* ==========================================================================
+   IMPECCABLE SUITE: CAPSULE CONTROLS & COMPREHENSIVE LIGHT THEME EXPANSION
+   ========================================================================== */
+
+/* Alias modal-container to modal-content for backward compatibility */
+.modal-container {
+    background: var(--bg-glass);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+    width: 90%;
+    position: relative;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+}
+body.light-theme .modal-container {
+    background: #ffffff !important;
+    border-color: #cbd5e1 !important;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.12) !important;
+}
+
+/* Universal Capsule Styling for Selects */
+.diag-select,
+.sizing-mes-select,
+.access-perfil-select,
+.select-review-status,
+#select-new-responsible-team,
+#cadastros-filter-area,
+#cadastros-filter-resp,
+#cadastros-filter-rpa,
+#modal-select-team-gerencia,
+#modal-select-team-diretoria,
+#modal-add-area,
+#modal-add-resp {
+    border-radius: 20px !important;
+    padding: 0.45rem 1.8rem 0.45rem 0.85rem !important;
+    border: 1px solid var(--border-color) !important;
+    background-color: rgba(255, 255, 255, 0.05) !important;
+    color: var(--text-primary) !important;
+    font-size: 0.82rem !important;
+    cursor: pointer !important;
+    outline: none !important;
+    appearance: none !important;
+    -webkit-appearance: none !important;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2212%22%20height%3D%2212%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%2394a3b8%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpolyline%20points%3D%226%209%2012%2015%2018%209%22%3E%3C%2Fpolyline%3E%3C%2Fsvg%3E") !important;
+    background-repeat: no-repeat !important;
+    background-position: right 0.75rem center !important;
+    background-size: 11px !important;
+}
+
+/* Light Theme Overrides for Capsule Selects */
+body.light-theme .diag-select,
+body.light-theme .sizing-mes-select,
+body.light-theme .access-perfil-select,
+body.light-theme .select-review-status,
+body.light-theme #select-new-responsible-team,
+body.light-theme #cadastros-filter-area,
+body.light-theme #cadastros-filter-resp,
+body.light-theme #cadastros-filter-rpa,
+body.light-theme #modal-select-team-gerencia,
+body.light-theme #modal-select-team-diretoria,
+body.light-theme #modal-add-area,
+body.light-theme #modal-add-resp {
+    background-color: #ffffff !important;
+    border-color: rgba(4, 62, 38, 0.2) !important;
+    color: #031c10 !important;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2212%22%20height%3D%2212%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%23475569%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpolyline%20points%3D%226%209%2012%2015%2018%209%22%3E%3C%2Fpolyline%3E%3C%2Fsvg%3E") !important;
+}
+
+/* Capsule Select Options */
+.diag-select option,
+.sizing-mes-select option,
+.access-perfil-select option,
+.select-review-status option,
+#select-new-responsible-team option,
+#cadastros-filter-area option,
+#cadastros-filter-resp option,
+#cadastros-filter-rpa option,
+#modal-select-team-gerencia option,
+#modal-select-team-diretoria option,
+#modal-add-area option,
+#modal-add-resp option {
+    background-color: var(--bg-secondary);
+    color: var(--text-primary);
+}
+
+body.light-theme .diag-select option,
+body.light-theme .sizing-mes-select option,
+body.light-theme .access-perfil-select option,
+body.light-theme .select-review-status option,
+body.light-theme #select-new-responsible-team option,
+body.light-theme #cadastros-filter-area option,
+body.light-theme #cadastros-filter-resp option,
+body.light-theme #cadastros-filter-rpa option,
+body.light-theme #modal-select-team-gerencia option,
+body.light-theme #modal-select-team-diretoria option,
+body.light-theme #modal-add-area option,
+body.light-theme #modal-add-resp option {
+    background-color: #ffffff !important;
+    color: #0f172a !important;
+}
+
+/* Organogram in Light Theme */
+body.light-theme .tree-node-diretoria {
+    background: #fff7ed !important;
+    color: #031c10 !important;
+    border-color: var(--color-primary) !important;
+    box-shadow: 0 4px 12px rgba(235, 92, 39, 0.1) !important;
+}
+body.light-theme .tree-node-gerencia {
+    background: #eff6ff !important;
+    color: #031c10 !important;
+    border-color: #3b82f6 !important;
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.1) !important;
+}
+body.light-theme .tree-node-team {
+    background: #ffffff !important;
+    color: #031c10 !important;
+    border-color: #cbd5e1 !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05) !important;
+}
+
+/* Sizing Badges & Status in Light Theme */
+body.light-theme #sizing-lock-badge.badge-open {
+    background: rgba(16, 185, 129, 0.15) !important;
+    color: #047857 !important;
+    border-color: rgba(16, 185, 129, 0.4) !important;
+}
+body.light-theme #sizing-lock-badge.badge-confirmed {
+    background: rgba(59, 130, 246, 0.15) !important;
+    color: #1d4ed8 !important;
+    border-color: rgba(59, 130, 246, 0.4) !important;
+}
+body.light-theme #sizing-lock-badge.badge-reopened {
+    background: rgba(245, 158, 11, 0.15) !important;
+    color: #b45309 !important;
+    border-color: rgba(245, 158, 11, 0.4) !important;
+}
+body.light-theme #sizing-sync-badge {
+    background: rgba(59, 130, 246, 0.12) !important;
+    color: #1d4ed8 !important;
+    border-color: rgba(59, 130, 246, 0.3) !important;
+}
+body.light-theme #btn-sizing-confirm-month {
+    background: linear-gradient(135deg, #10b981, #059669) !important;
+    color: #ffffff !important;
+    border: none !important;
+}
+body.light-theme .atendidas-badge {
+    background: rgba(16, 185, 129, 0.12) !important;
+    color: #047857 !important;
+    border-color: rgba(16, 185, 129, 0.3) !important;
+}
+
+/* Admin Zone Danger Text in Light Theme */
+body.light-theme #section-diag-admin-zone h4 {
+    color: #991b1b !important;
+}
+body.light-theme #section-diag-admin-zone div[style*="background: rgba(239,68,68,0.08)"] {
+    background: #fef2f2 !important;
+    border-color: #fca5a5 !important;
+    color: #991b1b !important;
+}
+
+/* De-Para dedicated tab button style */
+.diag-depara-tab-btn {
+    transition: all 0.2s ease;
+    border-radius: 20px !important;
+}
+.diag-depara-tab-btn.active {
+    background: var(--color-primary) !important;
+    color: #ffffff !important;
+    border-color: var(--color-primary) !important;
+}
+
+/* Table Tree rows hover & motivo styling in Light Theme */
+body.light-theme .diag-tree-row:hover {
+    background: rgba(4, 62, 38, 0.04) !important;
+}
+body.light-theme .diag-tree-row-motivo {
+    background: rgba(4, 62, 38, 0.02);
+}
+
+/* Coverage Pending badge in Light Theme */
+body.light-theme .diag-coverage-badge.status-pending {
+    background: #f8fafc !important;
+    color: #64748b !important;
+    border-color: #cbd5e1 !important;
+}
+
+/* Modal Toggle slider in Light Theme */
+body.light-theme .modal-toggle-slider {
+    background: #cbd5e1 !important;
 }

@@ -2015,7 +2015,7 @@ function subscribeRealtime() {
                 const now = Date.now();
                 if (now - _lastRealtimeToastTime > 6000) {
                     _lastRealtimeToastTime = now;
-                    showToast('âš¡ O painel foi atualizado em tempo real por outro usuário!', 'info', 4000);
+                    showToast('⚠️ O painel foi atualizado em tempo real por outro usuário!', 'info', 4000);
                 }
             }
         })
@@ -2177,7 +2177,7 @@ async function importPrdDataToHml() {
     }
     
     const confirmMsg = 'Deseja realmente importar todas as informações de PRODUÇÃO (PRD) para este ambiente de HOMOLOGAÇÃO (HML)?\n\n' +
-                       'âš ï¸ Todos os processos, responsáveis e equipes de HML serão substituídos pelo cenário atual de Produção para que você possa executar testes com dados reais.';
+                       '⚠️ Todos os processos, responsáveis e equipes de HML serão substituídos pelo cenário atual de Produção para que você possa executar testes com dados reais.';
     
     if (!confirm(confirmMsg)) {
         return;
@@ -2829,7 +2829,7 @@ function renderOrganogramFlowchart() {
 
     let html = `
         <div class="tree-node-diretoria" style="margin-bottom: 2rem;">
-            <div style="font-size: 1.1rem; font-weight: 700; color: #fff;">
+            <div style="font-size: 1.1rem; font-weight: 700; color: var(--text-main, var(--text-primary));">
                 <i class="fa-solid fa-building-columns" style="color: var(--color-primary); margin-right: 0.5rem;"></i> ${escapeHtml(diretoriaName)}
             </div>
             <span class="tree-node-badge">Diretoria Executiva</span>
@@ -2843,7 +2843,7 @@ function renderOrganogramFlowchart() {
         html += `
             <div class="tree-gerencia-block">
                 <div class="tree-node-gerencia">
-                    <div style="font-weight: 700; color: #fff; font-size: 0.95rem;">
+                    <div style="font-weight: 700; color: var(--text-main, var(--text-primary)); font-size: 0.95rem;">
                         <i class="fa-solid fa-folder-tree" style="color: #60a5fa; margin-right: 0.4rem;"></i> ${escapeHtml(gerName)}
                     </div>
                     <span class="tree-node-badge" style="color: #93c5fd;">Gerência Operacional</span>
@@ -4991,21 +4991,39 @@ function renderCharts(totalFteRequired) {
 }
 
 function updateChartsTheme() {
-    if (pieChartInstance && barChartInstance) {
-        const style = getComputedStyle(document.body);
-        const textColor = style.getPropertyValue('--text-secondary').trim();
-        const gridColor = style.getPropertyValue('--border-color').trim();
+    const isLight = document.body.classList.contains('light-theme');
+    const style = getComputedStyle(document.body);
+    const textColor = isLight ? '#1e293b' : (style.getPropertyValue('--text-primary').trim() || '#f8fafc');
+    const mutedColor = isLight ? '#64748b' : (style.getPropertyValue('--text-secondary').trim() || '#92ab9e');
+    const gridColor = isLight ? 'rgba(0, 0, 0, 0.08)' : (style.getPropertyValue('--border-color').trim() || 'rgba(255, 255, 255, 0.06)');
 
-        // Update Pie Chart Labels
-        pieChartInstance.options.plugins.legend.labels.color = textColor;
-        pieChartInstance.update();
+    [pieChartInstance, barChartInstance].forEach(chart => {
+        if (!chart) return;
+        if (chart.options?.plugins?.legend?.labels) chart.options.plugins.legend.labels.color = textColor;
+        if (chart.options?.scales?.x) chart.options.scales.x.ticks.color = mutedColor;
+        if (chart.options?.scales?.y) {
+            chart.options.scales.y.ticks.color = mutedColor;
+            if (chart.options.scales.y.grid) chart.options.scales.y.grid.color = gridColor;
+        }
+        chart.update();
+    });
 
-        // Update Bar Chart Labels
-        barChartInstance.options.scales.x.ticks.color = textColor;
-        barChartInstance.options.scales.y.ticks.color = textColor;
-        barChartInstance.options.scales.y.grid.color = gridColor;
-        barChartInstance.update();
-    }
+    [typeof diagChartComposicao !== 'undefined' ? diagChartComposicao : null,
+     typeof diagChartHistorico !== 'undefined' ? diagChartHistorico : null,
+     typeof diagChartEfetividade !== 'undefined' ? diagChartEfetividade : null,
+     typeof historyChartInstance !== 'undefined' ? historyChartInstance : null].forEach(chart => {
+        if (!chart) return;
+        if (chart.options?.plugins?.legend?.labels) chart.options.plugins.legend.labels.color = textColor;
+        if (chart.options?.scales?.x) {
+            if (chart.options.scales.x.ticks) chart.options.scales.x.ticks.color = mutedColor;
+            if (chart.options.scales.x.grid) chart.options.scales.x.grid.color = gridColor;
+        }
+        if (chart.options?.scales?.y) {
+            if (chart.options.scales.y.ticks) chart.options.scales.y.ticks.color = mutedColor;
+            if (chart.options.scales.y.grid) chart.options.scales.y.grid.color = gridColor;
+        }
+        chart.update();
+    });
 }
 
 // EXPORT TO CSV (Excel Compatible - Exports active tab content)
@@ -6261,7 +6279,7 @@ function renderCadastrosView() {
                 
                 btnDelete.addEventListener('click', (e) => {
                     e.stopPropagation();
-                    if (!verificarPermissao('OPERADOR')) { alert('Acesso negado: Perfil OPERADOR ou ADMIN necessário.'); return; }
+                    if (!verificarPermissao('OPERADOR')) { showToast('Acesso negado: Perfil OPERADOR ou ADMIN necessário.', 'error'); return; }
                     if (!podeEditarArea(resp.area)) { alert(`${t('msg_access_denied_team', 'Acesso negado: Você só pode excluir responsáveis da sua própria equipe')} (${currentUser.assignedTeam}).`); return; }
                     if (confirm(`${t('confirm_delete_resp', 'Tem certeza que deseja excluir o responsável')} "${resp.name}"? ${t('confirm_delete_resp_msg', 'Todas as atividades sob sua responsabilidade ficarão sem responsável.')}`)) {
                         state.responsaveis = state.responsaveis.filter(r => (typeof r === 'object' ? r.name : r) !== resp.name);
@@ -6582,7 +6600,7 @@ function renderCadastrosView() {
                     rpaCheckbox.addEventListener('change', (e) => {
                         if (!verificarPermissao('OPERADOR')) return;
                         if (!podeEditarArea(proc.area)) {
-                            alert(`Acesso negado: Você não pode alterar o status RPA de atividades de outra equipe.`);
+                            showToast('Acesso negado: Você não pode alterar o status RPA de atividades de outra equipe.', 'error');
                             e.target.checked = !e.target.checked;
                             return;
                         }
@@ -6632,7 +6650,7 @@ function renderCadastrosView() {
                         if (!podeEditarArea(proc.area)) return;
                         const newTeam = e.target.value;
                         if (currentUser.perfil === 'OPERADOR' && newTeam !== currentUser.assignedTeam) {
-                            alert(`Acesso negado: Operadores só podem manter atividades na sua própria equipe (${currentUser.assignedTeam}).`);
+                            showToast(`Acesso negado: Operadores só podem manter atividades na sua própria equipe (${currentUser.assignedTeam}).`, 'error');
                             renderCadastrosView();
                             return;
                         }
@@ -6724,7 +6742,7 @@ function renderCadastrosView() {
                 if (deleteBtn) {
                     deleteBtn.addEventListener('click', () => {
                         if (!verificarPermissao('OPERADOR')) { alert('Acesso negado: Perfil OPERADOR ou ADMIN necessário.'); return; }
-                        if (!podeEditarArea(proc.area)) { alert(`Acesso negado: Você só pode excluir atividades da sua equipe (${currentUser.assignedTeam}).`); return; }
+                        if (!podeEditarArea(proc.area)) { showToast(`Acesso negado: Você só pode excluir atividades da sua equipe (${currentUser.assignedTeam}).`, 'error'); return; }
                         if (confirm(`Deseja realmente excluir a atividade "${proc.name}"?`)) {
                             state.processes = state.processes.filter(p => p.id !== proc.id);
                             saveState();
@@ -8656,7 +8674,7 @@ function recalcSizing(fromInputs = true) {
                 <tr><td class="calc-label">Disponibilidade Efetiva NR 17</td><td class="calc-formula">1 - B16 (1 - 17%)</td><td class="calc-val">${resVoz.dispEfetiva.toFixed(1)}% (Total ref: ${resVoz.totalShrinkPct.toFixed(1)}%)</td></tr>
                 <tr style="background: rgba(245, 158, 11, 0.08);"><td class="calc-label" style="font-weight: 700; color: #f59e0b;">PA's Necessárias</td><td class="calc-formula" style="color: #f59e0b;">B23 (=ARREDONDAR.PARA.CIMA((m / B10)/(1-B16); 0))</td><td class="calc-val" style="color: #f59e0b; font-size: 1.1rem; font-weight: 800;">${resVoz.pas} PAs</td></tr>
                 <tr><td class="calc-label">Ajuste Manual</td><td class="calc-formula">B24 (Ajuste de contingência)</td><td class="calc-val">${resVoz.ajuste} PAs</td></tr>
-                <tr style="background: rgba(235, 92, 39, 0.12);"><td class="calc-label" style="font-weight: 700; color: #fff;">PA CONTRATADA (Voz)</td><td class="calc-formula" style="color: #fff;">B25 (=B23 + B24)</td><td class="calc-val" style="color: var(--color-primary); font-size: 1.18rem; font-weight: 800;">${resVoz.paContratada} PAs</td></tr>
+                <tr style="background: rgba(235, 92, 39, 0.12);"><td class="calc-label" style="font-weight: 700; color: var(--text-main, var(--text-primary));">PA CONTRATADA (Voz)</td><td class="calc-formula" style="color: var(--text-main, var(--text-primary));">B25 (=B23 + B24)</td><td class="calc-val" style="color: var(--color-primary); font-size: 1.18rem; font-weight: 800;">${resVoz.paContratada} PAs</td></tr>
                 <tr><td class="calc-label">CHAMADAS / OPERADOR</td><td class="calc-formula">B26 (=(B17*(1-B9)/(B25*2))/21)</td><td class="calc-val" style="color: var(--color-primary); font-weight: 700;">${resVoz.chamadasOp} chamadas/op</td></tr>
             </table>
         `;
@@ -8696,7 +8714,7 @@ function recalcSizing(fromInputs = true) {
                 <tr><td class="calc-label">Disponibilidade Efetiva NR 17</td><td class="calc-formula">1 - C16 (1 - 17%)</td><td class="calc-val">${resChat.dispEfetiva.toFixed(1)}% (Total ref: ${resChat.totalShrinkPct.toFixed(1)}%)</td></tr>
                 <tr style="background: rgba(245, 158, 11, 0.08);"><td class="calc-label" style="font-weight: 700; color: #f59e0b;">PA's Necessárias</td><td class="calc-formula" style="color: #f59e0b;">C23 (=ARREDONDAR.PARA.CIMA((Agents/Telas)/(1-C16); 0))</td><td class="calc-val" style="color: #f59e0b; font-size: 1.1rem; font-weight: 800;">${resChat.pas} PAs</td></tr>
                 <tr><td class="calc-label">Ajuste Manual</td><td class="calc-formula">C24 (Ajuste de contingência)</td><td class="calc-val">${resChat.ajuste} PAs</td></tr>
-                <tr style="background: rgba(229, 95, 145, 0.12);"><td class="calc-label" style="font-weight: 700; color: #fff;">PA CONTRATADA (Chat)</td><td class="calc-formula" style="color: #fff;">C25 (=C23 + C24)</td><td class="calc-val" style="color: var(--color-secondary); font-size: 1.18rem; font-weight: 800;">${resChat.paContratada} PAs</td></tr>
+                <tr style="background: rgba(229, 95, 145, 0.12);"><td class="calc-label" style="font-weight: 700; color: var(--text-main, var(--text-primary));">PA CONTRATADA (Chat)</td><td class="calc-formula" style="color: var(--text-main, var(--text-primary));">C25 (=C23 + C24)</td><td class="calc-val" style="color: var(--color-secondary); font-size: 1.18rem; font-weight: 800;">${resChat.paContratada} PAs</td></tr>
                 <tr><td class="calc-label">CHAMADAS / OPERADOR</td><td class="calc-formula">C26 (=(C17*(1-C9)/(C25*2))/21)</td><td class="calc-val" style="color: var(--color-secondary); font-weight: 700;">${resChat.chamadasOp} chamadas/op</td></tr>
             </table>
         `;
@@ -8731,7 +8749,7 @@ function recalcSizing(fromInputs = true) {
                 <tr><td class="calc-label">Prod. Máx. Operador/Dia</td><td class="calc-formula">E24 / E14 (CH_Efetiva / TMA_Real)</td><td class="calc-val" style="color: var(--color-success); font-weight: 700;">${resBO.prodMaxDia} demandas/dia</td></tr>
                 <tr><td class="calc-label">PA's Necessárias</td><td class="calc-formula">&lceil; (Vol_Dia / Prod_Max) / 2 &rceil;</td><td class="calc-val" style="color: var(--color-success); font-size: 1.05rem; font-weight: 700;">${resBO.pas} PAs</td></tr>
                 <tr><td class="calc-label">Ajuste Manual</td><td class="calc-formula">Ajuste</td><td class="calc-val">${resBO.ajuste} PAs</td></tr>
-                <tr style="background: rgba(16, 185, 129, 0.08);"><td class="calc-label" style="font-weight: 700; color: #fff;">PA CONTRATADA (BKO)</td><td class="calc-formula" style="color: #fff;">E10 + E11 (PA's Necessárias + Ajuste)</td><td class="calc-val" style="color: var(--color-success); font-size: 1.15rem; font-weight: 700;">${resBO.paContratada} PAs</td></tr>
+                <tr style="background: rgba(16, 185, 129, 0.08);"><td class="calc-label" style="font-weight: 700; color: var(--text-main, var(--text-primary));">PA CONTRATADA (BKO)</td><td class="calc-formula" style="color: var(--text-main, var(--text-primary));">E10 + E11 (PA's Necessárias + Ajuste)</td><td class="calc-val" style="color: var(--color-success); font-size: 1.15rem; font-weight: 700;">${resBO.paContratada} PAs</td></tr>
                 <tr><td class="calc-label">CHAMADAS / OPERADOR</td><td class="calc-formula">E8 / (E12 &times; 2)</td><td class="calc-val" style="color: var(--color-success); font-weight: 700;">${resBO.chamadasOp} chamadas/op</td></tr>
             </table>
         `;
@@ -8870,7 +8888,7 @@ function renderSizingView() {
             elHistoryBanner.style.display = 'flex';
             if (isTemporarilyUnlocked) {
                 if (elHistoryText) {
-                    elHistoryText.innerHTML = `âš ï¸ Projeção de <strong>${formatMonthName(curMonth)}</strong> <strong>reaberta para edição</strong>. As alterações salvas atualizarão este período.`;
+                    elHistoryText.innerHTML = `⚠️ Projeção de <strong>${formatMonthName(curMonth)}</strong> <strong>reaberta para edição</strong>. As alterações salvas atualizarão este período.`;
                 }
                 if (btnUnlock) btnUnlock.style.display = 'none';
                 if (btnRelock) btnRelock.style.display = 'inline-flex';
@@ -10193,7 +10211,7 @@ function renderCargasRealizadasTable() {
         const usuarioStr = c.usuario_nome || c.usuario_email || 'Usuário';
 
         html += `<tr>
-            <td style="font-weight: 600; color: #fff; display: flex; align-items: center; gap: 0.4rem;">
+            <td style="font-weight: 600; color: var(--text-main, var(--text-primary)); display: flex; align-items: center; gap: 0.4rem;">
                 <i class="fa-solid ${canalDef.icon}" style="color: ${canalDef.color};"></i>
                 ${canalDef.name}
             </td>
@@ -10202,7 +10220,7 @@ function renderCargasRealizadasTable() {
                 <i class="fa-solid fa-file-excel" style="color: #10b981; margin-right: 0.3rem;"></i>${c.nome_arquivo}
             </td>
             <td style="text-align: right;">${Number(c.total_linhas || 0).toLocaleString('pt-BR')}</td>
-            <td style="text-align: right; font-weight: 600; color: #fff;">${Number(c.volume_total || 0).toLocaleString('pt-BR')}</td>
+            <td style="text-align: right; font-weight: 600; color: var(--text-main, var(--text-primary));">${Number(c.volume_total || 0).toLocaleString('pt-BR')}</td>
             <td>${usuarioStr}</td>
             <td style="font-size: 0.76rem; color: var(--text-muted);">${dataHoraStr}</td>
             <td style="text-align: center;">
@@ -10229,7 +10247,7 @@ function renderCoverageMatrix() {
     let html = '';
     for (const [key, canal] of Object.entries(DIAG_CANAIS)) {
         html += `<tr>
-            <td style="font-weight: 700; color: #fff; display: flex; align-items: center; gap: 0.5rem;">
+            <td style="font-weight: 700; color: var(--text-main, var(--text-primary)); display: flex; align-items: center; gap: 0.5rem;">
                 <i class="fa-solid ${canal.icon}" style="color: ${canal.color}; width: 16px;"></i>
                 ${canal.name}
             </td>`;
@@ -10619,7 +10637,7 @@ function renderDiagVolumetria() {
                 </td>
                 <td style="text-align: right; font-weight: 600;">${prodData.m2.toLocaleString('pt-BR')}</td>
                 <td style="text-align: right; font-weight: 600;">${prodData.m1.toLocaleString('pt-BR')}</td>
-                <td style="text-align: right; font-weight: 700; color: #fff;">${prodData.m0.toLocaleString('pt-BR')}</td>
+                <td style="text-align: right; font-weight: 700; color: var(--text-main, var(--text-primary));">${prodData.m0.toLocaleString('pt-BR')}</td>
                 <td style="text-align: right; font-weight: 600; color: ${deltaProd > 0 ? '#ef4444' : '#10b981'}">
                     ${deltaProd !== 0 ? (deltaProd > 0 ? '+' : '') + deltaProd.toFixed(1) + '%' : '-'}
                 </td>
@@ -10647,7 +10665,7 @@ function renderDiagVolumetria() {
                     </td>
                     <td style="text-align: right;">${motData.m2.toLocaleString('pt-BR')}</td>
                     <td style="text-align: right;">${motData.m1.toLocaleString('pt-BR')}</td>
-                    <td style="text-align: right; font-weight: 600; color: #fff;">${motData.m0.toLocaleString('pt-BR')}</td>
+                    <td style="text-align: right; font-weight: 600; color: var(--text-main, var(--text-primary));">${motData.m0.toLocaleString('pt-BR')}</td>
                     <td style="text-align: right; color: ${deltaMot > 0 ? '#ef4444' : '#10b981'}">
                         ${deltaMot !== 0 ? (deltaMot > 0 ? '+' : '') + deltaMot.toFixed(1) + '%' : '-'}
                     </td>
@@ -10781,7 +10799,7 @@ function renderDiagVolumetriaCharts(tree, m0, m1, m2, allVolumes) {
                 plugins: {
                     legend: {
                         position: 'right',
-                        labels: { color: '#f8fafc', font: { family: 'Outfit', size: 11 } }
+                        labels: { color: document.body.classList.contains('light-theme') ? '#1e293b' : '#f8fafc', font: { family: 'Outfit', size: 11 } }
                     },
                     tooltip: {
                         callbacks: {
@@ -10953,7 +10971,7 @@ function renderDiagEfetividade() {
             }
 
             html += `<tr>
-                <td style="font-weight: 700; color: #fff;">${m.mesNome}/${anoFilter}</td>
+                <td style="font-weight: 700; color: var(--text-main, var(--text-primary));">${m.mesNome}/${anoFilter}</td>
                 <td style="text-align: right; font-weight: 600;">${m.total.toLocaleString('pt-BR')}</td>
                 <td style="text-align: right; color: #10b981; font-weight: 600;">${m.dentro.toLocaleString('pt-BR')}</td>
                 <td style="text-align: right; color: #ef4444; font-weight: 600;">${m.fora.toLocaleString('pt-BR')}</td>
@@ -10985,7 +11003,7 @@ function renderDiagEfetividade() {
                 `<span class="diag-badge-prazo fora">${pct.toFixed(1)}%</span>`;
 
             gHtml += `<tr>
-                <td style="font-weight: 600; color: #fff;">${grpName}</td>
+                <td style="font-weight: 600; color: var(--text-main, var(--text-primary));">${grpName}</td>
                 <td style="text-align: right;">${grpData.total.toLocaleString('pt-BR')}</td>
                 <td style="text-align: right; color: #10b981;">${grpData.dentro.toLocaleString('pt-BR')}</td>
                 <td style="text-align: right; color: #ef4444;">${grpData.fora.toLocaleString('pt-BR')}</td>
@@ -11143,7 +11161,7 @@ function renderDeParaTable() {
     let html = '';
     for (const r of pagedRules) {
         html += `<tr>
-            <td style="font-family: monospace; font-size: 0.78rem; color: #fff;">${r.chave}</td>
+            <td style="font-family: monospace; font-size: 0.78rem; color: var(--text-main, var(--text-primary));">${r.chave}</td>
             <td style="font-weight: 600; color: var(--color-primary);">${r.produto}</td>
             <td>${r.motivo}</td>
             <td style="color: var(--text-secondary);">${r.submotivo}</td>
