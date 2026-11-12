@@ -10918,8 +10918,9 @@ function collapseAllDiagTree() {
 
 function renderDiagVolumetriaCharts(tree, m0, m1, m2, allVolumes) {
     if (typeof Chart === 'undefined') return;
+    const isLight = document.body.classList.contains('light-theme');
 
-    // 1. Gráfico de Rosca: Composição de Produtos Mês Atual
+    // 1. Gráfico de Rosca Explodida: Composição de Produtos Mês Atual com Callout % ao lado
     const canvasComp = document.getElementById('chart-diag-composicao');
     if (canvasComp) {
         if (diagChartComposicao) diagChartComposicao.destroy();
@@ -10928,45 +10929,192 @@ function renderDiagVolumetriaCharts(tree, m0, m1, m2, allVolumes) {
         const top5 = sortedProds.slice(0, 5);
         const othersVol = sortedProds.slice(5).reduce((acc, curr) => acc + curr[1].m0, 0);
 
-        const labels = top5.map(p => p[0]);
+        const rawLabels = top5.map(p => p[0]);
         const dataVals = top5.map(p => p[1].m0);
         if (othersVol > 0) {
-            labels.push('Outros Produtos');
+            rawLabels.push('Outros Produtos');
             dataVals.push(othersVol);
         }
 
+        const totalComp = dataVals.reduce((a, b) => a + b, 0);
+        const labelsWithPct = rawLabels.map((lbl, idx) => {
+            const val = dataVals[idx] || 0;
+            const pct = totalComp > 0 ? ((val / totalComp) * 100).toFixed(1).replace('.', ',') : '0,0';
+            return `${lbl} (${pct}%)`;
+        });
+
         const palette = ['#eb5c27', '#10b981', '#6366f1', '#f59e0b', '#ec4899', '#94a3b8'];
+
+        // Plugin de Vista Explodida: desenha linhas de chamada (leader lines) e % ao lado de cada fatia
+        const explodedCalloutPlugin = {
+            id: 'explodedCalloutPlugin',
+            afterDatasetsDraw(chart) {
+                const { ctx } = chart;
+                const meta = chart.getDatasetMeta(0);
+                if (!meta || !meta.data || meta.data.length === 0) return;
+
+                const dataset = chart.data.datasets[0];
+                const total = (dataset.data || []).reduce((a, b) => a + (Number(b) || 0), 0);
+                if (total <= 0) return;
+
+                const lightNow = document.body.classList.contains('light-theme');
+                const textColor = lightNow ? '#0f172a' : '#f8fafc';
+                const subTextColor = lightNow ? '#64748b' : '#94a3b8';
+
+                // Coleta pontos de chamada separados por lado (direito / esquerdo) para evitar colisão vertical
+                const leftItems = [];
+                const rightItems = [];
+
+                meta.data.forEach((arc, index) => {
+                    const val = Number(dataset.data[index]) || 0;
+                    if (val <= 0 || !chart.getDataVisibility(index)) return;
+
+                    const pct = (val / total) * 100;
+                    const midAngle = (arc.startAngle + arc.endAngle) / 2;
+                    const cos = Math.cos(midAngle);
+                    const sin = Math.sin(midAngle);
+
+                    // Considera o deslocamento radial (offset) da vista explodida
+                    const arcX = arc.x;
+                    const arcY = arc.y;
+                    const outerR = arc.outerRadius;
+
+                    const sx = arcX + cos * (outerR - 2);
+                    const sy = arcY + sin * (outerR - 2);
+                    const ex = arcX + cos * (outerR + 13);
+                    const ey = arcY + sin * (outerR + 13);
+
+                    const isRight = cos >= 0;
+                    const item = {
+                        index,
+                        pctText: pct.toFixed(1).replace('.', ',') + '%',
+                        color: palette[index % palette.length],
+                        sx,
+                        sy,
+                        ex,
+                        ey,
+                        isRight
+                    };
+
+                    if (isRight) rightItems.push(item);
+                    else leftItems.push(item);
+                });
+
+                const resolveCollisions = (items, minY, maxY) => {
+                    items.sort((a, b) => a.ey - b.ey);
+                    const minGap = 16;
+                    for (let i = 1; i < items.length; i++) {
+                        if (items[i].ey - items[i - 1].ey < minGap) {
+                            items[i].ey = items[i - 1].ey + minGap;
+                        }
+                    }
+                    // Se passou do limite inferior, empurra de baixo para cima
+                    if (items.length > 0 && items[items.length - 1].ey > maxY) {
+                        items[items.length - 1].ey = maxY;
+                        for (let i = items.length - 2; i >= 0; i--) {
+                            if (items[i + 1].ey - items[i].ey < minGap) {
+                                items[i].ey = Math.max(minY, items[i + 1].ey - minGap);
+                            }
+                        }
+                    }
+                };
+
+                const topBound = chart.chartArea.top + 8;
+                const bottomBound = chart.chartArea.bottom - 8;
+                resolveCollisions(rightItems, topBound, bottomBound);
+                resolveCollisions(leftItems, topBound, bottomBound);
+
+                ctx.save();
+                [...rightItems, ...leftItems].forEach(item => {
+                    const hx = item.ex + (item.isRight ? 10 : -10);
+                    const hy = item.ey;
+
+                    // Linha guia (leader line)
+                    ctx.beginPath();
+                    ctx.moveTo(item.sx, item.sy);
+                    ctx.lineTo(item.ex, hy);
+                    ctx.lineTo(hx, hy);
+                    ctx.strokeStyle = item.color;
+                    ctx.lineWidth = 1.6;
+                    ctx.stroke();
+
+                    // Ponto na borda da fatia
+                    ctx.beginPath();
+                    ctx.arc(item.sx, item.sy, 2.5, 0, Math.PI * 2);
+                    ctx.fillStyle = item.color;
+                    ctx.fill();
+
+                    // Indicador % ao lado da linha
+                    ctx.font = '700 11px Outfit, sans-serif';
+                    ctx.fillStyle = textColor;
+                    ctx.textAlign = item.isRight ? 'left' : 'right';
+                    ctx.textBaseline = 'middle';
+                    ctx.fillText(item.pctText, hx + (item.isRight ? 4 : -4), hy);
+                });
+
+                // Volume total centralizado no anel
+                const firstArc = meta.data[0];
+                if (firstArc) {
+                    const centerX = chart.chartArea.left + (chart.chartArea.right - chart.chartArea.left) / 2;
+                    const centerY = chart.chartArea.top + (chart.chartArea.bottom - chart.chartArea.top) / 2;
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    ctx.font = '600 10px Outfit, sans-serif';
+                    ctx.fillStyle = subTextColor;
+                    ctx.fillText('TOTAL', centerX, centerY - 9);
+                    ctx.font = '700 14px Outfit, sans-serif';
+                    ctx.fillStyle = textColor;
+                    ctx.fillText(total.toLocaleString('pt-BR'), centerX, centerY + 8);
+                }
+                ctx.restore();
+            }
+        };
 
         diagChartComposicao = new Chart(canvasComp.getContext('2d'), {
             type: 'doughnut',
             data: {
-                labels: labels,
+                labels: labelsWithPct,
                 datasets: [{
                     data: dataVals,
                     backgroundColor: palette,
-                    borderWidth: 0
+                    borderWidth: 0,
+                    offset: dataVals.map((_, idx) => idx === 0 ? 12 : 7),
+                    spacing: 3,
+                    borderRadius: 4,
+                    hoverOffset: 16
                 }]
             },
+            plugins: [explodedCalloutPlugin],
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
+                layout: {
+                    padding: { top: 24, bottom: 24, left: 48, right: 16 }
+                },
                 plugins: {
                     legend: {
                         position: 'right',
-                        labels: { color: document.body.classList.contains('light-theme') ? '#1e293b' : '#f8fafc', font: { family: 'Outfit', size: 11 } }
+                        labels: {
+                            color: isLight ? '#1e293b' : '#f8fafc',
+                            font: { family: 'Outfit', size: 11, weight: '600' },
+                            padding: 12,
+                            boxWidth: 14,
+                            boxHeight: 10
+                        }
                     },
                     tooltip: {
                         callbacks: {
                             label: function(ctx) {
                                 const total = ctx.dataset.data.reduce((a, b) => a + b, 0);
                                 const val = ctx.raw || 0;
-                                const pct = total > 0 ? ((val / total) * 100).toFixed(1) : 0;
-                                return ` ${ctx.label}: ${val.toLocaleString('pt-BR')} (${pct}%)`;
+                                const pct = total > 0 ? ((val / total) * 100).toFixed(1).replace('.', ',') : '0,0';
+                                const baseName = rawLabels[ctx.dataIndex] || ctx.label;
+                                return ` ${baseName}: ${val.toLocaleString('pt-BR')} (${pct}%)`;
                             }
                         }
                     }
                 },
-                cutout: '68%'
+                cutout: '62%'
             }
         });
     }
@@ -11008,19 +11156,19 @@ function renderDiagVolumetriaCharts(tree, m0, m1, m2, allVolumes) {
                 scales: {
                     x: {
                         stacked: true,
-                        ticks: { color: '#92ab9e', font: { family: 'Outfit' } },
+                        ticks: { color: isLight ? '#475569' : '#92ab9e', font: { family: 'Outfit' } },
                         grid: { display: false }
                     },
                     y: {
                         stacked: true,
-                        ticks: { color: '#92ab9e', font: { family: 'Outfit' } },
-                        grid: { color: 'rgba(255,255,255,0.06)' }
+                        ticks: { color: isLight ? '#475569' : '#92ab9e', font: { family: 'Outfit' } },
+                        grid: { color: isLight ? 'rgba(15,23,42,0.06)' : 'rgba(255,255,255,0.06)' }
                     }
                 },
                 plugins: {
                     legend: {
                         position: 'bottom',
-                        labels: { color: '#f8fafc', font: { family: 'Outfit', size: 11 } }
+                        labels: { color: isLight ? '#1e293b' : '#f8fafc', font: { family: 'Outfit', size: 11, weight: '600' } }
                     }
                 }
             }
