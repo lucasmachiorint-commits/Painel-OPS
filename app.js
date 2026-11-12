@@ -10570,12 +10570,30 @@ function renderDiagDashboardView() {
     const sortedMonths = Array.from(monthSet).sort().reverse();
     const selMes = document.getElementById('filter-diag-mes');
 
+    // Mês padrão = mês mais recente com volume carregado (prioriza Central/Ligações).
+    // Evita abrir o painel em um mês que só existe pela data de fechamento dos tickets (volume 0).
+    const volByMonth = {};
+    const ligByMonth = {};
+    volumes.forEach(v => {
+        if (!v.mes) return;
+        const vol = Number(v.volume) || 0;
+        volByMonth[v.mes] = (volByMonth[v.mes] || 0) + vol;
+        if (v.canal === 'LIGACOES') ligByMonth[v.mes] = (ligByMonth[v.mes] || 0) + vol;
+    });
+    const defaultMonth = sortedMonths.find(m => ligByMonth[m] > 0) || sortedMonths.find(m => volByMonth[m] > 0) || sortedMonths[0];
+
     if (selMes) {
-        const curVal = selMes.value || sortedMonths[0];
+        const userPicked = selMes.dataset.userPicked === '1';
+        const curVal = (userPicked && selMes.value && monthSet.has(selMes.value)) ? selMes.value : defaultMonth;
         selMes.innerHTML = sortedMonths.map(m => {
-            return `<option value="${m}" ${m === curVal ? 'selected' : ''}>${getDiagMonthLabel(m)} (${m})</option>`;
+            const semVolume = !(volByMonth[m] > 0);
+            return `<option value="${m}" ${m === curVal ? 'selected' : ''}>${getDiagMonthLabel(m)} (${m})${semVolume ? ' - sem volume' : ''}</option>`;
         }).join('');
         selMes.value = curVal;
+        if (!selMes.dataset.pickListener) {
+            selMes.addEventListener('change', () => { selMes.dataset.userPicked = '1'; });
+            selMes.dataset.pickListener = '1';
+        }
     }
 
     // 2. Renderiza a subvisão selecionada (Volumetria ou Efetividade)
@@ -10696,8 +10714,13 @@ function renderDiagVolumetria() {
     }
     if (kpiVar) {
         const sign = varPct > 0 ? '+' : '';
-        kpiVar.textContent = sign + varPct.toFixed(1) + '%';
-        kpiVar.style.color = varPct > 0 ? '#ef4444' : '#10b981'; // Em SAC, aumento de volume é alerta vermelho
+        if (totalGeralM1 > 0) {
+            kpiVar.textContent = sign + varPct.toFixed(1).replace('.', ',') + '%';
+            kpiVar.style.color = varPct > 0 ? '#ef4444' : '#10b981'; // Em SAC, aumento de volume é alerta vermelho
+        } else {
+            kpiVar.textContent = '—'; // Sem base no mês anterior para comparar
+            kpiVar.style.color = 'var(--text-muted)';
+        }
     }
     if (kpiVarSub) {
         const diffAbs = totalGeralM0 - totalGeralM1;
@@ -10714,6 +10737,7 @@ function renderDiagVolumetria() {
             leaderCanal = DIAG_CANAIS[c]?.name || c;
         }
     }
+    if (leaderVol <= 0) { leaderCanal = '-'; leaderVol = 0; }
     if (kpiTopCanal) kpiTopCanal.textContent = leaderCanal;
     if (kpiTopCanalSub) {
         const pct = totalGeralM0 > 0 ? ((leaderVol / totalGeralM0) * 100).toFixed(1) : 0;
@@ -10731,6 +10755,7 @@ function renderDiagVolumetria() {
             }
         }
     }
+    if (topMotivoVol <= 0) { topMotivoName = '-'; topMotivoVol = 0; }
     if (kpiTopMotivo) kpiTopMotivo.textContent = topMotivoName;
     if (kpiTopMotivoSub) {
         const pct = totalGeralM0 > 0 ? ((topMotivoVol / totalGeralM0) * 100).toFixed(1) : 0;
