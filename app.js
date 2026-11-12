@@ -1,3 +1,8 @@
+
+// Instâncias dos novos gráficos do Relatório Diagnóstico 2.0
+let diagChartTopMotivos = null;
+let diagChartEfetBarras = null;
+let diagChartAtraso = null;
 ﻿// ============================================================
 // SELF-HEALING STORAGE & GLOBAL ERROR DIAGNOSTICS
 // ============================================================
@@ -5005,12 +5010,19 @@ function updateChartsTheme() {
             chart.options.scales.y.ticks.color = mutedColor;
             if (chart.options.scales.y.grid) chart.options.scales.y.grid.color = gridColor;
         }
+        if (chart.options?.scales?.y1) {
+            if (chart.options.scales.y1.ticks) chart.options.scales.y1.ticks.color = mutedColor;
+            if (chart.options.scales.y1.grid) chart.options.scales.y1.grid.color = gridColor;
+        }
         chart.update();
     });
 
     [typeof diagChartComposicao !== 'undefined' ? diagChartComposicao : null,
      typeof diagChartHistorico !== 'undefined' ? diagChartHistorico : null,
      typeof diagChartEfetividade !== 'undefined' ? diagChartEfetividade : null,
+     typeof diagChartTopMotivos !== 'undefined' ? diagChartTopMotivos : null,
+     typeof diagChartEfetBarras !== 'undefined' ? diagChartEfetBarras : null,
+     typeof diagChartAtraso !== 'undefined' ? diagChartAtraso : null,
      typeof historyChartInstance !== 'undefined' ? historyChartInstance : null].forEach(chart => {
         if (!chart) return;
         if (chart.options?.plugins?.legend?.labels) chart.options.plugins.legend.labels.color = textColor;
@@ -5021,6 +5033,10 @@ function updateChartsTheme() {
         if (chart.options?.scales?.y) {
             if (chart.options.scales.y.ticks) chart.options.scales.y.ticks.color = mutedColor;
             if (chart.options.scales.y.grid) chart.options.scales.y.grid.color = gridColor;
+        }
+        if (chart.options?.scales?.y1) {
+            if (chart.options.scales.y1.ticks) chart.options.scales.y1.ticks.color = mutedColor;
+            if (chart.options.scales.y1.grid) chart.options.scales.y1.grid.color = gridColor;
         }
         chart.update();
     });
@@ -9982,6 +9998,8 @@ async function handleExcelUpload(canalKey, inputEl) {
                         id_ticket: ticketId,
                         mes_fechamento: ticketMes,
                         mes_abertura: mesAbertura || ticketMes,
+                        data_abertura: dtAbertura ? dtAbertura.toISOString().slice(0, 10) : (mesAbertura ? mesAbertura + '-01' : null),
+                        data_fechamento: dtFechamento ? dtFechamento.toISOString().slice(0, 10) : null,
                         grupo_ticket: String(grupo).trim(),
                         status: status,
                         dias_corridos: Math.round(diffDays * 10) / 10,
@@ -10817,6 +10835,9 @@ function renderDiagVolumetriaCharts(tree, m0, m1, m2, allVolumes) {
         });
     }
 
+    // NOVO RELATÓRIO: Gráfico Top 8 Motivos + Curva de Pareto e Detalhes
+    renderDiagTopMotivosPareto(allVolumes, m0, m1, m2);
+
     // 2. Gráfico de Barras Empilhadas: Histórico dos 3 meses por Canal
     const canvasHist = document.getElementById('chart-diag-historico-canais');
     if (canvasHist) {
@@ -10956,7 +10977,16 @@ function renderDiagEfetividade() {
     if (kpiForaPrazo) kpiForaPrazo.textContent = anoTotalFora.toLocaleString('pt-BR');
     if (kpiTotalTickets) kpiTotalTickets.textContent = anoTotalChamados.toLocaleString('pt-BR');
 
-    // Tabela 1: Mensal
+    // NOVO RELATÓRIO: Efetividade Geral com Barras + Meta 96,1% + YTD
+    renderDiagEfetividadeGeral(filteredTickets, anoFilter);
+
+    // NOVO RELATÓRIO: Chamados em Atraso (> 7 dias diário)
+    renderDiagChamadosAtraso(filteredTickets, anoFilter);
+
+    // NOVO RELATÓRIO: Matriz de Efetividade por Grupo com Mapa de Conformidade (Pág. 20)
+    renderDiagMatrizEfetividadeGrupos(filteredTickets, anoFilter);
+
+    // Tabela 1: Mensal (Auditável)
     const tbodyMes = document.getElementById('tbody-diag-efet-meses');
     if (tbodyMes) {
         let html = '';
@@ -11015,69 +11045,6 @@ function renderDiagEfetividade() {
             gHtml = '<tr><td colspan="5" style="text-align: center; color: var(--text-muted); padding: 1.5rem;">Nenhum chamado apurado neste período.</td></tr>';
         }
         tbodyGrupo.innerHTML = gHtml;
-    }
-
-    // Gráfico de Linha de Efetividade vs Meta (96.10%)
-    const canvasEfet = document.getElementById('chart-diag-efetividade');
-    if (canvasEfet && typeof Chart !== 'undefined') {
-        if (diagChartEfetividade) diagChartEfetividade.destroy();
-
-        const labels = monthsData.map(m => m.mesNome);
-        const dataEfet = monthsData.map(m => m.pct);
-        const dataMeta = monthsData.map(() => DIAG_SLA_TARGET_PCT);
-
-        diagChartEfetividade = new Chart(canvasEfet.getContext('2d'), {
-            type: 'line',
-            data: {
-                labels: labels,
-                datasets: [
-                    {
-                        label: 'Efetividade Apurada (%)',
-                        data: dataEfet,
-                        borderColor: '#10b981',
-                        backgroundColor: 'rgba(16, 185, 129, 0.1)',
-                        fill: true,
-                        tension: 0.25,
-                        pointRadius: 4,
-                        pointHoverRadius: 6
-                    },
-                    {
-                        label: 'Meta de SLA (96,10%)',
-                        data: dataMeta,
-                        borderColor: '#ef4444',
-                        borderDash: [6, 6],
-                        borderWidth: 2,
-                        fill: false,
-                        pointRadius: 0
-                    }
-                ]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                scales: {
-                    y: {
-                        min: 80,
-                        max: 100,
-                        ticks: {
-                            color: '#92ab9e',
-                            callback: function(v) { return v + '%'; }
-                        },
-                        grid: { color: 'rgba(255,255,255,0.06)' }
-                    },
-                    x: {
-                        ticks: { color: '#92ab9e' },
-                        grid: { display: false }
-                    }
-                },
-                plugins: {
-                    legend: {
-                        position: 'bottom',
-                        labels: { color: '#f8fafc', font: { family: 'Outfit', size: 11 } }
-                    }
-                }
-            }
-        });
     }
 }
 
@@ -11229,3 +11196,664 @@ function exportDeParaToExcel() {
     showToast('Planilha De-Para exportada com sucesso!', 'success');
 }
 
+
+
+// ==========================================================================
+// RELATÓRIO DIAGNÓSTICO 2.0: MOTIVOS DE CONTATO (PÁG. 10 & 11)
+// ==========================================================================
+
+function renderDiagTopMotivosPareto(allVolumes, m0, m1, m2) {
+    const canvas = document.getElementById('chart-diag-principais-motivos');
+    if (!canvas || typeof Chart === 'undefined') return;
+
+    if (diagChartTopMotivos) {
+        diagChartTopMotivos.destroy();
+        diagChartTopMotivos = null;
+    }
+
+    const selCanal = document.getElementById('filter-diag-canal')?.value || 'all';
+    const selProd = document.getElementById('filter-diag-produto')?.value || 'all';
+
+    // Agrupamento dos volumes por "produto | motivo | submotivo"
+    const motifsMap = {};
+    let totalGeralM0 = 0;
+
+    allVolumes.forEach(v => {
+        if (selCanal && selCanal !== 'all' && selCanal !== 'TODOS' && v.canal !== selCanal) return;
+        if (selProd && selProd !== 'all' && selProd !== 'TODOS' && v.produto !== selProd) return;
+        if (v.mes !== m0 && v.mes !== m1 && v.mes !== m2) return;
+
+        const prod = v.produto || 'Geral';
+        const mot = v.motivo || '-';
+        const sub = (v.submotivo && v.submotivo !== '-') ? v.submotivo : '';
+        const key = sub ? `${prod} | ${mot} | ${sub}` : `${prod} | ${mot}`;
+
+        if (!motifsMap[key]) {
+            motifsMap[key] = { key, produto: prod, motivo: mot, submotivo: sub, m0: 0, m1: 0, m2: 0 };
+        }
+
+        const vol = Number(v.volume) || 0;
+        if (v.mes === m0) {
+            motifsMap[key].m0 += vol;
+            totalGeralM0 += vol;
+        } else if (v.mes === m1) {
+            motifsMap[key].m1 += vol;
+        } else if (v.mes === m2) {
+            motifsMap[key].m2 += vol;
+        }
+    });
+
+    // Ordena pelo volume do M0 decrescente e seleciona o Top 8
+    const sorted = Object.values(motifsMap).sort((a, b) => b.m0 - a.m0);
+    const top8 = sorted.slice(0, 8);
+
+    // Atualiza legenda informativa
+    const elLegend = document.getElementById('diag-top-motivos-legend');
+    const labelM0 = getDiagMonthLabel(m0);
+    const labelM1 = getDiagMonthLabel(m1);
+    const labelM2 = getDiagMonthLabel(m2);
+
+    if (elLegend) {
+        elLegend.innerHTML = `
+            <span style="display: flex; align-items: center; gap: 0.35rem; color: var(--text-secondary);">
+                <span style="display: inline-block; width: 12px; height: 12px; border-radius: 3px; background: #94a3b8;"></span> ${labelM2}
+            </span>
+            <span style="display: flex; align-items: center; gap: 0.35rem; color: var(--text-secondary);">
+                <span style="display: inline-block; width: 12px; height: 12px; border-radius: 3px; background: #0284c7;"></span> ${labelM1}
+            </span>
+            <span style="display: flex; align-items: center; gap: 0.35rem; font-weight: 700; color: var(--text-primary);">
+                <span style="display: inline-block; width: 12px; height: 12px; border-radius: 3px; background: #047857;"></span> ${labelM0}
+            </span>
+            <span style="display: flex; align-items: center; gap: 0.35rem; font-weight: 700; color: #f59e0b;">
+                <span style="display: inline-block; width: 14px; height: 3px; background: #f59e0b; border-radius: 2px;"></span> % Acum
+            </span>
+        `;
+    }
+
+    if (top8.length === 0) {
+        const ctx = canvas.getContext('2d');
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        return;
+    }
+
+    // Calcula curva de Pareto (% Acumulado)
+    let accVol = 0;
+    const paretoPcts = top8.map(item => {
+        accVol += item.m0;
+        return totalGeralM0 > 0 ? Number(((accVol / totalGeralM0) * 100).toFixed(1)) : 0;
+    });
+
+    const shareTop8 = totalGeralM0 > 0 ? ((accVol / totalGeralM0) * 100).toFixed(1) : 0;
+    const labelShare = document.getElementById('label-diag-top-motivos-share');
+    if (labelShare) {
+        labelShare.textContent = `Top 8 representa ${shareTop8}% do volume total de ${labelM0} (${accVol.toLocaleString('pt-BR')} de ${totalGeralM0.toLocaleString('pt-BR')})`;
+    }
+
+    // Formata rótulos quebrando em linhas para melhor legibilidade
+    const labels = top8.map(item => {
+        const parts = item.key.split(' | ');
+        return parts.length > 2 ? [parts[0] + ' | ' + parts[1], parts.slice(2).join(' | ')] : parts;
+    });
+
+    const isLight = document.body.classList.contains('light-theme');
+    const colorM2 = isLight ? '#94a3b8' : 'rgba(148, 163, 184, 0.7)';
+    const colorM1 = isLight ? '#0284c7' : 'rgba(2, 132, 199, 0.85)';
+    const colorM0 = isLight ? '#047857' : '#10b981';
+    const textColor = isLight ? '#1e293b' : '#f8fafc';
+    const mutedColor = isLight ? '#64748b' : '#92ab9e';
+    const gridColor = isLight ? 'rgba(0,0,0,0.06)' : 'rgba(255,255,255,0.06)';
+
+    diagChartTopMotivos = new Chart(canvas.getContext('2d'), {
+        data: {
+            labels: labels,
+            datasets: [
+                {
+                    type: 'bar',
+                    label: labelM2,
+                    data: top8.map(i => i.m2),
+                    backgroundColor: colorM2,
+                    borderRadius: 4,
+                    yAxisID: 'y'
+                },
+                {
+                    type: 'bar',
+                    label: labelM1,
+                    data: top8.map(i => i.m1),
+                    backgroundColor: colorM1,
+                    borderRadius: 4,
+                    yAxisID: 'y'
+                },
+                {
+                    type: 'bar',
+                    label: labelM0,
+                    data: top8.map(i => i.m0),
+                    backgroundColor: colorM0,
+                    borderRadius: 4,
+                    yAxisID: 'y'
+                },
+                {
+                    type: 'line',
+                    label: '% Acum',
+                    data: paretoPcts,
+                    borderColor: '#f59e0b',
+                    backgroundColor: '#f59e0b',
+                    borderWidth: 2.5,
+                    pointRadius: 5,
+                    pointHoverRadius: 7,
+                    pointBackgroundColor: '#ffffff',
+                    pointBorderColor: '#f59e0b',
+                    pointBorderWidth: 2,
+                    yAxisID: 'y1'
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            interaction: { mode: 'index', intersect: false },
+            scales: {
+                x: {
+                    grid: { display: false },
+                    ticks: {
+                        color: mutedColor,
+                        font: { family: 'Outfit', size: 10 },
+                        maxRotation: 0,
+                        autoSkip: false
+                    }
+                },
+                y: {
+                    type: 'linear',
+                    display: true,
+                    position: 'left',
+                    grid: { color: gridColor },
+                    ticks: {
+                        color: mutedColor,
+                        font: { family: 'Outfit', size: 11 },
+                        callback: v => v >= 1000 ? Math.round(v/1000) + 'k' : v
+                    }
+                },
+                y1: {
+                    type: 'linear',
+                    display: true,
+                    position: 'right',
+                    min: 0,
+                    max: 100,
+                    grid: { drawOnChartArea: false },
+                    ticks: {
+                        color: '#f59e0b',
+                        font: { family: 'Outfit', size: 11, weight: 'bold' },
+                        callback: v => v + '%'
+                    }
+                }
+            },
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    callbacks: {
+                        label: function(ctx) {
+                            if (ctx.dataset.yAxisID === 'y1') {
+                                return ` ${ctx.dataset.label}: ${ctx.raw}%`;
+                            }
+                            return ` ${ctx.dataset.label}: ${Number(ctx.raw || 0).toLocaleString('pt-BR')} acionamentos`;
+                        }
+                    }
+                }
+            }
+        }
+    });
+
+    // Renderiza também os cartões de detalhe para os motivos #2 e #3
+    renderDiagMotivosDetalhes(allVolumes, top8, m0);
+}
+
+// Detalhes automáticos para 2º e 3º maior motivo
+function renderDiagMotivosDetalhes(allVolumes, top8, m0) {
+    const container = document.getElementById('container-diag-motivo-detalhes');
+    if (!container) return;
+
+    if (!top8 || top8.length < 2) {
+        container.innerHTML = '<div style="grid-column: 1 / -1; text-align: center; color: var(--text-muted); padding: 1.5rem;">Volume insuficiente para gerar detalhes do 2º e 3º motivos.</div>';
+        return;
+    }
+
+    // Motivos #2 e #3 (índices 1 e 2)
+    const targets = [
+        { rank: 2, item: top8[1] },
+        { rank: 3, item: top8[2] || top8[1] }
+    ];
+
+    // Banco de gatilhos frequentes mapeados por contexto
+    const triggersDict = {
+        'BOLETO': ['Quero meu boleto', 'Segunda via', 'Linha digitável', 'Pagar', 'Consultar boletos', 'Dúvidas sobre abatimento'],
+        'ENCERRAMENTO': ['Quero cancelar minha conta', 'Cancelamento de conta', 'Como faço pra cancelar minha conta?', 'Encerramento'],
+        'FATURA': ['Consulta fatura', 'Código de barras fatura', 'Vencimento', 'Valor para pagamento', 'Detalhamento'],
+        'LIMITE': ['Aumento de limite', 'Consulta de limite disponível', 'Limite reduzido', 'Liberar limite'],
+        'ACORDO': ['Renegociação', 'Acordo de dívida', 'Parcelamento', 'Informação de acordo'],
+        'HABILITAR': ['Habilitar cartão', 'Ativação via app', 'Desbloquear cartão virtual'],
+        'ORIENTACOES': ['Vantagens da conta', 'Como funciona o app', 'Funcionalidades do cartão', 'Cadastro']
+    };
+
+    let html = '';
+    targets.forEach(t => {
+        const item = t.item;
+        const volM0 = item.m0;
+
+        // Calcula proporção por canal para este motivo no mês M0
+        let volLig = 0, volChat = 0, volWhats = 0, volUra = 0;
+        allVolumes.forEach(v => {
+            if (v.mes !== m0) return;
+            const sub = (v.submotivo && v.submotivo !== '-') ? v.submotivo : '';
+            const key = sub ? `${v.produto} | ${v.motivo} | ${sub}` : `${v.produto} | ${v.motivo}`;
+            if (key === item.key) {
+                const vol = Number(v.volume) || 0;
+                if (v.canal === 'LIGACOES') volLig += vol;
+                else if (v.canal === 'CHAT') volChat += vol;
+                else if (v.canal === 'WHATSAPP') volWhats += vol;
+                else if (v.canal === 'URA') volUra += vol;
+            }
+        });
+
+        const volIA = volChat + volWhats + volUra;
+        const totalCalc = (volIA + volLig) || volM0 || 1;
+        const pctIA = Math.round((volIA / totalCalc) * 100);
+        const pctCentral = 100 - pctIA;
+
+        // Distribuição interna da IA
+        const iaTotal = volIA || 1;
+        const pctChat = Math.round((volChat / iaTotal) * 100);
+        const pctWhats = Math.round((volWhats / iaTotal) * 100);
+        const pctUra = Math.max(0, 100 - pctChat - pctWhats);
+
+        // Identifica gatilhos adequados
+        const upper = (item.key || '').toUpperCase();
+        let triggers = triggersDict['ORIENTACOES'];
+        if (upper.includes('BOLETO')) triggers = triggersDict['BOLETO'];
+        else if (upper.includes('ENCERRA')) triggers = triggersDict['ENCERRAMENTO'];
+        else if (upper.includes('FATURA')) triggers = triggersDict['FATURA'];
+        else if (upper.includes('LIMITE')) triggers = triggersDict['LIMITE'];
+        else if (upper.includes('ACORDO') || upper.includes('DIVIDA')) triggers = triggersDict['ACORDO'];
+        else if (upper.includes('HABILITAR')) triggers = triggersDict['HABILITAR'];
+
+        let narrative = '';
+        if (pctIA >= 90) {
+            narrative = `<strong>${volM0.toLocaleString('pt-BR')} acionamentos</strong>: <strong>${pctIA}%</strong> desse volume foram absorvidos e orientados pelas FAQs da IA sem necessidade de transbordo humano, com forte concentração no <strong>Chat (${pctChat}%)</strong>, seguido de <strong>WhatsApp (${pctWhats}%)</strong> e <strong>URA (${pctUra}%)</strong>.`;
+        } else if (pctIA > 0) {
+            narrative = `<strong>${volM0.toLocaleString('pt-BR')} acionamentos</strong>: Em <strong>${pctIA}%</strong> dos casos a IA consegue orientar e esclarecer dúvidas diretamente. Os <strong>${pctCentral}%</strong> restantes demandaram atendimento com a Central humana para efetivação da solicitação.`;
+        } else {
+            narrative = `<strong>${volM0.toLocaleString('pt-BR')} acionamentos</strong>: 100% direcionados à Central Telefônica por requererem tratativa humana especializada.`;
+        }
+
+        html += `
+            <div class="diag-motivo-card">
+                <div>
+                    <div class="diag-motivo-card-header">
+                        <div>
+                            <span class="badge" style="font-size: 0.7rem; background: rgba(235,92,39,0.15); color: var(--color-primary); border-radius: 20px; font-weight: 700; margin-bottom: 0.35rem; display: inline-block;">
+                                ${t.rank}º MAIOR MOTIVO
+                            </span>
+                            <h4 class="diag-motivo-title">${escapeHtml(item.key)}</h4>
+                        </div>
+                        <span style="font-size: 1.25rem; font-weight: 800; color: var(--color-primary);">
+                            ${volM0.toLocaleString('pt-BR')}
+                        </span>
+                    </div>
+
+                    <p class="diag-motivo-summary">
+                        ${narrative}
+                    </p>
+
+                    <!-- Barra de Segmentação de Canais -->
+                    <div style="margin: 0.75rem 0;">
+                        <div style="display: flex; justify-content: space-between; font-size: 0.72rem; color: var(--text-muted); margin-bottom: 0.2rem;">
+                            <span><i class="fa-solid fa-robot" style="color: #10b981;"></i> IA: ${pctIA}%</span>
+                            <span><i class="fa-solid fa-phone" style="color: var(--color-primary);"></i> Central: ${pctCentral}%</span>
+                        </div>
+                        <div class="diag-segment-bar">
+                            <div class="diag-segment-item" style="width: ${pctIA}%; background: linear-gradient(90deg, #10b981, #059669);" title="IA: ${pctIA}%"></div>
+                            <div class="diag-segment-item" style="width: ${pctCentral}%; background: linear-gradient(90deg, #eb5c27, #f97316);" title="Central: ${pctCentral}%"></div>
+                        </div>
+                        <div style="display: flex; gap: 0.75rem; font-size: 0.7rem; color: var(--text-muted); flex-wrap: wrap;">
+                            <span>Chat: <strong>${pctChat}%</strong></span>
+                            <span>WhatsApp: <strong>${pctWhats}%</strong></span>
+                            <span>URA: <strong>${pctUra}%</strong></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="diag-gatilhos-box">
+                    <span style="font-size: 0.72rem; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; display: block; margin-bottom: 0.35rem;">
+                        <i class="fa-solid fa-comments" style="color: var(--color-primary); margin-right: 0.25rem;"></i> Principais Gatilhos Reconhecidos pela IA:
+                    </span>
+                    <div>
+                        ${triggers.map(g => `<span class="diag-gatilho-tag">"${escapeHtml(g)}"</span>`).join('')}
+                    </div>
+                </div>
+            </div>
+        `;
+    });
+
+    container.innerHTML = html;
+}
+
+// ==========================================================================
+// RELATÓRIO DIAGNÓSTICO 2.0: PERFORMANCE NFCR (PÁG. 19 & 20)
+// ==========================================================================
+
+// 1. Indicador de Efetividade Geral (Barras mensais + Meta 96,1% + YTD)
+function renderDiagEfetividadeGeral(filteredTickets, anoFilter) {
+    const canvas = document.getElementById('chart-diag-efetividade') || document.getElementById('chart-diag-efetividade-barras');
+    if (!canvas || typeof Chart === 'undefined') return;
+
+    if (diagChartEfetBarras) {
+        diagChartEfetBarras.destroy();
+        diagChartEfetBarras = null;
+    }
+
+    const monthNames = ['jan', 'fev', 'mar', 'abr', 'mai', 'jun', 'jul', 'ago', 'set', 'out', 'nov', 'dez'];
+    const monthlyStats = [];
+    let ytdTotal = 0, ytdDentro = 0;
+
+    for (let i = 1; i <= 12; i++) {
+        const mStr = String(i).padStart(2, '0');
+        const ym = `${anoFilter}-${mStr}`;
+        const ticksInMonth = filteredTickets.filter(t => t.mes_fechamento === ym);
+        const total = ticksInMonth.length;
+        const dentro = ticksInMonth.filter(t => t.dentro_prazo).length;
+        const pct = total > 0 ? Number(((dentro / total) * 100).toFixed(1)) : null;
+
+        if (total > 0) {
+            ytdTotal += total;
+            ytdDentro += dentro;
+        }
+
+        monthlyStats.push({
+            label: `${monthNames[i-1]}/${String(anoFilter).slice(-2)}`,
+            total,
+            dentro,
+            pct
+        });
+    }
+
+    // Filtra até o último mês com dados (ou setembro se estiver simulado)
+    let lastWithData = -1;
+    for (let i = 11; i >= 0; i--) {
+        if (monthlyStats[i].total > 0) { lastWithData = i; break; }
+    }
+    const displayedMonths = lastWithData >= 0 ? monthlyStats.slice(0, lastWithData + 1) : monthlyStats.slice(0, 9);
+
+    const ytdPct = ytdTotal > 0 ? Number(((ytdDentro / ytdTotal) * 100).toFixed(1)) : 0;
+
+    // Atualiza badge de status YTD
+    const badgeYTD = document.getElementById('badge-diag-ytd-status');
+    if (badgeYTD) {
+        badgeYTD.textContent = `YTD: ${ytdPct.toFixed(1)}%`;
+        if (ytdPct >= 96.1) {
+            badgeYTD.style.background = 'rgba(16,185,129,0.15)';
+            badgeYTD.style.color = '#10b981';
+            badgeYTD.style.borderColor = 'rgba(16,185,129,0.3)';
+        } else if (ytdPct >= 80.0) {
+            badgeYTD.style.background = 'rgba(245,158,11,0.15)';
+            badgeYTD.style.color = '#f59e0b';
+            badgeYTD.style.borderColor = 'rgba(245,158,11,0.3)';
+        } else {
+            badgeYTD.style.background = 'rgba(239,68,68,0.15)';
+            badgeYTD.style.color = '#ef4444';
+            badgeYTD.style.borderColor = 'rgba(239,68,68,0.3)';
+        }
+    }
+
+    const labels = displayedMonths.map(m => m.label).concat(['YTD']);
+    const dataVals = displayedMonths.map(m => m.pct || 0).concat([ytdPct]);
+
+    // Cores: barras normais em tom escuro/teal e YTD em azul marinho/destaque
+    const isLight = document.body.classList.contains('light-theme');
+    const bgColors = displayedMonths.map(m => {
+        if (m.pct === null || m.pct === 0) return 'rgba(148, 163, 184, 0.2)';
+        return isLight ? '#065f46' : '#047857';
+    }).concat([isLight ? '#0369a1' : '#38bdf8']);
+
+    const targetLineData = new Array(labels.length).fill(96.1);
+    const textColor = isLight ? '#1e293b' : '#f8fafc';
+    const mutedColor = isLight ? '#64748b' : '#92ab9e';
+    const gridColor = isLight ? 'rgba(0,0,0,0.06)' : 'rgba(255,255,255,0.06)';
+
+    diagChartEfetBarras = new Chart(canvas.getContext('2d'), {
+        data: {
+            labels: labels,
+            datasets: [
+                {
+                    type: 'line',
+                    label: 'Meta (96,10%)',
+                    data: targetLineData,
+                    borderColor: '#ea580c',
+                    borderWidth: 2,
+                    borderDash: [5, 4],
+                    pointRadius: 0,
+                    fill: false
+                },
+                {
+                    type: 'bar',
+                    label: 'Resultado',
+                    data: dataVals,
+                    backgroundColor: bgColors,
+                    borderRadius: 4
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    min: 50,
+                    max: 100,
+                    grid: { color: gridColor },
+                    ticks: {
+                        color: mutedColor,
+                        font: { family: 'Outfit', size: 11 },
+                        callback: v => v + '%'
+                    }
+                },
+                x: {
+                    grid: { display: false },
+                    ticks: {
+                        color: mutedColor,
+                        font: { family: 'Outfit', size: 11 }
+                    }
+                }
+            },
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: { color: textColor, font: { family: 'Outfit', size: 11 } }
+                },
+                tooltip: {
+                    callbacks: {
+                        label: ctx => ` ${ctx.dataset.label}: ${ctx.raw}%`
+                    }
+                }
+            }
+        }
+    });
+    diagChartEfetividade = diagChartEfetBarras;
+}
+
+// 2. Chamados em Atraso (Estoque diário com > 7 dias abertos)
+function renderDiagChamadosAtraso(filteredTickets, anoFilter) {
+    const canvas = document.getElementById('chart-diag-chamados-atraso');
+    const fallbackMsg = document.getElementById('diag-atraso-fallback-msg');
+    if (!canvas || typeof Chart === 'undefined') return;
+
+    if (diagChartAtraso) {
+        diagChartAtraso.destroy();
+        diagChartAtraso = null;
+    }
+
+    // Verifica se os tickets possuem a propriedade data_abertura populada
+    const hasDailyDates = filteredTickets.some(t => t.data_abertura && t.data_abertura.length >= 10);
+
+    if (!hasDailyDates) {
+        if (fallbackMsg) fallbackMsg.style.display = 'block';
+        const ctx = canvas.getContext('2d');
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        return;
+    }
+
+    if (fallbackMsg) fallbackMsg.style.display = 'none';
+
+    // Gera janela de 4 meses: Junho a Setembro do anoFilter (ou meses recentes)
+    const startDate = new Date(`${anoFilter}-06-01T00:00:00`);
+    const endDate = new Date(`${anoFilter}-09-30T23:59:59`);
+
+    const dailyLabels = [];
+    const dailyCounts = [];
+    const monthBands = [];
+
+    let cur = new Date(startDate);
+    while (cur <= endDate) {
+        // Pula fins de semana (opcional, report mostra dias úteis e sábados)
+        const dStr = cur.toISOString().slice(0, 10);
+        const dayFormatted = `${String(cur.getDate()).padStart(2, '0')}/${String(cur.getMonth()+1).padStart(2, '0')}`;
+
+        // Contagem de tickets que estavam em atraso no dia D:
+        // Abertos há mais de 7 dias (abertura <= D - 7) E (não fechados até D ou fechamento > D)
+        const dLimit = new Date(cur.getTime() - (7 * 24 * 60 * 60 * 1000));
+        const limitStr = dLimit.toISOString().slice(0, 10);
+
+        const backlogCount = filteredTickets.filter(t => {
+            const ab = t.data_abertura ? t.data_abertura.slice(0, 10) : '';
+            const fe = t.data_fechamento ? t.data_fechamento.slice(0, 10) : '';
+            if (!ab || ab > limitStr) return false;
+            if (fe && fe <= dStr) return false;
+            return true;
+        }).length;
+
+        dailyLabels.push(dayFormatted);
+        dailyCounts.push(backlogCount);
+
+        const mesIndex = cur.getMonth();
+        monthBands.push(mesIndex); // 5=Jun, 6=Jul, 7=Ago, 8=Set
+
+        cur.setDate(cur.getDate() + 1);
+    }
+
+    const isLight = document.body.classList.contains('light-theme');
+    const barColor = isLight ? '#0f172a' : '#1e293b';
+    const textColor = isLight ? '#1e293b' : '#f8fafc';
+    const mutedColor = isLight ? '#64748b' : '#92ab9e';
+    const gridColor = isLight ? 'rgba(0,0,0,0.06)' : 'rgba(255,255,255,0.06)';
+
+    diagChartAtraso = new Chart(canvas.getContext('2d'), {
+        type: 'bar',
+        data: {
+            labels: dailyLabels,
+            datasets: [{
+                label: 'Chamados em Atraso (> 7 dias)',
+                data: dailyCounts,
+                backgroundColor: barColor,
+                borderRadius: 2
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                x: {
+                    grid: { display: false },
+                    ticks: {
+                        color: mutedColor,
+                        font: { family: 'Outfit', size: 9 },
+                        maxRotation: 90,
+                        autoSkip: true,
+                        maxTicksLimit: 35
+                    }
+                },
+                y: {
+                    grid: { color: gridColor },
+                    ticks: {
+                        color: mutedColor,
+                        font: { family: 'Outfit', size: 10 }
+                    }
+                }
+            },
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    callbacks: {
+                        label: ctx => ` ${ctx.raw} chamados pendentes > 7 dias`
+                    }
+                }
+            }
+        }
+    });
+}
+
+// 3. Matriz Efetividade por Grupo (Página 20 do Report)
+function renderDiagMatrizEfetividadeGrupos(filteredTickets, anoFilter) {
+    const tbody = document.getElementById('tbody-diag-efet-matriz-grupos');
+    if (!tbody) return;
+
+    // Grupos padrão ordenados do report + grupos dinâmicos encontrados
+    const reportGroupsOrder = [
+        'Dock', 'N3 Benefícios', 'N3 Campanhas', 'N3 Cobrança', 'N3 Conta/App',
+        'N3 Crédito', 'N3 Operações', 'N3 PJ', 'N3 Prevenção', 'N3 Seguros',
+        'N3 Subadquirencia', 'N3 T2P'
+    ];
+
+    const discoveredGroups = new Set();
+    filteredTickets.forEach(t => {
+        if (t.grupo_ticket) discoveredGroups.add(t.grupo_ticket);
+    });
+
+    const allGroups = Array.from(new Set([...reportGroupsOrder, ...Array.from(discoveredGroups).sort()]));
+
+    let html = '';
+    allGroups.forEach(grp => {
+        let ytdTotal = 0, ytdDentro = 0;
+        let monthCells = '';
+
+        for (let m = 1; m <= 12; m++) {
+            const mStr = String(m).padStart(2, '0');
+            const ym = `${anoFilter}-${mStr}`;
+            const ticks = filteredTickets.filter(t => (t.grupo_ticket === grp || t.grupo === grp) && t.mes_fechamento === ym);
+            const total = ticks.length;
+            const dentro = ticks.filter(t => t.dentro_prazo).length;
+
+            if (total > 0) {
+                ytdTotal += total;
+                ytdDentro += dentro;
+                const pct = ((dentro / total) * 100).toFixed(1) + '%';
+                monthCells += `<td style="text-align: right; font-size: 0.8rem;">${pct}</td>`;
+            } else {
+                monthCells += `<td style="text-align: right; color: var(--text-muted); font-size: 0.75rem;">-</td>`;
+            }
+        }
+
+        // Se o grupo não tiver nenhum chamado no ano todo e não for do report oficial, podemos ocultar
+        if (ytdTotal === 0 && !reportGroupsOrder.includes(grp)) return;
+
+        let ytdBadge = '-';
+        if (ytdTotal > 0) {
+            const ytdPctVal = Number(((ytdDentro / ytdTotal) * 100).toFixed(1));
+            let statusClass = 'critico';
+            if (ytdPctVal >= 96.1) statusClass = 'dentro';
+            else if (ytdPctVal >= 80.0) statusClass = 'abaixo';
+
+            ytdBadge = `<span class="diag-matriz-cell-ytd ${statusClass}">${ytdPctVal.toFixed(1)}%</span>`;
+        }
+
+        html += `
+            <tr>
+                <td style="font-weight: 600; color: var(--text-primary);">${escapeHtml(grp)}</td>
+                ${monthCells}
+                <td style="text-align: right;">${ytdBadge}</td>
+            </tr>
+        `;
+    });
+
+    if (!html) {
+        html = '<tr><td colspan="14" style="text-align: center; color: var(--text-muted); padding: 1.5rem;">Nenhum chamado apurado neste período.</td></tr>';
+    }
+
+    tbody.innerHTML = html;
+}

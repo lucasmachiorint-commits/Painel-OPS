@@ -1644,11 +1644,11 @@
                             </div>
                             <!-- SUB-NAVEGAÇÃO: VOLUMETRIA x EFETIVIDADE -->
                             <div class="diag-subnav-container" style="display: flex; gap: 0.5rem; background: var(--bg-card); padding: 0.35rem; border-radius: 10px; border: 1px solid var(--border-color);">
-                                <button type="button" class="btn btn-secondary diag-subnav-btn active" id="btn-diag-tab-vol" onclick="switchDiagSubView('volumetria')" style="padding: 0.5rem 1.1rem; border-radius: 8px; font-weight: 600; font-size: 0.85rem;">
-                                    <i class="fa-solid fa-chart-pie" style="margin-right: 0.4rem;"></i> Volumetria
+                                <button type="button" class="btn btn-secondary diag-subnav-btn active" id="btn-diag-tab-vol" onclick="switchDiagSubView('volumetria')" style="padding: 0.5rem 1.15rem; border-radius: 20px; font-weight: 600; font-size: 0.85rem;">
+                                    <i class="fa-solid fa-headset" style="margin-right: 0.4rem;"></i> Centrais de Atendimento Pay
                                 </button>
-                                <button type="button" class="btn btn-secondary diag-subnav-btn" id="btn-diag-tab-efet" onclick="switchDiagSubView('efetividade')" style="padding: 0.5rem 1.1rem; border-radius: 8px; font-weight: 600; font-size: 0.85rem;">
-                                    <i class="fa-solid fa-stopwatch" style="margin-right: 0.4rem;"></i> Efetividade (SLA 7 dias)
+                                <button type="button" class="btn btn-secondary diag-subnav-btn" id="btn-diag-tab-efet" onclick="switchDiagSubView('efetividade')" style="padding: 0.5rem 1.15rem; border-radius: 20px; font-weight: 600; font-size: 0.85rem;">
+                                    <i class="fa-solid fa-stopwatch-20" style="margin-right: 0.4rem;"></i> Performance NFCR
                                 </button>
                             </div>
                         </div>
@@ -1761,6 +1761,50 @@
                                 </div>
                             </div>
                         </div>
+                        <!-- NOVO PAINEL 1: PRINCIPAIS MOTIVOS DE CONTATO (PÁG. 10 DO REPORT - TOP 8 + PARETO) -->
+                        <section class="panel glass-panel" id="section-diag-top-motivos" style="margin-bottom: 1.5rem; padding: 1.35rem;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.75rem;">
+                                <div>
+                                    <h3 class="panel-title" style="margin: 0; font-size: 1.1rem; display: flex; align-items: center; gap: 0.5rem;">
+                                        <i class="fa-solid fa-chart-column" style="color: var(--color-primary);"></i>
+                                        <span>Principais Motivos de Contato</span>
+                                        <span class="badge" style="font-size: 0.72rem; background: rgba(235,92,39,0.15); color: var(--color-primary); border: 1px solid rgba(235,92,39,0.3); border-radius: 20px;">Top 8 + Pareto</span>
+                                    </h3>
+                                    <p style="font-size: 0.8rem; color: var(--text-secondary); margin: 0.25rem 0 0 0;">
+                                        Evolução dos 3 meses mais recentes por produto e motivo com curva de concentração acumulada (% Acum).
+                                    </p>
+                                </div>
+                                <div id="diag-top-motivos-legend" style="display: flex; align-items: center; gap: 1rem; font-size: 0.78rem; flex-wrap: wrap;">
+                                    <!-- Preenchido dinamicamente via JS com os meses e Pareto -->
+                                </div>
+                            </div>
+                            <div style="height: 380px; position: relative;">
+                                <canvas id="chart-diag-principais-motivos"></canvas>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 0.75rem; padding-top: 0.5rem; border-top: 1px dashed var(--border-color); font-size: 0.76rem; color: var(--text-muted); flex-wrap: wrap; gap: 0.5rem;">
+                                <span><i class="fa-solid fa-circle-info" style="color: var(--color-primary); margin-right: 0.35rem;"></i> Obs.: Os volumes consideram os contatos atendidos pelos operadores + IA.</span>
+                                <span id="label-diag-top-motivos-share" style="font-weight: 600; color: var(--text-secondary);">Top 8 calculado sobre a base consolidada</span>
+                            </div>
+                        </section>
+
+                        <!-- NOVO PAINEL 2: 2º E 3º MAIOR MOTIVO DE CONTATO :: DETALHES (PÁG. 11 DO REPORT) -->
+                        <section class="panel glass-panel" id="section-diag-motivo-detalhes" style="margin-bottom: 1.5rem; padding: 1.35rem;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.5rem;">
+                                <div>
+                                    <h3 class="panel-title" style="margin: 0; font-size: 1.05rem; display: flex; align-items: center; gap: 0.5rem;">
+                                        <i class="fa-solid fa-magnifying-glass-chart" style="color: var(--color-primary);"></i>
+                                        <span>2º e 3º Maior Motivo de Contato :: Detalhes</span>
+                                    </h3>
+                                    <p style="font-size: 0.8rem; color: var(--text-secondary); margin: 0.2rem 0 0 0;">
+                                        Absorção pelas FAQs da IA, transbordo para a Central humana e gatilhos mais frequentes reconhecidos.
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="grid-2-col" id="container-diag-motivo-detalhes" style="grid-template-columns: repeat(auto-fit, minmax(420px, 1fr)); gap: 1.25rem;">
+                                <!-- Cards dinâmicos populados por renderDiagMotivosDetalhes() -->
+                            </div>
+                        </section>
+
 
                         <!-- GRÁFICOS: VOLUMETRIA (COMPOSIÇÃO & HISTÓRICO 3 MESES) -->
                         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(420px, 1fr)); gap: 1.5rem; margin-bottom: 1.5rem;">
@@ -1934,13 +1978,103 @@
                             </div>
                         </div>
 
-                        <!-- GRÁFICO: EFETIVIDADE MÊS A MÊS x META -->
-                        <section class="panel glass-panel" style="margin-bottom: 1.5rem; padding: 1.25rem;">
-                            <h3 class="panel-title" style="margin-bottom: 1rem; font-size: 1rem; display: flex; justify-content: space-between; align-items: center;">
-                                <span><i class="fa-solid fa-chart-line" style="color: var(--color-primary); margin-right: 0.4rem;"></i> Evolução do % de Atendimento no Prazo (SLA ≤ 7 dias) x Meta (96,10%)</span>
-                            </h3>
+                        <!-- GRÁFICO 1: INDICADOR DE EFETIVIDADE (META: 96,1%) COM BARRA YTD (PÁG. 19 TOPO) -->
+                        <section class="panel glass-panel" id="section-diag-efetividade-barras" style="margin-bottom: 1.5rem; padding: 1.35rem;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.5rem;">
+                                <div>
+                                    <h3 class="panel-title" style="margin: 0; font-size: 1.1rem; display: flex; align-items: center; gap: 0.5rem;">
+                                        <i class="fa-solid fa-chart-line" style="color: var(--color-primary);"></i>
+                                        <span>Indicador de Efetividade (Meta: 96,10%)</span>
+                                        <span class="badge" id="badge-diag-ytd-status" style="font-size: 0.72rem; background: rgba(16,185,129,0.15); color: #10b981; border: 1px solid rgba(16,185,129,0.3); border-radius: 20px;">YTD: 0%</span>
+                                    </h3>
+                                    <p style="font-size: 0.8rem; color: var(--text-secondary); margin: 0.25rem 0 0 0;">
+                                        Evolução mensal do percentual de chamados resolvidos no prazo contratual (SLA ≤ 7 dias corridos) e consolidado ano (YTD).
+                                    </p>
+                                </div>
+                                <div style="display: flex; align-items: center; gap: 0.75rem;">
+                                    <span style="font-size: 0.8rem; color: var(--text-secondary); display: flex; align-items: center; gap: 0.35rem;">
+                                        <span style="display: inline-block; width: 14px; height: 3px; background: #ea580c; border-radius: 2px;"></span> Meta: 96,10%
+                                    </span>
+                                </div>
+                            </div>
                             <div style="height: 300px; position: relative;">
                                 <canvas id="chart-diag-efetividade"></canvas>
+                            </div>
+                        </section>
+
+                        <!-- GRÁFICO 2: CHAMADOS EM ATRASO (PENDENTES COM >7 DIAS DA DATA DE ABERTURA) (PÁG. 19 BASE) -->
+                        <section class="panel glass-panel" id="section-diag-chamados-atraso" style="margin-bottom: 1.5rem; padding: 1.35rem;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem; flex-wrap: wrap; gap: 0.5rem;">
+                                <div>
+                                    <h3 class="panel-title" style="margin: 0; font-size: 1.1rem; display: flex; align-items: center; gap: 0.5rem;">
+                                        <i class="fa-solid fa-clock-rotate-left" style="color: #f43f5e;"></i>
+                                        <span>Chamados em Atraso</span>
+                                        <span class="badge" style="font-size: 0.72rem; background: rgba(244,63,94,0.15); color: #f43f5e; border: 1px solid rgba(244,63,94,0.3); border-radius: 20px;">Pendentes > 7 dias</span>
+                                    </h3>
+                                    <p style="font-size: 0.8rem; color: var(--text-secondary); margin: 0.25rem 0 0 0;">
+                                        Evolução diária do estoque de chamados com mais de 7 dias corridos desde a data de abertura.
+                                    </p>
+                                </div>
+                                <div id="diag-atraso-meses-legend" style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.78rem; flex-wrap: wrap;">
+                                    <!-- Legenda de meses diários -->
+                                </div>
+                            </div>
+                            <div style="height: 250px; position: relative;">
+                                <canvas id="chart-diag-chamados-atraso"></canvas>
+                            </div>
+                            <div id="diag-atraso-fallback-msg" style="display: none; padding: 0.75rem 1rem; border-radius: 8px; background: rgba(235,92,39,0.08); border: 1px dashed rgba(235,92,39,0.3); color: var(--text-secondary); font-size: 0.8rem; margin-top: 0.5rem; text-align: center;">
+                                <i class="fa-solid fa-circle-info" style="color: var(--color-primary); margin-right: 0.35rem;"></i> Aguardando upload das bases mensais com datas diárias de abertura e fechamento para cálculo exato do backlog diário.
+                            </div>
+                        </section>
+
+                        <!-- MATRIZ DE EFETIVIDADE POR GRUPO (PÁGINA 20 DO REPORT) -->
+                        <section class="panel glass-panel" id="section-diag-matriz-grupos" style="margin-bottom: 1.5rem; padding: 1.35rem;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.75rem;">
+                                <div>
+                                    <h3 class="panel-title" style="margin: 0; font-size: 1.1rem; display: flex; align-items: center; gap: 0.5rem;">
+                                        <i class="fa-solid fa-users-gear" style="color: var(--color-primary);"></i>
+                                        <span>Performance NFCR | Efetividade por Grupo</span>
+                                    </h3>
+                                    <p style="font-size: 0.8rem; color: var(--text-secondary); margin: 0.25rem 0 0 0;">
+                                        Indicador de efetividade mensal por grupo solucionador (meta: 96,10%) e apuração acumulada YTD.
+                                    </p>
+                                </div>
+                                <div style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.76rem; flex-wrap: wrap;">
+                                    <span class="badge" style="background: rgba(16,185,129,0.15); color: #10b981; border: 1px solid rgba(16,185,129,0.4); padding: 0.25rem 0.6rem; border-radius: 20px;">
+                                        <i class="fa-solid fa-circle" style="font-size: 0.5rem; margin-right: 0.3rem;"></i> Dentro da meta (≥ 96,1%)
+                                    </span>
+                                    <span class="badge" style="background: rgba(245,158,11,0.15); color: #f59e0b; border: 1px solid rgba(245,158,11,0.4); padding: 0.25rem 0.6rem; border-radius: 20px;">
+                                        <i class="fa-solid fa-circle" style="font-size: 0.5rem; margin-right: 0.3rem;"></i> Abaixo da meta (< 96,1%)
+                                    </span>
+                                    <span class="badge" style="background: rgba(239,68,68,0.15); color: #ef4444; border: 1px solid rgba(239,68,68,0.4); padding: 0.25rem 0.6rem; border-radius: 20px;">
+                                        <i class="fa-solid fa-circle" style="font-size: 0.5rem; margin-right: 0.3rem;"></i> Abaixo da meta crítico (< 80,0%)
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="table-responsive" style="max-height: 480px; overflow-x: auto; overflow-y: auto;">
+                                <table class="fte-table" id="table-diag-efet-matriz-grupos" style="font-size: 0.82rem; min-width: 920px;">
+                                    <thead>
+                                        <tr id="thead-diag-matriz-row">
+                                            <th style="width: 20%; text-align: left;">GRUPO RESPONSÁVEL</th>
+                                            <th style="text-align: right;">JAN</th>
+                                            <th style="text-align: right;">FEV</th>
+                                            <th style="text-align: right;">MAR</th>
+                                            <th style="text-align: right;">ABR</th>
+                                            <th style="text-align: right;">MAI</th>
+                                            <th style="text-align: right;">JUN</th>
+                                            <th style="text-align: right;">JUL</th>
+                                            <th style="text-align: right;">AGO</th>
+                                            <th style="text-align: right;">SET</th>
+                                            <th style="text-align: right;">OUT</th>
+                                            <th style="text-align: right;">NOV</th>
+                                            <th style="text-align: right;">DEZ</th>
+                                            <th style="width: 9%; text-align: right; background: rgba(0,0,0,0.15); font-weight: 700;">YTD</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="tbody-diag-efet-matriz-grupos">
+                                        <!-- Populado dinamicamente via JS -->
+                                    </tbody>
+                                </table>
                             </div>
                         </section>
 
