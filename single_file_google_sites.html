@@ -18051,7 +18051,26 @@ async function handleExcelUpload(canalKey, inputEl) {
         const workbook = XLSX.read(data, { type: 'array', cellDates: true });
         const sheetName = workbook.SheetNames[0];
         const sheet = workbook.Sheets[sheetName];
-        const rawRows = XLSX.utils.sheet_to_json(sheet, { defval: '' });
+        // DETECÇÃO INTELIGENTE DA LINHA DE CABEÇALHO (SMART HEADER DETECTION)
+        // Ignora linhas de anotações manuais, comentários ou títulos inseridos acima do cabeçalho
+        const sheet2D = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: '' });
+        let headerRowIndex = 0;
+        const KEYWORDS = [
+            'faq', 'motivo', 'id', 'id_ticket', 'id_do_ticket', 'ticket', 'call_id',
+            'session', 'use_case', 'usecase', 'createdat', 'created_at', 'data_abertura',
+            'status', 'tipo_contato', 'sub_motivo', 'grupo_do_ticket'
+        ];
+
+        for (let r = 0; r < Math.min(sheet2D.length, 10); r++) {
+            const rowVals = (sheet2D[r] || []).map(c => String(c).trim().toLowerCase());
+            const matchCount = rowVals.filter(c => KEYWORDS.includes(c)).length;
+            if (matchCount >= 2) {
+                headerRowIndex = r;
+                break;
+            }
+        }
+
+        const rawRows = XLSX.utils.sheet_to_json(sheet, { range: headerRowIndex, defval: '' });
 
         if (!rawRows || rawRows.length === 0) {
             throw new Error('A planilha está vazia ou a primeira aba não contém linhas.');
