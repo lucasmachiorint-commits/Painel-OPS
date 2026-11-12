@@ -10785,7 +10785,7 @@ function renderDiagVolumetria() {
 
             rowsHtml += `<tr class="diag-tree-row diag-tree-row-produto" data-tree-id="${prodId}">
                 <td style="padding-left: 0.75rem;">
-                    <span class="diag-tree-toggle open" onclick="toggleDiagTreeRow('${prodId}')"><i class="fa-solid fa-chevron-right"></i></span>
+                    <span class="diag-tree-toggle ${searchVal ? 'open' : ''}" onclick="toggleDiagTreeRow('${prodId}')"><i class="fa-solid fa-chevron-right"></i></span>
                     <i class="fa-solid fa-cube" style="color: var(--color-primary); margin-right: 0.35rem;"></i>
                     <strong>${prodName}</strong>
                 </td>
@@ -10811,9 +10811,9 @@ function renderDiagVolumetria() {
                 accPctCumulativo += pctMot;
                 const deltaMot = motData.m1 > 0 ? (((motData.m0 - motData.m1) / motData.m1) * 100) : 0;
 
-                rowsHtml += `<tr class="diag-tree-row diag-tree-row-motivo" data-parent-id="${prodId}" data-tree-id="${motId}">
+                rowsHtml += `<tr class="diag-tree-row diag-tree-row-motivo" data-parent-id="${prodId}" data-tree-id="${motId}" style="${searchVal ? '' : 'display: none;'}">
                     <td style="padding-left: 2rem;">
-                        <span class="diag-tree-toggle open" onclick="toggleDiagTreeRow('${motId}')"><i class="fa-solid fa-chevron-right"></i></span>
+                        <span class="diag-tree-toggle" onclick="toggleDiagTreeRow('${motId}')"><i class="fa-solid fa-chevron-right"></i></span>
                         <i class="fa-regular fa-folder-open" style="color: #f59e0b; margin-right: 0.35rem;"></i>
                         <span>${motName}</span>
                     </td>
@@ -10833,7 +10833,7 @@ function renderDiagVolumetria() {
                     const pctSub = totalGeralM0 > 0 ? ((subData.m0 / totalGeralM0) * 100) : 0;
                     const deltaSub = subData.m1 > 0 ? (((subData.m0 - subData.m1) / subData.m1) * 100) : 0;
 
-                    rowsHtml += `<tr class="diag-tree-row diag-tree-row-submotivo" data-parent-id="${motId}">
+                    rowsHtml += `<tr class="diag-tree-row diag-tree-row-submotivo" data-parent-id="${motId}" style="display: none;">
                         <td style="padding-left: 3.5rem;">
                             <i class="fa-solid fa-arrow-turn-down-right" style="color: var(--text-muted); font-size: 0.75rem; margin-right: 0.4rem;"></i>
                             <span style="color: var(--text-secondary);">${subName}</span>
