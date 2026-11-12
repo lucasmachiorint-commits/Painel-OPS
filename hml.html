@@ -19710,10 +19710,20 @@ function renderDiagTopMotivosPareto(allVolumes, m0, m1, m2) {
         labelShare.textContent = `Top 8 representa ${shareTop8}% do volume total de ${labelM0} (${accVol.toLocaleString('pt-BR')} de ${totalGeralM0.toLocaleString('pt-BR')})`;
     }
 
-    // Formata rótulos quebrando em linhas para melhor legibilidade
+    // Formata rótulos em até 3 linhas curtas (máx 18-19 chars/linha) para evitar sobreposição entre colunas vizinhas
+    const truncateAxisText = (str, maxLen) => {
+        const s = String(str || '').trim();
+        return s.length <= maxLen ? s : s.slice(0, maxLen - 1).trimEnd() + '…';
+    };
     const labels = top8.map(item => {
-        const parts = item.key.split(' | ');
-        return parts.length > 2 ? [parts[0] + ' | ' + parts[1], parts.slice(2).join(' | ')] : parts;
+        const lines = [truncateAxisText(item.produto, 18)];
+        if (item.motivo && item.motivo !== '-') {
+            lines.push(truncateAxisText(item.motivo, 19));
+        }
+        if (item.submotivo && item.submotivo !== '-') {
+            lines.push(truncateAxisText(item.submotivo, 19));
+        }
+        return lines;
     });
 
     const isLight = document.body.classList.contains('light-theme');
@@ -19777,8 +19787,10 @@ function renderDiagTopMotivosPareto(allVolumes, m0, m1, m2) {
                     grid: { display: false },
                     ticks: {
                         color: mutedColor,
-                        font: { family: 'Outfit', size: 10 },
+                        font: { family: 'Outfit', size: 10.5, lineHeight: 1.25 },
+                        padding: 6,
                         maxRotation: 0,
+                        minRotation: 0,
                         autoSkip: false
                     }
                 },
@@ -19811,6 +19823,10 @@ function renderDiagTopMotivosPareto(allVolumes, m0, m1, m2) {
                 legend: { display: false },
                 tooltip: {
                     callbacks: {
+                        title: function(ctx) {
+                            const idx = ctx && ctx[0] ? ctx[0].dataIndex : -1;
+                            return (idx >= 0 && top8[idx]) ? top8[idx].key : '';
+                        },
                         label: function(ctx) {
                             if (ctx.dataset.yAxisID === 'y1') {
                                 return ` ${ctx.dataset.label}: ${ctx.raw}%`;
