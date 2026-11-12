@@ -9234,6 +9234,48 @@ function normalizeDiagVolumeList(rawList) {
     return Object.values(consolidated);
 }
 
+// Compacta lista de tickets por chave analítica (evita QuotaExceededError no localStorage para bases com +70k linhas)
+function compactDiagTicketsList(list) {
+    if (!Array.isArray(list)) return [];
+    const buckets = {};
+    for (let i = 0; i < list.length; i++) {
+        const t = list[i];
+        if (!t) continue;
+        const mf = t.mes_fechamento || '';
+        const ma = t.mes_abertura || mf;
+        const da = t.data_abertura || '';
+        const df = t.data_fechamento || '';
+        const grp = String(t.grupo_ticket || t.grupo || 'Central Emana PAY').trim();
+        const dp = Boolean(t.dentro_prazo);
+        const q = Number(t.qtd || 1);
+        const key = `${mf}|${ma}|${da}|${df}|${grp}|${dp ? 1 : 0}`;
+        if (!buckets[key]) {
+            buckets[key] = {
+                mes_fechamento: mf,
+                mes_abertura: ma,
+                data_abertura: da,
+                data_fechamento: df || null,
+                grupo_ticket: grp,
+                dentro_prazo: dp,
+                qtd: q
+            };
+        } else {
+            buckets[key].qtd += q;
+        }
+    }
+    return Object.values(buckets);
+}
+
+function countDiagTickets(arr, predicate) {
+    if (!Array.isArray(arr)) return 0;
+    let total = 0;
+    for (let i = 0; i < arr.length; i++) {
+        const t = arr[i];
+        if (!predicate || predicate(t)) total += Number(t.qtd || 1);
+    }
+    return total;
+}
+
 const DiagStorage = {
     getVolume() {
         try {
@@ -9263,8 +9305,9 @@ const DiagStorage = {
     },
     saveTickets(list) {
         try {
-            localStorage.setItem(DIAG_STORAGE_KEYS.TICKETS, JSON.stringify(list));
-            this.syncSupabaseTickets(list);
+            const compacted = compactDiagTicketsList(list);
+            localStorage.setItem(DIAG_STORAGE_KEYS.TICKETS, JSON.stringify(compacted));
+            this.syncSupabaseTickets(compacted);
         } catch (e) {
             console.error('[DiagStorage] Erro ao salvar tickets:', e);
         }
@@ -11215,8 +11258,8 @@ function renderDiagEfetividade() {
         const ym = `${anoFilter}-${mStr}`;
         const monthTickets = filteredTickets.filter(t => t.mes_fechamento === ym);
 
-        const total = monthTickets.length;
-        const dentro = monthTickets.filter(t => t.dentro_prazo).length;
+        const total = countDiagTickets(monthTickets);
+        const dentro = countDiagTickets(monthTickets, t => t.dentro_prazo);
         const fora = total - dentro;
         const pct = total > 0 ? ((dentro / total) * 100) : null;
 
@@ -11302,10 +11345,11 @@ function renderDiagEfetividade() {
         const groupMap = {};
         for (const t of filteredTickets) {
             const g = t.grupo_ticket || 'Outros';
+            const q = Number(t.qtd || 1);
             if (!groupMap[g]) groupMap[g] = { total: 0, dentro: 0, fora: 0 };
-            groupMap[g].total++;
-            if (t.dentro_prazo) groupMap[g].dentro++;
-            else groupMap[g].fora++;
+            groupMap[g].total += q;
+            if (t.dentro_prazo) groupMap[g].dentro += q;
+            else groupMap[g].fora += q;
         }
 
         const sortedGroups = Object.entries(groupMap).sort((a, b) => b[1].total - a[1].total);
@@ -11857,8 +11901,8 @@ function renderDiagEfetividadeGeral(filteredTickets, anoFilter) {
         const mStr = String(i).padStart(2, '0');
         const ym = `${anoFilter}-${mStr}`;
         const ticksInMonth = filteredTickets.filter(t => t.mes_fechamento === ym);
-        const total = ticksInMonth.length;
-        const dentro = ticksInMonth.filter(t => t.dentro_prazo).length;
+        const total = countDiagTickets(ticksInMonth);
+        const dentro = countDiagTickets(ticksInMonth, t => t.dentro_prazo);
         const pct = total > 0 ? Number(((dentro / total) * 100).toFixed(1)) : null;
 
         if (total > 0) {
@@ -12020,13 +12064,13 @@ function renderDiagChamadosAtraso(filteredTickets, anoFilter) {
         const dLimit = new Date(cur.getTime() - (7 * 24 * 60 * 60 * 1000));
         const limitStr = dLimit.toISOString().slice(0, 10);
 
-        const backlogCount = filteredTickets.filter(t => {
+        const backlogCount = countDiagTickets(filteredTickets, t => {
             const ab = t.data_abertura ? t.data_abertura.slice(0, 10) : '';
             const fe = t.data_fechamento ? t.data_fechamento.slice(0, 10) : '';
             if (!ab || ab > limitStr) return false;
             if (fe && fe <= dStr) return false;
             return true;
-        }).length;
+        });
 
         dailyLabels.push(dayFormatted);
         dailyCounts.push(backlogCount);
@@ -12116,8 +12160,8 @@ function renderDiagMatrizEfetividadeGrupos(filteredTickets, anoFilter) {
             const mStr = String(m).padStart(2, '0');
             const ym = `${anoFilter}-${mStr}`;
             const ticks = filteredTickets.filter(t => (t.grupo_ticket === grp || t.grupo === grp) && t.mes_fechamento === ym);
-            const total = ticks.length;
-            const dentro = ticks.filter(t => t.dentro_prazo).length;
+            const total = countDiagTickets(ticks);
+            const dentro = countDiagTickets(ticks, t => t.dentro_prazo);
 
             if (total > 0) {
                 ytdTotal += total;
